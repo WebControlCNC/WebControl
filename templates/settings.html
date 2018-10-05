@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Settings{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-9">
+      <h3>Demo-Flask-SocketIO</h3>
+      <p id='test'> Hello </p>
+      {% for setting in settings %}
+        <p>{{setting}}</p>
+      {% endfor %}
+    </div>
+    <div class="row">
+      <div class="col-3">
+        <h3>Controls</h3>
+        <p> Hello </p>
+      </div>
+  </div>
+</div>
+{% endblock %}

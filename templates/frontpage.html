@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}FrontPage{% endblock %}</h1>
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      <h3>Demo-Flask-SocketIO</h3>
+      <p id='test'> Hello </p>
+    </div>
+    <div class="col my-sidebar">
+      <div class="container">
+        <h3>Controls</h3>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-secondary btn-block">upleft</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-dark btn-block">up</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-secondary btn-block">upright</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-primary btn-block">Macro1</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+            <button type="button" class="btn btn-dark btn-block">left</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-dark btn-block">home</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-dark btn-block">right</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-primary btn-block">Macro2</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+            <button type="button" class="btn btn-secondary btn-block">dleft</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-dark btn-block">down</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-secondary btn-block">dright</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-primary btn-block">ZAxis</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label>Dist. to Move:</label>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-secondary">0.01</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-secondary">MM</button>
+          </div>
+          <div class="col-4">
+            <button type="button" class="btn btn-primary btn-block" >Def. Home</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-block btn-success">Play</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-block btn-warning">Pause</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-block btn-danger">Stop</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-block btn-secondary">&lt;Z</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-block btn-secondary">&lt;1</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-block btn-secondary">Goto</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-block btn-secondary">1&gt;</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-block btn-secondary">Z&gt;</button>
+          </div>
+        </div>
+        <h3>Messages</h3>
+          <label>placeholder</label>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
