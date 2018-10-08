@@ -23,10 +23,7 @@ app.data = Data()
 app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
 app.data.config = config
-#app.data.serialPort = SerialPort(app)
-#app.data.serialPort.data = app.data
 app.data.comport = config.getSettingValue('Maslow Settings', 'COMport')
-#app.data.serialPort.openConnection()
 app.data.gcodeShift =[float(app.data.config.getSettingValue('Advanced Settings','homeX')),float(app.data.config.getSettingValue('Advanced Settings','homeY'))]
 
 
@@ -97,29 +94,19 @@ def my_event(msg):
 @socketio.on('connect', namespace='/MaslowCNC')
 def test_connect():
     print "connected"
-    print "socket="+str(socketio)
     print request.sid
-    #app.data.clients.append(request.sid)
-    app.data.logger.addClient(request.sid)
     socketio.emit('my response', {'data': 'Connected', 'count': 0})
 
 @socketio.on('disconnect', namespace='/MaslowCNC')
 def test_disconnect():
-    #data.clients.remove(request.sid)
-    app.data.logger.removeClient(request.sid)
     print('Client disconnected')
 
 @socketio.on('action', namespace='/MaslowCNC')
 def command(msg):
-    print "hello:"+str(request.sid)
-    print "action socket:"+str(socketio)
-    print app.app_context
-    #print app.data.clients
-    #print app.data.logger
-    #app.data.logger.addClient(request.sid)
-    print msg['data']
-    #print data.controllerMessage
-    #data.gcode_queue.put('$')
+    if (msg['data']=='resetChainLengths'):
+        app.data.gcode_queue.put("B08 ")
+    if (msg['data']=='reportSettings'):
+        app.data.gcode_queue.put('$$')
 
 @socketio.on_error_default
 def default_error_handler(e):

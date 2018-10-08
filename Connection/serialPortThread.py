@@ -63,7 +63,6 @@ class SerialPortThread(MakesmithInitFuncs):
         message = message.encode()
         try:
             self.serialInstance.write(message)
-            print "in _write, logger="+str(self.data.logger)
             self.data.logger.writeToLog("Sent: " + str(message))
         except:
             print("write issue")

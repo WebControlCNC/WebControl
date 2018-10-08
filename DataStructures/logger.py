@@ -8,8 +8,6 @@ behavior.
 from DataStructures.makesmithInitFuncs       import MakesmithInitFuncs
 import threading
 from app import app,socketio
-from flask_sse import sse
-
 
 
 class Logger(MakesmithInitFuncs):
@@ -24,14 +22,6 @@ class Logger(MakesmithInitFuncs):
     with open("log.txt", "a") as logFile:
             logFile.truncate()
 
-    def addClient(self,sid):
-        print "sid="+str(sid)
-        print "self="+str(self)
-        self.clients.append(sid)
-
-    def removeClient(self,sid):
-        self.clients.remove(sid)
-
     def writeToLog(self, message):
 
         '''
@@ -42,29 +32,16 @@ class Logger(MakesmithInitFuncs):
         way slow
 
         '''
-        #if hasattr(self,"clients"):
-        #print self.clients
-        #else:
-        #    print self
-        #for client in self.clients:
-            #app.data.sendMessage("message",message, client)
-            #print "logger socket="+str(socketio)+" client:"+client
-            #print app.app_context()
-            #with app.app_context():
-            #    print socketio
-            #    socketio.emit('message', {'data': message}, room=client)
-        #with app.app_context():
-        #    sse.publish({"message":"hello there"}, type='message')
-        app.data.message = app.data.message+message
+        #this code allows for background_stuff to update the web client
+        #app.data.message = app.data.message+message
 
         if (message[0]!="<" and message[0]!="["):
-        #if (True):
             try:
                 self.messageBuffer = self.messageBuffer + message
             except:
                 pass
 
-        if len(self.messageBuffer) > 100:
+        if len(self.messageBuffer) > 0:
 
             t = threading.Thread(target=self.writeToFile, args=(self.messageBuffer, "write"))
             t.daemon = True
@@ -81,6 +58,7 @@ class Logger(MakesmithInitFuncs):
         with open("log.txt", "a") as logFile:
             logFile.write(toWrite)
 
+        #print toWrite
         return
 
     def writeErrorValueToLog(self, error):

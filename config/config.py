@@ -15,7 +15,6 @@ def getJSONSettings():
     return settings
 
 def updateSettings(section, result):
-
     for x in range(len(app.data.config.settings[section])):
         found = False
         for setting in result:
@@ -23,23 +22,35 @@ def updateSettings(section, result):
                 if (app.data.config.settings[section][x]["type"]=="float"):
                     try:
                         app.data.config.settings[section][x]["value"]=float(result[setting])
+                        if ('firmwareKey' in app.data.config.settings[section][x]):
+                            syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],result[setting])
                     except:
                         pass
                 elif (app.data.config.settings[section][x]["type"]=="int"):
                     try:
                         app.data.config.settings[section][x]["value"]=int(result[setting])
+                        if ('firmwareKey' in app.data.config.settings[section][x]):
+                            syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],result[setting])
                     except:
                         pass
                 elif (app.data.config.settings[section][x]["type"]=="bool"):
                     try:
                         if (result[setting]=="on"):
                             app.data.config.settings[section][x]["value"]=1
+                            if ('firmwareKey' in app.data.config.settings[section][x]):
+                                syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],1)
                         else:
                             app.data.config.settings[section][x]["value"]=0
+                            if ('firmwareKey' in app.data.config.setting[section][x]):
+                                syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],0)
+
                     except:
                         pass
                 else:
                     app.data.config.settings[section][x]["value"]=result[setting]
+                    if ('firmwareKey' in app.data.config.settings[section][x]):
+                        syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],result[setting])
+
                 #print setting+":"+str(result[setting])+"->"+str(settings[section][x]["value"])
                 found = True
                 break
@@ -112,13 +123,15 @@ def getSettingValue(section, key):
     return ret
 
 
-'''
-# TODO:
-def syncFirmwareKey(firmwareKey, value, data):
+def syncFirmwareKey(firmwareKey, value, data=None):
     for section in settings:
         for option in settings[section]:
             if 'firmwareKey' in option and option['firmwareKey'] == firmwareKey:
-                storedValue = app.data.config.get(section, option['key'])
+                #storedValue = app.data.config.get(section, option['key'])
+                storedValue = option['value']
+                print "storedValue:"+str(storedValue)
+                print "value:"+str(value)
+                print "firmwareKey:"+str(firmwareKey)
                 if (option['key'] == "spindleAutomate"):
                     if (storedValue == "Servo"):
                         storedValue = 1
@@ -128,17 +141,26 @@ def syncFirmwareKey(firmwareKey, value, data):
                         storedValue = 3
                     else:
                         storedValue = 0
+                    if (value == "Servo"):
+                        value = 1
+                    elif (value == "Relay_High"):
+                        value = 2
+                    elif (value == "Relay_Low"):
+                        value = 3
+                    else:
+                        value = 0
+
                 if ( (firmwareKey == 45) ):
                     print "firmwareKey = 45"
                     if (storedValue != ""):
                         sendErrorArray(firmwareKey, storedValue, data)
-                elif not isClose(float(storedValue), value):
+                elif True: #not isClose(float(storedValue), float(value)):
                     print "firmwareKey(send) = "+str(firmwareKey)
                     app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                 else:
                     break
     return
-'''
+
 def isClose(a, b, rel_tol=1e-06):
     '''
     Takes two values and returns true if values are close enough in value
@@ -198,8 +220,8 @@ def parseErrorArray(value, asFloat):
                 xFloatErrors[x][y] = float(xErrors[x][y])/1000.0
                 yFloatErrors[x][y] = float(yErrors[x][y])/1000.0
         return xFloatErrors, yFloatErrors
-'''
-#TODO
+
+
 def sendErrorArray(firmwareKey, value, data):
     # parse out the array from string and then send them using the $O command
     xErrors, yErrors = parseErrorArray(value,False)
@@ -209,4 +231,3 @@ def sendErrorArray(firmwareKey, value, data):
             app.data.gcode_queue.put("$O=" + str(x)+","+str(y)+","+str(xErrors[x][y])+","+str(yErrors[x][y])+" ")
     # if you send a 31,15 , it will trigger a save to EEPROM
     app.data.gcode_queue.put("$O=" + str(31)+","+str(15)+","+str(42)+","+str(42)+" ")
-'''

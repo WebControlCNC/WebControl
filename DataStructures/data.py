@@ -94,6 +94,13 @@ class Data():
     gcode_queue     =  Queue.Queue()
     quick_queue     =  Queue.Queue()
 
+    '''
+    Position and Error values
+    '''
+    xval  = 0.0
+    yval  = 0.0
+    zval  = 0.0
+
     def __init__(self):
         '''
 

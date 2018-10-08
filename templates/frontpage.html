@@ -6,14 +6,15 @@
 {% endblock %}
 
 {% block javascript %}
-  <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/fabric.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage.js') }}" crossorigin="anonymous"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid d-flex h-100 flex-column">
   <div class="row flex-fill d-flex justify-content-start">
-    <div id="workarea" class="col">
+    <div id = "canvascolumn" class="col">
+      <canvas id="workarea"></canvas>
     </div>
     <div class="col my-sidebar">
       <div class="container">
