@@ -5,12 +5,15 @@
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
 {% endblock %}
 
+{% block javascript %}
+  <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage.js') }}" crossorigin="anonymous"></script>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <h3>Demo-Flask-SocketIO</h3>
-      <p id='test'> Hello </p>
+<div class="container-fluid d-flex h-100 flex-column">
+  <div class="row flex-fill d-flex justify-content-start">
+    <div id="workarea" class="col">
     </div>
     <div class="col my-sidebar">
       <div class="container">
@@ -97,8 +100,28 @@
             <button type="button" class="btn btn-block btn-secondary">Z&gt;</button>
           </div>
         </div>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('reportSettings');">Report Settings</button>
+          </div>
+        </div>
         <h3>Messages</h3>
-          <label>placeholder</label>
+        <div class="row">
+          <div class="col">
+            <h4>Controller</h4>
+          </div>
+          <div class="col">
+            <h4>Position</h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <p scrollText id='controllerMessage'></p>
+          </div>
+          <div class="col">
+            <p scrollText id='positionMessage'></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

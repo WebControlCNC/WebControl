@@ -1,4 +1,18 @@
 .my-sidebar {
     -ms-flex: 0 0 460px;
     flex: 0 0 460px;
+    min-height: calc(100vh - 70px)
+}
+
+.scrollText {
+    height: 300px;
+    overflow-y: scroll;
+}
+
+html, body{
+  height: 100%;
+}
+
+.flex-fill {
+  flex:1;
 }

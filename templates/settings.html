@@ -1,24 +1,40 @@
 {% extends 'base.html' %}
 
+
 {% block header %}
-  <h1>{% block title %}Settings{% endblock %}</h1>
+  <h1>{% block title %}{{title}}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-9">
-      <h3>Demo-Flask-SocketIO</h3>
-      <p id='test'> Hello </p>
+  <form id="settingsForm" action="" method="post">
+    <ul class="list-group">
       {% for setting in settings %}
-        <p>{{setting}}</p>
+      <li class="list-group-item">
+        <div class="row align-items-center">
+          <div class="col-9">
+            <h4>{{setting.title}}</h4>
+            <p>{{setting.desc}}</p>
+          </div>
+          <div class="col-3">
+            {% if setting.type=="bool" %}
+              <span class="switch switch-lg">
+                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
+                <label for="switch-{{setting.key}}"></label>
+              </span>
+            {% else %}
+              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}">
+            {% endif %}
+          </div>
+        </div>
+      </il>
       {% endfor %}
-    </div>
-    <div class="row">
-      <div class="col-3">
-        <h3>Controls</h3>
-        <p> Hello </p>
-      </div>
-  </div>
+    </ul>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </div>
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src = "{{ url_for('static',filename='scripts/settings.js') }}"></script>
 {% endblock %}

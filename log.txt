@@ -1,0 +1,16 @@
+
+Connected on port COM5:
+PCB v1.1 Detected
+ Zeroing Calibration
+Grbl v1.00
+ready
+ok
+Sent: B05  
+Kinematics Initializing:
+position loaded at:
+0.00
+-85.31
+B05
+Firmware Version 1.23
+ok
+Sent: G21  
