@@ -1,59 +1,58 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}FrontPage{% endblock %}</h1>
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
 {% endblock %}
 
 {% block javascript %}
-  <script src="{{ url_for('static',filename='scripts/fabric.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage.js') }}" crossorigin="anonymous"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid d-flex h-100 flex-column">
   <div class="row flex-fill d-flex justify-content-start">
-    <div id = "canvascolumn" class="col">
-      <canvas id="workarea"></canvas>
+    <div id="workarea" class="col">
     </div>
     <div class="col my-sidebar">
       <div class="container">
         <h3>Controls</h3>
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-secondary btn-block">upleft</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('upLeft')">upleft</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-dark btn-block">up</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('up')";>up</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-secondary btn-block">upright</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('upRight')">upright</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary btn-block">Macro1</button>
+            <button type="button" class="btn btn-primary btn-block" >Macro1</button>
           </div>
           <div class="w-100"></div>
           <div class="col">
-            <button type="button" class="btn btn-dark btn-block">left</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('left')">left</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-dark btn-block">home</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="action('home')">home</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-dark btn-block">right</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('right')">right</button>
           </div>
           <div class="col">
             <button type="button" class="btn btn-primary btn-block">Macro2</button>
           </div>
           <div class="w-100"></div>
           <div class="col">
-            <button type="button" class="btn btn-secondary btn-block">dleft</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('downLeft')">dleft</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-dark btn-block">down</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('down')">down</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-secondary btn-block">dright</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('downRight')">dright</button>
           </div>
           <div class="col">
             <button type="button" class="btn btn-primary btn-block">ZAxis</button>
@@ -61,27 +60,27 @@
         </div>
         <div class="row">
           <div class="col">
-            <label>Dist. to Move:</label>
+            <label>Dist To Move</label>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-secondary">0.01</button>
+            <input class="form-control" id="distToMove" value="0.01">
           </div>
           <div class="col">
-            <button type="button" class="btn btn-secondary">MM</button>
+            <button id="units" type="button" class="btn btn-secondary" onclick="unitSwitch();">--</button>
           </div>
           <div class="col-4">
-            <button type="button" class="btn btn-primary btn-block" >Def. Home</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="action('defineHome')" >Def. Home</button>
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-block btn-success">Play</button>
+            <button type="button" class="btn btn-block btn-success" onclick="action('startRun')">Play</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-block btn-warning">Pause</button>
+            <button type="button" class="btn btn-block btn-warning" onclick="action('pauseRun')">Pause</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-block btn-danger">Stop</button>
+            <button type="button" class="btn btn-block btn-danger onclick="action('stopRun')"">Stop</button>
           </div>
         </div>
         <div class="row">
@@ -106,21 +105,22 @@
             <button type="button" class="btn btn-block btn-secondary" onclick="action('reportSettings');">Report Settings</button>
           </div>
         </div>
-        <h3>Messages</h3>
         <div class="row">
-          <div class="col">
-            <h4>Controller</h4>
-          </div>
-          <div class="col">
+          <div class="col-4">
             <h4>Position</h4>
+          </div>
+          <div class="col-8">
+            <p id='positionMessage'></p>
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <p scrollText id='controllerMessage'></p>
+            <h3>Controller Messages</h3>
           </div>
+        </div>
+        <div class="row">
           <div class="col">
-            <p scrollText id='positionMessage'></p>
+            <div class="scrollText" id='controllerMessage'></div>
           </div>
         </div>
       </div>

@@ -1,143 +1,112 @@
-var socket
-var controllerMessages = [];
-$(document).ready(function(){
-  $("#workarea").width = $("#canvasColumn").width();
-  $("#workarea").height = $("#canvascolumn").height();
-    namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
+//checkForGCodeUpdate();
 
-    // the socket.io documentation recommends sending an explicit package upon connection
-    // this is specially important when using the global namespace
-    socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+//setInterval(function(){ alert("Hello"); }, 3000);
 
-    socket.on('connect', function(msg) {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
+var scale = 1;
 
-    socket.on('message', function(msg){
-        //console.log(msg);
-        $('#test').html('<p>' + msg + '</p>');
-    });
-
-    socket.on('controllerMessage', function(msg){
-        if (controllerMessages.length >50)
-          controllerMessages.shift();
-        controllerMessages.push(msg.data);
-        $('#controllerMessage').html('');
-        controllerMessages.forEach(function(message){
-          $('#controllerMessage').append(message+"<br>");
-        });
-    });
-
-    socket.on('positionMessage', function(msg){
-      var json = JSON.parse(msg.data);
-      $('#positionMessage').html('<p>XPos:'+json.xval+'</p><p>XYos:'+json.yval+'</p><p>ZPos:'+json.zval+'</p>');
-      positionUpdate(json.xval,json.yval,json.zval);
-    });
-
-    var canvas = new fabric.Canvas('workarea');
-
-    var circle = new fabric.Circle({
-      radius: 100,
-      fill: '#eef',
-      scaleY: 0.5,
-      originX: 'center',
-      originY: 'center'
-    });
-
-    var text = new fabric.Text('hello world', {
-      fontSize: 30,
-      originX: 'center',
-      originY: 'center'
-    });
-
-    var group = new fabric.Group([ circle, text ], {
-      left: 150,
-      top: 100,
-      angle: -10
-    });
-
-    canvas.add(group);
-
-    function makeLine(coords){
-      return new fabric.Line(coords, {
-        fill: 'red',
-        stroke: 'red',
-        strokeWidth: 5,
-        stroketable: false,
-        evented: false,
-      })
-    }
-
-    var line1 = makeLine([0,0,96,0]),
-        line2 = makeLine([0,48,96,48]),
-        line3 = makeLine([0,24,96,24]),
-        line4 = makeLine([0,0,0,48]),
-        line5 = makeLine([24,0,24,48]),
-        line6 = makeLine([48,0,48,48]),
-        line7 = makeLine([72,0,72,48]),
-        line8 = makeLine([96,0,96,48])
-
-    var gridLines = new fabric.Group([line1, line2, line3, line4, line5, line6, line7, line8], {
-      left: 100,
-      top: 100,
-    });
-
-    canvas.add(gridLines);
-
-
-
-});
-function action(command){
-  //console.log(command);
-  socket.emit('action',{data:command});
-}
-
-
-
-function positionUpdate(x,y,z){
-  //_x = originX+x;
-  //_y = originY+y
-}
-
-
-/*var scale = 10
-
-var draw = SVG('workarea').size('100%','100%')
-var viewbox = draw.viewbox()
-var originX = viewbox.width/2
-var originY = viewbox.height/2
-var currentPosX = 0
-var currentPosY = 0
+var draw = SVG('workarea').size('100%','100%').panZoom({zoomMin: 10, zoomMax: 100, zoomFactor:2.5});
+var viewbox = draw.viewbox();
+var originX = viewbox.width/2;
+var originY = viewbox.height/2;
+var currentPosX = 0;
+var currentPosY = 0;
+var gcode = null;
 //var rect = draw.rect(100,100).attr({fill: '#f06'})
 //var sheet = draw.rect(768,384).fill(draw.image('/static/images/materials/Plywood_texture.JPG',768,384)).scale(96/768*scale,48/384*scale).center(originX,originY)
 
 var gridLines = draw.group()
-gridLines.add(draw.line(0,0,96,0).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(0,48,96,48).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(0,24,96,24).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(0,0,0,48).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(24,0,24,48).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(48,0,48,48).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(72,0,72,48).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(96,0,96,48).stroke({width:.1, color: '#000'}))
-gridLines.center(originX,originY).scale(scale,scale)
+gridLines.add(draw.line(0*scale,0*scale,96*scale,0*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(0*scale,48*scale,96*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(0*scale,24*scale,96*scale,24*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(0*scale,0*scale,0*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(24*scale,0*scale,24*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(48*scale,0*scale,48*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(72*scale,0*scale,72*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(96*scale,0*scale,96*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.center(originX,originY)
 //gridLines.scale(scale,scale)
 
 var sled = draw.group()
-sled.add(draw.circle(3).stroke({width:.2,color:"#F00"}).fill({color:"#fff",opacity:0}))
-sled.add(draw.line(1.5,-0.5,1.5,3.5).stroke({width:.2,color:"#F00"}))
-sled.add(draw.line(-0.5,1.5,3.5,1.5).stroke({width:.2,color:"#F00"}))
-sled.translate(-1.5,-1.5)
-console.log(originX);
-console.log(originY);
-sled.center(originX,originY).scale(scale,scale)
-var vx = Math.floor((originX+10)/scale)
-var vy = Math.floor((originY+10)/scale)
-console.log(vx)
-console.log(vy)
+sled.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:.1,color:"#F00"}))
+sled.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:.1,color:"#F00"}))
+sled.add(draw.circle(3*scale).stroke({width:.1,color:"#F00"}).fill({color:"#fff",opacity:0}))
+sled.center(originX,originY)
 //sled.center(vx,vy)
+draw.zoom(10, {x:originX,y:originY});
 
+function positionUpdate(x,y,z){
+  var _x, _y =0
+  //console.log(x)
+  if ($("#units").text()=="MM"){
+    _x = originX+x*scale/25.4
+    _y = originY-y*scale/25.4
+  }
+  else{
+    _x = originX+x*scale;
+    _y = originY-y*scale
+  }
 
+  sled.center(_x, _y);
+}
+
+function unitSwitch(){
+  if ( $("#units").text()=="MM") {
+    $("#units").text("INCHES");
+    distToMove = Math.round($("#distToMove").val()/25.4,3)
+    $("#distToMove").val(distToMove);
+    updateSetting('toInches',distToMove);
+  } else {
+    $("#units").text("MM");
+    distToMove = Math.round($("#distToMove").val()*25.4,3)
+    $("#distToMove").val(distToMove);
+    updateSetting('toMM',distToMove);
+  }
+}
+
+$(document).ready(function(){
+    settingRequest("units");
+    settingRequest("distToMove");
+});
+
+function processRequestedSetting(msg){
+  console.log(msg);
+  if (msg.setting=="units"){
+    console.log("requestedSetting:"+msg.value);
+    $("#units").text(msg.value)
+  }
+  if (msg.setting=="distToMove"){
+    console.log("requestedSetting for distToMove:"+msg.value);
+    $("#distToMove").val(msg.value)
+  }
+}
+
+function processPositionMessage(msg){
+  var json = JSON.parse(msg.data);
+  $('#positionMessage').html('<p>XPos:'+json.xval+' Ypos:'+json.yval+' ZPos:'+json.zval+'</p>');
+  positionUpdate(json.xval,json.yval,json.zval);
+}
+
+function gcodeUpdate(msg){
+  console.log("updating gcode");
+  if (gcode!=null) {
+    console.log("removing gcode");
+    //gcode.remove();
+    gcode.remove();
+  }
+  gcode = draw.group();
+  var data = JSON.parse(msg.data)
+  data.forEach(function(line) {
+    console.log(line)
+    if (line.type=='line'){
+      if (line.dashed==true) {
+        gcode.add(draw.polyline(line.points).fill('none').stroke({width:.1, color: '#AA0'}))
+      } else {
+        gcode.add(draw.polyline(line.points).fill('none').stroke({width:.1, color: '#00F'}))
+      }
+    }
+    gcode.move(originX,originY)
+  });
+}
 
 //sled.scale(scale,scale)
 /*var sketch = function(p)

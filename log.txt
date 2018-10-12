@@ -7,11 +7,82 @@ ok
 Sent: B05  
 Kinematics Initializing:
 position loaded at:
--0.01
--26.18
+0.00
+-85.11
 B05
 Firmware Version 1.20
 ok
-Sent: G21  
-G21
+Sent: G20  
+G20
+ok
+Sent:   
+ok
+Sent:  
+ok
+Sent:  
+ok
+Sent: G20 G90 G40  
+G20 
+G90 
+G40
+ok
+Sent:  
+ok
+Sent:  
+ok
+Sent: G0 Z0.5  
+G0 Z0.5
+ok
+Sent: T0 M6  
+T0 
+Tool change to tool 0
+M6
+ok
+Sent: G17  
+G17
+Command G17 unsupported and ignored.
+ok
+Sent: M3  
+M3
+ok
+Sent: G0 X4.675 Y-2.6312  
+G0 X4.675 Y-2.6312
+ok
+Sent: G1 Z-0.75 F30  
+G1 Z-0.75 F30
+ok
+Sent: G1 X9.675 Y-2.6312 F60  
+G1 X9.675 Y-2.6312 F60
+ok
+Sent: G3 X9.8 Y-2.5062 I0 J0.125  
+G3 X9.8 Y-2.5062 I0 J0.125
+ok
+Sent: G1 X9.8 Y2.4938  
+G1 X9.8 Y2.4938
+ok
+Sent: G3 X9.675 Y2.6188 I-0.125 J0  
+G3 X9.675 Y2.6188 I-0.125 J0
+ok
+Sent: G1 X4.675 Y2.6188  
+G1 X4.675 Y2.6188
+ok
+Sent: G3 X4.55 Y2.4938 I0 J-0.125  
+G3 X4.55 Y2.4938 I0 J-0.125
+ok
+Sent: G1 X4.55 Y-2.5062  
+G1 X4.55 Y-2.5062
+ok
+Sent: G3 X4.675 Y-2.6312 I0.125 J0  
+G3 X4.675 Y-2.6312 I0.125 J0
+ok
+Sent: G0 Z0.5  
+G0 Z0.5
+ok
+Sent: M5  
+M5
+ok
+Sent: M30  
+M30
+ok
+Sent:  
 ok

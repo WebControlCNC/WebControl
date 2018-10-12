@@ -1,13 +1,6 @@
-{% extends 'base.html' %}
-
-
-{% block header %}
-  <h1>{% block title %}{{title}}{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
 <div class="container-fluid">
-  <form id="settingsForm" action="" method="post">
+  <form id="settingsForm">
     <ul class="list-group">
       {% for setting in settings %}
       <li class="list-group-item">
@@ -36,5 +29,23 @@
 {% endblock %}
 
 {% block javascript %}
-  <script type="text/javascript" src = "{{ url_for('static',filename='scripts/settings.js') }}"></script>
+<script>
+$(document).ready(function () {
+    $('#settingsForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url : '/maslowSettings',
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (data) {
+              console.log("success");
+                $('#notificationModal').modal('toggle')
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

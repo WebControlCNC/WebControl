@@ -140,7 +140,7 @@
             "section": "Advanced Settings", 
             "title": "Home Position Y Coordinate", 
             "type": "string", 
-            "value": "0.0"
+            "value": "-3.35"
         }, 
         {
             "default": 0, 
@@ -512,6 +512,18 @@
             "key": "distPerRotRightChainTolerance", 
             "type": "string", 
             "value": ""
+        }, 
+        {
+            "default": 25.4, 
+            "key": "distToMove", 
+            "type": "float", 
+            "value": 1.0
+        }, 
+        {
+            "default": "MM", 
+            "key": "units", 
+            "type": "string", 
+            "value": "INCHES"
         }
     ], 
     "Maslow Settings": [
@@ -532,7 +544,7 @@
             "section": "Maslow Settings", 
             "title": "Distance Between Motors", 
             "type": "string", 
-            "value": "2978.4"
+            "value": "2978.41"
         }, 
         {
             "default": 2438.4, 

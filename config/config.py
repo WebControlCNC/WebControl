@@ -14,7 +14,57 @@ with open('webcontrol.json', 'r') as infile:
 def getJSONSettings():
     return settings
 
+def updateSetting(section,key,value):
+    updated = False
+    for x in range(len(app.data.config.settings[section])):
+        if app.data.config.settings[section][x]["key"]==key:
+            if (app.data.config.settings[section][x]["type"]=="float"):
+                try:
+                    app.data.config.settings[section][x]["value"]=float(value)
+                    updated=True
+                    if ('firmwareKey' in app.data.config.settings[section][x]):
+                        syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],value)
+                except:
+                    pass
+            elif (app.data.config.settings[section][x]["type"]=="int"):
+                try:
+                    app.data.config.settings[section][x]["value"]=int(result[setting])
+                    updated=True
+                    if ('firmwareKey' in app.data.config.settings[section][x]):
+                        syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],value)
+                except:
+                    pass
+            elif (app.data.config.settings[section][x]["type"]=="bool"):
+                try:
+                    if(isinstance(value,bool)):
+                        if (value):
+                            value="on"
+                        else:
+                            value="off"
+                    if (value=="on"):
+                        app.data.config.settings[section][x]["value"]=1
+                        updated=True
+                        if ('firmwareKey' in app.data.config.settings[section][x]):
+                            syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],1)
+                    else:
+                        app.data.config.settings[section][x]["value"]=0
+                        updated=True
+                        if ('firmwareKey' in app.data.config.setting[section][x]):
+                            syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],0)
+
+                except:
+                    pass
+            else:
+                app.data.config.settings[section][x]["value"]=value
+                updated=True
+                if ('firmwareKey' in app.data.config.settings[section][x]):
+                    syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],value)
+    if updated==True:
+        with open('webcontrol.json', 'w') as outfile:
+            json.dump(app.data.config.settings,outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
 def updateSettings(section, result):
+    updated=False
     for x in range(len(app.data.config.settings[section])):
         found = False
         for setting in result:
@@ -22,6 +72,7 @@ def updateSettings(section, result):
                 if (app.data.config.settings[section][x]["type"]=="float"):
                     try:
                         app.data.config.settings[section][x]["value"]=float(result[setting])
+                        updated=True
                         if ('firmwareKey' in app.data.config.settings[section][x]):
                             syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],result[setting])
                     except:
@@ -29,6 +80,7 @@ def updateSettings(section, result):
                 elif (app.data.config.settings[section][x]["type"]=="int"):
                     try:
                         app.data.config.settings[section][x]["value"]=int(result[setting])
+                        updated=True
                         if ('firmwareKey' in app.data.config.settings[section][x]):
                             syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],result[setting])
                     except:
@@ -37,10 +89,12 @@ def updateSettings(section, result):
                     try:
                         if (result[setting]=="on"):
                             app.data.config.settings[section][x]["value"]=1
+                            updated=True
                             if ('firmwareKey' in app.data.config.settings[section][x]):
                                 syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],1)
                         else:
                             app.data.config.settings[section][x]["value"]=0
+                            updated=True
                             if ('firmwareKey' in app.data.config.setting[section][x]):
                                 syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],0)
 
@@ -48,6 +102,7 @@ def updateSettings(section, result):
                         pass
                 else:
                     app.data.config.settings[section][x]["value"]=result[setting]
+                    updated=True
                     if ('firmwareKey' in app.data.config.settings[section][x]):
                         syncFirmwareKey(app.data.config.settings[section][x]["firmwareKey"],result[setting])
 
@@ -58,6 +113,8 @@ def updateSettings(section, result):
             #must be a turned off checkbox.. what a pain to figure out
             if (app.data.config.settings[section][x]["type"]=="bool"):
                 app.data.config.settings[section][x]["value"]=0
+                updated=True
+    if updated==True:
         with open('webcontrol.json', 'w') as outfile:
             json.dump(app.data.config.settings,outfile, sort_keys=True, indent=4, ensure_ascii=False)
 

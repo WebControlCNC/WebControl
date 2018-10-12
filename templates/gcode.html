@@ -1,0 +1,41 @@
+{% block content %}
+<div class="container-fluid">
+  <form id="gcodeForm" method="post" enctype=multipart/form-data>
+    <div class="form-group">
+      <label for="gcodeFile">GCode File</label>
+      <input type="file" class="form-control-file" name="file">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function () {
+    $('#gcodeForm').on('submit', function(e) {
+        e.preventDefault();
+
+        var formdata = new FormData(this);
+
+        $.ajax({
+            url : '/gcode',
+            type: "POST",
+            data: formdata,
+            mimeTypes:"multipart/form-data",
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data) {
+              console.log("success");
+                $('#notificationModal').modal('toggle')
+                checkForGCodeUpdate();
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
