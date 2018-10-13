@@ -22,10 +22,10 @@ def background_stuff(app):
                         #socketio.emit('positionMessage', {'data':message }, namespace='/MaslowCNC')
                 #further process (original Maslow)
                 if message[0] == "<":
-                    print message
+                    #print message
                     setPosOnScreen(app,message)
-'''                elif message[0] == "$":
-                    app.receivedSetting(message)
+                elif message[0] == "$":
+                    app.data.config.receivedSetting(message)
                 elif message[0] == "[":
                     if message[1:4] == "PE:":
                         #todo:
@@ -62,7 +62,7 @@ def background_stuff(app):
                     pass #displaying all the 'ok' messages clutters up the display
                 else:
                     print(message)
-'''
+
 
 def setPosOnScreen(app, message):
     try:
@@ -77,7 +77,7 @@ def setPosOnScreen(app, message):
             app.data.yval  = float(valz[1])
             app.data.zval  = float(valz[2])
 
-            print "x:"+str(app.data.xval)+", y:"+str(app.data.yval)+", z:"+str(app.data.zval)
+            #print "x:"+str(app.data.xval)+", y:"+str(app.data.yval)+", z:"+str(app.data.zval)
 
             if math.isnan(app.data.xval):
                 sendControllerMessage("Unable to resolve x Kinematics.")

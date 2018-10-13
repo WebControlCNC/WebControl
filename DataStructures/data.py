@@ -1,6 +1,7 @@
 from time                                             import time
 from DataStructures.logger                            import   Logger
 from DataStructures.loggingQueue                      import   LoggingQueue
+from config.config                                    import Config
 import Queue
 
 class Data():
@@ -42,7 +43,7 @@ class Data():
     gcodeShift = [0.0,0.0]                          #the amount that the gcode has been shifted
     message = ""                # used to update the client
     logger     =  Logger()                                          #the module which records the machines behavior to review later
-
+    config     =  Config()
     # Background image stuff, persist but not saved
     backgroundFile = None
     backgroundTexture = None
@@ -108,3 +109,4 @@ class Data():
 
         '''
         self.logger.data = self
+        self.config.data = self

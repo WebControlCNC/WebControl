@@ -14,7 +14,7 @@ from werkzeug import secure_filename
 from background.backgroundTasks import background_stuff #do this after socketio is declared
 from DataStructures.data          import   Data
 from Connection.serialPort        import   SerialPort
-from config                       import   config
+from config.config                       import   Config
 from DataStructures.logger                            import   Logger
 from DataStructures.loggingQueue                      import   LoggingQueue
 from Connection.nonVisibleWidgets import   NonVisibleWidgets
@@ -23,14 +23,14 @@ import Queue
 app.data = Data()
 app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
-app.data.config = config
-app.data.units = config.getSettingValue('Computed Settings', 'units')
-app.data.comport = config.getSettingValue('Maslow Settings', 'COMport')
+app.data.config.computeSettings(None,None,None,True)
+app.data.units = app.data.config.getValue('Computed Settings', 'units')
+app.data.comport = app.data.config.getValue('Maslow Settings', 'COMport')
 if app.data.units == "INCHES":
     scale = 1.0
 else:
     scale = 25.4
-app.data.gcodeShift =[float(app.data.config.getSettingValue('Advanced Settings','homeX'))/scale,float(app.data.config.getSettingValue('Advanced Settings','homeY'))/scale]
+app.data.gcodeShift =[float(app.data.config.getValue('Advanced Settings','homeX'))/scale,float(app.data.config.getValue('Advanced Settings','homeY'))/scale]
 
 
 
@@ -56,8 +56,8 @@ def index():
 def maslowSettings():
     if request.method=="POST":
         result = request.form
-        config.updateSettings("Maslow Settings", result)
-        setValues = config.getJSONSettingSection("Maslow Settings")
+        app.data.config.updateSettings("Maslow Settings", result)
+        setValues = app.data.config.getJSONSettingSection("Maslow Settings")
         message = {'status': 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -67,8 +67,8 @@ def maslowSettings():
 def advancedSettings():
     if request.method=="POST":
         result = request.form
-        config.updateSettings("Advanced Settings", result)
-        setValues = config.getJSONSettingSection("Advanced Settings")
+        app.data.config.updateSettings("Advanced Settings", result)
+        setValues = app.data.config.getJSONSettingSection("Advanced Settings")
         message = {'status': 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -78,8 +78,8 @@ def advancedSettings():
 def webControlSettings():
     if request.method=="POST":
         result = request.form
-        config.updateSettings("WebControl Settings", result)
-        setValues = config.getJSONSettingSection("WebControl Settings")
+        app.data.config.updateSettings("WebControl Settings", result)
+        setValues = app.data.config.getJSONSettingSection("WebControl Settings")
         message = {'status': 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -134,15 +134,15 @@ def my_event(msg):
 @socketio.on('requestPage', namespace="/MaslowCNC")
 def requestPage(msg):
     if msg['data']=="maslowSettings":
-        setValues = config.getJSONSettingSection("Maslow Settings")
+        setValues = app.data.config.getJSONSettingSection("Maslow Settings")
         page =render_template('settings.html', title="Maslow Settings", settings=setValues)
         socketio.emit('activateModal', {'title':"Maslow Settings", 'message':page}, namespace='/MaslowCNC')
     if msg['data']=="advancedSettings":
-        setValues = config.getJSONSettingSection("Advanced Settings")
+        setValues = app.data.config.getJSONSettingSection("Advanced Settings")
         page =render_template('settings.html', title="Advanced Settings", settings=setValues)
         socketio.emit('activateModal', {'title':"Advanced Settings", 'message':page}, namespace='/MaslowCNC')
     if msg['data']=="webControlSettings":
-        setValues = config.getJSONSettingSection("WebControl Settings")
+        setValues = app.data.config.getJSONSettingSection("WebControl Settings")
         page =render_template('settings.html', title="WebControl Settings", settings=setValues)
         socketio.emit('activateModal', {'title':"WebControl Settings", 'message':page}, namespace='/MaslowCNC')
     if msg['data']=="gcode":
@@ -169,7 +169,7 @@ def command(msg):
     elif (msg['data']=='home'):
         app.data.gcode_queue.put("G90  ")
         #todo:self.gcodeVel = "[MAN]"
-        safeHeightMM = float(config.getSettingValue('Maslow Settings', 'zAxisSafeHeight'))
+        safeHeightMM = float(app.data.config.getValue('Maslow Settings', 'zAxisSafeHeight'))
         safeHeightInches = safeHeightMM / 25.5
         if app.data.units == "INCHES":
             app.data.gcode_queue.put("G00 Z" + '%.3f'%(safeHeightInches))
@@ -185,13 +185,13 @@ def command(msg):
             scaleFactor = 1.0
         #print "xval:"+str(app.data.xval)+", yval:"+str(app.data.yval)
         app.data.gcodeShift = [app.data.xval/scaleFactor,app.data.yval/scaleFactor]
-        config.updateSetting("Advanced Settings", 'homeX', str(app.data.xval))
-        config.updateSetting("Advanced Settings", 'homeY', str(app.data.yval))
+        app.data.config.setValue("Advanced Settings", 'homeX', str(app.data.xval))
+        app.data.config.setValue("Advanced Settings", 'homeY', str(app.data.yval))
         app.data.gcodeFile.loadUpdateFile()
         print "preparing gcode update"
         sendStr = json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])
         app.data.gcodeFile.isChanged=False
-        units = config.getSettingValue('Computed Settings', 'units')
+        units = app.data.config.getValue('Computed Settings', 'units')
         socketio.emit('requestedSetting', {'setting':'units','value':units}, namespace='/MaslowCNC')
         socketio.emit('gcodeUpdate', {'data':sendStr}, namespace='/MaslowCNC')
         print "#Gcode Sent"
@@ -236,30 +236,30 @@ def move(msg):
 @socketio.on('settingRequest', namespace="/MaslowCNC")
 def settingRequest(msg):
     if (msg['data']=="units"):
-        units = config.getSettingValue('Computed Settings', 'units')
+        units = app.data.config.getValue('Computed Settings', 'units')
         socketio.emit('requestedSetting', {'setting':msg['data'], 'value':units}, namespace='/MaslowCNC')
     if (msg['data']=="distToMove"):
-        distToMove = config.getSettingValue('Computed Settings', 'distToMove')
+        distToMove = app.data.config.getValue('Computed Settings', 'distToMove')
         socketio.emit('requestedSetting', {'setting':msg['data'], 'value':distToMove}, namespace='/MaslowCNC')
 
 @socketio.on('updateSetting', namespace="/MaslowCNC")
 def updateSetting(msg):
     if (msg['data']['setting']=='toInches'):
         app.data.units = "INCHES"
-        config.updateSetting("Computed Settings", 'units',app.data.units)
+        app.data.config.setValue("Computed Settings", 'units',app.data.units)
         scaleFactor = 1.0
         app.data.gcodeShift = [app.data.xval/scaleFactor,app.data.yval/scaleFactor]
         app.data.tolerance = 0.020
         app.data.gcode_queue.put('G20 ')
-        config.updateSetting("Computed Settings", 'distToMove',msg['data']['value'])
+        app.data.config.setValue("Computed Settings", 'distToMove',msg['data']['value'])
     if (msg['data']['setting']=='toMM'):
         app.data.units = "MM"
-        config.updateSetting("Computed Settings", 'units',app.data.units)
+        app.data.config.setValue("Computed Settings", 'units',app.data.units)
         scaleFactor = 25.4
         app.data.gcodeShift = [app.data.xval/scaleFactor,app.data.yval/scaleFactor]
         app.data.tolerance = 0.5
         app.data.gcode_queue.put('G21')
-        config.updateSetting("Computed Settings", 'distToMove',msg['data']['value'])
+        app.data.config.setValue("Computed Settings", 'distToMove',msg['data']['value'])
 
 @socketio.on('checkForGCodeUpdate', namespace="/MaslowCNC")
 def checkForGCodeUpdate(msg):
@@ -269,7 +269,7 @@ def checkForGCodeUpdate(msg):
         print "preparing gcode update"
         sendStr = json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])
         app.data.gcodeFile.isChanged=False
-        units = config.getSettingValue('Computed Settings', 'units')
+        units = app.data.config.getValue('Computed Settings', 'units')
         print units
         socketio.emit('requestedSetting', {'setting':'units', 'value':units}, namespace='/MaslowCNC')
         socketio.emit('gcodeUpdate', {'data':sendStr}, namespace='/MaslowCNC')

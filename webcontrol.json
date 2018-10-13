@@ -140,7 +140,7 @@
             "section": "Advanced Settings", 
             "title": "Home Position Y Coordinate", 
             "type": "string", 
-            "value": "-3.35"
+            "value": "-1.0"
         }, 
         {
             "default": 0, 
@@ -397,121 +397,121 @@
             "firmwareKey": 7, 
             "key": "kinematicsTypeComputed", 
             "type": "string", 
-            "value": ""
+            "value": "2"
         }, 
         {
             "firmwareKey": 13, 
             "key": "distPerRot", 
             "type": "string", 
-            "value": ""
+            "value": "63.5"
         }, 
         {
             "firmwareKey": 21, 
             "key": "KpPosMain", 
             "type": "string", 
-            "value": ""
+            "value": 1300
         }, 
         {
             "firmwareKey": 22, 
             "key": "KiPosMain", 
             "type": "string", 
-            "value": ""
+            "value": 0
         }, 
         {
             "firmwareKey": 23, 
             "key": "KdPosMain", 
             "type": "string", 
-            "value": ""
+            "value": 34
         }, 
         {
             "firmwareKey": 24, 
             "key": "propWeightMain", 
             "type": "string", 
-            "value": ""
+            "value": 1
         }, 
         {
             "firmwareKey": 29, 
             "key": "KpPosZ", 
             "type": "string", 
-            "value": ""
+            "value": 1300
         }, 
         {
             "firmwareKey": 30, 
             "key": "KiPosZ", 
             "type": "string", 
-            "value": ""
+            "value": 0
         }, 
         {
             "firmwareKey": 31, 
             "key": "KdPosZ", 
             "type": "string", 
-            "value": ""
+            "value": 34
         }, 
         {
             "firmwareKey": 32, 
             "key": "propWeightZ", 
             "type": "string", 
-            "value": ""
+            "value": 1
         }, 
         {
             "firmwareKey": 25, 
             "key": "KpVMain", 
             "type": "string", 
-            "value": ""
+            "value": 5
         }, 
         {
             "firmwareKey": 26, 
             "key": "KiVMain", 
             "type": "string", 
-            "value": ""
+            "value": 0
         }, 
         {
             "firmwareKey": 27, 
             "key": "KdVMain", 
             "type": "string", 
-            "value": ""
+            "value": 0.28
         }, 
         {
             "firmwareKey": 33, 
             "key": "KpVZ", 
             "type": "string", 
-            "value": ""
+            "value": 5
         }, 
         {
             "firmwareKey": 34, 
             "key": "KiVZ", 
             "type": "string", 
-            "value": ""
+            "value": 0
         }, 
         {
             "firmwareKey": 35, 
             "key": "KdVZ", 
             "type": "string", 
-            "value": ""
+            "value": 0.28
         }, 
         {
             "firmwareKey": 38, 
             "key": "chainOverSprocketComputed", 
             "type": "string", 
-            "value": ""
+            "value": 2
         }, 
         {
             "firmwareKey": 39, 
             "key": "fPWMComputed", 
             "type": "string", 
-            "value": ""
+            "value": 3
         }, 
         {
             "firmwareKey": 40, 
             "key": "distPerRotLeftChainTolerance", 
             "type": "string", 
-            "value": ""
+            "value": "63.50000"
         }, 
         {
             "firmwareKey": 41, 
             "key": "distPerRotRightChainTolerance", 
             "type": "string", 
-            "value": ""
+            "value": "63.50000"
         }, 
         {
             "default": 25.4, 
@@ -544,7 +544,7 @@
             "section": "Maslow Settings", 
             "title": "Distance Between Motors", 
             "type": "string", 
-            "value": "2978.41"
+            "value": "3600"
         }, 
         {
             "default": 2438.4, 
@@ -574,7 +574,7 @@
             "section": "Maslow Settings", 
             "title": "Motor Offset Height in MM", 
             "type": "string", 
-            "value": "463"
+            "value": "500"
         }, 
         {
             "default": 310, 
@@ -614,7 +614,7 @@
             "section": "Maslow Settings", 
             "title": "z-axis installed", 
             "type": "bool", 
-            "value": 1
+            "value": 0
         }, 
         {
             "default": 3.17, 

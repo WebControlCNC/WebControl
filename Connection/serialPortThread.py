@@ -102,7 +102,7 @@ class SerialPortThread(MakesmithInitFuncs):
         if float(serial.VERSION[0]) < 3:
             self.data.message_queue.put("Pyserial version 3.x is needed, version " + serial.VERSION + " is installed")
 
-        weAreBufferingLines = bool(int(self.data.config.getSettingValue('Maslow Settings', "bufferOn")))
+        weAreBufferingLines = bool(int(self.data.config.getValue('Maslow Settings', "bufferOn")))
 
         try:
             print("connecting")

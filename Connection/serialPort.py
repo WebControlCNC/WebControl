@@ -45,7 +45,7 @@ class SerialPort(MakesmithInitFuncs):
         This function may not be necessary, but it should stay in because it simplifies the user experience.
 
         '''
-        self.data.config.set('Makesmith Settings', 'COMport', str(self.data.comport))
+        self.data.config.setValue('Makesmith Settings', 'COMport', str(self.data.comport))
 
     '''
 

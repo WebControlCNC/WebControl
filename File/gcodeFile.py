@@ -48,10 +48,10 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = re.sub(r'\n\n','\n',filtersparsed) #removes blank lines
             filtersparsed = re.sub(r'([0-9])([GXYZIJFTM]) *', '\\1 \\2',filtersparsed) #put spaces between gcodes
             filtersparsed = re.sub(r'  +',' ',filtersparsed) #condense space runs
-            value = self.data.config.getSettingValue('Advanced Settings','truncate')
+            value = self.data.config.getValue('Advanced Settings','truncate')
 
             if value==1:
-                digits = self.data.config.getSettingValue('Advanced Settings','digits')
+                digits = self.data.config.getValue('Advanced Settings','digits')
                 filtersparsed = re.sub(r'([+-]?\d*\.\d{1,'+digits+'})(\d*)',r'\g<1>',filtersparsed) #truncates all long floats to 4 decimal places, leaves shorter floats
             filtersparsed = re.split('\n', filtersparsed) #splits the gcode into elements to be added to the list
             filtersparsed = [x + ' ' for x in filtersparsed] #adds a space to the end of each line

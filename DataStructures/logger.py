@@ -35,7 +35,7 @@ class Logger(MakesmithInitFuncs):
         #this code allows for background_stuff to update the web client
         #app.data.message = app.data.message+message
 
-        if (message[0]!="<" and message[0]!="["):
+        if True:#(message[0]!="<" and message[0]!="["):
             try:
                 self.messageBuffer = self.messageBuffer + message
             except:
