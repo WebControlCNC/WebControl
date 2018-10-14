@@ -36,6 +36,8 @@ class GCodeFile(MakesmithInitFuncs):
 
     def loadUpdateFile(self):
         filename = self.data.gcodeFile.filename
+        print filename
+        del self.line[:]
         if filename is "": #Blank the g-code if we're loading "nothing"
             self.data.gcode = ""
             return

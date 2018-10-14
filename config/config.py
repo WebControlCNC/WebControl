@@ -79,11 +79,14 @@ class Config(MakesmithInitFuncs):
                 json.dump(self.settings,outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
     def updateSettings(self,section, result):
+        #print "at update Settings"
         updated=False
         for x in range(len(self.settings[section])):
+            #print x
             found = False
             for setting in result:
                 if self.settings[section][x]["key"]==setting:
+                    #print self.settings[section][x]["key"]
                     if (self.settings[section][x]["type"]=="float"):
                         try:
                             storedValue=self.settings[section][x]["value"]
@@ -103,7 +106,7 @@ class Config(MakesmithInitFuncs):
                         except:
                             pass
                     elif (self.settings[section][x]["type"]=="bool"):
-                        print result[setting]
+                        #print result[setting]
                         try:
                             if (result[setting]=="on"):
                                 storedValue=self.settings[section][x]["value"]
@@ -117,7 +120,7 @@ class Config(MakesmithInitFuncs):
                                 self.settings[section][x]["value"]=0
                                 updated=True
                                 if ('firmwareKey' in self.settings[section][x]):
-                                    print "syncing2 true bool at:"+str(self.settings[section][x]['firmwareKey'])
+                                    #print "syncing2 true bool at:"+str(self.settings[section][x]['firmwareKey'])
                                     self.syncFirmwareKey(self.settings[section][x]["firmwareKey"],storedValue)
 
                         except:
@@ -126,7 +129,9 @@ class Config(MakesmithInitFuncs):
                         storedValue=self.settings[section][x]["value"]
                         self.settings[section][x]["value"]=result[setting]
                         updated=True
+                        #print str(storedValue)+", "+str(result[settig])
                         if ('firmwareKey' in self.settings[section][x]):
+                            #print "firmwareKey:"+str(self.settings[section][x]["firmwareKey"])
                             self.syncFirmwareKey(self.settings[section][x]["firmwareKey"],storedValue)
 
                     #print setting+":"+str(result[setting])+"->"+str(settings[section][x]["value"])
@@ -216,9 +221,7 @@ class Config(MakesmithInitFuncs):
                 if 'firmwareKey' in option and option['firmwareKey'] == firmwareKey:
                     #storedValue = self.get(section, option['key'])
                     storedValue = option['value']
-                    #print "storedValue:"+str(storedValue)
-                    #print "value:"+str(value)
-                    #print "firmwareKey:"+str(firmwareKey)
+                    #print "firmwareKey:"+str(firmwareKey)+ " storedValue:"+str(storedValue)+" value:"+str(value)
                     if (option['key'] == "spindleAutomate"):
                         if (storedValue == "Servo"):
                             storedValue = 1
@@ -237,13 +240,13 @@ class Config(MakesmithInitFuncs):
                         else:
                             value = 0
 
-                    print str(firmwareKey)+": "+str(storedValue)+"?"+str(value)
+                    #print str(firmwareKey)+": "+str(storedValue)+"?"+str(value)
                     if ( (firmwareKey == 45) ):
                         #print "firmwareKey = 45"
                         if (storedValue != ""):
                             self.sendErrorArray(firmwareKey, storedValue, data)
                     elif not self.isClose(float(storedValue), float(value)):
-                        print "firmwareKey(send) = "+str(firmwareKey)+":"+str(storedValue)
+                        #print "firmwareKey(send) = "+str(firmwareKey)+":"+str(storedValue)
                         app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                     else:
                         break

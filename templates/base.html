@@ -56,9 +56,9 @@
         })
 
     });
-    function action(command){
+    function action(command, arg){
       //if (command=='reportSettings'){
-      socket.emit('action',{data:command});
+      socket.emit('action',{data:{command:command,arg:arg}});
       //}
 
     }
@@ -66,6 +66,11 @@
         distToMove = $("#distToMove").val();
         console.log(distToMove)
         socket.emit('move',{data:{direction:direction,distToMove:distToMove}});
+    }
+    function moveZ(direction){
+        distToMoveZ = $("#distToMoveZ").val();
+        console.log(distToMoveZ)
+        socket.emit('moveZ',{data:{direction:direction,distToMoveZ:distToMoveZ}});
     }
 
     function settingRequest(setting){
@@ -100,11 +105,20 @@
         <li class="nav-item active">
           <a class="nav-link" href="\">FrontPage <span class="sr-only">(current)</span></a>
         </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            G-Code
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a>
+            <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
+          </div>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="requestPage('gcode');">GCode</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="\actions">Actions</a>
+            <a class="nav-link" href="#" onclick="requestPage('actions');">Actions</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

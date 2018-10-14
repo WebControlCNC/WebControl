@@ -76,7 +76,7 @@
             "section": "Advanced Settings", 
             "title": "Extend Chain Distance", 
             "type": "string", 
-            "value": "2000"
+            "value": "2200"
         }, 
         {
             "default": 3360, 
@@ -131,7 +131,7 @@
             "section": "Advanced Settings", 
             "title": "Home Position X Coordinate", 
             "type": "string", 
-            "value": "0.0"
+            "value": "4.67"
         }, 
         {
             "default": 0.0, 
@@ -140,7 +140,7 @@
             "section": "Advanced Settings", 
             "title": "Home Position Y Coordinate", 
             "type": "string", 
-            "value": "-1.0"
+            "value": "0.71"
         }, 
         {
             "default": 0, 
@@ -514,14 +514,26 @@
             "value": "63.50000"
         }, 
         {
-            "default": 25.4, 
+            "default": 1.0, 
             "key": "distToMove", 
             "type": "float", 
             "value": 1.0
         }, 
         {
+            "default": 0.5, 
+            "key": "distToMoveZ", 
+            "type": "float", 
+            "value": 0.2
+        }, 
+        {
             "default": "MM", 
             "key": "units", 
+            "type": "string", 
+            "value": "INCHES"
+        }, 
+        {
+            "default": "MM", 
+            "key": "unitsZ", 
             "type": "string", 
             "value": "INCHES"
         }
@@ -614,7 +626,7 @@
             "section": "Maslow Settings", 
             "title": "z-axis installed", 
             "type": "bool", 
-            "value": 0
+            "value": 1
         }, 
         {
             "default": 3.17, 

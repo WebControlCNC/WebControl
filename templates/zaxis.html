@@ -1,0 +1,38 @@
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class = "col-9">
+      <div class="row">
+        <div class="col-4 mb-1">
+          <input class="form-control" id="distToMoveZ" value="0.01">
+        </div>
+        <div class="col-4 mb-1">
+          <button id="unitsZ" type="button" class="btn  btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">--</button>
+        </div>
+        <div class="col-4 mb-1">
+          <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="moveZ('raise')">Raise</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4 mb-1">
+            <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="done();">Done</button>
+        </div>
+        <div class="col-4 mb-1">
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('defineZ0');">Define Zero</button>
+        </div>
+        <div class="col-4 mb-1">
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="moveZ('lower');">Lower</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn  btn-lg btn-block btn-danger" onclick="action('stopZ');">Stop</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+  <script src="{{ url_for('static',filename='scripts/zAxis.js') }}" crossorigin="anonymous"></script>
+{% endblock %}

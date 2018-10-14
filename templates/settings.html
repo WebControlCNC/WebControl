@@ -1,5 +1,6 @@
 {% block content %}
 <div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
   <form id="settingsForm">
     <ul class="list-group">
       {% for setting in settings %}
@@ -33,8 +34,9 @@
 $(document).ready(function () {
     $('#settingsForm').on('submit', function(e) {
         e.preventDefault();
+        var url = $("#pageID").val()
         $.ajax({
-            url : '/maslowSettings',
+            url : '/'+url,
             type: "POST",
             data: $(this).serialize(),
             success: function (data) {

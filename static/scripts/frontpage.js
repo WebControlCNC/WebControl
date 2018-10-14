@@ -66,7 +66,20 @@ function unitSwitch(){
 $(document).ready(function(){
     settingRequest("units");
     settingRequest("distToMove");
+    checkForGCodeUpdate();
 });
+
+function pauseRun(){
+  if ($("#pauseButton").text()=="Pause"){
+    $("#pauseButton").text("Resume");
+    action('pauseRun');
+  }
+  else {
+    $("#pauseButton").text("Pause");
+    action('resumeRun');
+  }
+
+}
 
 function processRequestedSetting(msg){
   console.log(msg);
@@ -77,6 +90,14 @@ function processRequestedSetting(msg){
   if (msg.setting=="distToMove"){
     console.log("requestedSetting for distToMove:"+msg.value);
     $("#distToMove").val(msg.value)
+  }
+  if (msg.setting=="unitsZ"){
+    console.log("requestedSetting:"+msg.value);
+    $("#unitsZ").text(msg.value)
+  }
+  if (msg.setting=="distToMoveZ"){
+    console.log("requestedSetting for distToMoveZ:"+msg.value);
+    $("#distToMoveZ").val(msg.value)
   }
 }
 
