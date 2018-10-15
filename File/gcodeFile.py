@@ -3,7 +3,6 @@ from DataStructures.makesmithInitFuncs         import  MakesmithInitFuncs
 import sys
 import threading
 import re
-import svgwrite
 import math
 
 class Line():
