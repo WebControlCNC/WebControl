@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
+
+{% block javascript %}
+  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage.js') }}" crossorigin="anonymous"></script>
+  <script> feather.replace() </script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h3>Controls</h3>
+  <div class="row">
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="move('upLeft')">
+        <i data-feather="arrow-up-left"></i>
+      </button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="move('up')";>
+        <i data-feather="arrow-up"></i>
+      </button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="move('upRight')">
+        <i data-feather="arrow-up-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="move('left')">
+        <i data-feather="arrow-left"></i>
+      </button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('home')">
+        <i data-feather="home"></i>
+      </button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="move('right')">
+        <i data-feather="arrow-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="move('downLeft')">
+        <i data-feather="arrow-down-left"></i>
+      </button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="move('down')">
+        <i data-feather="arrow-down"></i>
+      </button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="move('downRight')">
+        <i data-feather="arrow-down-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-primary btn-block" >Macro1</button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-primary btn-block">Macro2</button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-5  mb-1">
+      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('defineHome')" >Def. Home</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3  mb-1">
+      <label>Dist To Move</label>
+    </div>
+    <div class="col-4  mb-1">
+      <input class="form-control" id="distToMove" value="0.01">
+    </div>
+    <div class="col-4  mb-1">
+      <button id="units" type="button" class="btn btn-lg btn-secondary" onclick="unitSwitch();">--</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-block btn-success" onclick="action('startRun')">Play</button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" id="pauseButton" class="btn btn-lg btn-block btn-warning" onclick="pauseRun()">Pause</button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-lg btn-block btn-danger onclick="action('stopRun')"">Stop</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2  mb-1">
+      <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeZ',-1);">&lt;Z</button>
+    </div>
+    <div class="col-2  mb-1">
+      <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeIndex',1);">&lt;1</button>
+    </div>
+    <div class="col-4  mb-1">
+      <button type="button" class="btn btn-md btn-block btn-secondary">Goto</button>
+    </div>
+    <div class="col-2  mb-1">
+      <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeIndex',1);">1&gt;</button>
+    </div>
+    <div class="col-2  mb-1">
+      <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeZ',-1);">Z&gt;</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3  mb-1">
+      <h4>Position</h4>
+    </div>
+    <div class="col-6  mb-1">
+      <p id='positionMessage'></p>
+    </div>
+  </div>
+  <div id="workarea" class="row" style="height:400px">
+  </div>
+  <div class="row">
+      <div class="col mb-1">
+        <h3>Controller Messages</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col mb-1">
+        <div class="scrollText" id='controllerMessage'></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

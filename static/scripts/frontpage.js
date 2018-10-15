@@ -4,7 +4,7 @@
 
 var scale = 1;
 
-var draw = SVG('workarea').size('100%','100%').panZoom({zoomMin: 10, zoomMax: 100, zoomFactor:2.5});
+var draw = SVG('workarea').size('100%','100%').panZoom({zoomMin: 1, zoomMax: 500, zoomFactor:2.5});
 var viewbox = draw.viewbox();
 var originX = viewbox.width/2;
 var originY = viewbox.height/2;

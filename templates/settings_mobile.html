@@ -1,0 +1,55 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+  <form id="settingsForm">
+    <ul class="list-group">
+      {% for setting in settings %}
+      <li class="list-group-item">
+        <div class="row align-items-center">
+          <div class="col">
+            <h4>{{setting.title}}</h4>
+            <p>{{setting.desc}}</p>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col">
+            {% if setting.type=="bool" %}
+              <span class="switch switch-lg">
+                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
+                <label for="switch-{{setting.key}}"></label>
+              </span>
+            {% else %}
+              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}">
+            {% endif %}
+          </div>
+        </div>
+      </il>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function () {
+    $('#settingsForm').on('submit', function(e) {
+        e.preventDefault();
+        var url = $("#pageID").val()
+        $.ajax({
+            url : '/'+url,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (data) {
+              console.log("success");
+                $('#notificationModal').modal('toggle')
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

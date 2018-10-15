@@ -9,6 +9,8 @@ import json
 import re
 from threading import Thread
 from flask import Flask, jsonify, render_template, current_app, request, flash
+from flask_mobility import Mobility
+from flask_mobility.decorators import mobile_template
 from flask_socketio import SocketIO
 from werkzeug import secure_filename
 
@@ -45,13 +47,18 @@ app.previousPosY = 0.0
 #read settings file from disk:
 
 @app.route('/')
-def index():
+@mobile_template('{mobile/}')
+def index(template):
+    print template
     current_app._get_current_object()
     thread = socketio.start_background_task(background_stuff, current_app._get_current_object())
     thread.start()
     if not app.data.connectionStatus:
         app.data.serialPort.openConnection()
-    return render_template('frontpage.html')
+    if (template=='mobile/'):
+        return render_template('frontpage_mobile.html')
+    else:
+        return render_template('frontpage.html')
 
 
 @app.route('/maslowSettings', methods=['GET','POST'])
@@ -106,25 +113,34 @@ def my_event(msg):
 
 @socketio.on('requestPage', namespace="/MaslowCNC")
 def requestPage(msg):
-    if msg['data']=="maslowSettings":
+    if msg['data']['page']=="maslowSettings":
         setValues = app.data.config.getJSONSettingSection("Maslow Settings")
-        page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
+        if msg['data']['isMobile']:
+            page =render_template('settings_mobile.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
+        else:
+            page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
         socketio.emit('activateModal', {'title':"Maslow Settings", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']=="advancedSettings":
+    if msg['data']['page']=="advancedSettings":
         setValues = app.data.config.getJSONSettingSection("Advanced Settings")
-        page =render_template('settings.html', title="Advanced Settings", settings=setValues, pageID="advancedSettings")
+        if msg['data']['isMobile']:
+            page =render_template('settings_mobile.html', title="Advanced Settings", settings=setValues, pageID="advancedSettings")
+        else:
+            page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
         socketio.emit('activateModal', {'title':"Advanced Settings", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']=="webControlSettings":
+    if msg['data']['page']=="webControlSettings":
         setValues = app.data.config.getJSONSettingSection("WebControl Settings")
-        page =render_template('settings.html', title="WebControl Settings", settings=setValues, pageID="webControlSettings")
+        if msg['data']['isMobile']:
+            page =render_template('settings_mobile.html', title="WebControl Settings", settings=setValues, pageID="webControlSettings")
+        else:
+            page =render_template('settings.html', title="WebControl Settings", settings=setValues, pageID="webControlSettings")
         socketio.emit('activateModal', {'title':"WebControl Settings", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']=="openGCode":
+    if msg['data']['page']=="openGCode":
         page =render_template('openGCode.html')
         socketio.emit('activateModal', {'title':"GCode", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']=='actions':
+    if msg['data']['page']=='actions':
         page = render_template('actions.html')
         socketio.emit('activateModal', {'title':"Actions", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']=='zAxis':
+    if msg['data']['page']=='zAxis':
         page = render_template('zaxis.html')
         socketio.emit('activateModal', {'title':"Z-Axis", 'message':page}, namespace='/MaslowCNC')
 
@@ -388,3 +404,4 @@ if __name__ == '__main__':
     app.debug = False
     app.config['SECRET_KEY'] = 'secret!'
     socketio.run(app, use_reloader=False)
+    #socketio.run(app, host='0.0.0.0')
