@@ -1,0 +1,128 @@
+
+{% block content %}
+<div class="container-fluid">
+  <h3>Left Motor</h3>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',360.0)">
+        <i data-feather="refresh-cw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',10.0)">
+        <i data-feather="rotate-cw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',1)">
+        <i data-feather="rotate-cw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',0.1)">
+        <i data-feather="rotate-cw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',-360.0)">
+        <i data-feather="refresh-ccw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',-10.0)">
+        <i data-feather="rotate-ccw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',-1)">
+        <i data-feather="rotate-ccw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','L',-0.1)">
+        <i data-feather="rotate-ccw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <h3>Right Motor</h3>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',360.0)">
+        <i data-feather="refresh-cw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',10.0)">
+        <i data-feather="rotate-cw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',1)">
+        <i data-feather="rotate-cw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',0.1)">
+        <i data-feather="rotate-cw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',-360.0)">
+        <i data-feather="refresh-ccw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',-10.0)">
+        <i data-feather="rotate-ccw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',-1)">
+        <i data-feather="rotate-ccw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprockets','R',-0.1)">
+        <i data-feather="rotate-ccw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketAutomatic')">Automatic</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsZero')">Define Zero</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+   <script src="{{ url_for('static',filename='scripts/setSprockets.js') }}" crossorigin="anonymous"></script>
+   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+   <script>feather.replace() </script>
+{% endblock %}

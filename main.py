@@ -7,6 +7,7 @@ monkey.patch_all()
 import time
 import json
 import re
+import Queue
 from threading import Thread
 from flask import Flask, jsonify, render_template, current_app, request, flash
 from flask_mobility import Mobility
@@ -14,14 +15,15 @@ from flask_mobility.decorators import mobile_template
 from flask_socketio import SocketIO
 from werkzeug import secure_filename
 
-from background.backgroundTasks import background_stuff #do this after socketio is declared
-from DataStructures.data          import   Data
-from Connection.serialPort        import   SerialPort
-from config.config                       import   Config
-from DataStructures.logger                            import   Logger
-from DataStructures.loggingQueue                      import   LoggingQueue
-from Connection.nonVisibleWidgets import   NonVisibleWidgets
-import Queue
+from background.backgroundTasks     import    background_stuff #do this after socketio is declared
+from DataStructures.data            import    Data
+from Connection.serialPort          import    SerialPort
+from config.config                  import    Config
+from DataStructures.logger          import    Logger
+from DataStructures.loggingQueue    import    LoggingQueue
+from Connection.nonVisibleWidgets   import    NonVisibleWidgets
+from Actions.actions                import    Actions
+
 
 app.data = Data()
 app.nonVisibleWidgets = NonVisibleWidgets()
@@ -100,12 +102,17 @@ def gcode():
         f = request.files['file']
         app.data.gcodeFile.filename="gcode\\"+secure_filename(f.filename)
         f.save(app.data.gcodeFile.filename)
-        app.data.gcodeFile.loadUpdateFile()
-        #return render_template('frontpage.html')
-        message = {'status': 200}
-        resp = jsonify(message)
-        resp.status_code = 200
-        return resp
+        returnVal = app.data.gcodeFile.loadUpdateFile()
+        if (returnVal):
+            message = {'status': 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {'status': 500 }
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
 
 @socketio.on('my event', namespace='/MaslowCNC')
 def my_event(msg):
@@ -120,28 +127,31 @@ def requestPage(msg):
         else:
             page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
         socketio.emit('activateModal', {'title':"Maslow Settings", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']['page']=="advancedSettings":
+    elif msg['data']['page']=="advancedSettings":
         setValues = app.data.config.getJSONSettingSection("Advanced Settings")
         if msg['data']['isMobile']:
             page =render_template('settings_mobile.html', title="Advanced Settings", settings=setValues, pageID="advancedSettings")
         else:
             page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
         socketio.emit('activateModal', {'title':"Advanced Settings", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']['page']=="webControlSettings":
+    elif msg['data']['page']=="webControlSettings":
         setValues = app.data.config.getJSONSettingSection("WebControl Settings")
         if msg['data']['isMobile']:
             page =render_template('settings_mobile.html', title="WebControl Settings", settings=setValues, pageID="webControlSettings")
         else:
             page =render_template('settings.html', title="WebControl Settings", settings=setValues, pageID="webControlSettings")
         socketio.emit('activateModal', {'title':"WebControl Settings", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']['page']=="openGCode":
+    elif msg['data']['page']=="openGCode":
         page =render_template('openGCode.html')
         socketio.emit('activateModal', {'title':"GCode", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']['page']=='actions':
+    elif msg['data']['page']=='actions':
         page = render_template('actions.html')
         socketio.emit('activateModal', {'title':"Actions", 'message':page}, namespace='/MaslowCNC')
-    if msg['data']['page']=='zAxis':
+    elif msg['data']['page']=='zAxis':
         page = render_template('zaxis.html')
+        socketio.emit('activateModal', {'title':"Z-Axis", 'message':page}, namespace='/MaslowCNC')
+    elif msg['data']['page']=='setSprockets':
+        page = render_template('setSprockets.html')
         socketio.emit('activateModal', {'title':"Z-Axis", 'message':page}, namespace='/MaslowCNC')
 
 @socketio.on('connect', namespace='/MaslowCNC')
@@ -156,188 +166,91 @@ def test_disconnect():
 
 @socketio.on('action', namespace='/MaslowCNC')
 def command(msg):
-    dist = 0
     if (msg['data']['command']=='resetChainLengths'):
-        app.data.gcode_queue.put("B08 ")
+        if not app.data.actions.resetChainLengths():
+            app.data.message_queue.put("Message: Error with resetting chain lengths.")
     elif (msg['data']['command']=='reportSettings'):
         app.data.gcode_queue.put('$$')
     elif (msg['data']['command']=='home'):
-        app.data.gcode_queue.put("G90  ")
-        #todo:self.gcodeVel = "[MAN]"
-        safeHeightMM = float(app.data.config.getValue('Maslow Settings', 'zAxisSafeHeight'))
-        safeHeightInches = safeHeightMM / 25.5
-        if app.data.units == "INCHES":
-            app.data.gcode_queue.put("G00 Z" + '%.3f'%(safeHeightInches))
-        else:
-            app.data.gcode_queue.put("G00 Z" + str(safeHeightMM))
-        app.data.gcode_queue.put("G00 X" + str(app.data.gcodeShift[0]) + " Y" + str(app.data.gcodeShift[1]) + " ")
-        app.data.gcode_queue.put("G00 Z0 ")
+        if not app.data.actions.home():
+            app.data.message_queue.put("Message: Error with returning to home.")
     elif (msg['data']['command']=='defineHome'):
-        if app.data.units == 'MM':
-            scaleFactor = 25.4
+        if app.data.actions.defineHome():
+            ## the gcode file might change the active units so we need to inform the UI of the change.
+            units = app.data.config.getValue('Computed Settings', 'units')
+            socketio.emit('requestedSetting', {'setting':'units','value':units}, namespace='/MaslowCNC')
+            ## send updated gcode to UI
+            socketio.emit('gcodeUpdate', {'data':json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])}, namespace='/MaslowCNC')
         else:
-            scaleFactor = 1.0
-        #print "xval:"+str(app.data.xval)+", yval:"+str(app.data.yval)
-        app.data.gcodeShift = [app.data.xval/scaleFactor,app.data.yval/scaleFactor]
-        app.data.config.setValue("Advanced Settings", 'homeX', str(app.data.xval))
-        app.data.config.setValue("Advanced Settings", 'homeY', str(app.data.yval))
-        app.data.gcodeFile.loadUpdateFile()
-        print "preparing gcode update"
-        sendStr = json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])
-        #app.data.gcodeFile.isChanged=False
-        units = app.data.config.getValue('Computed Settings', 'units')
-        socketio.emit('requestedSetting', {'setting':'units','value':units}, namespace='/MaslowCNC')
-        socketio.emit('gcodeUpdate', {'data':sendStr}, namespace='/MaslowCNC')
-        print "#Gcode Sent"
+            app.data.message_queue.put("Message: Error with defining home.")
+
     elif (msg['data']['command']=='defineZ0'):
-        app.data.gcode_queue.put("G10 Z0 ")
+        if not app.data.actions.defineZ0():
+            app.data.message_queue.put("Message: Error with defining Z-Axis zero.")
     elif (msg['data']['command']=='stopZ'):
-        app.data.quick_queue.put("!")
-        with app.data.gcode_queue.mutex:
-            app.data.gcode_queue.queue.clear()
+        if not app.data.actions.stopZ():
+            app.data.message_queue.put("Message: Error with stopping Z-Axis movement")
     elif (msg['data']['command']=='startRun'):
-        try:
-            app.data.uploadFlag = 1
-            app.data.gcode_queue.put(app.data.gcode[app.data.gcodeIndex])
-            app.data.gcodeIndex = app.data.gcodeIndex + 1
-        except:
-            print "gcode run complete"
-            app.gcodecanvas.uploadFlag = 0
-            app.data.gcodeIndex = 0
+        if not app.data.actions.startRun():
+            app.data.message_queue.put("Message: Error with starting run")
     elif (msg['data']['command']=='stopRun'):
-        app.data.uploadFlag = 0
-        app.data.gcodeIndex = 0
-        app.data.quick_queue.put("!")
-        with app.data.gcode_queue.mutex:
-            app.data.gcode_queue.queue.clear()
-        #TODO: app.onUploadFlagChange(self.stopRun, 0)
-        print("Gcode Stopped")
+        if not app.data.actions.stopRun():
+            app.data.message_queue.put("Message: Error with stopping run")
     elif (msg['data']['command']=='moveToDefault'):
-        chainLength = app.data.config.getValue('Advanced Settings', 'chainExtendLength')
-        app.data.gcode_queue.put("G90 ")
-        app.data.gcode_queue.put("B09 R"+str(chainLength)+" L"+str(chainLength)+" ")
-        app.data.gcode_queue.put("G91 ")
+        if not app.data.actions.moveToDefault():
+            app.data.message_queue.put("Message: Error with moving to default chain lengths")
     elif (msg['data']['command']=='testMotors'):
-        app.data.gcode_queue.put("B04 ")
+        if not app.data.actions.testMotors():
+            app.data.message_queue.put("Message: Error with testing motors")
     elif (msg['data']['command']=='wipeEEPROM'):
-        app.data.gcode_queue.put("$RST=* ")
-        timer = threading.Timer(6.0, app.data.gcode_queue.put('$$'))
-        timer.start()
+        if not app.data.actions.wipeEEPROM():
+            app.data.message_queue.put("Message: Error with wiping EEPROM")
     elif (msg['data']['command']=='pauseRun'):
-        app.data.uploadFlag = 0
-        print("Run Paused")
+        if not app.data.actions.pauseRun():
+            app.data.message_queue.put("Message: Error with pausing run")
     elif (msg['data']['command']=='resumeRun'):
-        app.data.uploadFlag = 1
-        app.data.quick_queue.put("~") #send cycle resume command to unpause the machine
+        if not app.data.actions.resumeRun():
+            app.data.message_queue.put("Message: Error with resuming run")
     elif (msg['data']['command']=='returnToCenter'):
-        app.data.gcode_queue.put("G90  ")
-        safeHeightMM = float(app.data.config.getValue('Maslow Settings', 'zAxisSafeHeight'))
-        safeHeightInches = safeHeightMM / 24.5
-        if app.data.units == "INCHES":
-            app.data.gcode_queue.put("G00 Z" + '%.3f'%(safeHeightInches))
-        else:
-            app.data.gcode_queue.put("G00 Z" + str(safeHeightMM))
-        app.data.gcode_queue.put("G00 X0.0 Y0.0 ")
+        if not app.data.actions.returnToCenter():
+            app.data.message_queue.put("Message: Error with returning to center")
     elif (msg['data']['command']=='clearGCode'):
-        app.data.gcodeFile = ""
-        socketio.emit('gcodeUpdate', {'data':''}, namespace='/MaslowCNC')
+        if app.data.actions.clearGCode():
+            #send blank gcode to UI
+            socketio.emit('gcodeUpdate', {'data':''}, namespace='/MaslowCNC')
+        else:
+            app.data.message_queue.put("Message: Error with clearing gcode")
     elif (msg['data']['command']=='moveGcodeZ'):
-        dist = 0
-        moves = int(msg['data']['arg'])
-        for index,zMove in enumerate(app.data.zMoves):
-            if moves > 0 and zMove > app.data.gcodeIndex:
-                dist = app.data.zMoves[index+moves-1]-app.data.gcodeIndex
-                break
-            if moves < 0 and zMove < app.data.gcodeIndex:
-                dist = app.data.zMoves[index+moves+1]-app.data.gcodeIndex
-        #this command will continue on in the moveGcodeIndex "if"
+        if not app.data.actions.moveGcodeZ(int(msg['data']['arg'])):
+            app.data.message_queue.put("Message: Error with moving to Z move")
+    elif (msg['data']['command']=='moveGcodeIndex' or msg['data']['command']=='moveGcodeZ'):
+        if not app.data.actions.moveGcodeIndex(int(msg['data']['arg'])):
+            app.data.message_queue.put("Message: Error with moving to index")
+    elif (msg['data']['command']=='setSprockets'):
+        if not app.data.actions.setSprockets(msg['data']['arg'],msg['data']['arg1']):
+            app.data.message_queue.put("Message: Error with setting sprocket")
+    elif (msg['data']['command']=='setSprocketsAutomatic'):
+        if not app.data.actions.setSprocketsAutomatic():
+            app.data.message_queue.put("Message: Error with setting sprockets automatically")
+    elif (msg['data']['command']=='setSprocketsZero'):
+        if not app.data.actions.setSprocketsZero():
+            app.data.message_queue.put("Message: Error with setting sprockets zero value")
 
-    if (msg['data']['command']=='moveGcodeIndex' or msg['data']['command']=='moveGcodeZ'):
-        maxIndex = len(app.data.gcode)-1
-        if  msg['data']['command']=='moveGcodeZ':
-            targetIndex = app.data.gcodeIndex + dist
-        else:
-            targetIndex = app.data.gcodeIndex + int(msg['data']['arg'])
 
-        print "targetIndex="+str(targetIndex)
-        #check to see if we are still within the length of the file
-        if maxIndex < 0:              #break if there is no data to read
-            return
-        elif targetIndex < 0:             #negative index not allowed
-            app.data.gcodeIndex = 0
-        elif targetIndex > maxIndex:    #reading past the end of the file is not allowed
-            app.data.gcodeIndex = maxIndex
-        else:
-            app.data.gcodeIndex = targetIndex
-        gCodeLine = app.data.gcode[app.data.gcodeIndex]
-        print app.data.gcode
-        print "gcodeIndex="+str(app.data.gcodeIndex)+", gCodeLine:"+gCodeLine
-        xTarget = 0
-        yTarget = 0
-
-        try:
-            x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-            if x:
-                xTarget = float(x.groups()[0])
-                app.previousPosX = xTarget
-            else:
-                xTarget = app.previousPosX
-
-            y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-            print y
-            if y:
-                yTarget = float(y.groups()[0])
-                app.previousPosY = yTarget
-            else:
-                yTarget = app.previousPosY
-            #self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
-            print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
-            position = {'xval':xTarget,'yval':yTarget,'zval':app.data.zval}
-            socketio.emit('positionMessage', {'data':json.dumps(position) }, namespace='/MaslowCNC')
-        except:
-            print "Unable to update position for new gcode line"
 
 @socketio.on('move', namespace='/MaslowCNC')
 def move(msg):
-    distToMove = float(msg['data']['distToMove'])
-    if (msg['data']['direction']=='upLeft'):
-        app.data.gcode_queue.put("G91 G00 X" + str(-1.0*distToMove) + " Y" + str(distToMove) + " G90 ")
-    elif (msg['data']['direction']=='up'):
-        app.data.gcode_queue.put("G91 G00 Y" + str(distToMove) + " G90 ")
-    elif (msg['data']['direction']=='upRight'):
-        app.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " Y" + str(distToMove) + " G90 ")
-    elif (msg['data']['direction']=='left'):
-        app.data.gcode_queue.put("G91 G00 X" + str(-1.0*distToMove) + " G90 ")
-    elif (msg['data']['direction']=='right'):
-        app.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " G90 ")
-    elif (msg['data']['direction']=='downLeft'):
-        app.data.gcode_queue.put("G91 G00 X" + str(-1.0*distToMove) + " Y" + str(-1.0*distToMove) + " G90 ")
-    elif (msg['data']['direction']=='down'):
-        app.data.gcode_queue.put("G91 G00 Y" + str(-1.0*distToMove) + " G90 ")
-    elif (msg['data']['direction']=='downRight'):
-        app.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " Y" + str(-1.0*distToMove) + " G90 ")
+    if not app.data.actions.move(msg['data']['direction'],float(msg['data']['distToMove'])):
+        app.data.message_queue.put("Message: Error with move")
 
 @socketio.on('moveZ', namespace='/MaslowCNC')
 def moveZ(msg):
-    distToMoveZ = float(msg['data']['distToMoveZ'])
-    app.data.config.setValue("Computed Settings", 'distToMoveZ',distToMoveZ)
-    unitsZ = app.data.config.getValue('Computed Settings', 'unitsZ')
-    if unitsZ == "MM":
-        app.data.gcode_queue.put('G21 ')
-    else:
-        app.data.gcode_queue.put('G20 ')
-    if (msg['data']['direction']=='raise'):
-        app.data.gcode_queue.put("G91 G00 Z" + str(float(distToMoveZ)) + " G90 ")
-    elif (msg['data']['direction']=='lower'):
-        app.data.gcode_queue.put("G91 G00 Z" + str(-1.0*float(distToMoveZ)) + " G90 ")
-    units = app.data.config.getValue('Computed Settings', 'units')
-    if units == "MM":
-        app.data.gcode_queue.put('G21 ')
-    else:
-        app.data.gcode_queue.put('G20 ')
+    if not app.data.actions.moveZ(float(msg['data']['distToMoveZ'])):
+        app.data.message_queue.put("Message: Error with Z-Axis move")
 
 @socketio.on('settingRequest', namespace="/MaslowCNC")
 def settingRequest(msg):
+    # didn't move to actions.. this request is just to send it computed values
     if (msg['data']=="units"):
         units = app.data.config.getValue('Computed Settings', 'units')
         socketio.emit('requestedSetting', {'setting':msg['data'], 'value':units}, namespace='/MaslowCNC')
@@ -353,44 +266,17 @@ def settingRequest(msg):
 
 @socketio.on('updateSetting', namespace="/MaslowCNC")
 def updateSetting(msg):
-    if (msg['data']['setting']=='toInches'):
-        app.data.units = "INCHES"
-        app.data.config.setValue("Computed Settings", 'units',app.data.units)
-        scaleFactor = 1.0
-        app.data.gcodeShift = [app.data.xval/scaleFactor,app.data.yval/scaleFactor]
-        app.data.tolerance = 0.020
-        app.data.gcode_queue.put('G20 ')
-        app.data.config.setValue("Computed Settings", 'distToMove',msg['data']['value'])
-    if (msg['data']['setting']=='toMM'):
-        app.data.units = "MM"
-        app.data.config.setValue("Computed Settings", 'units',app.data.units)
-        scaleFactor = 25.4
-        app.data.gcodeShift = [app.data.xval/scaleFactor,app.data.yval/scaleFactor]
-        app.data.tolerance = 0.5
-        app.data.gcode_queue.put('G21')
-        app.data.config.setValue("Computed Settings", 'distToMove',msg['data']['value'])
-    if (msg['data']['setting']=='toInchesZ'):
-        app.data.units = "INCHES"
-        app.data.config.setValue("Computed Settings", 'unitsZ',app.data.units)
-        app.data.config.setValue("Computed Settings", 'distToMoveZ',msg['data']['value'])
-    if (msg['data']['setting']=='toMMZ'):
-        app.data.units = "MM"
-        app.data.config.setValue("Computed Settings", 'unitsZ',app.data.units)
-        app.data.config.setValue("Computed Settings", 'distToMoveZ',msg['data']['value'])
+    if not app.data.actions.updateSetting(msg['data']['setting'],msg['data']['value']):
+        app.data.message_queue.put("Message: Error updating setting")
 
 @socketio.on('checkForGCodeUpdate', namespace="/MaslowCNC")
 def checkForGCodeUpdate(msg):
-    print "got request for gcode update"
-    #print app.data.gcodeFile.isChanged
-    if True:#app.data.gcodeFile.isChanged:
-        print "preparing gcode update"
-        sendStr = json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])
-        #app.data.gcodeFile.isChanged=False
-        units = app.data.config.getValue('Computed Settings', 'units')
-        print units
-        socketio.emit('requestedSetting', {'setting':'units', 'value':units}, namespace='/MaslowCNC')
-        socketio.emit('gcodeUpdate', {'data':sendStr}, namespace='/MaslowCNC')
-        print "#Gcode Sent"
+    # this currently doesn't check for updated gcode, it just resends it..
+    ## the gcode file might change the active units so we need to inform the UI of the change.
+    units = app.data.config.getValue('Computed Settings', 'units')
+    socketio.emit('requestedSetting', {'setting':'units', 'value':units}, namespace='/MaslowCNC')
+    ## send updated gcode to UI
+    socketio.emit('gcodeUpdate', {'data':json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])}, namespace='/MaslowCNC')
 
 
 @socketio.on_error_default

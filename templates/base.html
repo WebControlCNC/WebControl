@@ -56,9 +56,9 @@
         })
 
     });
-    function action(command, arg){
+    function action(command, arg, arg1){
       //if (command=='reportSettings'){
-      socket.emit('action',{data:{command:command,arg:arg}});
+      socket.emit('action',{data:{command:command,arg:arg, arg1:arg1}});
       //}
 
     }

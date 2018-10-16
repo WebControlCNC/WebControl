@@ -1,6 +1,7 @@
 from DataStructures.makesmithInitFuncs         import   MakesmithInitFuncs
 from Connection.serialPort                     import   SerialPort
 from File.gcodeFile                            import   GCodeFile
+from Actions.actions                           import   Actions
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     '''
@@ -12,6 +13,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
 
     serialPort = SerialPort()
     gcodeFile = GCodeFile()
+    actions = Actions()
 
     def setUpData(self, data):
         '''
@@ -27,5 +29,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
 
         data.serialPort = self.serialPort #add the serial port widget to the data object
         data.gcodeFile = self.gcodeFile
+        data.actions = self.actions
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
+        self.actions.setUpData(data)

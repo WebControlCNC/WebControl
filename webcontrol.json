@@ -131,7 +131,7 @@
             "section": "Advanced Settings", 
             "title": "Home Position X Coordinate", 
             "type": "string", 
-            "value": "4.67"
+            "value": "0.0"
         }, 
         {
             "default": 0.0, 
@@ -140,7 +140,7 @@
             "section": "Advanced Settings", 
             "title": "Home Position Y Coordinate", 
             "type": "string", 
-            "value": "0.71"
+            "value": "0.0"
         }, 
         {
             "default": 0, 

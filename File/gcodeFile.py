@@ -33,13 +33,17 @@ class GCodeFile(MakesmithInitFuncs):
     filename=""
     line = []
 
+    def serializeGCode(self):
+        sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
+        return sendStr
+
     def loadUpdateFile(self):
         filename = self.data.gcodeFile.filename
         print filename
         del self.line[:]
         if filename is "": #Blank the g-code if we're loading "nothing"
             self.data.gcode = ""
-            return
+            return False
 
         try:
             filterfile = open(filename, 'r')
@@ -81,10 +85,13 @@ class GCodeFile(MakesmithInitFuncs):
                         self.data.zMoves.append(index)
         except:
             print "error"
-            self.data.message_queue.put("Message: Cannot reopen gcode file. It may have been moved or deleted. To locate it or open a different file use Actions > Open G-code")
+            self.data.message_queue.put("Message: Cannot open gcode file.")
             self.data.gcodeFile = ""
+            return False
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
+        return True
+
     def isClose(self, a, b):
         return abs(a-b) <= self.data.tolerance
 
