@@ -1,0 +1,54 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+  <form id="quickConfigureForm">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Kinematics</h4>
+        <p>The only option you can pick here at this time is Triangular.</p>
+        <select name="kinematics">
+          <option value="Triangular" selected}>Triangular</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Chain Around Sprocket</h4>
+        <p>Your setup is configured either with the chain from the sled wrapping around the sprocket counterclockwise (Top):</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/chainofftop.png') }}" height="300" width="300">
+        <p>Or wrapping around the sprocket clockwise (Bottom):</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/chainoffbottom.png') }}" height="300" width="300">
+        <p></p>
+        <select name="chainAroundSprocket">
+          <option value="Top" selected}>Top</option>
+          <option value="Top" selected}>Bottom</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function () {
+    $('#quickConfigureForm').on('submit', function(e) {
+        e.preventDefault();
+        var url = $("#pageID").val()
+        $.ajax({
+            url : '/'+url,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (data) {
+              console.log("success");
+                $('#notificationModal').modal('toggle')
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

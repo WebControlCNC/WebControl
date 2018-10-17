@@ -193,6 +193,10 @@ def requestPage(msg):
         chainSagCorrection = app.data.config.getValue("Advanced Settings", "chainSagCorrection")
         page = render_template('calibrate.html', pageID="calibrate", motorYoffset=motorYoffset, rotationRadius=rotationRadius, chainSagCorrection=chainSagCorrection)
         socketio.emit('activateModal', {'title':"Calibrate", 'message':page}, namespace='/MaslowCNC')
+    elif msg['data']['page']=='quickConfigure':
+        page = render_template('quickConfigure.html', pageID="quickConfigure")
+        socketio.emit('activateModal', {'title':"Quick Configure", 'message':page}, namespace='/MaslowCNC')
+
 
 @socketio.on('connect', namespace='/MaslowCNC')
 def test_connect():
