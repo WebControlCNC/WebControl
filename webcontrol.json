@@ -181,7 +181,7 @@
             "section": "Advanced Settings",
             "title": "Rotation Radius for Triangular Kinematics",
             "type": "string",
-            "value": "140"
+            "value": "139.6"
         },
         {
             "default": 0,
@@ -191,7 +191,7 @@
             "section": "Advanced Settings",
             "title": "Chain Sag Correction Value for Triangular Kinematics",
             "type": "string",
-            "value": "0"
+            "value": "7.815891"
         },
         {
             "default": 0,
@@ -586,7 +586,7 @@
             "section": "Maslow Settings",
             "title": "Motor Offset Height in MM",
             "type": "string",
-            "value": "500"
+            "value": "895.3"
         },
         {
             "default": 310,
@@ -626,7 +626,7 @@
             "section": "Maslow Settings",
             "title": "z-axis installed",
             "type": "bool",
-            "value": 0
+            "value": 1
         },
         {
             "default": 3.17,

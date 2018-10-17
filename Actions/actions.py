@@ -238,18 +238,18 @@ class Actions(MakesmithInitFuncs):
             return False
 
 
-    def moveZ(self, distToMoveZ):
-        try:
-            distToMoveZ = float(msg['data']['distToMoveZ'])
+    def moveZ(self, direction, distToMoveZ):
+        if True:
+            #distToMoveZ = float(msg['data']['distToMoveZ'])
             self.data.config.setValue("Computed Settings", 'distToMoveZ',distToMoveZ)
             unitsZ = self.data.config.getValue('Computed Settings', 'unitsZ')
             if unitsZ == "MM":
                 self.data.gcode_queue.put('G21 ')
             else:
                 self.data.gcode_queue.put('G20 ')
-            if (msg['data']['direction']=='raise'):
+            if (direction=='raise'):
                 self.data.gcode_queue.put("G91 G00 Z" + str(float(distToMoveZ)) + " G90 ")
-            elif (msg['data']['direction']=='lower'):
+            elif (direction=='lower'):
                 self.data.gcode_queue.put("G91 G00 Z" + str(-1.0*float(distToMoveZ)) + " G90 ")
             units = self.data.config.getValue('Computed Settings', 'units')
             if units == "MM":
@@ -257,7 +257,7 @@ class Actions(MakesmithInitFuncs):
             else:
                 self.data.gcode_queue.put('G20 ')
             return True
-        except:
+        if False:
             return False
 
     def updateSetting(self, setting, value):
@@ -378,4 +378,29 @@ class Actions(MakesmithInitFuncs):
             self.data.comPorts = portsList
             return True
         if False:
+            return False
+
+    def calibrate(self, result):
+        try:
+            motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(result)
+            print(motorYoffsetEst)
+            print(rotationRadiusEst)
+            print(chainSagCorrectionEst)
+            if (motorYoffsetEst==False):
+                return False
+            return motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst
+            '''
+            self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorYoffsetEst))
+            self.data.config.setValue('Advanced Settings', 'rotationRadius', str(rotationRadiusEst))
+            self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(chainSagCorrectionEst))
+
+            # With new calibration parameters return sled to workspace center
+
+            self.data.gcode_queue.put("G21 ")
+            self.data.gcode_queue.put("G90 ")
+            self.data.gcode_queue.put("G40 ")
+            self.data.gcode_queue.put("G0 X0 Y0 ")
+            '''
+            return True
+        except:
             return False

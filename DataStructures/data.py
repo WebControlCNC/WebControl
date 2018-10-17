@@ -68,7 +68,7 @@ class Data():
     Pointers to Objects
     '''
     serialPort = None #this is a pointer to the program serial port object
-
+    triangularCalibration = None #points to the triangular calibration object
     '''
 
     Colors

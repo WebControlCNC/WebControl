@@ -1,0 +1,72 @@
+
+{% block content %}
+<div class="container-fluid">
+  <h5>Cut Test Pattern</h5>
+  <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutTriangularCalibrationPattern');">Cut Triangular Calibration Pattern</button>
+  <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopCut');">Stop</button>
+  <h5>Measurements</h5>
+  <div class="card">
+    <div class="card-body">
+      <form id="calibrateForm">
+        <input id="pageID" type="hidden" value="{{pageID}}">
+        <div class="form-group">
+          <div class="form-group">
+            <label for="cut12">Distance Between Cuts 1 and 2</label>
+            <input class="form-control" name="cut12" value="1930">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="cut34">Distance Between Cuts 3 and 4</label>
+            <input class="form-control" name="cut34" value="1930">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="cut12">Distance Between Top of Work Area and Cut 5</label>
+            <input class="form-control" name="cut5" value="300">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="cut12">Router Bit Diameter</label>
+            <input class="form-control" name="bitDiameter" value="6.35">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <h5>Parameters</h5>
+  <p><label id="motorYoffset">Height of Motors: {{motorYoffset}}</label></p>
+  <p><label id="rotationRadius">Rotational Radius: {{rotationRadius}}</label></p>
+  <p><label id="chainSagCorrection">Chain Sag Correction: {{chainSagCorrection}}</label></p>
+  <p><label id="calibrationError">Calibration Error: n/a</label></p>
+  <button id="acceptCalibration" disabled type="Accept" class="btn btn-lg btn-block btn-primary" onclick="action('acceptCalibrationResults',0,0);$('#notificationModal').modal('toggle')">Accept Results</button>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function () {
+    $('#calibrateForm').on('submit', function(e) {
+        e.preventDefault();
+        var url = $("#pageID").val()
+        $.ajax({
+            url : '/'+url,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (msg) {
+              console.log("success");
+              $("#motorYoffset").html("Height of Motors: "+msg.data.motorYoffset);
+              $("#rotationRadius").html("Rotational Radius: "+msg.data.rotationRadius);
+              $("#chainSagCorrection").html("Chain Sag Correction: "+msg.data.chainSagCorrection);
+              $("#calibationError").html("Calibration Error: "+msg.data.calibrationError);
+              $("#acceptCalibration").prop("disabled", false);
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

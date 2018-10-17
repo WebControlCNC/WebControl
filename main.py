@@ -126,6 +126,24 @@ def gcode():
             resp.status_code = 500
             return resp
 
+@app.route('/calibrate', methods=['GET','POST'])
+def calibrate():
+    if request.method=="POST":
+        result = request.form
+        motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = app.data.actions.calibrate(result)
+        #print(returnVal)
+        if (motorYoffsetEst):
+            message = {'status': 200, 'data':{'motorYoffset':motorYoffsetEst, 'rotationRadius':rotationRadiusEst, 'chainSagCorrection':chainSagCorrectionEst, 'calibrationError':cut34YoffsetEst}}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {'status': 500 }
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+
 @socketio.on('my event', namespace='/MaslowCNC')
 def my_event(msg):
     print (msg['data'])
@@ -169,6 +187,12 @@ def requestPage(msg):
     elif msg['data']['page']=='setSprockets':
         page = render_template('setSprockets.html')
         socketio.emit('activateModal', {'title':"Z-Axis", 'message':page}, namespace='/MaslowCNC')
+    elif msg['data']['page']=='calibrate':
+        motorYoffset = app.data.config.getValue("Maslow Settings", "motorOffsetY")
+        rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
+        chainSagCorrection = app.data.config.getValue("Advanced Settings", "chainSagCorrection")
+        page = render_template('calibrate.html', pageID="calibrate", motorYoffset=motorYoffset, rotationRadius=rotationRadius, chainSagCorrection=chainSagCorrection)
+        socketio.emit('activateModal', {'title':"Calibrate", 'message':page}, namespace='/MaslowCNC')
 
 @socketio.on('connect', namespace='/MaslowCNC')
 def test_connect():
@@ -264,7 +288,7 @@ def move(msg):
 
 @socketio.on('moveZ', namespace='/MaslowCNC')
 def moveZ(msg):
-    if not app.data.actions.moveZ(float(msg['data']['distToMoveZ'])):
+    if not app.data.actions.moveZ(msg['data']['direction'],float(msg['data']['distToMoveZ'])):
         app.data.message_queue.put("Message: Error with Z-Axis move")
 
 @socketio.on('settingRequest', namespace="/MaslowCNC")
