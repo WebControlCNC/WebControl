@@ -82,8 +82,8 @@ class Config(MakesmithInitFuncs):
         print("at update Settings")
         updated=False
         for x in range(len(self.settings[section])):
-            print(self.settings[section][x]["key"])
-            print(self.settings[section][x]["type"])
+            #print(self.settings[section][x]["key"])
+            #print(self.settings[section][x]["type"])
             found = False
             for setting in result:
                 if self.settings[section][x]["key"]==setting:
@@ -259,7 +259,7 @@ class Config(MakesmithInitFuncs):
                         if (storedValue != ""):
                             self.sendErrorArray(firmwareKey, storedValue, data)
                     elif not self.isClose(float(storedValue), float(value)):
-                        #print "firmwareKey(send) = "+str(firmwareKey)+":"+str(storedValue)
+                        print("firmwareKey(send) = "+str(firmwareKey)+":"+str(storedValue))
                         app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                     else:
                         break
@@ -364,6 +364,8 @@ class Config(MakesmithInitFuncs):
     def computeSettings(self, section, key, value, all=False):
             # Update Computed settings
             if key == 'kinematicsType' or all==True:
+                if all==True:
+                    value=self.getValue("Advanced Settings","kinematicsType")
                 if value == 'Quadrilateral':
                     self.setValue('Computed Settings', 'kinematicsTypeComputed', "1", True)
                 else:
@@ -418,10 +420,15 @@ class Config(MakesmithInitFuncs):
                     self.setValue('Computed Settings', key, value, True)
 
             if key == 'chainOverSprocket' or all == True:
+                if all==True:
+                    value=self.getValue("Advanced Settings","chainOverSprocket")
+                    print(value)
                 if value == 'Top':
                     self.setValue('Computed Settings',  'chainOverSprocketComputed', 1, True)
-                else:
+                elif value == 'Bottom':
                     self.setValue('Computed Settings',  'chainOverSprocketComputed', 2, True)
+                else:
+                    print(str(value)+" for chainOversprocket didnt register")
 
             if key == 'fPWM' or all == True:
                 if value == '31,000Hz':

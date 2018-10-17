@@ -76,7 +76,7 @@
             "section": "Advanced Settings",
             "title": "Extend Chain Distance",
             "type": "string",
-            "value": "2200"
+            "value": "2032"
         },
         {
             "default": 3360,
@@ -181,7 +181,7 @@
             "section": "Advanced Settings",
             "title": "Rotation Radius for Triangular Kinematics",
             "type": "string",
-            "value": "139.6"
+            "value": "132.75"
         },
         {
             "default": 0,
@@ -191,7 +191,7 @@
             "section": "Advanced Settings",
             "title": "Chain Sag Correction Value for Triangular Kinematics",
             "type": "string",
-            "value": "7.815891"
+            "value": "33"
         },
         {
             "default": 0,
@@ -493,7 +493,7 @@
             "firmwareKey": 38,
             "key": "chainOverSprocketComputed",
             "type": "string",
-            "value": 2
+            "value": 1
         },
         {
             "firmwareKey": 39,
@@ -546,7 +546,7 @@
             "section": "Maslow Settings",
             "title": "Serial Connection",
             "type": "string",
-            "value": "COM5"
+            "value": "/dev/ttyACM0"
         },
         {
             "default": 2978.4,
@@ -556,7 +556,7 @@
             "section": "Maslow Settings",
             "title": "Distance Between Motors",
             "type": "string",
-            "value": "3600"
+            "value": "3581.481"
         },
         {
             "default": 2438.4,
@@ -586,7 +586,7 @@
             "section": "Maslow Settings",
             "title": "Motor Offset Height in MM",
             "type": "string",
-            "value": "895.3"
+            "value": "510"
         },
         {
             "default": 310,

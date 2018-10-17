@@ -9,3 +9,6 @@ venv.bak/
 
 #logs
 log.txt
+
+#compiles
+*.pyc

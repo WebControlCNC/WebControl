@@ -5,6 +5,7 @@ import threading
 import re
 import math
 import serial.tools.list_ports
+import glob
 
 class Actions(MakesmithInitFuncs):
 
@@ -75,6 +76,7 @@ class Actions(MakesmithInitFuncs):
 
     def stopRun(self):
         try:
+            print("trying to stop run")
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             self.data.quick_queue.put("!")
@@ -293,12 +295,12 @@ class Actions(MakesmithInitFuncs):
 
     def setSprockets(self, sprocket, degrees):
         try:
-            degValue = round(float(self.data.config.getValue('Advanced Settings',"gearTeeth"))*float(self.data.config.getValue('Advanced Settings',"chainPitch"))/360.0*degrees,4);
+            degValue = round(float(self.data.config.getValue('Advanced Settings',"gearTeeth"))*float(self.data.config.getValue('Advanced Settings',"chainPitch"))/360.0*degrees,4)
             self.data.gcode_queue.put("G91 ")
             if self.data.config.getValue('Advanced Settings', 'chainOverSprocket') == 'Top':
-                self.data.gcode_queue.put("B09 L"+str(degValue)+" ")
+                self.data.gcode_queue.put("B09 "+sprocket+str(degValue)+" ")
             else:
-                self.data.gcode_queue.put("B09 L-"+str(degValue)+" ")
+                self.data.gcode_queue.put("B09 "+sprocket+"-"+str(degValue)+" ")
             self.data.gcode_queue.put("G90 ")
             return True
         except:
