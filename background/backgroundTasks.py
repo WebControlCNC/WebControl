@@ -36,7 +36,7 @@ def background_stuff(app):
                         try:
                             app.data.measureRequest(measuredDist)
                         except:
-                            print "No function has requested a measurement"
+                            print ("No function has requested a measurement")
                 elif message[0:13] == "Maslow Paused":
                     app.data.uploadFlag = 0
                     print(message)
@@ -89,7 +89,7 @@ def setPosOnScreen(app, message):
                 sendControllerMessage("Unable to resolve z Kinematics.")
                 app.data.zval = 0
     except:
-        print "One Machine Position Report Command Misread"
+        print ("One Machine Position Report Command Misread")
         return
 
     position = {'xval':app.data.xval,'yval':app.data.yval,'zval':app.data.zval}

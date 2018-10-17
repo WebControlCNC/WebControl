@@ -2,7 +2,7 @@ from time                                             import time
 from DataStructures.logger                            import   Logger
 from DataStructures.loggingQueue                      import   LoggingQueue
 from config.config                                    import Config
-import Queue
+import queue
 
 class Data():
     '''
@@ -92,8 +92,8 @@ class Data():
     Queues
     '''
     message_queue   =  LoggingQueue(logger)
-    gcode_queue     =  Queue.Queue()
-    quick_queue     =  Queue.Queue()
+    gcode_queue     =  queue.Queue()
+    quick_queue     =  queue.Queue()
 
     '''
     Position and Error values

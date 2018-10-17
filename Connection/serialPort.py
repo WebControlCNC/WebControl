@@ -33,8 +33,8 @@ class SerialPort(MakesmithInitFuncs):
         Defines which port the machine is attached to
 
         '''
-        print "update ports"
-        print port
+        print("update ports")
+        print(port)
         self.data.comport = port
 
     def connect(self, *args):
@@ -57,7 +57,7 @@ class SerialPort(MakesmithInitFuncs):
         #This function opens the thread which handles the input from the serial port
         #It only needs to be run once, it is run by connecting to the machine
 
-        print "At openConnection"
+        print("Attempting to open connection to controller")
         if not self.data.connectionStatus:
             #self.data.message_queue is the queue which handles passing CAN messages between threads
             #print "serialport.self.app.logger="+str(self.app.logger)

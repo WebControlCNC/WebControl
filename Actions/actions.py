@@ -171,7 +171,7 @@ class Actions(MakesmithInitFuncs):
             maxIndex = len(self.data.gcode)-1
             targetIndex = self.data.gcodeIndex + dist
 
-            print "targetIndex="+str(targetIndex)
+            #print "targetIndex="+str(targetIndex)
             #check to see if we are still within the length of the file
             if maxIndex < 0:              #break if there is no data to read
                 return
@@ -182,8 +182,8 @@ class Actions(MakesmithInitFuncs):
             else:
                 self.data.gcodeIndex = targetIndex
             gCodeLine = self.data.gcode[self.data.gcodeIndex]
-            print self.data.gcode
-            print "gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+gCodeLine
+            #print self.data.gcode
+            #print "gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+gCodeLine
             xTarget = 0
             yTarget = 0
 
@@ -196,18 +196,18 @@ class Actions(MakesmithInitFuncs):
                     xTarget = app.previousPosX
 
                 y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-                print y
+                #print y
                 if y:
                     yTarget = float(y.groups()[0])
                     app.previousPosY = yTarget
                 else:
                     yTarget = app.previousPosY
                 #self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
-                print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
+                #print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
                 position = {'xval':xTarget,'yval':yTarget,'zval':self.data.zval}
                 socketio.emit('positionMessage', {'data':json.dumps(position) }, namespace='/MaslowCNC')
             except:
-                print "Unable to update position for new gcode line"
+                print("Unable to update position for new gcode line")
                 return False
             return True
         except:
@@ -326,21 +326,21 @@ class Actions(MakesmithInitFuncs):
         self.moveToVertical()
 
     def moveToVertical(self):
-        print "Current chain lengths:"
-        print self.leftChainLength
-        print self.rightChainLength
+        #print "Current chain lengths:"
+        #print self.leftChainLength
+        #print self.rightChainLength
 
         chainPitch = float(self.data.config.get('Advanced Settings', 'chainPitch'))
         gearTeeth  = float(self.data.config.get('Advanced Settings', 'gearTeeth'))
 
         distPerRotation = chainPitch*gearTeeth
 
-        print "Rotations remainder:"
+        #print "Rotations remainder:"
         distL = (-1*(self.leftChainLength%distPerRotation))
         distR = (-1*(self.rightChainLength%distPerRotation))
 
-        print distL
-        print distR
+        #print distL
+        #print distR
 
         self.data.gcode_queue.put("G91 ")
         self.data.gcode_queue.put("B09 L"+str(distL)+" ")

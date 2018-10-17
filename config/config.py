@@ -14,7 +14,7 @@ class Config(MakesmithInitFuncs):
     settings = {}
 
     def __init__(self):
-        print "here"
+        print ("Initializing Configuration")
         with open('webcontrol.json', 'r') as infile:
             self.settings = json.load(infile)
             #self.computeSettings(None, None, None, True);

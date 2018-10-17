@@ -39,7 +39,7 @@ class GCodeFile(MakesmithInitFuncs):
 
     def loadUpdateFile(self):
         filename = self.data.gcodeFile.filename
-        print filename
+        #print(filename)
         del self.line[:]
         if filename is "": #Blank the g-code if we're loading "nothing"
             self.data.gcode = ""
@@ -84,7 +84,7 @@ class GCodeFile(MakesmithInitFuncs):
                     else:
                         self.data.zMoves.append(index)
         except:
-            print "error"
+            print("Gcode File Error")
             self.data.message_queue.put("Message: Cannot open gcode file.")
             self.data.gcodeFile = ""
             return False
@@ -303,8 +303,8 @@ class GCodeFile(MakesmithInitFuncs):
 
             return gCodeLine
         except ValueError:
-            print "line could not be moved:"
-            print originalLine
+            print("line could not be moved:")
+            print(originalLine)
             return originalLine
 
     def loadNextLine(self):
@@ -373,7 +373,7 @@ class GCodeFile(MakesmithInitFuncs):
             pass
 
         if gString == 'G18':
-            print "G18 not supported"
+            print("G18 not supported")
 
         if gString == 'G20':
             self.canvasScaleFactor = self.INCHES
@@ -409,11 +409,11 @@ class GCodeFile(MakesmithInitFuncs):
 
         #Repeat until end of file
         #print "end:"+str(self.lineNumber)
-        print self.lineNumber
-        print len(self.data.gcode)
-        print self.maxNumberOfLinesToRead
+        #print self.lineNumber
+        #print len(self.data.gcode)
+        #print self.maxNumberOfLinesToRead
         if self.lineNumber < min(len(self.data.gcode),self.maxNumberOfLinesToRead):
-            print "here"
+#            print "here"
             self.callBackMechanism(self.updateGcode)
         if (True):
             for line in self.line:
@@ -426,7 +426,7 @@ class GCodeFile(MakesmithInitFuncs):
         updateGcode parses the gcode commands and calls the appropriate drawing function for the
         specified command.
         '''
-        print "Here at updateGcode"
+        #print "Here at updateGcode"
 
         #reset variables
         self.data.backgroundRedraw = False
@@ -442,7 +442,7 @@ class GCodeFile(MakesmithInitFuncs):
         #Check to see if file is too large to load
         if len(self.data.gcode) > self.maxNumberOfLinesToRead:
             errorText = "The current file contains " + str(len(self.data.gcode)) + " lines of gcode.\nrendering all " +  str(len(self.data.gcode)) + " lines simultaneously may crash the\n program, only the first " + self.maxNumberOfLinesToRead + "lines are shown here.\nThe complete program will cut if you choose to do so unless the home position is moved from (0,0)."
-            print errorText
+            print(errorText)
             self.data.message_queue.put("Message: " + errorText)
 
         self.callBackMechanism(self.updateGcode)
