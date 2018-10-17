@@ -51,7 +51,7 @@ app.previousPosY = 0.0
 @app.route('/')
 @mobile_template('{mobile/}')
 def index(template):
-    print template
+    #print template
     current_app._get_current_object()
     thread = socketio.start_background_task(background_stuff, current_app._get_current_object())
     thread.start()
@@ -116,7 +116,7 @@ def gcode():
 
 @socketio.on('my event', namespace='/MaslowCNC')
 def my_event(msg):
-    print msg['data']
+    print (msg['data'])
 
 @socketio.on('requestPage', namespace="/MaslowCNC")
 def requestPage(msg):
@@ -156,8 +156,8 @@ def requestPage(msg):
 
 @socketio.on('connect', namespace='/MaslowCNC')
 def test_connect():
-    print "connected"
-    print request.sid
+    print ("connected")
+    print (request.sid)
     socketio.emit('my response', {'data': 'Connected', 'count': 0})
 
 @socketio.on('disconnect', namespace='/MaslowCNC')
