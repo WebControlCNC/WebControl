@@ -5,6 +5,8 @@ import sys
 import serial
 import serial.tools.list_ports
 import threading
+import schedule
+import time
 
 class SerialPort(MakesmithInitFuncs):
     '''
@@ -23,9 +25,7 @@ class SerialPort(MakesmithInitFuncs):
         Runs on creation, schedules the software to attempt to connect to the machine
 
         '''
-        #self.app=app
-        #self.openConnection()
-        y=1
+        schedule.every(5).seconds.do(self.openConnection)
 
     def setPort(self, port):
         '''
@@ -57,7 +57,7 @@ class SerialPort(MakesmithInitFuncs):
         #This function opens the thread which handles the input from the serial port
         #It only needs to be run once, it is run by connecting to the machine
 
-        print("Attempting to open connection to controller")
+        #print("Attempting to open connection to controller")
         if not self.data.connectionStatus:
             #self.data.message_queue is the queue which handles passing CAN messages between threads
             #print "serialport.self.app.logger="+str(self.app.logger)

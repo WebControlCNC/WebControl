@@ -4,6 +4,7 @@ import sys
 import threading
 import re
 import math
+import serial.tools.list_ports
 
 class Actions(MakesmithInitFuncs):
 
@@ -353,4 +354,28 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B06 L0 R0 ");
             return True
         except:
+            return False
+
+    def updatePorts(self):
+        #refresh the list of available comports
+        portsList = []
+        if True:
+            if sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+                # this excludes your current terminal "/dev/tty"
+                sysports = glob.glob('/dev/tty[A-Za-z]*')
+                for port in sysports:
+                    portsList.append(port)
+            elif sys.platform.startswith('darwin'):
+                sysports = glob.glob('/dev/tty.*')
+                for port in sysports:
+                    portsList.append(port)
+            elif sys.platform.startswith('win'):
+                list = serial.tools.list_ports.comports()
+                for element in list:
+                    portsList.append(element.device)
+            if len(portsList) == 0:
+                portsList.append("None")
+            self.data.comPorts = portsList
+            return True
+        if False:
             return False

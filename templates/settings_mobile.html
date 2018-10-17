@@ -13,13 +13,23 @@
         </div>
         <div class="row align-items-center">
           <div class="col">
-            {% if setting.type=="bool" %}
-              <span class="switch switch-lg">
-                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
-                <label for="switch-{{setting.key}}"></label>
-              </span>
+            {% if setting.key =="COMport" %}
+              <select name="{{setting.key}}" data-group="{{title}}">
+                {% for port in ports %}
+                  <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
+                    {{port}}
+                  </option>
+                {% endfor %}
+              </select>
             {% else %}
-              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}">
+              {% if setting.type=="bool" %}
+                <span class="switch switch-lg">
+                  <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
+                  <label for="switch-{{setting.key}}"></label>
+                </span>
+              {% else %}
+                <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}">
+              {% endif %}
             {% endif %}
           </div>
         </div>

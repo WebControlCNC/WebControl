@@ -37,10 +37,10 @@ class SerialPortThread(MakesmithInitFuncs):
             # self.data.logger.writeToLog("Sleeping: " + str( taken ) + "\n")
             time.sleep (self.MINTimePerLine) # could use (taken - MINTimePerLine)
 
-        message = message.encode()
+        message = message + '\n'
+        #message = message.encode()
         print("Sending: " + str(message))
 
-        message = message + '\n'
 
         self.bufferSpace       = self.bufferSpace - len(message)        #shrink the available buffer space by the length of the line
 
@@ -143,7 +143,8 @@ class SerialPortThread(MakesmithInitFuncs):
 
                 try:
                     if self.serialInstance.in_waiting > 0:
-                        lineFromMachine = self.serialInstance.readline()
+                        lineFromMachine = self.serialInstance.readline().decode()
+                        #lineFromMachine = lineFromMachine.encode('utf-8')
                         self.lastMessageTime = time.time()
                         self.data.message_queue.put(lineFromMachine)
                 except:

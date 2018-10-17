@@ -4,7 +4,9 @@ from app    import app, socketio
 from gevent import monkey
 monkey.patch_all()
 
+import schedule
 import time
+import threading
 import json
 import re
 import queue
@@ -16,6 +18,7 @@ from flask_socketio import SocketIO
 from werkzeug import secure_filename
 
 from background.backgroundTasks     import    background_stuff #do this after socketio is declared
+#from background.scheduler           import    ScheduleThread
 from DataStructures.data            import    Data
 from Connection.serialPort          import    SerialPort
 from config.config                  import    Config
@@ -39,6 +42,15 @@ app.data.gcodeShift =[float(app.data.config.getValue('Advanced Settings','homeX'
 app.previousPosX = 0.0
 app.previousPosY = 0.0
 
+## this runs the scheduler
+def run_schedule():
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
+
+app.th=threading.Thread(target=run_schedule)
+app.th.daemon = True
+app.th.start()
 
 #write settings file to disk:
 #from settings import settings
@@ -55,8 +67,8 @@ def index(template):
     current_app._get_current_object()
     thread = socketio.start_background_task(background_stuff, current_app._get_current_object())
     thread.start()
-    if not app.data.connectionStatus:
-        app.data.serialPort.openConnection()
+    #if not app.data.connectionStatus:
+    #    app.data.serialPort.openConnection()
     if (template=='mobile/'):
         return render_template('frontpage_mobile.html')
     else:
@@ -122,17 +134,21 @@ def my_event(msg):
 def requestPage(msg):
     if msg['data']['page']=="maslowSettings":
         setValues = app.data.config.getJSONSettingSection("Maslow Settings")
+        #because this page allows you to select the comport from a list that is not stored in webcontrol.json, we need to package and send the list of comports
+        #Todo:? change it to store the list?
+        ports = app.data.comPorts
         if msg['data']['isMobile']:
-            page =render_template('settings_mobile.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
+            page =render_template('settings_mobile.html', title="Maslow Settings", settings=setValues, ports=ports, pageID="maslowSettings")
         else:
-            page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
+            page =render_template('settings.html', title="Maslow Settings", settings=setValues, ports=ports, pageID="maslowSettings")
+            print("here3")
         socketio.emit('activateModal', {'title':"Maslow Settings", 'message':page}, namespace='/MaslowCNC')
     elif msg['data']['page']=="advancedSettings":
         setValues = app.data.config.getJSONSettingSection("Advanced Settings")
         if msg['data']['isMobile']:
             page =render_template('settings_mobile.html', title="Advanced Settings", settings=setValues, pageID="advancedSettings")
         else:
-            page =render_template('settings.html', title="Maslow Settings", settings=setValues, pageID="maslowSettings")
+            page =render_template('settings.html', title="Advanced Settings", settings=setValues, pageID="advancedSettings")
         socketio.emit('activateModal', {'title':"Advanced Settings", 'message':page}, namespace='/MaslowCNC')
     elif msg['data']['page']=="webControlSettings":
         setValues = app.data.config.getJSONSettingSection("WebControl Settings")
@@ -235,6 +251,9 @@ def command(msg):
     elif (msg['data']['command']=='setSprocketsZero'):
         if not app.data.actions.setSprocketsZero():
             app.data.message_queue.put("Message: Error with setting sprockets zero value")
+    elif (msg['data']['command']=='updatePorts'):
+        if not app.data.actions.updatePorts():
+            app.data.message_queue.put("Message: Error with updating list of ports")
 
 
 

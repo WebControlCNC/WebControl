@@ -546,7 +546,7 @@
             "section": "Maslow Settings",
             "title": "Serial Connection",
             "type": "string",
-            "value": "/dev/ttyACM0"
+            "value": "COM5"
         },
         {
             "default": 2978.4,
@@ -626,7 +626,7 @@
             "section": "Maslow Settings",
             "title": "z-axis installed",
             "type": "bool",
-            "value": 1
+            "value": 0
         },
         {
             "default": 3.17,

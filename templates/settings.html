@@ -11,7 +11,29 @@
             <p>{{setting.desc}}</p>
           </div>
           <div class="col-3">
-            {% if setting.type=="bool" %}
+            {% if setting.key =="COMport" %}
+              <select name="{{setting.key}}" data-group="{{title}}">
+                {% if ports|length == 0 %}
+                  <option value="{{setting.value}}" 'selected'>
+                    {{setting.value}}
+                  </option>
+                {% else %}
+                  {% for port in ports %}
+                    <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
+                      {{port}}
+                    </option>
+                  {% endfor %}
+                {% endif %}
+              </select>
+            {% elif setting.type=="options" %}
+              <select name="{{setting.key}}" data-group="{{title}}">
+                {% for option in setting.options %}
+                  <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
+                    {{option}}
+                  </option>
+                {% endfor %}
+              </select>
+            {% elif setting.type=="bool" %}
               <span class="switch switch-lg">
                 <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
                 <label for="switch-{{setting.key}}"></label>

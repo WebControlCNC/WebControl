@@ -79,14 +79,15 @@ class Config(MakesmithInitFuncs):
                 json.dump(self.settings,outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
     def updateSettings(self,section, result):
-        #print "at update Settings"
+        print("at update Settings")
         updated=False
         for x in range(len(self.settings[section])):
-            #print x
+            print(self.settings[section][x]["key"])
+            print(self.settings[section][x]["type"])
             found = False
             for setting in result:
                 if self.settings[section][x]["key"]==setting:
-                    #print self.settings[section][x]["key"]
+
                     if (self.settings[section][x]["type"]=="float"):
                         try:
                             storedValue=self.settings[section][x]["value"]
@@ -122,9 +123,21 @@ class Config(MakesmithInitFuncs):
                                 if ('firmwareKey' in self.settings[section][x]):
                                     #print "syncing2 true bool at:"+str(self.settings[section][x]['firmwareKey'])
                                     self.syncFirmwareKey(self.settings[section][x]["firmwareKey"],storedValue)
-
                         except:
                             pass
+
+                    elif (self.settings[section][x]["type"]=="options"):
+                        try:
+                            print(str(result[setting]))
+                            storedValue=self.settings[section][x]["value"]
+                            self.settings[section][x]["value"]=str(result[setting])
+                            print(self.settings[section][x]["value"])
+                            updated=True
+                            if ('firmwareKey' in self.settings[section][x]):
+                                self.syncFirmwareKey(self.settings[section][x]["firmwareKey"],storedValue)
+                        except:
+                            pass
+
                     else:
                         storedValue=self.settings[section][x]["value"]
                         self.settings[section][x]["value"]=result[setting]
