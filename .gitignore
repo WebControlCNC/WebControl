@@ -9,3 +9,7 @@ venv.bak/
 
 #logs
 log.txt
+*.pyc
+
+# IDE-specific files
+.idea
