@@ -10,5 +10,10 @@ venv.bak/
 #logs
 log.txt
 
-#compiles
-*.pyc
+# IDE-specific files
+.idea
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
