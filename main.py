@@ -75,34 +75,34 @@ def index(template):
         return render_template('frontpage.html')
 
 
-@app.route('/maslowSettings', methods=['GET','POST'])
+@app.route('/maslowSettings', methods=['POST'])
 def maslowSettings():
     if request.method=="POST":
         result = request.form
         app.data.config.updateSettings("Maslow Settings", result)
-        setValues = app.data.config.getJSONSettingSection("Maslow Settings")
+        #setValues = app.data.config.getJSONSettingSection("Maslow Settings")
         message = {'status': 200}
         resp = jsonify(message)
         resp.status_code = 200
         return resp
 
-@app.route('/advancedSettings', methods=['GET','POST'])
+@app.route('/advancedSettings', methods=['POST'])
 def advancedSettings():
     if request.method=="POST":
         result = request.form
         app.data.config.updateSettings("Advanced Settings", result)
-        setValues = app.data.config.getJSONSettingSection("Advanced Settings")
+        #setValues = app.data.config.getJSONSettingSection("Advanced Settings")
         message = {'status': 200}
         resp = jsonify(message)
         resp.status_code = 200
         return resp
 
-@app.route('/webControlSettings', methods=['GET','POST'])
+@app.route('/webControlSettings', methods=['POST'])
 def webControlSettings():
     if request.method=="POST":
         result = request.form
         app.data.config.updateSettings("WebControl Settings", result)
-        setValues = app.data.config.getJSONSettingSection("WebControl Settings")
+        #setValues = app.data.config.getJSONSettingSection("WebControl Settings")
         message = {'status': 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -126,7 +126,7 @@ def gcode():
             resp.status_code = 500
             return resp
 
-@app.route('/calibrate', methods=['GET','POST'])
+@app.route('/calibrate', methods=['POST'])
 def calibrate():
     if request.method=="POST":
         result = request.form
@@ -142,6 +142,17 @@ def calibrate():
             resp = jsonify(message)
             resp.status_code = 500
             return resp
+
+@app.route('/quickConfigure', methods=['POST'])
+def quickConfigure():
+    if request.method=="POST":
+        result = request.form
+        app.data.config.updateQuickConfigure(result)
+        message = {'status': 200}
+        resp = jsonify(message)
+        resp.status_code = 200
+        return resp
+
 
 
 @socketio.on('my event', namespace='/MaslowCNC')
@@ -194,7 +205,17 @@ def requestPage(msg):
         page = render_template('calibrate.html', pageID="calibrate", motorYoffset=motorYoffset, rotationRadius=rotationRadius, chainSagCorrection=chainSagCorrection)
         socketio.emit('activateModal', {'title':"Calibrate", 'message':page}, namespace='/MaslowCNC')
     elif msg['data']['page']=='quickConfigure':
-        page = render_template('quickConfigure.html', pageID="quickConfigure")
+        motorOffsetY = app.data.config.getValue("Maslow Settings", "motorOffsetY")
+        rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
+        kinematicsType = app.data.config.getValue("Advanced Settings", "kinematicsType")
+        if (kinematicsType!='Quadrilateral'):
+            if (abs(float(rotationRadius)-138.4)<0.01):
+                kinematicsType = "Ring"
+            else:
+                kinematicsType = "Custom"
+        motorSpacingX = app.data.config.getValue("Advanced Settings", "motorSpacingX")
+        chainOverSprocket = app.data.config.getValue("Advanced Settings", "chainOverSprocket")
+        page = render_template('quickConfigure.html', pageID="quickConfigure", motorOffsetY=motorOffsetY, rotationRadius=rotationRadius, kinematicsType=kinematicsType, motorSpacingX=motorSpacingX, chainOverSprocket=chainOverSprocket)
         socketio.emit('activateModal', {'title':"Quick Configure", 'message':page}, namespace='/MaslowCNC')
 
 

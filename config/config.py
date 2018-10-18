@@ -22,6 +22,17 @@ class Config(MakesmithInitFuncs):
     def getJSONSettings(self):
         return self.settings
 
+    def updateQuickConfigure(results):
+        if (result['kinematicsType']=='Quadrilateral'):
+            self.setValue("Advanced Setttings","kinematicsType","Quadrilateral")
+        else:
+            self.setValue("Advanced Setttings","kinematicsType","Triangular")
+        self.setValue("Advanced Setttings","rotationRadius",result['rotationRadius'])
+        self.setValue("Advanced Settings","chainOverSprocket", result['chainOverSprocket'])
+        self.setValue("Advanced Settings","motorSpacingX", result['motorSpacingX'])
+        self.setValue("Advanced Settings","motorOffsetY", result['motorOffsetY'])
+        return True
+
     def setValue(self,section,key,value, recursionBreaker=False):
         updated = False
         for x in range(len(self.settings[section])):

@@ -4,11 +4,18 @@
   <form id="quickConfigureForm">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">Kinematics</h4>
-        <p>The only option you can pick here at this time is Triangular.</p>
-        <select name="kinematics">
-          <option value="Triangular" selected}>Triangular</option>
+        <h4 class="card-title">Kinematics Kit</h4>
+        <p>Select your type of kit or provide a custom value for rotational radius.  Note: Quadrilateral kits have no rotational radius, you can leave it zero.</p>
+        <select name="kinematicsType" id="kinematicsType">
+          <option value="Ring" selected}>Ring</option>
+          <option value="Linkage" }>45 Degree Linkage</option>
+          <option value="Pantograph" }>Top Mounted Pantograph</option>
+          <option value="Custom" }>Custom</option>
+          <option value="Quadrilateral"}>Quadrilateral</option>
         </select>
+        <label for="rotationRadius">Rotational Radius</label>
+        <input class="form-control" name="rotationRadius" id="rotationRadius" value="138.4">
+        <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
     <div class="card">
@@ -19,10 +26,43 @@
         <p>Or wrapping around the sprocket clockwise (Bottom):</p>
         <img src="{{ url_for('static',filename='images/quickConfig/chainoffbottom.png') }}" height="300" width="300">
         <p></p>
-        <select name="chainAroundSprocket">
+        <select name="chainOverSprocket">
           <option value="Top" selected}>Top</option>
-          <option value="Top" selected}>Bottom</option>
+          <option value="Bottom"}>Bottom</option>
         </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Distance Between Motors</h4>
+        <p>Break out your tape measure and measure the distance between the center of the sprockets.
+           Note, if you have the motors positioned in a normal fashion, you can measure from the outside
+           edge of the two gearboxes and then subtract 40.4 mm from that measurement to get sprocket center
+           to sprocket center.  There's a handy button you can press to make that subtraction for you if you like.
+           Your choice.</p>
+        <p>Measure sprocket to sprocket:</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/sprocket2sprocket.png') }}" height="300" width="300">
+        <p>Or measure gearbox to gearbox (and don't forget to subtract 40.4 mm!):</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/gearbox2gearbox.png') }}" height="300" width="300">
+        <p></p>
+        <label for="motorSpacingX">Distance Between Motors</label>
+        <input class="form-control" name="motorSpacingX" id="motorSpacingX" value="3000">
+        <small class="form-text text-muted">Enter value in mm only</small>
+        <button type="button" onclick="subtract40p4();">Subtract 40.4 mm</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Height of Motors Above Workspace</h4>
+        <p>One last measurement.  Make a reasonable measurement of how high the motors
+           are above the top of the workspace.  Just get close because this value will get adjusted during calibration.
+           but it needs to be reasonably close so the first stage of calibration can get close to where it needs to be. </p>
+        <p>Height of Motors Above Workspace:</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/sprocket2sprocket.png') }}" height="300" width="300">
+        <p></p>
+        <label for="motorOffsetY">Height of Motors Above Workspace</label>
+        <input class="form-control" name="motorOffsetY" id="motorOffSetY" value="480">
+        <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
@@ -32,6 +72,9 @@
 
 {% block javascript %}
 <script>
+function subtract40p4(){
+   $("#motorSpacingX").val($("#motorSpacingX").val()-40.4);
+}
 $(document).ready(function () {
     $('#quickConfigureForm').on('submit', function(e) {
         e.preventDefault();
@@ -48,6 +91,27 @@ $(document).ready(function () {
                 alert(errorThrown);
             }
         });
+    });
+    $('#kinematicsType').change(function(){
+      selected = $("#kinematicType option:selected").val()
+      switch(selected) {
+        case "Ring":
+          rotationRadius = 138.4;
+          break;
+        case "Linkage":
+          rotationRadius = 273;
+          break;
+        case "Pantograph":
+          rotationRadius = 100;
+          break;
+        case "Quadrilateral":
+          rotationRadius = 0;
+          break;
+        default:
+          rotationRadius = 0;
+          break;
+      }
+      $("#rotationRadius").val(rotationRadius);
     });
 });
 </script>
