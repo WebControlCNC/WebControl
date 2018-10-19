@@ -112,6 +112,7 @@ class SerialPortThread(MakesmithInitFuncs):
 
         try:
             print("connecting")
+            self.data.comport = self.data.config.getValue('Maslow Settings', 'COMport')
             self.serialInstance = serial.Serial(
                 self.data.comport, 57600, timeout=0.25
             )  # self.data.comport is the com port which is opened
