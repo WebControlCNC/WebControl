@@ -25,10 +25,10 @@ class Config(MakesmithInitFuncs):
 
     def updateQuickConfigure(self, result):
         if result["kinematicsType"] == "Quadrilateral":
-            self.setValue("Advanced Setttings", "kinematicsType", "Quadrilateral")
+            self.setValue("Advanced Settings", "kinematicsType", "Quadrilateral")
         else:
-            self.setValue("Advanced Setttings", "kinematicsType", "Triangular")
-        self.setValue("Advanced Setttings", "rotationRadius", result["rotationRadius"])
+            self.setValue("Advanced Settings", "kinematicsType", "Triangular")
+        self.setValue("Advanced Settings", "rotationRadius", result["rotationRadius"])
         self.setValue(
             "Advanced Settings", "chainOverSprocket", result["chainOverSprocket"]
         )
