@@ -2,6 +2,8 @@
 
 A web-based version of [MaslowCNC/GroundControl](https://www.github.com/MaslowCNC/GroundControl)
 
+![Screenshot](https://user-images.githubusercontent.com/218876/47197523-ac1d9e00-d31b-11e8-93c8-93a84a7eb0cf.png)
+
 ## Developing
 
 ### Virtualenv
