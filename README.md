@@ -49,6 +49,10 @@ Subsequently, you can just run `black .` to format all files in the current dire
 
     black .
 
+If you don't have python3.6+ locally (to be able to run `black`), you can run `black` in a Docker container.
+
+    docker run -v $(pwd):/code johnboiles/python-black .
+
 ### IDE
 
 [Pycharm Community Edition](https://www.jetbrains.com/pycharm/download) is a free, well-featured Python IDE.
