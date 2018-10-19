@@ -1,4 +1,4 @@
-from DataStructures.makesmithInitFuncs         import  MakesmithInitFuncs
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import sys
 import threading
@@ -7,18 +7,20 @@ import math
 import serial.tools.list_ports
 import glob
 
+
 class Actions(MakesmithInitFuncs):
-
-
     def defineHome(self):
         try:
-            if self.data.units == 'MM':
+            if self.data.units == "MM":
                 scaleFactor = 25.4
             else:
                 scaleFactor = 1.0
-            self.data.gcodeShift = [self.data.xval/scaleFactor,self.data.yval/scaleFactor]
-            self.data.config.setValue("Advanced Settings", 'homeX', str(self.data.xval))
-            self.data.config.setValue("Advanced Settings", 'homeY', str(self.data.yval))
+            self.data.gcodeShift = [
+                self.data.xval / scaleFactor,
+                self.data.yval / scaleFactor,
+            ]
+            self.data.config.setValue("Advanced Settings", "homeX", str(self.data.xval))
+            self.data.config.setValue("Advanced Settings", "homeY", str(self.data.yval))
             self.data.gcodeFile.loadUpdateFile()
             return True
         except:
@@ -27,14 +29,22 @@ class Actions(MakesmithInitFuncs):
     def home(self):
         try:
             self.data.gcode_queue.put("G90  ")
-            #todo:self.gcodeVel = "[MAN]"
-            safeHeightMM = float(self.data.config.getValue('Maslow Settings', 'zAxisSafeHeight'))
+            # todo:self.gcodeVel = "[MAN]"
+            safeHeightMM = float(
+                self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
+            )
             safeHeightInches = safeHeightMM / 25.5
             if self.data.units == "INCHES":
-                self.data.gcode_queue.put("G00 Z" + '%.3f'%(safeHeightInches))
+                self.data.gcode_queue.put("G00 Z" + "%.3f" % (safeHeightInches))
             else:
                 self.data.gcode_queue.put("G00 Z" + str(safeHeightMM))
-            self.data.gcode_queue.put("G00 X" + str(self.data.gcodeShift[0]) + " Y" + str(self.data.gcodeShift[1]) + " ")
+            self.data.gcode_queue.put(
+                "G00 X"
+                + str(self.data.gcodeShift[0])
+                + " Y"
+                + str(self.data.gcodeShift[1])
+                + " "
+            )
             self.data.gcode_queue.put("G00 Z0 ")
             return True
         except:
@@ -82,7 +92,7 @@ class Actions(MakesmithInitFuncs):
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
-            #TODO: app.onUploadFlagChange(self.stopRun, 0)
+            # TODO: app.onUploadFlagChange(self.stopRun, 0)
             print("Gcode Stopped")
             return True
         except:
@@ -90,9 +100,13 @@ class Actions(MakesmithInitFuncs):
 
     def moveToDefault(self):
         try:
-            chainLength = self.data.config.getValue('Advanced Settings', 'chainExtendLength')
+            chainLength = self.data.config.getValue(
+                "Advanced Settings", "chainExtendLength"
+            )
             self.data.gcode_queue.put("G90 ")
-            self.data.gcode_queue.put("B09 R"+str(chainLength)+" L"+str(chainLength)+" ")
+            self.data.gcode_queue.put(
+                "B09 R" + str(chainLength) + " L" + str(chainLength) + " "
+            )
             self.data.gcode_queue.put("G91 ")
             return True
         except:
@@ -108,7 +122,7 @@ class Actions(MakesmithInitFuncs):
     def wipeEEPROM(self):
         try:
             self.data.gcode_queue.put("$RST=* ")
-            timer = threading.Timer(6.0, self.data.gcode_queue.put('$$'))
+            timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
             timer.start()
             return True
         except:
@@ -125,7 +139,8 @@ class Actions(MakesmithInitFuncs):
     def resumeRun(self):
         try:
             self.data.uploadFlag = 1
-            self.data.quick_queue.put("~") #send cycle resume command to unpause the machine
+            # send cycle resume command to unpause the machine
+            self.data.quick_queue.put("~")
             return True
         except:
             return False
@@ -133,10 +148,12 @@ class Actions(MakesmithInitFuncs):
     def returnToCenter(self):
         try:
             self.data.gcode_queue.put("G90  ")
-            safeHeightMM = float(self.data.config.getValue('Maslow Settings', 'zAxisSafeHeight'))
+            safeHeightMM = float(
+                self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
+            )
             safeHeightInches = safeHeightMM / 24.5
             if self.data.units == "INCHES":
-                self.data.gcode_queue.put("G00 Z" + '%.3f'%(safeHeightInches))
+                self.data.gcode_queue.put("G00 Z" + "%.3f" % (safeHeightInches))
             else:
                 self.data.gcode_queue.put("G00 Z" + str(safeHeightMM))
             self.data.gcode_queue.put("G00 X0.0 Y0.0 ")
@@ -154,39 +171,40 @@ class Actions(MakesmithInitFuncs):
     def moveGcodeZ(self, moves):
         try:
             dist = 0
-            for index,zMove in enumerate(self.data.zMoves):
+            for index, zMove in enumerate(self.data.zMoves):
                 if moves > 0 and zMove > self.data.gcodeIndex:
-                    dist = self.data.zMoves[index+moves-1]-self.data.gcodeIndex
+                    dist = self.data.zMoves[index + moves - 1] - self.data.gcodeIndex
                     break
                 if moves < 0 and zMove < self.data.gcodeIndex:
-                    dist = self.data.zMoves[index+moves+1]-self.data.gcodeIndex
+                    dist = self.data.zMoves[index + moves + 1] - self.data.gcodeIndex
             if moveGcodeIndex(dist):
-            #this command will continue on in the moveGcodeIndex "if"
+                # this command will continue on in the moveGcodeIndex "if"
                 return True
             else:
                 return False
         except:
             return False
 
-
     def moveGcodeIndex(self, dist):
         try:
-            maxIndex = len(self.data.gcode)-1
+            maxIndex = len(self.data.gcode) - 1
             targetIndex = self.data.gcodeIndex + dist
 
-            #print "targetIndex="+str(targetIndex)
-            #check to see if we are still within the length of the file
-            if maxIndex < 0:              #break if there is no data to read
+            # print "targetIndex="+str(targetIndex)
+            # check to see if we are still within the length of the file
+            if maxIndex < 0:  # break if there is no data to read
                 return
-            elif targetIndex < 0:             #negative index not allowed
+            elif targetIndex < 0:  # negative index not allowed
                 self.data.gcodeIndex = 0
-            elif targetIndex > maxIndex:    #reading past the end of the file is not allowed
+            elif (
+                targetIndex > maxIndex
+            ):  # reading past the end of the file is not allowed
                 self.data.gcodeIndex = maxIndex
             else:
                 self.data.gcodeIndex = targetIndex
             gCodeLine = self.data.gcode[self.data.gcodeIndex]
-            #print self.data.gcode
-            #print "gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+gCodeLine
+            # print self.data.gcode
+            # print "gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+gCodeLine
             xTarget = 0
             yTarget = 0
 
@@ -199,16 +217,20 @@ class Actions(MakesmithInitFuncs):
                     xTarget = app.previousPosX
 
                 y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-                #print y
+                # print y
                 if y:
                     yTarget = float(y.groups()[0])
                     app.previousPosY = yTarget
                 else:
                     yTarget = app.previousPosY
-                #self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
-                #print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
-                position = {'xval':xTarget,'yval':yTarget,'zval':self.data.zval}
-                socketio.emit('positionMessage', {'data':json.dumps(position) }, namespace='/MaslowCNC')
+                # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
+                # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
+                position = {"xval": xTarget, "yval": yTarget, "zval": self.data.zval}
+                socketio.emit(
+                    "positionMessage",
+                    {"data": json.dumps(position)},
+                    namespace="/MaslowCNC",
+                )
             except:
                 print("Unable to update position for new gcode line")
                 return False
@@ -216,102 +238,145 @@ class Actions(MakesmithInitFuncs):
         except:
             return False
 
-
-    def move(self,direction,distToMove):
+    def move(self, direction, distToMove):
         try:
-            if (direction=='upLeft'):
-                self.data.gcode_queue.put("G91 G00 X" + str(-1.0*distToMove) + " Y" + str(distToMove) + " G90 ")
-            elif (direction=='up'):
+            if direction == "upLeft":
+                self.data.gcode_queue.put(
+                    "G91 G00 X"
+                    + str(-1.0 * distToMove)
+                    + " Y"
+                    + str(distToMove)
+                    + " G90 "
+                )
+            elif direction == "up":
                 self.data.gcode_queue.put("G91 G00 Y" + str(distToMove) + " G90 ")
-            elif (direction=='upRight'):
-                self.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " Y" + str(distToMove) + " G90 ")
-            elif (direction=='left'):
-                self.data.gcode_queue.put("G91 G00 X" + str(-1.0*distToMove) + " G90 ")
-            elif (direction=='right'):
+            elif direction == "upRight":
+                self.data.gcode_queue.put(
+                    "G91 G00 X" + str(distToMove) + " Y" + str(distToMove) + " G90 "
+                )
+            elif direction == "left":
+                self.data.gcode_queue.put(
+                    "G91 G00 X" + str(-1.0 * distToMove) + " G90 "
+                )
+            elif direction == "right":
                 self.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " G90 ")
-            elif (direction=='downLeft'):
-                self.data.gcode_queue.put("G91 G00 X" + str(-1.0*distToMove) + " Y" + str(-1.0*distToMove) + " G90 ")
-            elif (direction=='down'):
-                self.data.gcode_queue.put("G91 G00 Y" + str(-1.0*distToMove) + " G90 ")
-            elif (direction=='downRight'):
-                self.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " Y" + str(-1.0*distToMove) + " G90 ")
+            elif direction == "downLeft":
+                self.data.gcode_queue.put(
+                    "G91 G00 X"
+                    + str(-1.0 * distToMove)
+                    + " Y"
+                    + str(-1.0 * distToMove)
+                    + " G90 "
+                )
+            elif direction == "down":
+                self.data.gcode_queue.put(
+                    "G91 G00 Y" + str(-1.0 * distToMove) + " G90 "
+                )
+            elif direction == "downRight":
+                self.data.gcode_queue.put(
+                    "G91 G00 X"
+                    + str(distToMove)
+                    + " Y"
+                    + str(-1.0 * distToMove)
+                    + " G90 "
+                )
             return True
         except:
             return False
 
-
     def moveZ(self, direction, distToMoveZ):
         if True:
-            #distToMoveZ = float(msg['data']['distToMoveZ'])
-            self.data.config.setValue("Computed Settings", 'distToMoveZ',distToMoveZ)
-            unitsZ = self.data.config.getValue('Computed Settings', 'unitsZ')
+            # distToMoveZ = float(msg['data']['distToMoveZ'])
+            self.data.config.setValue("Computed Settings", "distToMoveZ", distToMoveZ)
+            unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             if unitsZ == "MM":
-                self.data.gcode_queue.put('G21 ')
+                self.data.gcode_queue.put("G21 ")
             else:
-                self.data.gcode_queue.put('G20 ')
-            if (direction=='raise'):
-                self.data.gcode_queue.put("G91 G00 Z" + str(float(distToMoveZ)) + " G90 ")
-            elif (direction=='lower'):
-                self.data.gcode_queue.put("G91 G00 Z" + str(-1.0*float(distToMoveZ)) + " G90 ")
-            units = self.data.config.getValue('Computed Settings', 'units')
+                self.data.gcode_queue.put("G20 ")
+            if direction == "raise":
+                self.data.gcode_queue.put(
+                    "G91 G00 Z" + str(float(distToMoveZ)) + " G90 "
+                )
+            elif direction == "lower":
+                self.data.gcode_queue.put(
+                    "G91 G00 Z" + str(-1.0 * float(distToMoveZ)) + " G90 "
+                )
+            units = self.data.config.getValue("Computed Settings", "units")
             if units == "MM":
-                self.data.gcode_queue.put('G21 ')
+                self.data.gcode_queue.put("G21 ")
             else:
-                self.data.gcode_queue.put('G20 ')
+                self.data.gcode_queue.put("G20 ")
             return True
         if False:
             return False
 
     def updateSetting(self, setting, value):
         try:
-            if (setting=='toInches'):
+            if setting == "toInches":
                 self.data.units = "INCHES"
-                self.data.config.setValue("Computed Settings", 'units',self.data.units)
+                self.data.config.setValue("Computed Settings", "units", self.data.units)
                 scaleFactor = 1.0
-                self.data.gcodeShift = [self.data.xval/scaleFactor,self.data.yval/scaleFactor]
+                self.data.gcodeShift = [
+                    self.data.xval / scaleFactor,
+                    self.data.yval / scaleFactor,
+                ]
                 self.data.tolerance = 0.020
-                self.data.gcode_queue.put('G20 ')
-                self.data.config.setValue("Computed Settings", 'distToMove',value)
-            elif (setting=='toMM'):
+                self.data.gcode_queue.put("G20 ")
+                self.data.config.setValue("Computed Settings", "distToMove", value)
+            elif setting == "toMM":
                 self.data.units = "MM"
-                self.data.config.setValue("Computed Settings", 'units',self.data.units)
+                self.data.config.setValue("Computed Settings", "units", self.data.units)
                 scaleFactor = 25.4
-                self.data.gcodeShift = [self.data.xval/scaleFactor,self.data.yval/scaleFactor]
+                self.data.gcodeShift = [
+                    self.data.xval / scaleFactor,
+                    self.data.yval / scaleFactor,
+                ]
                 self.data.tolerance = 0.5
-                self.data.gcode_queue.put('G21')
-                self.data.config.setValue("Computed Settings", 'distToMove',value)
-            elif (setting=='toInchesZ'):
+                self.data.gcode_queue.put("G21")
+                self.data.config.setValue("Computed Settings", "distToMove", value)
+            elif setting == "toInchesZ":
                 self.data.units = "INCHES"
-                self.data.config.setValue("Computed Settings", 'unitsZ',self.data.units)
-                self.data.config.setValue("Computed Settings", 'distToMoveZ',value)
-            elif (setting=='toMMZ'):
+                self.data.config.setValue(
+                    "Computed Settings", "unitsZ", self.data.units
+                )
+                self.data.config.setValue("Computed Settings", "distToMoveZ", value)
+            elif setting == "toMMZ":
                 self.data.units = "MM"
-                self.data.config.setValue("Computed Settings", 'unitsZ',self.data.units)
-                self.data.config.setValue("Computed Settings", 'distToMoveZ',value)
+                self.data.config.setValue(
+                    "Computed Settings", "unitsZ", self.data.units
+                )
+                self.data.config.setValue("Computed Settings", "distToMoveZ", value)
             return True
         except:
             return False
 
-
     def setSprockets(self, sprocket, degrees):
         try:
-            degValue = round(float(self.data.config.getValue('Advanced Settings',"gearTeeth"))*float(self.data.config.getValue('Advanced Settings',"chainPitch"))/360.0*degrees,4)
+            degValue = round(
+                float(self.data.config.getValue("Advanced Settings", "gearTeeth"))
+                * float(self.data.config.getValue("Advanced Settings", "chainPitch"))
+                / 360.0
+                * degrees,
+                4,
+            )
             self.data.gcode_queue.put("G91 ")
-            if self.data.config.getValue('Advanced Settings', 'chainOverSprocket') == 'Top':
-                self.data.gcode_queue.put("B09 "+sprocket+str(degValue)+" ")
+            if (
+                self.data.config.getValue("Advanced Settings", "chainOverSprocket")
+                == "Top"
+            ):
+                self.data.gcode_queue.put("B09 " + sprocket + str(degValue) + " ")
             else:
-                self.data.gcode_queue.put("B09 "+sprocket+"-"+str(degValue)+" ")
+                self.data.gcode_queue.put("B09 " + sprocket + "-" + str(degValue) + " ")
             self.data.gcode_queue.put("G90 ")
             return True
         except:
             return False
 
-
     def setVerticalAutomatic(self):
-        #set the call back for the measurement
+        # set the call back for the measurement
         try:
             self.data.measureRequest = self.getLeftChainLength
-            #request a measurement
+            # request a measurement
             self.data.gcode_queue.put("B10 L")
             return True
         except:
@@ -319,9 +384,9 @@ class Actions(MakesmithInitFuncs):
 
     def getLeftChainLength(self, dist):
         self.leftChainLength = dist
-        #set the call back for the measurement
+        # set the call back for the measurement
         self.data.measureRequest = self.getRightChainLength
-        #request a measurement
+        # request a measurement
         self.data.gcode_queue.put("B10 R")
 
     def getRightChainLength(self, dist):
@@ -329,49 +394,49 @@ class Actions(MakesmithInitFuncs):
         self.moveToVertical()
 
     def moveToVertical(self):
-        #print "Current chain lengths:"
-        #print self.leftChainLength
-        #print self.rightChainLength
+        # print "Current chain lengths:"
+        # print self.leftChainLength
+        # print self.rightChainLength
 
-        chainPitch = float(self.data.config.get('Advanced Settings', 'chainPitch'))
-        gearTeeth  = float(self.data.config.get('Advanced Settings', 'gearTeeth'))
+        chainPitch = float(self.data.config.get("Advanced Settings", "chainPitch"))
+        gearTeeth = float(self.data.config.get("Advanced Settings", "gearTeeth"))
 
-        distPerRotation = chainPitch*gearTeeth
+        distPerRotation = chainPitch * gearTeeth
 
-        #print "Rotations remainder:"
-        distL = (-1*(self.leftChainLength%distPerRotation))
-        distR = (-1*(self.rightChainLength%distPerRotation))
+        # print "Rotations remainder:"
+        distL = -1 * (self.leftChainLength % distPerRotation)
+        distR = -1 * (self.rightChainLength % distPerRotation)
 
-        #print distL
-        #print distR
+        # print distL
+        # print distR
 
         self.data.gcode_queue.put("G91 ")
-        self.data.gcode_queue.put("B09 L"+str(distL)+" ")
-        self.data.gcode_queue.put("B09 R"+str(distR)+" ")
+        self.data.gcode_queue.put("B09 L" + str(distL) + " ")
+        self.data.gcode_queue.put("B09 R" + str(distR) + " ")
         self.data.gcode_queue.put("G90 ")
 
     def setSprocketsZero(self):
-        #mark that the sprockets are straight up
+        # mark that the sprockets are straight up
         try:
-            self.data.gcode_queue.put("B06 L0 R0 ");
+            self.data.gcode_queue.put("B06 L0 R0 ")
             return True
         except:
             return False
 
     def updatePorts(self):
-        #refresh the list of available comports
+        # refresh the list of available comports
         portsList = []
         if True:
-            if sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            if sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
                 # this excludes your current terminal "/dev/tty"
-                sysports = glob.glob('/dev/tty[A-Za-z]*')
+                sysports = glob.glob("/dev/tty[A-Za-z]*")
                 for port in sysports:
                     portsList.append(port)
-            elif sys.platform.startswith('darwin'):
-                sysports = glob.glob('/dev/tty.*')
+            elif sys.platform.startswith("darwin"):
+                sysports = glob.glob("/dev/tty.*")
                 for port in sysports:
                     portsList.append(port)
-            elif sys.platform.startswith('win'):
+            elif sys.platform.startswith("win"):
                 list = serial.tools.list_ports.comports()
                 for element in list:
                     portsList.append(element.device)
@@ -384,14 +449,21 @@ class Actions(MakesmithInitFuncs):
 
     def calibrate(self, result):
         try:
-            motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(result)
+            motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
+                result
+            )
             print(motorYoffsetEst)
             print(rotationRadiusEst)
             print(chainSagCorrectionEst)
-            if (motorYoffsetEst==False):
+            if motorYoffsetEst == False:
                 return False
-            return motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst
-            '''
+            return (
+                motorYoffsetEst,
+                rotationRadiusEst,
+                chainSagCorrectionEst,
+                cut34YoffsetEst,
+            )
+            """
             self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorYoffsetEst))
             self.data.config.setValue('Advanced Settings', 'rotationRadius', str(rotationRadiusEst))
             self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(chainSagCorrectionEst))
@@ -402,7 +474,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 ")
             self.data.gcode_queue.put("G40 ")
             self.data.gcode_queue.put("G0 X0 Y0 ")
-            '''
+            """
             return True
         except:
             return False
