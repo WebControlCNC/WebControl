@@ -213,8 +213,9 @@ def requestPage(msg):
                 kinematicsType = "Ring"
             else:
                 kinematicsType = "Custom"
-        motorSpacingX = app.data.config.getValue("Advanced Settings", "motorSpacingX")
+        motorSpacingX = app.data.config.getValue("Maslow Settings", "motorSpacingX")
         chainOverSprocket = app.data.config.getValue("Advanced Settings", "chainOverSprocket")
+        print("MotorOffsetY="+str(motorOffsetY))
         page = render_template('quickConfigure.html', pageID="quickConfigure", motorOffsetY=motorOffsetY, rotationRadius=rotationRadius, kinematicsType=kinematicsType, motorSpacingX=motorSpacingX, chainOverSprocket=chainOverSprocket)
         socketio.emit('activateModal', {'title':"Quick Configure", 'message':page}, namespace='/MaslowCNC')
 

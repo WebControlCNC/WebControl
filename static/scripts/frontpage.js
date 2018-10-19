@@ -12,7 +12,7 @@ var currentPosX = 0;
 var currentPosY = 0;
 var gcode = null;
 //var rect = draw.rect(100,100).attr({fill: '#f06'})
-//var sheet = draw.rect(768,384).fill(draw.image('/static/images/materials/Plywood_texture.JPG',768,384)).scale(96/768*scale,48/384*scale).center(originX,originY)
+//var sheet = draw.image('/static/images/materials/Plywood_texture.JPG',96,48).center(originX,originY)
 
 var gridLines = draw.group()
 gridLines.add(draw.line(0*scale,0*scale,96*scale,0*scale).stroke({width:.1, color: '#000'}))

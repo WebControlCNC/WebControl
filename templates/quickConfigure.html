@@ -7,14 +7,14 @@
         <h4 class="card-title">Kinematics Kit</h4>
         <p>Select your type of kit or provide a custom value for rotational radius.  Note: Quadrilateral kits have no rotational radius, you can leave it zero.</p>
         <select name="kinematicsType" id="kinematicsType">
-          <option value="Ring" selected}>Ring</option>
-          <option value="Linkage" }>45 Degree Linkage</option>
-          <option value="Pantograph" }>Top Mounted Pantograph</option>
-          <option value="Custom" }>Custom</option>
-          <option value="Quadrilateral"}>Quadrilateral</option>
+          <option value="Ring" {{'selected' if kinematicsType=='Ring' else ''}}>Ring</option>
+          <option value="Linkage" {{'selected' if kinematicsType=='Linkage' else '' }}>45 Degree Linkage</option>
+          <option value="Pantograph" {{'selected' if kinematicsType=='Pantograph' else '' }}>Top Mounted Pantograph</option>
+          <option value="Custom" {{'selected' if kinematicsType=='Custom' else ''}}>Custom</option>
+          <option value="Quadrilateral" {{'selected' if kinematicsType=='Quadrilateral' else ''}}>Quadrilateral</option>
         </select>
         <label for="rotationRadius">Rotational Radius</label>
-        <input class="form-control" name="rotationRadius" id="rotationRadius" value="138.4">
+        <input class="form-control" name="rotationRadius" id="rotationRadius" value="{{rotationRadius}}">
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
@@ -27,8 +27,8 @@
         <img src="{{ url_for('static',filename='images/quickConfig/chainoffbottom.png') }}" height="300" width="300">
         <p></p>
         <select name="chainOverSprocket">
-          <option value="Top" selected}>Top</option>
-          <option value="Bottom"}>Bottom</option>
+          <option value="Top" {{'selected' if chainOverSprocket=='Top' else ''}}>Top</option>
+          <option value="Bottom" {{'selected' if chainOverSprocket=='Bottom' else ''}}>Bottom</option>
         </select>
       </div>
     </div>
@@ -46,7 +46,7 @@
         <img src="{{ url_for('static',filename='images/quickConfig/gearbox2gearbox.png') }}" height="300" width="300">
         <p></p>
         <label for="motorSpacingX">Distance Between Motors</label>
-        <input class="form-control" name="motorSpacingX" id="motorSpacingX" value="3000">
+        <input class="form-control" name="motorSpacingX" id="motorSpacingX" value="{{motorSpacingX}}">
         <small class="form-text text-muted">Enter value in mm only</small>
         <button type="button" onclick="subtract40p4();">Subtract 40.4 mm</button>
       </div>
@@ -61,7 +61,7 @@
         <img src="{{ url_for('static',filename='images/quickConfig/sprocket2sprocket.png') }}" height="300" width="300">
         <p></p>
         <label for="motorOffsetY">Height of Motors Above Workspace</label>
-        <input class="form-control" name="motorOffsetY" id="motorOffSetY" value="480">
+        <input class="form-control" name="motorOffsetY" id="motorOffSetY" value="{{motorOffsetY}}">
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
@@ -93,7 +93,8 @@ $(document).ready(function () {
         });
     });
     $('#kinematicsType').change(function(){
-      selected = $("#kinematicType option:selected").val()
+      selected = $("#kinematicsType option:selected").val()
+      console.log(selected);
       switch(selected) {
         case "Ring":
           rotationRadius = 138.4;
