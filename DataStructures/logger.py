@@ -17,9 +17,14 @@ class Logger(MakesmithInitFuncs):
     clients = []
 
     messageBuffer = ""
+    amessageBuffer = ""
 
     # clear the old log file
     with open("log.txt", "a") as logFile:
+        logFile.truncate()
+
+
+    with open("alog.txt", "a") as logFile:
         logFile.truncate()
 
     def writeToLog(self, message):
@@ -32,35 +37,46 @@ class Logger(MakesmithInitFuncs):
         way slow
 
         """
-        # this code allows for background_stuff to update the web client
-        # app.data.message = app.data.message+message
-
-        if True:  # (message[0]!="<" and message[0]!="["):
+        if (message[0]!="<" and message[0]!="["):
+            try:
+                self.amessageBuffer = self.amessageBuffer + message
+                self.messageBuffer = self.messageBuffer + message
+            except:
+                pass
+        else:
             try:
                 self.messageBuffer = self.messageBuffer + message
             except:
                 pass
 
         if len(self.messageBuffer) > 0:
-
             t = threading.Thread(
-                target=self.writeToFile, args=(self.messageBuffer, "write")
+                target=self.writeToFile, args=(self.messageBuffer, True, "write")
             )
             t.daemon = True
             t.start()
             self.messageBuffer = ""
 
-    def writeToFile(self, toWrite, *args):
-        """
+        if len(self.amessageBuffer) > 0:
+            t = threading.Thread(
+                target=self.writeToFile, args=(self.amessageBuffer, False, "write")
+            )
+            t.daemon = True
+            t.start()
+            self.amessageBuffer = ""
 
+
+    def writeToFile(self, toWrite, log, *args):
+        """
         Write to the log file
-
         """
+        if (log is True):
+            with open("log.txt", "a") as logFile:
+                logFile.write(toWrite)
+        else:
+            with open("alog.txt", "a") as logFile:
+                logFile.write(toWrite)
 
-        with open("log.txt", "a") as logFile:
-            logFile.write(toWrite)
-
-        # print toWrite
         return
 
     def writeErrorValueToLog(self, error):

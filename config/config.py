@@ -102,9 +102,9 @@ class Config(MakesmithInitFuncs):
                         self.syncFirmwareKey(
                             self.settings[section][x]["firmwareKey"], storedValue
                         )
-        if found == False:
+        if not found:
             print("Did not find " + str(section) + ", " + str(key) + ", " + str(value))
-        if updated == True:
+        if updated:
             if not recursionBreaker:
                 self.computeSettings(None, None, None, True)
             with open("webcontrol.json", "w") as outfile:
@@ -202,7 +202,7 @@ class Config(MakesmithInitFuncs):
                     # print setting+":"+str(result[setting])+"->"+str(settings[section][x]["value"])
                     found = True
                     break
-            if found == False:
+            if not found:
                 # must be a turned off checkbox.. what a pain to figure out
                 if self.settings[section][x]["type"] == "bool":
                     storedValue = self.settings[section][x]["value"]
@@ -213,7 +213,7 @@ class Config(MakesmithInitFuncs):
                             self.settings[section][x]["firmwareKey"], storedValue
                         )
                     updated = True
-        if updated == True:
+        if updated:
             self.computeSettings(None, None, None, True)
             with open("webcontrol.json", "w") as outfile:
                 json.dump(
@@ -432,61 +432,37 @@ class Config(MakesmithInitFuncs):
         else:
             return (None, position)
 
-    def computeSettings(self, section, key, value, all=False):
+    def computeSettings(self, section, key, value, doAll=False):
         # Update Computed settings
-        print(
-            "At Compute Settings for "
-            + str(section)
-            + ", "
-            + str(key)
-            + ", "
-            + str(value)
-            + ", "
-            + str(all)
-        )
-        if key == "kinematicsType" or all == True:
-            if all is True:
+        if key == "kinematicsType" or doAll is True:
+            if doAll is True:
                 value = self.getValue("Advanced Settings", "kinematicsType")
             if value == "Quadrilateral":
                 self.setValue("Computed Settings", "kinematicsTypeComputed", "1", True)
             else:
                 self.setValue("Computed Settings", "kinematicsTypeComputed", "2", True)
 
-        if key == "gearTeeth" or key == "chainPitch" or all == True:
-            distPerRot = float(self.getValue("Advanced Settings", "gearTeeth")) * float(
-                self.getValue("Advanced Settings", "chainPitch")
-            )
+        if key == "gearTeeth" or key == "chainPitch" or doAll is True:
+            gearTeeth = float(self.getValue("Advanced Settings", "gearTeeth"))
+            chainPitch = float(self.getValue("Advanced Settings", "chainPitch"))
+            distPerRot = gearTeeth * chainPitch
             self.setValue("Computed Settings", "distPerRot", str(distPerRot), True)
-
-            distPerRotLeftChainTolerance = (
-                (
-                    1
-                    + (
-                        float(self.getValue("Advanced Settings", "leftChainTolerance"))
-                        / 100
-                    )
-                )
-                * float(self.getValue("Advanced Settings", "gearTeeth"))
-                * float(self.getValue("Advanced Settings", "chainPitch"))
-            )
+            leftChainTolerance = float(self.getValue(
+                "Advanced Settings", "leftChainTolerance"
+            ))
+            distPerRotLeftChainTolerance = (1 + leftChainTolerance / 100.0) * distPerRot
             self.setValue(
                 "Computed Settings",
                 "distPerRotLeftChainTolerance",
                 str("{0:.5f}".format(distPerRotLeftChainTolerance)),
                 True,
             )
-
+            rightChainTolerance = float(self.getValue(
+                "Advanced Settings", "rightChainTolerance"
+            ))
             distPerRotRightChainTolerance = (
-                (
-                    1
-                    + (
-                        float(self.getValue("Advanced Settings", "rightChainTolerance"))
-                        / 100
-                    )
-                )
-                * float(self.getValue("Advanced Settings", "gearTeeth"))
-                * float(self.getValue("Advanced Settings", "chainPitch"))
-            )
+                1 + rightChainTolerance / 100.0
+            ) * distPerRot
             self.setValue(
                 "Computed Settings",
                 "distPerRotRightChainTolerance",
@@ -494,14 +470,12 @@ class Config(MakesmithInitFuncs):
                 True,
             )
 
-        if key == "leftChainTolerance" or all == True:
-            distPerRotLeftChainTolerance = (
-                1
-                + (
-                    float(self.getValue("Advanced Settings", "leftChainTolerance"))
-                    / 100.0
-                )
-            ) * float(self.getValue("Computed Settings", "distPerRot"))
+        if key == "leftChainTolerance" or doAll:
+            distPerRot = float(self.getValue("Computed Settings", "distPerRot"))
+            leftChainTolerance = float(self.getValue(
+                "Advanced Settings", "leftChainTolerance"
+            ))
+            distPerRotLeftChainTolerance = (1 + leftChainTolerance / 100.0) * distPerRot
             self.setValue(
                 "Computed Settings",
                 "distPerRotLeftChainTolerance",
@@ -509,14 +483,14 @@ class Config(MakesmithInitFuncs):
                 True,
             )
 
-        if key == "rightChainTolerance" or all == True:
+        if key == "rightChainTolerance" or doAll is True:
+            distPerRot = float(self.getValue("Computed Settings", "distPerRot"))
+            rightChainTolerance = float(self.getValue(
+                "Advanced Settings", "rightChainTolerance"
+            ))
             distPerRotRightChainTolerance = (
-                1
-                + (
-                    float(self.getValue("Advanced Settings", "rightChainTolerance"))
-                    / 100
-                )
-            ) * float(self.getValue("Computed Settings", "distPerRot"))
+                1 + rightChainTolerance / 100.0
+            ) * distPerRot
             self.setValue(
                 "Computed Settings",
                 "distPerRotRightChainTolerance",
@@ -524,7 +498,7 @@ class Config(MakesmithInitFuncs):
                 True,
             )
 
-        if key == "enablePosPIDValues" or all == True:
+        if key == "enablePosPIDValues" or doAll is True:
             for key in ("KpPos", "KiPos", "KdPos", "propWeight"):
                 if int(self.getValue("Advanced Settings", "enablePosPIDValues")) == 1:
                     value = float(self.getValue("Advanced Settings", key))
@@ -539,7 +513,7 @@ class Config(MakesmithInitFuncs):
                     value = self.getDefaultValue("Advanced Settings", key)
                 self.setValue("Computed Settings", key, value, True)
 
-        if key == "enableVPIDValues" or all == True:
+        if key == "enableVPIDValues" or doAll is True:
             for key in ("KpV", "KiV", "KdV"):
                 if int(self.getValue("Advanced Settings", "enablePosPIDValues")) == 1:
                     value = float(self.getValue("Advanced Settings", key))
@@ -554,18 +528,16 @@ class Config(MakesmithInitFuncs):
                     value = self.getDefaultValue("Advanced Settings", key)
                 self.setValue("Computed Settings", key, value, True)
 
-        if key == "chainOverSprocket" or all == True:
-            if all is True:
+        if key == "chainOverSprocket" or doAll is True:
+            if doAll is True:
                 value = self.getValue("Advanced Settings", "chainOverSprocket")
                 # print(value)
             if value == "Top":
                 self.setValue("Computed Settings", "chainOverSprocketComputed", 1, True)
             elif value == "Bottom":
                 self.setValue("Computed Settings", "chainOverSprocketComputed", 2, True)
-            # else:
-            #    print(str(value) + " for chainOversprocket didnt register")
 
-        if key == "fPWM" or all == True:
+        if key == "fPWM" or doAll is True:
             if value == "31,000Hz":
                 self.setValue("Computed Settings", "fPWMComputed", 1, True)
             elif value == "4,100Hz":
