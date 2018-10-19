@@ -35,6 +35,7 @@ class Data:
     feedRate = 20
     # holds the address of the g-code file so that the gcode can be refreshed
     gcodeFile = ""
+    importFile = ""
     # the current position of the cutting head
     currentpos = [0.0, 0.0, 0.0]
     target = [0.0, 0.0, 0.0]

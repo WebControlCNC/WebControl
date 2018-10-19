@@ -1,6 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Connection.serialPort import SerialPort
 from File.gcodeFile import GCodeFile
+from File.importFile import ImportFile
 from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
 
@@ -15,6 +16,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
 
     serialPort = SerialPort()
     gcodeFile = GCodeFile()
+    importFile = ImportFile()
     actions = Actions()
     triangularCalibration = TriangularCalibration()
 
@@ -34,9 +36,11 @@ class NonVisibleWidgets(MakesmithInitFuncs):
             self.serialPort
         )  # add the serial port widget to the data object
         data.gcodeFile = self.gcodeFile
+        data.importFile = self.importFile
         data.actions = self.actions
         data.triangularCalibration = self.triangularCalibration
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
+        self.importFile.setUpData(data)
         self.actions.setUpData(data)
         self.triangularCalibration.setUpData(data)

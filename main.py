@@ -141,6 +141,25 @@ def gcode():
             return resp
 
 
+@app.route("/importFile", methods=["POST"])
+def importFile():
+    if request.method == "POST":
+        f = request.files["file"]
+        secureFilename = "imports\\" + secure_filename(f.filename)
+        f.save(secureFilename)
+        returnVal = app.data.importFile.importGCini(secureFilename)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+
 @app.route("/calibrate", methods=["POST"])
 def calibrate():
     if request.method == "POST":
@@ -260,6 +279,13 @@ def requestPage(msg):
         page = render_template("openGCode.html")
         socketio.emit(
             "activateModal", {"title": "GCode", "message": page}, namespace="/MaslowCNC"
+        )
+    elif msg["data"]["page"] == "importGCini":
+        page = render_template("importFile.html")
+        socketio.emit(
+            "activateModal",
+            {"title": "Import File", "message": page},
+            namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "actions":
         page = render_template("actions.html")

@@ -23,7 +23,7 @@ class Config(MakesmithInitFuncs):
     def getJSONSettings(self):
         return self.settings
 
-    def updateQuickConfigure(results):
+    def updateQuickConfigure(self, result):
         if result["kinematicsType"] == "Quadrilateral":
             self.setValue("Advanced Setttings", "kinematicsType", "Quadrilateral")
         else:
@@ -38,8 +38,10 @@ class Config(MakesmithInitFuncs):
 
     def setValue(self, section, key, value, recursionBreaker=False):
         updated = False
+        found = False
         for x in range(len(self.settings[section])):
-            if self.settings[section][x]["key"] == key:
+            if self.settings[section][x]["key"].lower() == key.lower():
+                found = True
                 if self.settings[section][x]["type"] == "float":
                     try:
                         storedValue = self.settings[section][x]["value"]
@@ -54,12 +56,14 @@ class Config(MakesmithInitFuncs):
                 elif self.settings[section][x]["type"] == "int":
                     try:
                         storedValue = self.settings[section][x]["value"]
-                        self.settings[section][x]["value"] = int(result[setting])
+                        self.settings[section][x]["value"] = int(value)
                         updated = True
                         if "firmwareKey" in self.settings[section][x]:
-                            self.syncFirmwareKey(
-                                self.settings[section][x]["firmwareKey"], storedValue
-                            )
+                            if self.settings[section][x]["firmwareKey"] != 45:
+                                self.syncFirmwareKey(
+                                    self.settings[section][x]["firmwareKey"],
+                                    storedValue,
+                                )
                     except:
                         pass
                 elif self.settings[section][x]["type"] == "bool":
@@ -98,10 +102,13 @@ class Config(MakesmithInitFuncs):
                         self.syncFirmwareKey(
                             self.settings[section][x]["firmwareKey"], storedValue
                         )
+        if found == False:
+            print("Did not find " + str(section) + ", " + str(key) + ", " + str(value))
         if updated == True:
             if not recursionBreaker:
                 self.computeSettings(None, None, None, True)
             with open("webcontrol.json", "w") as outfile:
+                # print ("writing file")
                 json.dump(
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )
@@ -168,10 +175,10 @@ class Config(MakesmithInitFuncs):
 
                     elif self.settings[section][x]["type"] == "options":
                         try:
-                            print(str(result[setting]))
+                            # print(str(result[setting]))
                             storedValue = self.settings[section][x]["value"]
                             self.settings[section][x]["value"] = str(result[setting])
-                            print(self.settings[section][x]["value"])
+                            # print(self.settings[section][x]["value"])
                             updated = True
                             if "firmwareKey" in self.settings[section][x]:
                                 self.syncFirmwareKey(
@@ -284,7 +291,7 @@ class Config(MakesmithInitFuncs):
                 if "firmwareKey" in option and option["firmwareKey"] == firmwareKey:
                     # storedValue = self.get(section, option['key'])
                     storedValue = option["value"]
-                    # print "firmwareKey:"+str(firmwareKey)+ " storedValue:"+str(storedValue)+" value:"+str(value)
+                    # print("firmwareKey:"+str(firmwareKey)+ " section:"+section+" storedValue:"+str(storedValue)+" value:"+str(value))
                     if option["key"] == "spindleAutomate":
                         if storedValue == "Servo":
                             storedValue = 1
@@ -306,15 +313,11 @@ class Config(MakesmithInitFuncs):
                     # print str(firmwareKey)+": "+str(storedValue)+"?"+str(value)
                     if firmwareKey == 45:
                         # print "firmwareKey = 45"
-                        if storedValue != "":
-                            self.sendErrorArray(firmwareKey, storedValue, data)
+                        # if storedValue != "":
+                        #    self.sendErrorArray(firmwareKey, storedValue, data)
+                        pass
                     elif not self.isClose(float(storedValue), float(value)):
-                        print(
-                            "firmwareKey(send) = "
-                            + str(firmwareKey)
-                            + ":"
-                            + str(storedValue)
-                        )
+                        # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
                         app.data.gcode_queue.put(
                             "$" + str(firmwareKey) + "=" + str(storedValue)
                         )
@@ -431,8 +434,18 @@ class Config(MakesmithInitFuncs):
 
     def computeSettings(self, section, key, value, all=False):
         # Update Computed settings
+        print(
+            "At Compute Settings for "
+            + str(section)
+            + ", "
+            + str(key)
+            + ", "
+            + str(value)
+            + ", "
+            + str(all)
+        )
         if key == "kinematicsType" or all == True:
-            if all == True:
+            if all is True:
                 value = self.getValue("Advanced Settings", "kinematicsType")
             if value == "Quadrilateral":
                 self.setValue("Computed Settings", "kinematicsTypeComputed", "1", True)
@@ -486,7 +499,7 @@ class Config(MakesmithInitFuncs):
                 1
                 + (
                     float(self.getValue("Advanced Settings", "leftChainTolerance"))
-                    / 100
+                    / 100.0
                 )
             ) * float(self.getValue("Computed Settings", "distPerRot"))
             self.setValue(
@@ -542,15 +555,15 @@ class Config(MakesmithInitFuncs):
                 self.setValue("Computed Settings", key, value, True)
 
         if key == "chainOverSprocket" or all == True:
-            if all == True:
+            if all is True:
                 value = self.getValue("Advanced Settings", "chainOverSprocket")
-                print(value)
+                # print(value)
             if value == "Top":
                 self.setValue("Computed Settings", "chainOverSprocketComputed", 1, True)
             elif value == "Bottom":
                 self.setValue("Computed Settings", "chainOverSprocketComputed", 2, True)
-            else:
-                print(str(value) + " for chainOversprocket didnt register")
+            # else:
+            #    print(str(value) + " for chainOversprocket didnt register")
 
         if key == "fPWM" or all == True:
             if value == "31,000Hz":
