@@ -17,7 +17,7 @@
         <h5>Quadrilateral</h5>
         <img src="{{ url_for('static',filename='images/quickConfig/quadrilateral.png') }}" height="300" width="300">
         <p></p>
-        <select name="kinematicsType" id="kinematicsType">
+        <select class="custom-select" name="kinematicsType" id="kinematicsType">
           <option value="Ring" {{'selected' if kinematicsType=='Ring' else ''}}>Ring</option>
           <option value="Linkage" {{'selected' if kinematicsType=='Linkage' else '' }}>45 Degree Linkage</option>
           <option value="Pantograph" {{'selected' if kinematicsType=='Pantograph' else '' }}>Top Mounted Pantograph</option>

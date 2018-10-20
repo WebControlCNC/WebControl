@@ -498,6 +498,9 @@ def command(msg):
     elif msg["data"]["command"] == "optical_onStart":
         if not app.data.opticalCalibration.on_Start():
             app.data.message_queue.put("Message: Error with starting optical calibration")
+    elif msg["data"]["command"] == "optical_Calibrate":
+        if not app.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
+            app.data.message_queue.put("Message: Error with starting optical calibration")
 
 @socketio.on("move", namespace="/MaslowCNC")
 def move(msg):

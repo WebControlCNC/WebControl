@@ -21,8 +21,12 @@ class OpticalCalibration(MakesmithInitFuncs):
     cannyLowValue = 50
     cannyHighValue = 100
     opticalCenter = (None,None)
-    xD = 1
-    yD = 1
+
+    def removeOutliersAndAverage(self, data):
+        mean = np.mean(data)
+        sd = np.std(data)
+        tArray = [x for x in data if ( (x >= mean-2.0*sd) and (x<=mean+2.0*sd))]
+        return np.average(tArray), np.std(tArray)
 
     def simplifyContour(self,c,sides=4):
         tolerance = 0.01
@@ -39,15 +43,29 @@ class OpticalCalibration(MakesmithInitFuncs):
                     break
         return _c
 
-    def on_Start(self):
-        print("at onstart")
-        self.camera = cv2.VideoCapture(0) #WebcamVideoStream(src=0).start()
-        print(self.camera)
-        print("initialized.. now trying to start")
-        #self.camera.start()
-        print("going to on square")
+    def setCalibraitonSettings(self,args):
+        self.markerX = args['markerX']
+        self.markerY = args['markerY']
+        self.centerX = args['centerX']
+        self.centerY = args['centerY']
+        self.scaleX = args['scaleX']
+        self.scaleY = args['scaleY']
+        self.tlX = args['tlX']
+        self.tlY = args['tlY']
+        self.brX = args['brX']
+        self.brY = args['brY']
+
+    def on_Start(self,args):
+        self.setCalibrationSettings(args)
+        self.camera = cv2.VideoCapture(0)
         self.on_CenterOnSquare()
-        print("stopping camera")
+        self.camera.release()
+        return True
+
+    def on_Calibrate(self, args):
+        self.setCalibrationSettings(args)
+        self.camera = cv2.VideoCapture(0)
+        self.on_CenterOnSquare(self, False)
         self.camera.release()
         return True
 
@@ -62,7 +80,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         yB = _yB+yA
         return xB, yB
 
-    def on_CenterOnSquare(self, doCalibrate=False, findCenter=False):
+    def on_CenterOnSquare(self, findCenter=False):
 
         dxList = np.zeros(shape=(10))  # [-9999.9 for x in range(10)]
         dyList = np.zeros(shape=(10))  # [-9999.9 for x in range(10)]
@@ -132,21 +150,18 @@ class OpticalCalibration(MakesmithInitFuncs):
                 xB = np.average(box[:, 0])
                 yB = np.average(box[:, 1])
 
-                if doCalibrate == True:
-                    (tl, tr, br, bl) = box
-                    (tlblX, tlblY) = self.midpoint(tl, bl)
-                    (trbrX, trbrY) = self.midpoint(tr, br)
-                    (tltrX, tltrY) = self.midpoint(tl, tr)
-                    (blbrX, blbrY) = self.midpoint(bl, br)
+                (tl, tr, br, bl) = box
+                (tlblX, tlblY) = self.midpoint(tl, bl)
+                (trbrX, trbrY) = self.midpoint(tr, br)
+                (tltrX, tltrY) = self.midpoint(tl, tr)
+                (blbrX, blbrY) = self.midpoint(bl, br)
 
-                    self.xD = dist.euclidean((tlblX,tlblY),(trbrX,trbrY))/self.markerX
-                    self.yD = dist.euclidean((tltrX,tltrY),(blbrX,blbrY))/self.markerY
-                    self.ids.OpticalCalibrationAutoCalibrateButton.disabled = False
-                    self.ids.OpticalCalibrationAutoMeasureButton.disabled = False
-                    if self.xD == 0:  #doing this to catch bad calibrations and stop crashing
-                        self.xD = 1.0
-                    if self.yD == 0:
-                        self.yD = 1.0
+                xD = dist.euclidean((tlblX,tlblY),(trbrX,trbrY))/self.markerX
+                yD = dist.euclidean((tltrX,tltrY),(blbrX,blbrY))/self.markerY
+                if xD == 0:  #doing this to catch bad calibrations and stop crashing
+                    xD = 1.0
+                if yD == 0:
+                    yD = 1.0
 
 
                 cos = math.cos(angle*3.141592/180.0)
@@ -157,11 +172,10 @@ class OpticalCalibration(MakesmithInitFuncs):
                     xB,yB = self.translatePoint(xB,yB,xA,yA,_angle)
                 print("here7")
 
-                #Dist = dist.euclidean((xA, yA), (xB, yB)) / self.D
-                Dx = dist.euclidean((xA,0), (xB,0))/self.xD
+                Dx = dist.euclidean((xA,0), (xB,0))/xD
                 if (xA>xB):
                     Dx *= -1
-                Dy = dist.euclidean((0,yA), (0,yB))/self.yD
+                Dy = dist.euclidean((0,yA), (0,yB))/yD
                 if (yA<yB):
                     Dy *= -1
                 Dist = math.sqrt(Dx**2.0 + Dy**2.0 )
@@ -178,7 +192,20 @@ class OpticalCalibration(MakesmithInitFuncs):
                 falseCounter += 1
                 if (falseCounter == 10):
                     break
-        return True
+        print("Got 10 images processed, " + str(falseCounter) + " images were bad")
+        if dxList.ndim != 0:
+            avgDx, stdDx = self.removeOutliersAndAverage(dxList)
+            avgDy, stdDy = self.removeOutliersAndAverage(dyList)
+            avgDi, stdDi = self.removeOutliersAndAverage(diList)
+            avgxB, stdxB = self.removeOutliersAndAverage(xBList)
+            avgyB, stdyB = self.removeOutliersAndAverage(yBList)
+            print("avgDx, stdDx:" + str(avgDx) + ", " + str(stdDx))
+            print("avgDy, stdDy:" + str(avgDy) + ", " + str(stdDy))
+            print("avgDy, stdDy:" + str(avgDy) + ", " + str(stdDy))
+            print("avgxB, stdxB:" + str(avgxB) + ", " + str(stdxB))
+            print("avgyB, stdyB:" + str(avgyB) + ", " + str(stdyB))
+            return True
+        return False
 
 
 
