@@ -11,12 +11,14 @@ import threading
 import json
 import re
 import queue
+
 from threading import Thread
 from flask import Flask, jsonify, render_template, current_app, request, flash
 from flask_mobility import Mobility
 from flask_mobility.decorators import mobile_template
 from flask_socketio import SocketIO
 from werkzeug import secure_filename
+
 
 from background.backgroundTasks import (
     background_stuff,
@@ -49,6 +51,7 @@ app.data.gcodeShift = [
 app.previousPosX = 0.0
 app.previousPosY = 0.0
 
+
 ## this runs the scheduler
 def run_schedule():
     while 1:
@@ -78,8 +81,8 @@ def index(template):
         background_stuff, current_app._get_current_object()
     )
     thread.start()
-    # if not app.data.connectionStatus:
-    #    app.data.serialPort.openConnection()
+    if not app.data.connectionStatus:
+        app.data.serialPort.openConnection()
     if template == "mobile/":
         return render_template("frontpage_mobile.html")
     else:
