@@ -15,5 +15,5 @@ six==1.11.0
 Werkzeug==0.14.1
 scipy
 numpy
-imutils
+imutils==0.5.1
 cv2

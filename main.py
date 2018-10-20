@@ -572,7 +572,7 @@ def default_error_handler(e):
 
 
 if __name__ == "__main__":
-    app.debug = True
+    app.debug = False
     app.config["SECRET_KEY"] = "secret!"
     socketio.run(app, use_reloader=False, host="0.0.0.0")
     # socketio.run(app, host='0.0.0.0')

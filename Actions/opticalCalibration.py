@@ -13,7 +13,7 @@ import math
 
 class OpticalCalibration(MakesmithInitFuncs):
 
-    camera = VideoStream(src=0).start()
+    camera = None #VideoStream(src=0).start()
     time.sleep(2.0)
     gaussianBlurValue = 3
     cannyLowValue = 50
