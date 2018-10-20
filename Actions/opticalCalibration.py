@@ -1,7 +1,8 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from scipy.spatial                      import distance as dist
 from imutils                            import perspective, contours
-from imutils.video                      import VideoStream
+#from imutils.video                      import VideoStream
+from background.webcamVideoStream       import WebcamVideoStream
 import numpy                            as np
 import imutils
 import cv2
@@ -13,13 +14,18 @@ import math
 
 class OpticalCalibration(MakesmithInitFuncs):
 
-    camera = None #VideoStream(src=0).start()
+    camera = None
     time.sleep(2.0)
     gaussianBlurValue = 3
     cannyLowValue = 50
     cannyHighValue = 75
     opticalCenter = (None,None)
 
+def on_Start(self):
+    self.camera = WebcamVideoStream(src=0).start()
+    self.on_CenterOnSquare()
+    self.camera.stop()
+    return True
 
 def on_CenterOnSquare(self, doCalibrate=False, findCenter=False):
 
