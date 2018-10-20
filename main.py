@@ -345,7 +345,7 @@ def requestPage(msg):
         )
     elif msg["data"]["page"] == "opticalCalibration":
         page = render_template(
-            "triangularCalibration.html",
+            "opticalCalibration.html",
             pageID="opticalCalibration",
         )
         socketio.emit(
@@ -492,7 +492,9 @@ def command(msg):
     elif msg["data"]["command"] == "macro2":
         if not app.data.actions.macro(2):
             app.data.message_queue.put("Message: Error with performing macro")
-
+    elif msg["data"]["command"] == "optical_onStart":
+        if not app.data.opticalCalibration.on_Start():
+            app.data.message_queue.put("Message: Error with starting optical calibration")
 
 @socketio.on("move", namespace="/MaslowCNC")
 def move(msg):
