@@ -5,7 +5,18 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Kinematics Kit</h4>
-        <p>Select your type of kit or provide a custom value for rotational radius.  Note: Quadrilateral kits have no rotational radius, you can leave it zero.</p>
+        <p>Select your type of kit or provide a custom value for rotational radius.  Note: Quadrilateral kits have no rotational radius, you can leave it zero.
+        If you've come back to this page and see your setting is custom, don't worry.  Custom means a triangular kit.  As long as its marked custom and has a
+        rotational radius entered, you're good to go (unless of course you are using a quadrilateral kit for some reason)</p>
+        <h5>Ring</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/ring.png') }}" height="300" width="300">
+        <h5>Linkage</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/linkage.png') }}" height="300" width="300">
+        <h5>Pantograph</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/pantograph.png') }}" height="300" width="300">
+        <h5>Quadrilateral</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/quadrilateral.png') }}" height="300" width="300">
+        <p></p>
         <select name="kinematicsType" id="kinematicsType">
           <option value="Ring" {{'selected' if kinematicsType=='Ring' else ''}}>Ring</option>
           <option value="Linkage" {{'selected' if kinematicsType=='Linkage' else '' }}>45 Degree Linkage</option>
@@ -13,6 +24,7 @@
           <option value="Custom" {{'selected' if kinematicsType=='Custom' else ''}}>Custom</option>
           <option value="Quadrilateral" {{'selected' if kinematicsType=='Quadrilateral' else ''}}>Quadrilateral</option>
         </select>
+        <p></p>
         <label for="rotationRadius">Rotational Radius</label>
         <input class="form-control" name="rotationRadius" id="rotationRadius" value="{{rotationRadius}}">
         <small class="form-text text-muted">Enter value in mm only</small>
@@ -21,9 +33,9 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Chain Around Sprocket</h4>
-        <p>Your setup is configured either with the chain from the sled wrapping around the sprocket counterclockwise (Top):</p>
+        <p>Your setup is configured either with the chain from the slack side and wrapping around the sprocket clockwise to go to the sled(Top):</p>
         <img src="{{ url_for('static',filename='images/quickConfig/chainofftop.png') }}" height="300" width="300">
-        <p>Or wrapping around the sprocket clockwise (Bottom):</p>
+        <p>Or coming from the slack side and wrapping around the sprocket counterclockwise to go to the sled (Bottom):</p>
         <img src="{{ url_for('static',filename='images/quickConfig/chainoffbottom.png') }}" height="300" width="300">
         <p></p>
         <select name="chainOverSprocket">
@@ -58,7 +70,7 @@
            are above the top of the workspace.  Just get close because this value will get adjusted during calibration.
            but it needs to be reasonably close so the first stage of calibration can get close to where it needs to be. </p>
         <p>Height of Motors Above Workspace:</p>
-        <img src="{{ url_for('static',filename='images/quickConfig/sprocket2sprocket.png') }}" height="300" width="300">
+        <img src="{{ url_for('static',filename='images/quickConfig/motorOffsetY.png') }}" height="300" width="300">
         <p></p>
         <label for="motorOffsetY">Height of Motors Above Workspace</label>
         <input class="form-control" name="motorOffsetY" id="motorOffSetY" value="{{motorOffsetY}}">

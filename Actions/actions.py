@@ -478,3 +478,14 @@ class Actions(MakesmithInitFuncs):
             return True
         except:
             return False
+
+    def macro(self, number):
+        try:
+            if number==1:
+                macro = self.data.config.getValue('Maslow Settings', 'macro1')
+            else:
+                macro = self.data.config.getValue('Maslow Settings', 'macro2')
+            self.data.gcode_queue.put(macro)
+            return True
+        except:
+            return False

@@ -160,8 +160,8 @@ def importFile():
             return resp
 
 
-@app.route("/calibrate", methods=["POST"])
-def calibrate():
+@app.route("/triangularCalibration", methods=["POST"])
+def triangularCalibration():
     if request.method == "POST":
         result = request.form
         motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = app.data.actions.calibrate(
@@ -186,6 +186,23 @@ def calibrate():
             resp = jsonify(message)
             resp.status_code = 500
             return resp
+
+@app.route("/opticalCalibration", methods=["POST"])
+def opticalCalibration():
+    if request.method == "POST":
+        result = request.form
+        message = {
+            "status":200,
+        }
+        resp = jsonify(message)
+        resp.status_code = 200
+        return resp
+    else:
+        message = {"status": 500}
+        resp = jsonify(message)
+        resp.status_code = 500
+        return resp
+
 
 
 @app.route("/quickConfigure", methods=["POST"])
@@ -308,22 +325,32 @@ def requestPage(msg):
             {"title": "Z-Axis", "message": page},
             namespace="/MaslowCNC",
         )
-    elif msg["data"]["page"] == "calibrate":
+    elif msg["data"]["page"] == "triangularCalibration":
         motorYoffset = app.data.config.getValue("Maslow Settings", "motorOffsetY")
         rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
         chainSagCorrection = app.data.config.getValue(
             "Advanced Settings", "chainSagCorrection"
         )
         page = render_template(
-            "calibrate.html",
-            pageID="calibrate",
+            "triangularCalibration.html",
+            pageID="triangularCalibration",
             motorYoffset=motorYoffset,
             rotationRadius=rotationRadius,
             chainSagCorrection=chainSagCorrection,
         )
         socketio.emit(
             "activateModal",
-            {"title": "Calibrate", "message": page},
+            {"title": "Triangular Calibration", "message": page},
+            namespace="/MaslowCNC",
+        )
+    elif msg["data"]["page"] == "opticalCalibration":
+        page = render_template(
+            "triangularCalibration.html",
+            pageID="opticalCalibration",
+        )
+        socketio.emit(
+            "activateModal",
+            {"title": "Optical Calibration", "message": page},
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "quickConfigure":
@@ -459,6 +486,12 @@ def command(msg):
     elif msg["data"]["command"] == "updatePorts":
         if not app.data.actions.updatePorts():
             app.data.message_queue.put("Message: Error with updating list of ports")
+    elif msg["data"]["command"] == "macro1":
+        if not app.data.actions.macro(1):
+            app.data.message_queue.put("Message: Error with performing macro")
+    elif msg["data"]["command"] == "macro2":
+        if not app.data.actions.macro(2):
+            app.data.message_queue.put("Message: Error with performing macro")
 
 
 @socketio.on("move", namespace="/MaslowCNC")
@@ -539,7 +572,7 @@ def default_error_handler(e):
 
 
 if __name__ == "__main__":
-    app.debug = False
+    app.debug = True
     app.config["SECRET_KEY"] = "secret!"
     socketio.run(app, use_reloader=False, host="0.0.0.0")
     # socketio.run(app, host='0.0.0.0')

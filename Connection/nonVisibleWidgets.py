@@ -4,6 +4,7 @@ from File.gcodeFile import GCodeFile
 from File.importFile import ImportFile
 from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
+from Actions.opticalCalibration import OpticalCalibration
 
 
 class NonVisibleWidgets(MakesmithInitFuncs):
@@ -19,6 +20,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     importFile = ImportFile()
     actions = Actions()
     triangularCalibration = TriangularCalibration()
+    opticalCalibration = OpticalCalibration()
 
     def setUpData(self, data):
         """
@@ -39,8 +41,10 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.importFile = self.importFile
         data.actions = self.actions
         data.triangularCalibration = self.triangularCalibration
+        data.opticalCalibration = self.opticalCalibration
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
         self.importFile.setUpData(data)
         self.actions.setUpData(data)
         self.triangularCalibration.setUpData(data)
+        self.opticalCalibration.setUpData(data)
