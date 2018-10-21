@@ -9,6 +9,7 @@ venv.bak/
 
 #logs
 log.txt
+alog.txt
 
 # IDE-specific files
 .idea
