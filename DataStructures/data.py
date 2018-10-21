@@ -69,6 +69,8 @@ class Data:
     serialPort = None  # this is a pointer to the program serial port object
     triangularCalibration = None  # points to the triangular calibration object
     opticalCalibration = None #points to the optical calibration object
+    opticalCalibrationImage = None #stores the current image
+    opticalCalibrationImageUpdated = False #stores whether its been updated or not
     """
 
     Colors

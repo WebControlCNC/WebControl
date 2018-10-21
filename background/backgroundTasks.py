@@ -11,6 +11,10 @@ def background_stuff(app):
     with app.app_context():
         while True:
             time.sleep(0.001)
+            if app.data.opticalCalibrationImageUpdated is True:
+                print("updated image")
+                sendCalibrationMessage("OpticalCalibrationImageUpdated", app.data.opticalCalibrationImage)
+                app.data.opticalCalibrationImageUpdated = False
             while not app.data.message_queue.empty():  # if there is new data to be read
                 message = app.data.message_queue.get()
                 # send message to web for display in appropriate column
@@ -36,7 +40,8 @@ def background_stuff(app):
                         measuredDist = float(message[9 : len(message) - 3])
                         try:
                             app.data.measureRequest(measuredDist)
-                        except:
+                        except Exception as e:
+                            print(e)
                             print("No function has requested a measurement")
                 elif message[0:13] == "Maslow Paused":
                     app.data.uploadFlag = 0
@@ -134,3 +139,8 @@ def sendPositionMessage(position):
     socketio.emit(
         "positionMessage", {"data": json.dumps(position)}, namespace="/MaslowCNC"
     )
+
+def sendCalibrationMessage(message,data):
+    print("sending updated image")
+    #print(len(data))
+    socketio.emit("calibrationMessage", {"msg": message, "data":data}, namespace="/MaslowCNC")

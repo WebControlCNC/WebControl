@@ -353,7 +353,7 @@ def requestPage(msg):
         )
         socketio.emit(
             "activateModal",
-            {"title": "Optical Calibration", "message": page},
+            {"title": "Optical Calibration", "message": page, "mode":"static"},
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "quickConfigure":
@@ -499,6 +499,7 @@ def command(msg):
         if not app.data.opticalCalibration.on_Start():
             app.data.message_queue.put("Message: Error with starting optical calibration")
     elif msg["data"]["command"] == "optical_Calibrate":
+        print("here")
         if not app.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
             app.data.message_queue.put("Message: Error with starting optical calibration")
 

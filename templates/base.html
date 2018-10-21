@@ -36,15 +36,25 @@
             });
         });
 
+        socket.on('calibrationMessage', function(msg){
+            processCalibrationMessage(msg)
+        });
+   
         socket.on('positionMessage', function(msg){
             processPositionMessage(msg)
         });
 
         socket.on('activateModal', function(msg){
           console.log("activateModal")
+          $('#notificationModal').data('bs.modal',null);
           $('#notificationModalTitle').html("<h3>"+msg.title+"</h3");
           $('#notificationModalText').html("<p>"+msg.message+"</p>");
-          $('#notificationModal').modal()
+          if (msg.mode=="static"){
+              console.log("Static Modal")
+              $('#notificationModal').modal({backdrop: 'static', keyboard: false})
+          } else {
+              $('#notificationModal').modal()
+          }
         });
 
         socket.on('requestedSetting', function(msg){
@@ -146,19 +156,20 @@
   </section>
 
   <div class="modal" id="notificationModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 id="notificationModalTitle" class="modal-title">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div id="notificationModalText" class="modal-body">
-        <p>Modal body text goes here.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="notificationModalTitle" class="modal-title">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="notificationModalText" class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>

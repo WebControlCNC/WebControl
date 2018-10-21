@@ -1,98 +1,110 @@
 
 {% block content %}
 <div class="container-fluid">
-  <div class="card">
-    <div class="card-body">
-      <h4 class="card-title">Configuration</h4>
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="markerX">Horizontal Size of Marker</label>
-            <input class="form-control" name="markerX" id="markerX" value="0.6">
-            <small class="form-text text-muted">Enter value in inches only</small>
+  <div class="card" id="configurationAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
+      <h4 class="card-title" id="configurationHeader">
+        Configuration...
+      </h4>
+    </button>
+    <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-parent="#configurationAccordion">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="markerX">Horizontal Size of Marker</label>
+              <input class="form-control" name="markerX" id="markerX" value="0.6">
+              <small class="form-text text-muted">Enter value in inches only</small>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="markerY">Vertical Size of Marker</label>
+              <input class="form-control" name="markerY" id="markerY" value="0.6">
+              <small class="form-text text-muted">Enter value in inches only</small>
+            </div>
           </div>
         </div>
-        <div class="col">
-          <div class="form-group">
-            <label for="markerY">Vertical Size of Marker</label>
-            <input class="form-control" name="markerY" id="markerY" value="0.6">
-            <small class="form-text text-muted">Enter value in inches only</small>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="scaleX">Horizontal Scale Factor</label>
+              <input class="form-control" name="scaleX" id="scaleX" value="1.0">
+              <small class="form-text text-muted">Enter something like 1.0028</small>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="scaleY">Vertical Scale Factor</label>
+              <input class="form-control" name="scaleY" id="scaleY" value="1.0">
+              <small class="form-text text-muted">Enter something like 1.0028</small>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="scaleX">Horizontal Scale Factor</label>
-            <input class="form-control" name="scaleX" id="scaleX" value="1.0">
-            <small class="form-text text-muted">Enter something like 1.0028</small>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="centerX">X Coordinate of Center</label>
+              <input class="form-control" name="centerX" id="centerX" value="300">
+              <small class="form-text text-muted">Enter something like 300</small>
+            </div>
           </div>
-        </div>
-        <div class="col">
-          <div class="form-group">
-            <label for="scaleY">Vertical Scale Factor</label>
-            <input class="form-control" name="scaleY" id="scaleY" value="1.0">
-            <small class="form-text text-muted">Enter something like 1.0028</small>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="centerX">X Coordinate of Center</label>
-            <input class="form-control" name="centerX" id="centerX" value="300">
-            <small class="form-text text-muted">Enter something like 300</small>
-          </div>
-        </div>
-        <div class="col">
-          <div class="form-group">
-            <label for="centerY">Y Coordinate of Center</label>
-            <input class="form-control" name="centerY" id="centerY" value="200">
-            <small class="form-text text-muted">Enter something like 200</small>
-          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="centerY">Y Coordinate of Center</label>
+              <input class="form-control" name="centerY" id="centerY" value="200">
+              <small class="form-text text-muted">Enter something like 200</small>
+            </div>
+         </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-body">
-      <h4 class="card-title">Calibration Extents</h4>
-      <select class="custom-select" name="calibrationExtents" id="calibrationExtents">
-        <option value="Top Left" {{'selected' if calibrationExtents=='Top Left' else ''}}>48 x 36 Top Left</option>
-        <option value="Bottom Left" {{'selected' if calibrationExtents=='Bottom Left' else '' }}>48 x 36 Bottom Left</option>
-        <option value="Top Right" {{'selected' if calibrationExtents=='Rop Right' else '' }}>48 x 36 Top Right</option>
-        <option value="Bottom Right" {{'selected' if calibrationExtents=='Bottom Right' else ''}}>48 x 36 Bottom Right</option>
-        <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Aera</option>
-      </select>
-      <div class="row">
-      <div class="col">
-        <div class="form-group">
-          <label for="tlX">X Coordinate of Top Left</label>
-          <input class="form-control" name="tlX" id="tlX" value="-15">
-          <small class="form-text text-muted">Enter something like -15</small>
+  <div class="card" id="calibrationExtentsAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationExtents" aria-expanded="false" aria-controls="collapseCalibrationExtents">
+      <h4 class="card-title" id="calibrationExtentsHeader">Calibration Extents...</h4>
+    </button>
+    <div id="collapseCalibrationExtents" class="collapse" aria-labelledby="calibrationExtentsHeader" data-parent="#calibrationExtentsAccordion">
+      <div class="card-body">
+        <h4 class="card-title">Calibration Extents</h4>
+        <select class="custom-select" name="calibrationExtents" id="calibrationExtents">
+          <option value="Top Left" {{'selected' if calibrationExtents=='Top Left' else ''}}>48 x 36 Top Left</option>
+          <option value="Bottom Left" {{'selected' if calibrationExtents=='Bottom Left' else '' }}>48 x 36 Bottom Left</option>
+          <option value="Top Right" {{'selected' if calibrationExtents=='Rop Right' else '' }}>48 x 36 Top Right</option>
+          <option value="Bottom Right" {{'selected' if calibrationExtents=='Bottom Right' else ''}}>48 x 36 Bottom Right</option>
+          <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Aera</option>
+        </select>
+        <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="tlX">X Coordinate of Top Left</label>
+            <input class="form-control" name="tlX" id="tlX" value="-15">
+            <small class="form-text text-muted">Enter something like -15</small>
+          </div>
         </div>
-      </div>
-      <div class="col">
-        <div class="form-group">
-          <label for="tlY">Y Coordinate of Top Left</label>
-          <input class="form-control" name="tlY" id="tlY" value="7">
-          <small class="form-text text-muted">Enter something like 7</small>
+        <div class="col">
+          <div class="form-group">
+            <label for="tlY">Y Coordinate of Top Left</label>
+            <input class="form-control" name="tlY" id="tlY" value="7">
+            <small class="form-text text-muted">Enter something like 7</small>
+          </div>
         </div>
-      </div>
-      </div>
-      <div class="row">
-      <div class="col">
-        <div class="form-group">
-          <label for="brX">X Coordinate of Bottom Right</label>
-          <input class="form-control" name="brX" id="brX" value="15">
-          <small class="form-text text-muted">Enter something like 15</small>
         </div>
-      </div>
-      <div class="col">
-        <div class="form-group">
-          <label for="brY">Y Coordinate of Bottom Right</label>
-          <input class="form-control" name="brY" id="brY" value="-7">
-          <small class="form-text text-muted">Enter something like -7</small>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="brX">X Coordinate of Bottom Right</label>
+              <input class="form-control" name="brX" id="brX" value="15">
+              <small class="form-text text-muted">Enter something like 15</small>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="brY">Y Coordinate of Bottom Right</label>
+              <input class="form-control" name="brY" id="brY" value="-7">
+              <small class="form-text text-muted">Enter something like -7</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -100,10 +112,31 @@
   <div class="card">
     <div class="card-body">
       <h4 class="card-title">Calibration</h4>
-      <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('optical_Calibrate');">Calibrate</button>
-      <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('optical_onStart');">Start Automatic  Calibration</button>
+      <div class="row">
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('optical_Calibrate');">Start Automatic Calibration</button>
+          </div>
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopOpticalCalibrate');">Stop</button>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');">Return to Center</button>
+          </div>
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('saveAndSendOpticalCalibration');">Save and Send</button>
+          </div>
+      </div>
     </div>
   </div>
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Active Image</h4>
+      <div id="imageDiv"></div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}
 
@@ -131,6 +164,13 @@ function process(processName){
                     brX:brX,
                     brY:brY};
   action('optical_Calibrate',parameters);
+}
+
+function processCalibrationMessage(msg){
+    console.log(msg.msg)
+    console.log(msg.data)
+    $("#imageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>")
+    //console.log(msg.data.length)
 }
 
 $(document).ready(function () {
