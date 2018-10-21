@@ -157,7 +157,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 box = np.array(box, dtype="int")
                 box = perspective.order_points(box)
                 cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
-                cv2.imwrite('image-out'+str(x)+".png",orig)
+                #cv2.imwrite('testing/image-out'+str(x)+".png",orig)
                 if findCenter == False:
                     M = cv2.getRotationMatrix2D((xA,yA),_angle,1)
                     orig = cv2.warpAffine(orig,M,(width,height))

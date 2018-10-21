@@ -129,7 +129,7 @@ def webControlSettings():
 def gcode():
     if request.method == "POST":
         f = request.files["file"]
-        app.data.gcodeFile.filename = "gcode\\" + secure_filename(f.filename)
+        app.data.gcodeFile.filename = "gcode/" + secure_filename(f.filename)
         f.save(app.data.gcodeFile.filename)
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
