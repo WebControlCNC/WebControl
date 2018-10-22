@@ -23,7 +23,6 @@ class Logger(MakesmithInitFuncs):
     with open("log.txt", "a") as logFile:
         logFile.truncate()
 
-
     with open("alog.txt", "a") as logFile:
         logFile.truncate()
 
@@ -37,7 +36,7 @@ class Logger(MakesmithInitFuncs):
         way slow
 
         """
-        if (message[0]!="<" and message[0]!="["):
+        if message[0] != "<" and message[0] != "[":
             try:
                 self.amessageBuffer = self.amessageBuffer + message
                 self.messageBuffer = self.messageBuffer + message
@@ -65,12 +64,11 @@ class Logger(MakesmithInitFuncs):
             t.start()
             self.amessageBuffer = ""
 
-
     def writeToFile(self, toWrite, log, *args):
         """
         Write to the log file
         """
-        if (log is True):
+        if log is True:
             with open("log.txt", "a") as logFile:
                 logFile.write(toWrite)
         else:

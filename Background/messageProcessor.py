@@ -6,14 +6,16 @@ import json
 
 
 class MessageProcessor(MakesmithInitFuncs):
-    '''
+    """
     This class processes messages from the controller and sends them to the UI message queue if something needs to get relayed to the user
-    '''
+    """
 
     def start(self):
         while True:
             time.sleep(0.001)
-            while not self.data.message_queue.empty():  # if there is new data to be read
+            while (
+                not self.data.message_queue.empty()
+            ):  # if there is new data to be read
                 message = self.data.message_queue.get()
                 # send message to web for display in appropriate column
                 if message != "":
@@ -46,7 +48,7 @@ class MessageProcessor(MakesmithInitFuncs):
                         break
                     self.data.previousUploadStatus = self.data.uploadFlag
                     self.data.uploadFlag = 0
-                    if message.find('adjust Z-Axis') != -1:
+                    if message.find("adjust Z-Axis") != -1:
                         self.data.ui_queue.put(message)
                 elif message[0:6] == "ALARM:":
                     self.data.previousUploadStatus = self.data.uploadFlag
@@ -84,6 +86,3 @@ class MessageProcessor(MakesmithInitFuncs):
                     pass  # displaying all the 'ok' messages clutters up the display
                 else:
                     print(message)
-
-
-

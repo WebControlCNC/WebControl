@@ -20,16 +20,15 @@ from flask_socketio import SocketIO
 from werkzeug import secure_filename
 
 
-from Background.UIProcessor import (
-    UIProcessor,
-)  # do this after socketio is declared
+from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 
 # from Background.scheduler           import    ScheduleThread
 from DataStructures.data import Data
-#from Connection.serialPort import SerialPort
-#from config.config import Config
-#from DataStructures.logger import Logger
-#from DataStructures.loggingQueue import LoggingQueue
+
+# from Connection.serialPort import SerialPort
+# from config.config import Config
+# from DataStructures.logger import Logger
+# from DataStructures.loggingQueue import LoggingQueue
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from Actions.actions import Actions
 
@@ -48,16 +47,18 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")) / scale,
     float(app.data.config.getValue("Advanced Settings", "homeY")) / scale,
 ]
-#app.previousPosX = 0.0
-#app.previousPosY = 0.0
+# app.previousPosX = 0.0
+# app.previousPosY = 0.0
 
-app.UIProcessor = UIProcessor();
+app.UIProcessor = UIProcessor()
 
 ## this runs the scheduler to check for connections
 def run_schedule():
     while 1:
         schedule.run_pending()
         time.sleep(1)
+
+
 app.th = threading.Thread(target=run_schedule)
 app.th.daemon = True
 app.th.start()
@@ -197,9 +198,7 @@ def triangularCalibration():
 def opticalCalibration():
     if request.method == "POST":
         result = request.form
-        message = {
-            "status":200,
-        }
+        message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
         return resp
@@ -349,13 +348,10 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "opticalCalibration":
-        page = render_template(
-            "opticalCalibration.html",
-            pageID="opticalCalibration",
-        )
+        page = render_template("opticalCalibration.html", pageID="opticalCalibration")
         socketio.emit(
             "activateModal",
-            {"title": "Optical Calibration", "message": page, "mode":"static"},
+            {"title": "Optical Calibration", "message": page, "mode": "static"},
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "quickConfigure":

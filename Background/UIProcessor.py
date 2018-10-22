@@ -5,7 +5,7 @@ import math
 import json
 
 
-class UIProcessor():
+class UIProcessor:
 
     app = None
 
@@ -16,9 +16,14 @@ class UIProcessor():
             while True:
                 time.sleep(0.001)
                 if self.app.data.opticalCalibrationImageUpdated is True:
-                    self.sendCalibrationMessage("OpticalCalibrationImageUpdated", self.app.data.opticalCalibrationImage)
+                    self.sendCalibrationMessage(
+                        "OpticalCalibrationImageUpdated",
+                        self.app.data.opticalCalibrationImage,
+                    )
                     self.app.data.opticalCalibrationImageUpdated = False
-                while not self.app.data.ui_queue.empty():  # if there is new data to be read
+                while (
+                    not self.app.data.ui_queue.empty()
+                ):  # if there is new data to be read
                     message = self.app.data.ui_queue.get()
                     # send message to web for display in appropriate column
                     if message != "":
@@ -33,7 +38,7 @@ class UIProcessor():
                             oo = 1
                             # app.setErrorOnScreen(message)
                     elif message[0:8] == "Message:":
-                        if message.find('adjust Z-Axis') != -1:
+                        if message.find("adjust Z-Axis") != -1:
                             print("found adjust Z-Axis in message")
                             socketio.emit(
                                 "requestedSetting",
@@ -42,33 +47,44 @@ class UIProcessor():
                             )
                         self.activateModal("Notification:", message[9:])
                     elif message[0:7] == "Action:":
-                        if message.find('unitsUpdate')!=-1:
-                            units = self.app.data.config.getValue("Computed Settings", "units")
+                        if message.find("unitsUpdate") != -1:
+                            units = self.app.data.config.getValue(
+                                "Computed Settings", "units"
+                            )
                             socketio.emit(
                                 "requestedSetting",
                                 {"setting": "units", "value": units},
-                                namespace = "/MaslowCNC",
-                            )
-                        if message.find('gcodeUpdate')!=-1:
-                            socketio.emit(
-                                "gcodeUpdate",
-                                {"data": json.dumps([ob.__dict__ for ob in self.app.data.gcodeFile.line])},
                                 namespace="/MaslowCNC",
                             )
-                        if message.find('setAsPause')!=-1:
+                        if message.find("gcodeUpdate") != -1:
+                            socketio.emit(
+                                "gcodeUpdate",
+                                {
+                                    "data": json.dumps(
+                                        [
+                                            ob.__dict__
+                                            for ob in self.app.data.gcodeFile.line
+                                        ]
+                                    )
+                                },
+                                namespace="/MaslowCNC",
+                            )
+                        if message.find("setAsPause") != -1:
                             socketio.emit(
                                 "requestedSetting",
                                 {"setting": "pauseButtonSetting", "value": "Pause"},
                                 namespace="/MaslowCNC",
                             )
-                        if message.find('setAsResume')!=-1:
+                        if message.find("setAsResume") != -1:
                             socketio.emit(
                                 "requestedSetting",
                                 {"setting": "pauseButtonSetting", "value": "Resume"},
                                 namespace="/MaslowCNC",
                             )
-                        if message.find('positionUpdate') != -1:
-                            msg = message.split('_') # everything to the right of the "_" should be the position data already json.dumps'ed
+                        if message.find("positionUpdate") != -1:
+                            msg = message.split(
+                                "_"
+                            )  # everything to the right of the "_" should be the position data already json.dumps'ed
                             socketio.emit(
                                 "positionMessage",
                                 {"data": msg[1]},
@@ -80,7 +96,6 @@ class UIProcessor():
                         pass  # displaying all the 'ok' messages clutters up the display
                     else:
                         print(message)
-
 
     def setPosOnScreen(self, message):
         try:
@@ -110,24 +125,29 @@ class UIProcessor():
             print("One Machine Position Report Command Misread")
             return
 
-        position = {"xval": self.app.data.xval, "yval": self.app.data.yval, "zval": self.app.data.zval}
+        position = {
+            "xval": self.app.data.xval,
+            "yval": self.app.data.yval,
+            "zval": self.app.data.zval,
+        }
         self.sendPositionMessage(position)
-
 
     def activateModal(self, title, message):
         socketio.emit(
-            "activateModal", {"title": title, "message": message}, namespace="/MaslowCNC"
+            "activateModal",
+            {"title": title, "message": message},
+            namespace="/MaslowCNC",
         )
-
 
     def sendControllerMessage(self, message):
         socketio.emit("controllerMessage", {"data": message}, namespace="/MaslowCNC")
-
 
     def sendPositionMessage(self, position):
         socketio.emit(
             "positionMessage", {"data": json.dumps(position)}, namespace="/MaslowCNC"
         )
 
-    def sendCalibrationMessage(message,data):
-        socketio.emit("calibrationMessage", {"msg": message, "data":data}, namespace="/MaslowCNC")
+    def sendCalibrationMessage(message, data):
+        socketio.emit(
+            "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
+        )

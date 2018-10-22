@@ -10,7 +10,6 @@ import json
 
 
 class Actions(MakesmithInitFuncs):
-
     def processAction(self, msg):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
@@ -69,8 +68,8 @@ class Actions(MakesmithInitFuncs):
             if not self.moveGcodeZ(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to Z move")
         elif (
-                msg["data"]["command"] == "moveGcodeIndex"
-                or msg["data"]["command"] == "moveGcodeZ"
+            msg["data"]["command"] == "moveGcodeIndex"
+            or msg["data"]["command"] == "moveGcodeZ"
         ):
             if not self.moveGcodeIndex(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to index")
@@ -98,11 +97,15 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put("Message: Error with performing macro")
         elif msg["data"]["command"] == "optical_onStart":
             if not self.data.opticalCalibration.on_Start():
-                self.data.ui_queue.put("Message: Error with starting optical calibration")
+                self.data.ui_queue.put(
+                    "Message: Error with starting optical calibration"
+                )
         elif msg["data"]["command"] == "optical_Calibrate":
             print("here")
             if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with starting optical calibration")
+                self.data.ui_queue.put(
+                    "Message: Error with starting optical calibration"
+                )
 
     def defineHome(self):
         try:
@@ -338,7 +341,9 @@ class Actions(MakesmithInitFuncs):
                 # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
                 # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
                 position = {"xval": xTarget, "yval": yTarget, "zval": self.data.zval}
-                self.data.ui_queue.put("Action: positionMessage:_"+json.dumps(position)) # the "_" facilitates the parse
+                self.data.ui_queue.put(
+                    "Action: positionMessage:_" + json.dumps(position)
+                )  # the "_" facilitates the parse
             except Exception as e:
                 print(e)
                 print("Unable to update position for new gcode line")
@@ -590,10 +595,10 @@ class Actions(MakesmithInitFuncs):
 
     def macro(self, number):
         try:
-            if number==1:
-                macro = self.data.config.getValue('Maslow Settings', 'macro1')
+            if number == 1:
+                macro = self.data.config.getValue("Maslow Settings", "macro1")
             else:
-                macro = self.data.config.getValue('Maslow Settings', 'macro2')
+                macro = self.data.config.getValue("Maslow Settings", "macro2")
             self.data.gcode_queue.put(macro)
             return True
         except Exception as e:

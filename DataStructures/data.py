@@ -69,9 +69,9 @@ class Data:
     """
     serialPort = None  # this is a pointer to the program serial port object
     triangularCalibration = None  # points to the triangular calibration object
-    opticalCalibration = None #points to the optical calibration object
-    opticalCalibrationImage = None #stores the current image
-    opticalCalibrationImageUpdated = False #stores whether its been updated or not
+    opticalCalibration = None  # points to the optical calibration object
+    opticalCalibrationImage = None  # stores the current image
+    opticalCalibrationImageUpdated = False  # stores whether its been updated or not
     """
 
     Colors
@@ -109,7 +109,6 @@ class Data:
     previousPosX = 0.0
     previousPosY = 0.0
     previousPosZ = 0.0
-
 
     def __init__(self):
         """
