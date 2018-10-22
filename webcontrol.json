@@ -517,7 +517,7 @@
             "default": 1.0,
             "key": "distToMove",
             "type": "float",
-            "value": 76.0
+            "value": 3.0
         },
         {
             "default": 0.5,
@@ -529,7 +529,7 @@
             "default": "MM",
             "key": "units",
             "type": "string",
-            "value": "MM"
+            "value": "INCHES"
         },
         {
             "default": "MM",

@@ -42,6 +42,9 @@
    
         socket.on('positionMessage', function(msg){
             processPositionMessage(msg)
+            if (typeof processPositionMessageOptical === "function") { 
+                 processPositionMessageOptical(msg)
+            }
         });
 
         socket.on('activateModal', function(msg){

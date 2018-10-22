@@ -278,7 +278,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomingPosX = minX
                     self.HomingScanDirection *= -1
                     self.HomingPosY -= 1
-                if (self.HomingPosY!=maxY-1):
+                if (self.HomingPosY>maxY-1):
                     self.HomingY -= 7.0  # drop down 7 mm for next square's guess (only)
                     self.HomeIn()
                 else:
@@ -309,6 +309,7 @@ class OpticalCalibration(MakesmithInitFuncs):
     def on_Calibrate(self, args):
         print("Initializing")
         self.setCalibrationSettings(args)
+        print("Extents:"+str(self.tlX)+", "+str(self.tlY)+" to "+str(self.brX)+", "+str(self.brY))
         if self.camera is None:
              print("Starting Camera")
              self.camera = cv2.VideoCapture(0)
