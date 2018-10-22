@@ -83,17 +83,17 @@ class SerialPortThread(MakesmithInitFuncs):
         """
             Sends the next line of gcode to the machine
         """
+        if self.data.gcodeIndex < len(self.data.gcode):
+            if self.data.uploadFlag:
+                self._write(self.data.gcode[self.data.gcodeIndex])
 
-        if self.data.uploadFlag:
-            self._write(self.data.gcode[self.data.gcodeIndex])
-
-            # increment gcode index
-            if self.data.gcodeIndex + 1 < len(self.data.gcode):
-                self.data.gcodeIndex = self.data.gcodeIndex + 1
-            else:
-                self.data.uploadFlag = 0
-                self.data.gcodeIndex = 0
-                print("Gcode Ended")
+                # increment gcode index
+                if self.data.gcodeIndex + 1 < len(self.data.gcode):
+                    self.data.gcodeIndex = self.data.gcodeIndex + 1
+                else:
+                    self.data.uploadFlag = 0
+                    self.data.gcodeIndex = 0
+                    print("Gcode Ended")
 
     def getmessage(self):
         # opens a serial connection called self.serialInstance

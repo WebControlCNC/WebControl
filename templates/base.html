@@ -70,9 +70,7 @@
 
     });
     function action(command, arg, arg1){
-      //if (command=='reportSettings'){
       socket.emit('action',{data:{command:command,arg:arg, arg1:arg1}});
-      //}
 
     }
     function move(direction){
@@ -123,10 +121,10 @@
           <a class="nav-link" href="\">FrontPage <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             G-Code
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
             <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a>
             <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
           </div>
@@ -135,10 +133,10 @@
             <a class="nav-link" href="#" onclick="requestPage('actions');">Actions</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Settings
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
             <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Setttings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl Settings</a>

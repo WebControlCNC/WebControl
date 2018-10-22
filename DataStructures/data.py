@@ -104,6 +104,10 @@ class Data:
     yval = 0.0
     zval = 0.0
 
+    previousPosX = 0.0
+    previousPosY = 0.0
+    previousPosZ = 0.0
+
     def __init__(self):
         """
 

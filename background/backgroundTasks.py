@@ -54,7 +54,49 @@ def background_stuff(app):
                         break
                     app.previousUploadStatus = app.data.uploadFlag
                     app.data.uploadFlag = 0
+                    if message.find('adjust Z-Axis') != -1:
+                        print("found adjust Z-Axis in message")
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "pauseButtonSetting", "value": "Resume"},
+                            namespace="/MaslowCNC",
+                        )
                     activateModal("Notification:", message[9:])
+                elif message[0:7] == "Action:":
+                    if message.find('unitsUpdate')!=-1:
+                        units = app.data.config.getValue("Computed Settings", "units")
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "units", "value": units},
+                            namespace = "/MaslowCNC",
+                        )
+                    if message.find('gcodeUpdate')!=-1:
+                        socketio.emit(
+                            "gcodeUpdate",
+                            {"data": json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])},
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find('setAsPause')!=-1:
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "pauseButtonSetting", "value": "Pause"},
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find('setAsResume')!=-1:
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "pauseButtonSetting", "value": "Resume"},
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find('positionUpdate') != -1:
+                        msg = message.split('_') # everything to the right of the "_" should be the position data already json.dumps'ed
+                        socketio.emit(
+                            "positionMessage",
+                            {"data": msg[1]},
+                            namespace="/MaslowCNC",
+                        )
+
+
                 elif message[0:6] == "ALARM:":
                     app.previousUploadStatus = app.data.uploadFlag
                     app.data.uploadFlag = 0

@@ -71,18 +71,18 @@ $(document).ready(function(){
 
 function pauseRun(){
   if ($("#pauseButton").text()=="Pause"){
-    $("#pauseButton").text("Resume");
     action('pauseRun');
   }
   else {
-    $("#pauseButton").text("Pause");
     action('resumeRun');
   }
-
 }
 
 function processRequestedSetting(msg){
   console.log(msg);
+  if (msg.setting=="pauseButtonSetting"){
+    $("#pauseButton").text(msg.value);
+  }
   if (msg.setting=="units"){
     console.log("requestedSetting:"+msg.value);
     $("#units").text(msg.value)
@@ -128,70 +128,3 @@ function gcodeUpdate(msg){
     gcode.move(originX,originY)
   });
 }
-
-//sled.scale(scale,scale)
-/*var sketch = function(p)
-{
-  p.setup= function(){
-    p.createCanvas(640,480);
-  }
-  p.draw = function(){
-    p.ellipse(50,50,80,80)
-  }
-};
-new p5(sketch, 'workarea')
-*/
-
-
-
-/*
-// Simple way to attach js code to the canvas is by using a function
-function sketchProc(processing) {
-  // Override draw function, by default it will be called 60 times per second
-  processing.draw = function() {
-    // determine center and max clock arm length
-    var centerX = processing.width / 2, centerY = processing.height / 2;
-    var maxArmLength = Math.min(centerX, centerY);
-
-    function drawArm(position, lengthScale, weight) {
-      processing.strokeWeight(weight);
-      processing.line(centerX, centerY,
-        centerX + Math.sin(position * 2 * Math.PI) * lengthScale * maxArmLength,
-        centerY - Math.cos(position * 2 * Math.PI) * lengthScale * maxArmLength);
-    }
-
-    // erase background
-    processing.background(224);
-
-    var now = new Date();
-
-    // Moving hours arm by small increments
-    var hoursPosition = (now.getHours() % 12 + now.getMinutes() / 60) / 12;
-    drawArm(hoursPosition, 0.5, 5);
-
-    // Moving minutes arm by small increments
-    var minutesPosition = (now.getMinutes() + now.getSeconds() / 60) / 60;
-    drawArm(minutesPosition, 0.80, 3);
-
-    // Moving hour arm by second increments
-    var secondsPosition = now.getSeconds() / 60;
-    drawArm(secondsPosition, 0.90, 1);
-  };
-
-}
-
-var canvas = document.getElementById("workarea");
-// attaching the sketchProc function to the canvas
-var p = new Processing(canvas, sketchProc);
-// p.exit(); to detach it
-*/
-/*var elem = document.getElementById('workarea');
-var params = {width: 1000, height: 600};
-var two = new Two(params).appendTo(elem);
-
-var rectangle = two.makeRectangle(500,300,1000,600);
-var texture = new Two.Texture("/static/images/materials/Plywood_texture.JPG", function() {
-});
-rectangle.fill = texture
-two.update();
-*/
