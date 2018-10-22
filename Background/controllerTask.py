@@ -1,7 +1,3 @@
-from flask import session
-from flask_socketio import emit
-from __main__ import socketio
-
 import time
 import math
 import json
@@ -12,7 +8,6 @@ def background_stuff(app):
         while True:
             time.sleep(0.001)
             if app.data.opticalCalibrationImageUpdated is True:
-                print("updated image")
                 sendCalibrationMessage("OpticalCalibrationImageUpdated", app.data.opticalCalibrationImage)
                 app.data.opticalCalibrationImageUpdated = False
             while not app.data.message_queue.empty():  # if there is new data to be read
@@ -21,11 +16,6 @@ def background_stuff(app):
                 if message != "":
                     if message[0] != "[" and message[0] != "<":
                         sendControllerMessage(message)
-                        # socketio.emit('controllerMessage', {'data':message }, namespace='/MaslowCNC')
-                    # else:
-                    # sendPositionMessage(message)
-                    # socketio.emit('positionMessage', {'data':message }, namespace='/MaslowCNC')
-                # further process (original Maslow)
                 if message[0] == "<":
                     # print message
                     setPosOnScreen(app, message)
@@ -95,8 +85,6 @@ def background_stuff(app):
                             {"data": msg[1]},
                             namespace="/MaslowCNC",
                         )
-
-
                 elif message[0:6] == "ALARM:":
                     app.previousUploadStatus = app.data.uploadFlag
                     app.data.uploadFlag = 0

@@ -14,98 +14,95 @@ class Actions(MakesmithInitFuncs):
     def processAction(self, msg):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
-                self.data.message_queue.put("Message: Error with resetting chain lengths.")
+                self.data.ui_queue.put("Message: Error with resetting chain lengths.")
         elif msg["data"]["command"] == "reportSettings":
             self.data.gcode_queue.put("$$")
         elif msg["data"]["command"] == "home":
             if not self.home():
-                self.data.message_queue.put("Message: Error with returning to home.")
+                self.data.ui_queue.put("Message: Error with returning to home.")
         elif msg["data"]["command"] == "defineHome":
             if self.defineHome():
                 ## the gcode file might change the active units so we need to inform the UI of the change.
-                self.data.message_queue.put("Action: unitsUpdate gcodeUpdate")
+                self.data.ui_queue.put("Action: unitsUpdate gcodeUpdate")
             else:
-                self.data.message_queue.put("Message: Error with defining home.")
+                self.data.ui_queue.put("Message: Error with defining home.")
         elif msg["data"]["command"] == "defineZ0":
             if not self.data.actions.defineZ0():
-                self.data.message_queue.put("Message: Error with defining Z-Axis zero.")
+                self.data.ui_queue.put("Message: Error with defining Z-Axis zero.")
         elif msg["data"]["command"] == "stopZ":
             if not self.stopZ():
-                self.data.message_queue.put("Message: Error with stopping Z-Axis movement")
+                self.data.ui_queue.put("Message: Error with stopping Z-Axis movement")
         elif msg["data"]["command"] == "startRun":
             if not self.startRun():
-                self.data.message_queue.put("Message: Error with starting run")
+                self.data.ui_queue.put("Message: Error with starting run")
         elif msg["data"]["command"] == "stopRun":
             if not self.stopRun():
-                self.data.message_queue.put("Message: Error with stopping run")
+                self.data.ui_queue.put("Message: Error with stopping run")
         elif msg["data"]["command"] == "moveToDefault":
             if not self.moveToDefault():
-                self.data.message_queue.put(
+                self.data.ui_queue.put(
                     "Message: Error with moving to default chain lengths"
                 )
         elif msg["data"]["command"] == "testMotors":
             if not self.testMotors():
-                self.data.message_queue.put("Message: Error with testing motors")
+                self.data.ui_queue.put("Message: Error with testing motors")
         elif msg["data"]["command"] == "wipeEEPROM":
             if not self.wipeEEPROM():
-                self.data.message_queue.put("Message: Error with wiping EEPROM")
+                self.data.ui_queue.put("Message: Error with wiping EEPROM")
         elif msg["data"]["command"] == "pauseRun":
             if not self.pauseRun():
-                self.data.message_queue.put("Message: Error with pausing run")
+                self.data.ui_queue.put("Message: Error with pausing run")
         elif msg["data"]["command"] == "resumeRun":
             if not self.resumeRun():
-                self.data.message_queue.put("Message: Error with resuming run")
+                self.data.ui_queue.put("Message: Error with resuming run")
         elif msg["data"]["command"] == "returnToCenter":
             if not self.returnToCenter():
-                self.data.message_queue.put("Message: Error with returning to center")
+                self.data.ui_queue.put("Message: Error with returning to center")
         elif msg["data"]["command"] == "clearGCode":
             if self.clearGCode():
                 # send blank gcode to UI
-                self.data.message_queue.put("Action: gcodeUpdate")
+                self.data.ui_queue.put("Action: gcodeUpdate")
                 # socketio.emit("gcodeUpdate", {"data": ""}, namespace="/MaslowCNC")
             else:
-                self.data.message_queue.put("Message: Error with clearing gcode")
+                self.data.ui_queue.put("Message: Error with clearing gcode")
         elif msg["data"]["command"] == "moveGcodeZ":
             if not self.moveGcodeZ(int(msg["data"]["arg"])):
-                self.data.message_queue.put("Message: Error with moving to Z move")
+                self.data.ui_queue.put("Message: Error with moving to Z move")
         elif (
                 msg["data"]["command"] == "moveGcodeIndex"
                 or msg["data"]["command"] == "moveGcodeZ"
         ):
             if not self.moveGcodeIndex(int(msg["data"]["arg"])):
-                self.data.message_queue.put("Message: Error with moving to index")
+                self.data.ui_queue.put("Message: Error with moving to index")
         elif msg["data"]["command"] == "setSprockets":
             if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
-                self.data.message_queue.put("Message: Error with setting sprocket")
+                self.data.ui_queue.put("Message: Error with setting sprocket")
         elif msg["data"]["command"] == "setSprocketsAutomatic":
             if not self.setSprocketsAutomatic():
-                self.data.message_queue.put(
+                self.data.ui_queue.put(
                     "Message: Error with setting sprockets automatically"
                 )
         elif msg["data"]["command"] == "setSprocketsZero":
             if not self.setSprocketsZero():
-                self.data.message_queue.put(
+                self.data.ui_queue.put(
                     "Message: Error with setting sprockets zero value"
                 )
         elif msg["data"]["command"] == "updatePorts":
             if not self.updatePorts():
-                self.data.message_queue.put("Message: Error with updating list of ports")
+                self.data.ui_queue.put("Message: Error with updating list of ports")
         elif msg["data"]["command"] == "macro1":
             if not self.macro(1):
-                self.data.message_queue.put("Message: Error with performing macro")
+                self.data.ui_queue.put("Message: Error with performing macro")
         elif msg["data"]["command"] == "macro2":
             if not self.macro(2):
-                self.data.message_queue.put("Message: Error with performing macro")
+                self.data.ui_queue.put("Message: Error with performing macro")
         elif msg["data"]["command"] == "optical_onStart":
             if not self.data.opticalCalibration.on_Start():
-                self.data.message_queue.put("Message: Error with starting optical calibration")
+                self.data.ui_queue.put("Message: Error with starting optical calibration")
         elif msg["data"]["command"] == "optical_Calibrate":
             print("here")
             if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-                self.data.message_queue.put("Message: Error with starting optical calibration")
-
-
-
+                self.data.ui_queue.put("Message: Error with starting optical calibration")
 
     def defineHome(self):
         try:
@@ -121,7 +118,8 @@ class Actions(MakesmithInitFuncs):
             self.data.config.setValue("Advanced Settings", "homeY", str(self.data.yval))
             self.data.gcodeFile.loadUpdateFile()
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def home(self):
@@ -145,21 +143,24 @@ class Actions(MakesmithInitFuncs):
             )
             self.data.gcode_queue.put("G00 Z0 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def resetChainLengths(self):
         try:
             self.data.gcode_queue.put("B08 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def defineZ0(self):
         try:
             self.data.gcode_queue.put("G10 Z0 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def stopZ(self):
@@ -168,7 +169,8 @@ class Actions(MakesmithInitFuncs):
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def startRun(self):
@@ -177,7 +179,8 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
             self.data.gcodeIndex += 1
             return True
-        except:
+        except Exception as e:
+            print(e)
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             return False
@@ -193,7 +196,8 @@ class Actions(MakesmithInitFuncs):
             # TODO: app.onUploadFlagChange(self.stopRun, 0)
             print("Gcode Stopped")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def moveToDefault(self):
@@ -207,14 +211,16 @@ class Actions(MakesmithInitFuncs):
             )
             self.data.gcode_queue.put("G91 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def testMotors(self):
         try:
             self.data.gcode_queue.put("B04 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def wipeEEPROM(self):
@@ -223,16 +229,18 @@ class Actions(MakesmithInitFuncs):
             timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
             timer.start()
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def pauseRun(self):
         try:
             self.data.uploadFlag = 0
             print("Run Paused")
-            self.data.message_queue.put("Action: setAsResume")
+            self.data.ui_queue.put("Action: setAsResume")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def resumeRun(self):
@@ -240,9 +248,10 @@ class Actions(MakesmithInitFuncs):
             self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
             self.data.quick_queue.put("~")
-            self.data.message_queue.put("Action: setAsPause")
+            self.data.ui_queue.put("Action: setAsPause")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def returnToCenter(self):
@@ -258,14 +267,16 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G00 Z" + str(safeHeightMM))
             self.data.gcode_queue.put("G00 X0.0 Y0.0 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def clearGCode(self):
         try:
             self.data.gcodeFile = ""
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def moveGcodeZ(self, moves):
@@ -282,7 +293,8 @@ class Actions(MakesmithInitFuncs):
                 return True
             else:
                 return False
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def moveGcodeIndex(self, dist):
@@ -326,12 +338,14 @@ class Actions(MakesmithInitFuncs):
                 # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
                 # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
                 position = {"xval": xTarget, "yval": yTarget, "zval": self.data.zval}
-                self.data.message_queue.put("Action: positionMessage:_"+json.dumps(position)) # the "_" facilitates the parse
-            except:
+                self.data.ui_queue.put("Action: positionMessage:_"+json.dumps(position)) # the "_" facilitates the parse
+            except Exception as e:
+                print(e)
                 print("Unable to update position for new gcode line")
                 return False
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def move(self, direction, distToMove):
@@ -377,11 +391,12 @@ class Actions(MakesmithInitFuncs):
                     + " G90 "
                 )
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def moveZ(self, direction, distToMoveZ):
-        if True:
+        try:
             # distToMoveZ = float(msg['data']['distToMoveZ'])
             self.data.config.setValue("Computed Settings", "distToMoveZ", distToMoveZ)
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
@@ -403,7 +418,8 @@ class Actions(MakesmithInitFuncs):
             else:
                 self.data.gcode_queue.put("G20 ")
             return True
-        if False:
+        except Exception as e:
+            print(e)
             return False
 
     def updateSetting(self, setting, value):
@@ -443,7 +459,8 @@ class Actions(MakesmithInitFuncs):
                 )
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def setSprockets(self, sprocket, degrees):
@@ -465,7 +482,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("B09 " + sprocket + "-" + str(degValue) + " ")
             self.data.gcode_queue.put("G90 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def setVerticalAutomatic(self):
@@ -475,7 +493,8 @@ class Actions(MakesmithInitFuncs):
             # request a measurement
             self.data.gcode_queue.put("B10 L")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def getLeftChainLength(self, dist):
@@ -490,21 +509,12 @@ class Actions(MakesmithInitFuncs):
         self.moveToVertical()
 
     def moveToVertical(self):
-        # print "Current chain lengths:"
-        # print self.leftChainLength
-        # print self.rightChainLength
-
         chainPitch = float(self.data.config.get("Advanced Settings", "chainPitch"))
         gearTeeth = float(self.data.config.get("Advanced Settings", "gearTeeth"))
-
         distPerRotation = chainPitch * gearTeeth
 
-        # print "Rotations remainder:"
         distL = -1 * (self.leftChainLength % distPerRotation)
         distR = -1 * (self.rightChainLength % distPerRotation)
-
-        # print distL
-        # print distR
 
         self.data.gcode_queue.put("G91 ")
         self.data.gcode_queue.put("B09 L" + str(distL) + " ")
@@ -516,13 +526,14 @@ class Actions(MakesmithInitFuncs):
         try:
             self.data.gcode_queue.put("B06 L0 R0 ")
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def updatePorts(self):
         # refresh the list of available comports
         portsList = []
-        if True:
+        try:
             if sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
                 # this excludes your current terminal "/dev/tty"
                 sysports = glob.glob("/dev/tty[A-Za-z]*")
@@ -540,7 +551,8 @@ class Actions(MakesmithInitFuncs):
                 portsList.append("None")
             self.data.comPorts = portsList
             return True
-        if False:
+        except Exception as e:
+            print(e)
             return False
 
     def calibrate(self, result):
@@ -572,7 +584,8 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G0 X0 Y0 ")
             """
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def macro(self, number):
@@ -583,5 +596,6 @@ class Actions(MakesmithInitFuncs):
                 macro = self.data.config.getValue('Maslow Settings', 'macro2')
             self.data.gcode_queue.put(macro)
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False

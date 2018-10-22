@@ -2,7 +2,7 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from scipy.spatial                      import distance as dist
 from imutils                            import perspective, contours
 #from imutils.video                      import VideoStream
-#from background.webcamVideoStream       import WebcamVideoStream
+#from Background.webcamVideoStream       import WebcamVideoStream
 #from imutils.video			import WebcamVideoStream
 import numpy                            as np
 import imutils

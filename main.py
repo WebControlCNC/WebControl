@@ -20,11 +20,11 @@ from flask_socketio import SocketIO
 from werkzeug import secure_filename
 
 
-from background.backgroundTasks import (
-    background_stuff,
+from Background.UIProcessor import (
+    UIProcessor,
 )  # do this after socketio is declared
 
-# from background.scheduler           import    ScheduleThread
+# from Background.scheduler           import    ScheduleThread
 from DataStructures.data import Data
 #from Connection.serialPort import SerialPort
 #from config.config import Config
@@ -51,17 +51,21 @@ app.data.gcodeShift = [
 #app.previousPosX = 0.0
 #app.previousPosY = 0.0
 
+app.UIProcessor = UIProcessor();
 
-## this runs the scheduler
+## this runs the scheduler to check for connections
 def run_schedule():
     while 1:
         schedule.run_pending()
         time.sleep(1)
-
-
 app.th = threading.Thread(target=run_schedule)
 app.th.daemon = True
 app.th.start()
+
+## this runs the thread that processes messages from the controller
+app.th1 = threading.Thread(target=app.data.messageProcessor.start)
+app.th1.daemon = True
+app.th1.start()
 
 # write settings file to disk:
 # from settings import settings
@@ -78,7 +82,7 @@ def index(template):
     # print template
     current_app._get_current_object()
     thread = socketio.start_background_task(
-        background_stuff, current_app._get_current_object()
+        app.UIProcessor.start, current_app._get_current_object()
     )
     thread.start()
     if not app.data.connectionStatus:
@@ -406,7 +410,7 @@ def move(msg):
     if not app.data.actions.move(
         msg["data"]["direction"], float(msg["data"]["distToMove"])
     ):
-        app.data.message_queue.put("Message: Error with move")
+        app.data.ui_queue.put("Message: Error with move")
 
 
 @socketio.on("moveZ", namespace="/MaslowCNC")
@@ -414,7 +418,7 @@ def moveZ(msg):
     if not app.data.actions.moveZ(
         msg["data"]["direction"], float(msg["data"]["distToMoveZ"])
     ):
-        app.data.message_queue.put("Message: Error with Z-Axis move")
+        app.data.ui_queue.put("Message: Error with Z-Axis move")
 
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
@@ -453,7 +457,7 @@ def settingRequest(msg):
 @socketio.on("updateSetting", namespace="/MaslowCNC")
 def updateSetting(msg):
     if not app.data.actions.updateSetting(msg["data"]["setting"], msg["data"]["value"]):
-        app.data.message_queue.put("Message: Error updating setting")
+        app.data.ui_queue.put("Message: Error updating setting")
 
 
 @socketio.on("checkForGCodeUpdate", namespace="/MaslowCNC")
