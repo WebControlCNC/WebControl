@@ -6,25 +6,32 @@
       {% for setting in settings %}
       <li class="list-group-item">
         <div class="row align-items-center">
-          <div class="col-9">
+          <div class="col-8">
             <h4>{{setting.title}}</h4>
             <p>{{setting.desc}}</p>
           </div>
-          <div class="col-3">
+          <div class="col-4">
             {% if setting.key =="COMport" %}
-              <select name="{{setting.key}}" data-group="{{title}}">
-                {% if ports|length == 0 %}
-                  <option value="{{setting.value}}" 'selected'>
-                    {{setting.value}}
-                  </option>
-                {% else %}
-                  {% for port in ports %}
-                    <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
-                      {{port}}
-                    </option>
-                  {% endfor %}
-                {% endif %}
-              </select>
+              <div class="row">
+                <div class="col-10">
+                  <select class="custom-select no-gutters" name="{{setting.key}}" data-group="{{title}}">
+                    {% if ports|length == 0 %}
+                      <option value="{{setting.value}}" 'selected'>
+                        {{setting.value}}
+                      </option>
+                    {% else %}
+                      {% for port in ports %}
+                        <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
+                          {{port}}
+                        </option>
+                      {% endfor %}
+                    {% endif %}
+                  </select>
+                </div>
+                <div class="col-2">
+                  <button type="button no-gutters" onclick="event.preventDefault();action('updatePorts');">R</button>
+                </div>
+              </div>
             {% elif setting.type=="options" %}
               <select name="{{setting.key}}" data-group="{{title}}">
                 {% for option in setting.options %}

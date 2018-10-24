@@ -86,7 +86,7 @@
             "section": "Advanced Settings",
             "title": "Chain Length",
             "type": "string",
-            "value": "3871"
+            "value": "4267"
         },
         {
             "default": 7560.0,
@@ -112,7 +112,7 @@
             "section": "Advanced Settings",
             "title": "Spindle Automation",
             "type": "options",
-            "value": "0"
+            "value": "None"
         },
         {
             "default": 800,
@@ -546,7 +546,7 @@
             "section": "Maslow Settings",
             "title": "Serial Connection",
             "type": "string",
-            "value": "COM5"
+            "value": "/dev/ttyACM0"
         },
         {
             "default": 2978.4,

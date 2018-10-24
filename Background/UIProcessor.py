@@ -147,7 +147,7 @@ class UIProcessor:
             "positionMessage", {"data": json.dumps(position)}, namespace="/MaslowCNC"
         )
 
-    def sendCalibrationMessage(message, data):
+    def sendCalibrationMessage(self, message, data):
         socketio.emit(
             "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
         )

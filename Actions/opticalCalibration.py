@@ -323,6 +323,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                     self.HomeIn()
                 else:
                     self.inAutoMode = False
+                    print("Releasing Camera")
+                    self.camera.release()
                     print("Calibration Completed")
 
     def on_Calibrate(self, args):
