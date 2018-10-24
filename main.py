@@ -20,16 +20,15 @@ from flask_socketio import SocketIO
 from werkzeug import secure_filename
 
 
-from background.backgroundTasks import (
-    background_stuff,
-)  # do this after socketio is declared
+from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 
-# from background.scheduler           import    ScheduleThread
+# from Background.scheduler           import    ScheduleThread
 from DataStructures.data import Data
-from Connection.serialPort import SerialPort
-from config.config import Config
-from DataStructures.logger import Logger
-from DataStructures.loggingQueue import LoggingQueue
+
+# from Connection.serialPort import SerialPort
+# from config.config import Config
+# from DataStructures.logger import Logger
+# from DataStructures.loggingQueue import LoggingQueue
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from Actions.actions import Actions
 
@@ -48,11 +47,12 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")) / scale,
     float(app.data.config.getValue("Advanced Settings", "homeY")) / scale,
 ]
-app.previousPosX = 0.0
-app.previousPosY = 0.0
+# app.previousPosX = 0.0
+# app.previousPosY = 0.0
 
+app.UIProcessor = UIProcessor()
 
-## this runs the scheduler
+## this runs the scheduler to check for connections
 def run_schedule():
     while 1:
         schedule.run_pending()
@@ -62,6 +62,11 @@ def run_schedule():
 app.th = threading.Thread(target=run_schedule)
 app.th.daemon = True
 app.th.start()
+
+## this runs the thread that processes messages from the controller
+app.th1 = threading.Thread(target=app.data.messageProcessor.start)
+app.th1.daemon = True
+app.th1.start()
 
 # write settings file to disk:
 # from settings import settings
@@ -78,7 +83,7 @@ def index(template):
     # print template
     current_app._get_current_object()
     thread = socketio.start_background_task(
-        background_stuff, current_app._get_current_object()
+        app.UIProcessor.start, current_app._get_current_object()
     )
     thread.start()
     if not app.data.connectionStatus:
@@ -106,7 +111,6 @@ def advancedSettings():
     if request.method == "POST":
         result = request.form
         app.data.config.updateSettings("Advanced Settings", result)
-        # setValues = app.data.config.getJSONSettingSection("Advanced Settings")
         message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -118,7 +122,6 @@ def webControlSettings():
     if request.method == "POST":
         result = request.form
         app.data.config.updateSettings("WebControl Settings", result)
-        # setValues = app.data.config.getJSONSettingSection("WebControl Settings")
         message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -190,13 +193,12 @@ def triangularCalibration():
             resp.status_code = 500
             return resp
 
+
 @app.route("/opticalCalibration", methods=["POST"])
 def opticalCalibration():
     if request.method == "POST":
         result = request.form
-        message = {
-            "status":200,
-        }
+        message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
         return resp
@@ -205,7 +207,6 @@ def opticalCalibration():
         resp = jsonify(message)
         resp.status_code = 500
         return resp
-
 
 
 @app.route("/quickConfigure", methods=["POST"])
@@ -347,13 +348,10 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "opticalCalibration":
-        page = render_template(
-            "opticalCalibration.html",
-            pageID="opticalCalibration",
-        )
+        page = render_template("opticalCalibration.html", pageID="opticalCalibration")
         socketio.emit(
             "activateModal",
-            {"title": "Optical Calibration", "message": page, "mode":"static"},
+            {"title": "Optical Calibration", "message": page, "mode": "static"},
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "quickConfigure":
@@ -400,115 +398,15 @@ def test_disconnect():
 
 @socketio.on("action", namespace="/MaslowCNC")
 def command(msg):
-    if msg["data"]["command"] == "resetChainLengths":
-        if not app.data.actions.resetChainLengths():
-            app.data.message_queue.put("Message: Error with resetting chain lengths.")
-    elif msg["data"]["command"] == "reportSettings":
-        app.data.gcode_queue.put("$$")
-    elif msg["data"]["command"] == "home":
-        if not app.data.actions.home():
-            app.data.message_queue.put("Message: Error with returning to home.")
-    elif msg["data"]["command"] == "defineHome":
-        if app.data.actions.defineHome():
-            ## the gcode file might change the active units so we need to inform the UI of the change.
-            units = app.data.config.getValue("Computed Settings", "units")
-            socketio.emit(
-                "requestedSetting",
-                {"setting": "units", "value": units},
-                namespace="/MaslowCNC",
-            )
-            ## send updated gcode to UI
-            socketio.emit(
-                "gcodeUpdate",
-                {"data": json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])},
-                namespace="/MaslowCNC",
-            )
-        else:
-            app.data.message_queue.put("Message: Error with defining home.")
+    app.data.actions.processAction(msg)
 
-    elif msg["data"]["command"] == "defineZ0":
-        if not app.data.actions.defineZ0():
-            app.data.message_queue.put("Message: Error with defining Z-Axis zero.")
-    elif msg["data"]["command"] == "stopZ":
-        if not app.data.actions.stopZ():
-            app.data.message_queue.put("Message: Error with stopping Z-Axis movement")
-    elif msg["data"]["command"] == "startRun":
-        if not app.data.actions.startRun():
-            app.data.message_queue.put("Message: Error with starting run")
-    elif msg["data"]["command"] == "stopRun":
-        if not app.data.actions.stopRun():
-            app.data.message_queue.put("Message: Error with stopping run")
-    elif msg["data"]["command"] == "moveToDefault":
-        if not app.data.actions.moveToDefault():
-            app.data.message_queue.put(
-                "Message: Error with moving to default chain lengths"
-            )
-    elif msg["data"]["command"] == "testMotors":
-        if not app.data.actions.testMotors():
-            app.data.message_queue.put("Message: Error with testing motors")
-    elif msg["data"]["command"] == "wipeEEPROM":
-        if not app.data.actions.wipeEEPROM():
-            app.data.message_queue.put("Message: Error with wiping EEPROM")
-    elif msg["data"]["command"] == "pauseRun":
-        if not app.data.actions.pauseRun():
-            app.data.message_queue.put("Message: Error with pausing run")
-    elif msg["data"]["command"] == "resumeRun":
-        if not app.data.actions.resumeRun():
-            app.data.message_queue.put("Message: Error with resuming run")
-    elif msg["data"]["command"] == "returnToCenter":
-        if not app.data.actions.returnToCenter():
-            app.data.message_queue.put("Message: Error with returning to center")
-    elif msg["data"]["command"] == "clearGCode":
-        if app.data.actions.clearGCode():
-            # send blank gcode to UI
-            socketio.emit("gcodeUpdate", {"data": ""}, namespace="/MaslowCNC")
-        else:
-            app.data.message_queue.put("Message: Error with clearing gcode")
-    elif msg["data"]["command"] == "moveGcodeZ":
-        if not app.data.actions.moveGcodeZ(int(msg["data"]["arg"])):
-            app.data.message_queue.put("Message: Error with moving to Z move")
-    elif (
-        msg["data"]["command"] == "moveGcodeIndex"
-        or msg["data"]["command"] == "moveGcodeZ"
-    ):
-        if not app.data.actions.moveGcodeIndex(int(msg["data"]["arg"])):
-            app.data.message_queue.put("Message: Error with moving to index")
-    elif msg["data"]["command"] == "setSprockets":
-        if not app.data.actions.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
-            app.data.message_queue.put("Message: Error with setting sprocket")
-    elif msg["data"]["command"] == "setSprocketsAutomatic":
-        if not app.data.actions.setSprocketsAutomatic():
-            app.data.message_queue.put(
-                "Message: Error with setting sprockets automatically"
-            )
-    elif msg["data"]["command"] == "setSprocketsZero":
-        if not app.data.actions.setSprocketsZero():
-            app.data.message_queue.put(
-                "Message: Error with setting sprockets zero value"
-            )
-    elif msg["data"]["command"] == "updatePorts":
-        if not app.data.actions.updatePorts():
-            app.data.message_queue.put("Message: Error with updating list of ports")
-    elif msg["data"]["command"] == "macro1":
-        if not app.data.actions.macro(1):
-            app.data.message_queue.put("Message: Error with performing macro")
-    elif msg["data"]["command"] == "macro2":
-        if not app.data.actions.macro(2):
-            app.data.message_queue.put("Message: Error with performing macro")
-    elif msg["data"]["command"] == "optical_onStart":
-        if not app.data.opticalCalibration.on_Start():
-            app.data.message_queue.put("Message: Error with starting optical calibration")
-    elif msg["data"]["command"] == "optical_Calibrate":
-        print("here")
-        if not app.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-            app.data.message_queue.put("Message: Error with starting optical calibration")
 
 @socketio.on("move", namespace="/MaslowCNC")
 def move(msg):
     if not app.data.actions.move(
         msg["data"]["direction"], float(msg["data"]["distToMove"])
     ):
-        app.data.message_queue.put("Message: Error with move")
+        app.data.ui_queue.put("Message: Error with move")
 
 
 @socketio.on("moveZ", namespace="/MaslowCNC")
@@ -516,7 +414,7 @@ def moveZ(msg):
     if not app.data.actions.moveZ(
         msg["data"]["direction"], float(msg["data"]["distToMoveZ"])
     ):
-        app.data.message_queue.put("Message: Error with Z-Axis move")
+        app.data.ui_queue.put("Message: Error with Z-Axis move")
 
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
@@ -555,7 +453,7 @@ def settingRequest(msg):
 @socketio.on("updateSetting", namespace="/MaslowCNC")
 def updateSetting(msg):
     if not app.data.actions.updateSetting(msg["data"]["setting"], msg["data"]["value"]):
-        app.data.message_queue.put("Message: Error updating setting")
+        app.data.ui_queue.put("Message: Error updating setting")
 
 
 @socketio.on("checkForGCodeUpdate", namespace="/MaslowCNC")

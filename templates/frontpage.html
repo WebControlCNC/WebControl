@@ -11,12 +11,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid d-flex h-100 flex-column">
-  <div class="row flex-fill d-flex justify-content-start">
+<div class="container-fluid h-100">
+  <div class="row justify-content-start h-100">
     <div id="workarea" class="col">
     </div>
     <div class="col my-sidebar">
-      <div class="container">
+      <div class="h-100 d-flex flex-column">
         <h3>Controls</h3>
         <div class="row">
           <div class="col mb-1">
@@ -113,10 +113,7 @@
             <h3>Controller Messages</h3>
           </div>
         </div>
-        <div class="row">
-          <div class="col mb-1">
-            <div class="scrollText" id='controllerMessage'></div>
-          </div>
+        <div class="row scrollText flex-grow-1" id='controllerMessage'>
         </div>
       </div>
     </div>

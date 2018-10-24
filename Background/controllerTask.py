@@ -1,7 +1,3 @@
-from flask import session
-from flask_socketio import emit
-from __main__ import socketio
-
 import time
 import math
 import json
@@ -12,8 +8,9 @@ def background_stuff(app):
         while True:
             time.sleep(0.001)
             if app.data.opticalCalibrationImageUpdated is True:
-                print("updated image")
-                sendCalibrationMessage("OpticalCalibrationImageUpdated", app.data.opticalCalibrationImage)
+                sendCalibrationMessage(
+                    "OpticalCalibrationImageUpdated", app.data.opticalCalibrationImage
+                )
                 app.data.opticalCalibrationImageUpdated = False
             while not app.data.message_queue.empty():  # if there is new data to be read
                 message = app.data.message_queue.get()
@@ -21,11 +18,6 @@ def background_stuff(app):
                 if message != "":
                     if message[0] != "[" and message[0] != "<":
                         sendControllerMessage(message)
-                        # socketio.emit('controllerMessage', {'data':message }, namespace='/MaslowCNC')
-                    # else:
-                    # sendPositionMessage(message)
-                    # socketio.emit('positionMessage', {'data':message }, namespace='/MaslowCNC')
-                # further process (original Maslow)
                 if message[0] == "<":
                     # print message
                     setPosOnScreen(app, message)
@@ -54,7 +46,51 @@ def background_stuff(app):
                         break
                     app.previousUploadStatus = app.data.uploadFlag
                     app.data.uploadFlag = 0
+                    if message.find("adjust Z-Axis") != -1:
+                        print("found adjust Z-Axis in message")
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "pauseButtonSetting", "value": "Resume"},
+                            namespace="/MaslowCNC",
+                        )
                     activateModal("Notification:", message[9:])
+                elif message[0:7] == "Action:":
+                    if message.find("unitsUpdate") != -1:
+                        units = app.data.config.getValue("Computed Settings", "units")
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "units", "value": units},
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find("gcodeUpdate") != -1:
+                        socketio.emit(
+                            "gcodeUpdate",
+                            {
+                                "data": json.dumps(
+                                    [ob.__dict__ for ob in app.data.gcodeFile.line]
+                                )
+                            },
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find("setAsPause") != -1:
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "pauseButtonSetting", "value": "Pause"},
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find("setAsResume") != -1:
+                        socketio.emit(
+                            "requestedSetting",
+                            {"setting": "pauseButtonSetting", "value": "Resume"},
+                            namespace="/MaslowCNC",
+                        )
+                    if message.find("positionUpdate") != -1:
+                        msg = message.split(
+                            "_"
+                        )  # everything to the right of the "_" should be the position data already json.dumps'ed
+                        socketio.emit(
+                            "positionMessage", {"data": msg[1]}, namespace="/MaslowCNC"
+                        )
                 elif message[0:6] == "ALARM:":
                     app.previousUploadStatus = app.data.uploadFlag
                     app.data.uploadFlag = 0
@@ -140,7 +176,10 @@ def sendPositionMessage(position):
         "positionMessage", {"data": json.dumps(position)}, namespace="/MaslowCNC"
     )
 
-def sendCalibrationMessage(message,data):
+
+def sendCalibrationMessage(message, data):
     print("sending updated image")
-    #print(len(data))
-    socketio.emit("calibrationMessage", {"msg": message, "data":data}, namespace="/MaslowCNC")
+    # print(len(data))
+    socketio.emit(
+        "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
+    )

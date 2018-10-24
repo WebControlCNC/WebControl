@@ -39,4 +39,3 @@ class WebcamVideoStream:
         # indicate that the thread should be stopped
         print("Stopping camera")
         self.stopped = True
-

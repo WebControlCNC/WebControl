@@ -2,6 +2,7 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import sys
 import threading
+import json
 import re
 import math
 
@@ -101,7 +102,7 @@ class GCodeFile(MakesmithInitFuncs):
                         self.data.zMoves.append(index)
         except:
             print("Gcode File Error")
-            self.data.message_queue.put("Message: Cannot open gcode file.")
+            self.data.ui_queue.put("Message: Cannot open gcode file.")
             self.data.gcodeFile = ""
             return False
         self.updateGcode()
@@ -527,6 +528,6 @@ class GCodeFile(MakesmithInitFuncs):
                 + "lines are shown here.\nThe complete program will cut if you choose to do so unless the home position is moved from (0,0)."
             )
             print(errorText)
-            self.data.message_queue.put("Message: " + errorText)
+            self.data.ui_queue.put("Message: " + errorText)
 
         self.callBackMechanism(self.updateGcode)

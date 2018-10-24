@@ -447,9 +447,9 @@ class Config(MakesmithInitFuncs):
             chainPitch = float(self.getValue("Advanced Settings", "chainPitch"))
             distPerRot = gearTeeth * chainPitch
             self.setValue("Computed Settings", "distPerRot", str(distPerRot), True)
-            leftChainTolerance = float(self.getValue(
-                "Advanced Settings", "leftChainTolerance"
-            ))
+            leftChainTolerance = float(
+                self.getValue("Advanced Settings", "leftChainTolerance")
+            )
             distPerRotLeftChainTolerance = (1 + leftChainTolerance / 100.0) * distPerRot
             self.setValue(
                 "Computed Settings",
@@ -457,9 +457,9 @@ class Config(MakesmithInitFuncs):
                 str("{0:.5f}".format(distPerRotLeftChainTolerance)),
                 True,
             )
-            rightChainTolerance = float(self.getValue(
-                "Advanced Settings", "rightChainTolerance"
-            ))
+            rightChainTolerance = float(
+                self.getValue("Advanced Settings", "rightChainTolerance")
+            )
             distPerRotRightChainTolerance = (
                 1 + rightChainTolerance / 100.0
             ) * distPerRot
@@ -472,9 +472,9 @@ class Config(MakesmithInitFuncs):
 
         if key == "leftChainTolerance" or doAll:
             distPerRot = float(self.getValue("Computed Settings", "distPerRot"))
-            leftChainTolerance = float(self.getValue(
-                "Advanced Settings", "leftChainTolerance"
-            ))
+            leftChainTolerance = float(
+                self.getValue("Advanced Settings", "leftChainTolerance")
+            )
             distPerRotLeftChainTolerance = (1 + leftChainTolerance / 100.0) * distPerRot
             self.setValue(
                 "Computed Settings",
@@ -485,9 +485,9 @@ class Config(MakesmithInitFuncs):
 
         if key == "rightChainTolerance" or doAll is True:
             distPerRot = float(self.getValue("Computed Settings", "distPerRot"))
-            rightChainTolerance = float(self.getValue(
-                "Advanced Settings", "rightChainTolerance"
-            ))
+            rightChainTolerance = float(
+                self.getValue("Advanced Settings", "rightChainTolerance")
+            )
             distPerRotRightChainTolerance = (
                 1 + rightChainTolerance / 100.0
             ) * distPerRot

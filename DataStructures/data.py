@@ -56,6 +56,7 @@ class Data:
     """
     # sets a flag if the gcode is being uploaded currently
     uploadFlag = 0
+    previousUploadStatus = 0
     # this is used to determine the first time the position is received from the machine
     firstTimePosFlag = 0
     # report if the serial connection is open
@@ -68,9 +69,9 @@ class Data:
     """
     serialPort = None  # this is a pointer to the program serial port object
     triangularCalibration = None  # points to the triangular calibration object
-    opticalCalibration = None #points to the optical calibration object
-    opticalCalibrationImage = None #stores the current image
-    opticalCalibrationImageUpdated = False #stores whether its been updated or not
+    opticalCalibration = None  # points to the optical calibration object
+    opticalCalibrationImage = None  # stores the current image
+    opticalCalibrationImageUpdated = False  # stores whether its been updated or not
     """
 
     Colors
@@ -94,6 +95,7 @@ class Data:
     Queues
     """
     message_queue = LoggingQueue(logger)
+    ui_queue = queue.Queue()
     gcode_queue = queue.Queue()
     quick_queue = queue.Queue()
 
@@ -103,6 +105,10 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+
+    previousPosX = 0.0
+    previousPosY = 0.0
+    previousPosZ = 0.0
 
     def __init__(self):
         """
