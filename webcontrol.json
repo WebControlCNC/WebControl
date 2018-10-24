@@ -546,7 +546,7 @@
             "section": "Maslow Settings",
             "title": "Serial Connection",
             "type": "string",
-            "value": "/dev/ttyACM0"
+            "value": "COM5"
         },
         {
             "default": 2978.4,

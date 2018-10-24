@@ -12,24 +12,24 @@
           </div>
           <div class="col-4">
             {% if setting.key =="COMport" %}
-              <div class="row">
-                <div class="col-10">
-                  <select class="custom-select no-gutters" name="{{setting.key}}" data-group="{{title}}">
-                    {% if ports|length == 0 %}
-                      <option value="{{setting.value}}" 'selected'>
-                        {{setting.value}}
+              <div class="input-group mb-3">
+                <select class="custom-select" name="{{setting.key}}" id="comPorts" data-group="{{title}}">
+                  {% if ports|length == 0 %}
+                    <option value="{{setting.value}}" 'selected'>
+                      {{setting.value}}
+                    </option>
+                  {% else %}
+                    {% for port in ports %}
+                      <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
+                        {{port}}
                       </option>
-                    {% else %}
-                      {% for port in ports %}
-                        <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
-                          {{port}}
-                        </option>
-                      {% endfor %}
-                    {% endif %}
-                  </select>
-                </div>
-                <div class="col-2">
-                  <button type="button no-gutters" onclick="event.preventDefault();action('updatePorts');">R</button>
+                    {% endfor %}
+                  {% endif %}
+                </select>
+                <div class="input-group-append">
+                  <button class="btn" type="button" id="updateListofPorts">
+                    <i data-feather="refresh-cw"></i>
+                  </button>
                 </div>
               </div>
             {% elif setting.type=="options" %}
@@ -50,7 +50,7 @@
             {% endif %}
           </div>
         </div>
-      </il>
+      </li>
       {% endfor %}
     </ul>
     <button type="submit" class="btn btn-primary">Submit</button>
@@ -77,6 +77,32 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('#updateListofPorts').on('click',function(){ //bind click handler
+        event.preventDefault();
+        action('updatePorts');
+     });
+
 });
+
+function updatePorts(msg){
+  ports = JSON.parse(msg.data);
+  var selectedPort = $("#comPorts").find(":selected").text();
+  if ($("#comPorts").length){
+    $("#comPorts").empty()
+    ports.forEach(function(port){
+       var option = "";
+       if (port==selectedPort){
+          option = "<option value='"+port+"' 'selected'>"+port+"</option>";
+       }
+       else {
+          option = "<option value='"+port+"' >"+port+"</option>";
+       }
+       $("#comPorts").append(option);
+    });
+  }
+
+}
 </script>
+<script> feather.replace() </script>
 {% endblock %}

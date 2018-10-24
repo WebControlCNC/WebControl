@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block javascript %}
+  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage.js') }}" crossorigin="anonymous"></script>
+  <script> feather.replace() </script>
 {% endblock %}
 
 {% block content %}
@@ -20,39 +22,39 @@
         <h3>Controls</h3>
         <div class="row">
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('upLeft')">upleft</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('upLeft')"><i data-feather="arrow-up-left"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('up')";>up</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('up')";><i data-feather="arrow-up"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('upRight')">upright</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('upRight')"><i data-feather="arrow-up-right"></i></button>
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">Macro1</button>
           </div>
           <div class="w-100"></div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('left')">left</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('left')"><i data-feather="arrow-left"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('home')">home</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="action('home')"><i data-feather="home"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('right')">right</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('right')"><i data-feather="arrow-right"></i></button>
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">Macro2</button>
           </div>
           <div class="w-100"></div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('downLeft')">dleft</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('downLeft')"><i data-feather="arrow-down-left"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('down')">down</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="move('down')"><i data-feather="arrow-down"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('downRight')">dright</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="move('downRight')"><i data-feather="arrow-down-right"></i></button>
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>

@@ -555,6 +555,7 @@ class Actions(MakesmithInitFuncs):
             if len(portsList) == 0:
                 portsList.append("None")
             self.data.comPorts = portsList
+            self.data.ui_queue.put("Action: updatePorts")
             return True
         except Exception as e:
             print(e)

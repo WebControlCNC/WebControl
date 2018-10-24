@@ -248,7 +248,6 @@ def requestPage(msg):
                 ports=ports,
                 pageID="maslowSettings",
             )
-            print("here3")
         socketio.emit(
             "activateModal",
             {"title": "Maslow Settings", "message": page},
