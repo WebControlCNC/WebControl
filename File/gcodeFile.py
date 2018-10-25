@@ -19,7 +19,7 @@ class GCodeFile(MakesmithInitFuncs):
     isChanged = False
     canvasScaleFactor = 1  # scale from mm to pixels
     INCHES = 1.0
-    MILLIMETERS = 1.0 / 25.4
+    MILLIMETERS = 1.0/25.4
 
     xPosition = 0
     yPosition = 0
@@ -41,6 +41,11 @@ class GCodeFile(MakesmithInitFuncs):
         return sendStr
 
     def loadUpdateFile(self):
+        if (self.data.units=="MM"):
+            self.canvasScaleFactor = self.MILLIMETERS
+        else:
+            self.canvasScaleFactor = self.INCHES
+
         filename = self.data.gcodeFile.filename
         # print(filename)
         del self.line[:]
@@ -103,7 +108,7 @@ class GCodeFile(MakesmithInitFuncs):
         except:
             print("Gcode File Error")
             self.data.ui_queue.put("Message: Cannot open gcode file.")
-            self.data.gcodeFile = ""
+            self.data.gcodeFile.filename = ""
             return False
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
@@ -117,7 +122,8 @@ class GCodeFile(MakesmithInitFuncs):
         Add a point to the line currently being plotted
         """
         self.line[-1].points.append(
-            (x * self.canvasScaleFactor, y * self.canvasScaleFactor * -1.0)
+            #(x * self.canvasScaleFactor, y * self.canvasScaleFactor * -1.0)
+            (x , y * -1.0)
         )
 
     def isNotReallyClose(self, x0, x1):
@@ -444,10 +450,60 @@ class GCodeFile(MakesmithInitFuncs):
             print("G18 not supported")
 
         if gString == "G20":
+            '''
+            TODO: Fix this.. this is sloppy programming
+            '''
+            if self.data.units != "INCHES":
+                self.data.units = "INCHES"
+                self.data.config.setValue("Computed Settings", "units", self.data.units)
+                scaleFactor = 1.0 / 25.4
+                self.data.gcodeShift = [
+                    self.data.gcodeShift[0] * scaleFactor,
+                    self.data.gcodeShift[1] * scaleFactor,
+                ]
+                self.xPosition *= scaleFactor
+                self.yPosition *= scaleFactor
+                self.data.tolerance = 0.020
+                value = float(self.data.config.getValue("Computed Settings", "distToMove"))/25.4
+                self.data.config.setValue("Computed Settings", "distToMove", value)
+                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
+                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
+                self.data.ui_queue.put("Action: unitsUpdate")
+                self.data.ui_queue.put("Action: distToMoveUpdate")
+                position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
+                self.data.ui_queue.put(
+                    "Action: homePositionMessage:_" + json.dumps(position)
+                )  # the "_" facilitates the parse
+                self.data.gcode_queue.put("G20 ")
+                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
             self.canvasScaleFactor = self.INCHES
             # self.data.units = "INCHES"
 
         if gString == "G21":
+            '''
+            TODO: Fix this.. this is sloppy programming
+            '''
+            if self.data.units != "MM":
+                self.data.units = "MM"
+                self.data.config.setValue("Computed Settings", "units", self.data.units)
+                scaleFactor = 25.4
+                self.data.gcodeShift = [
+                    self.data.gcodeShift[0] * scaleFactor,
+                    self.data.gcodeShift[1] * scaleFactor,
+                ]
+                self.data.tolerance = 0.50
+                value = float(self.data.config.getValue("Computed Settings", "distToMove"))*25.4
+                self.data.config.setValue("Computed Settings", "distToMove", value)
+                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
+                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
+                self.data.ui_queue.put("Action: unitsUpdate")
+                self.data.ui_queue.put("Action: distToMoveUpdate")
+                position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
+                self.data.ui_queue.put(
+                    "Action: homePositionMessage:_" + json.dumps(position)
+                )  # the "_" facilitates the parse
+                self.data.gcode_queue.put("G21 ")
+                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
             self.canvasScaleFactor = self.MILLIMETERS
             # self.data.units = "MM"
 
@@ -457,46 +513,15 @@ class GCodeFile(MakesmithInitFuncs):
         if gString == "G91":
             self.absoluteFlag = 1
 
-    def callBackMechanism(self, callback):
+    def callBackMechanism(self):
         """
 
-        Call the loadNextLine function periodically in a non-blocking way to
-        update the gcode.
+        Call the loadNextLine function in background.
 
         """
 
-        # with self.scatterObject.canvas:
-
-        # self.line.append(Line()) #Line(points = (), width = 1, group = 'gcode')
-
-        # Draw numberOfTimesToCall lines on the canvas
-        # print "here:"+str(self.lineNumber)
-        numberOfTimesToCall = 500
-        for _ in range(numberOfTimesToCall):
+        for _ in range(min(len(self.data.gcode), self.maxNumberOfLinesToRead)):
             self.loadNextLine()
-
-        # Repeat until end of file
-        # print "end:"+str(self.lineNumber)
-        # print self.lineNumber
-        # print len(self.data.gcode)
-        # print self.maxNumberOfLinesToRead
-        if self.lineNumber < min(len(self.data.gcode), self.maxNumberOfLinesToRead):
-            #            print "here"
-            self.callBackMechanism(self.updateGcode)
-        if True:
-            for line in self.line:
-                _str = (
-                    "Type:"
-                    + str(line.type)
-                    + ", Color:"
-                    + str(line.color)
-                    + ", Dashed:"
-                    + str(line.dashed)
-                    + "..."
-                )
-                for point in line.points:
-                    _str += str(point)
-                # print _str
 
     def updateGcode(self):
         """
@@ -524,10 +549,13 @@ class GCodeFile(MakesmithInitFuncs):
                 + " lines of gcode.\nrendering all "
                 + str(len(self.data.gcode))
                 + " lines simultaneously may crash the\n program, only the first "
-                + self.maxNumberOfLinesToRead
+                + str(self.maxNumberOfLinesToRead)
                 + "lines are shown here.\nThe complete program will cut if you choose to do so unless the home position is moved from (0,0)."
             )
             print(errorText)
             self.data.ui_queue.put("Message: " + errorText)
 
-        self.callBackMechanism(self.updateGcode)
+        th = threading.Thread(target=self.callBackMechanism)
+        th.start()
+
+

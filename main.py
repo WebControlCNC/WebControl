@@ -133,6 +133,7 @@ def uploadGCode():
 def openGCode():
     if request.method == "POST":
         f = request.form["selectedGCode"]
+        print("selectedGcode="+str(f))
         app.data.gcodeFile.filename = "gcode/" + f
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:

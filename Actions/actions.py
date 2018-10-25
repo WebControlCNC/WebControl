@@ -259,7 +259,10 @@ class Actions(MakesmithInitFuncs):
 
     def resumeRun(self):
         try:
-            self.data.uploadFlag = 1
+            if self.data.manualZAxisAdjust:
+                self.data.uploadFlag = self.data.previousUploadStatus
+            else:
+                self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
             self.data.quick_queue.put("~")
             self.data.ui_queue.put("Action: setAsPause")
@@ -287,7 +290,7 @@ class Actions(MakesmithInitFuncs):
 
     def clearGCode(self):
         try:
-            self.data.gcodeFile = ""
+            self.data.gcodeFile.clearGcode()
             return True
         except Exception as e:
             print(e)

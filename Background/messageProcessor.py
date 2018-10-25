@@ -47,6 +47,7 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.previousUploadStatus = self.data.uploadFlag
                         self.data.uploadFlag = 0
                         if message.find("adjust Z-Axis") != -1:
+                            self.data.manualZAxisAdjust = True
                             self.data.ui_queue.put(message)
                     elif message[0:6] == "ALARM:":
                         self.data.previousUploadStatus = self.data.uploadFlag
@@ -83,5 +84,4 @@ class MessageProcessor(MakesmithInitFuncs):
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
                     else:
-                        #print("messageProcessor:"+message)
                         self.data.ui_queue.put(message)

@@ -54,6 +54,15 @@ class UIProcessor:
                                     {"setting": "units", "value": units},
                                     namespace="/MaslowCNC",
                                 )
+                            if message.find("distToMoveUpdate") != -1:
+                                units = self.app.data.config.getValue(
+                                    "Computed Settings", "distToMove"
+                                )
+                                socketio.emit(
+                                    "requestedSetting",
+                                    {"setting": "distToMove", "value": units},
+                                    namespace="/MaslowCNC",
+                                )
                             if message.find("gcodeUpdate") != -1:
                                 socketio.emit(
                                     "gcodeUpdate",
@@ -117,14 +126,11 @@ class UIProcessor:
                 startpt = message.find("MPos:") + 5
                 endpt = message.find("WPos:")
                 numz = message[startpt:endpt]
-                units = "mm"  # message[endpt+1:endpt+3]
                 valz = numz.split(",")
 
                 self.app.data.xval = float(valz[0])
                 self.app.data.yval = float(valz[1])
                 self.app.data.zval = float(valz[2])
-
-                # print "x:"+str(app.data.xval)+", y:"+str(app.data.yval)+", z:"+str(app.data.zval)
 
                 if math.isnan(self.app.data.xval):
                     self.sendControllerMessage("Unable to resolve x Kinematics.")
@@ -154,7 +160,9 @@ class UIProcessor:
         )
 
     def sendControllerMessage(self, message):
-        socketio.emit("controllerMessage", {"data": message}, namespace="/MaslowCNC")
+        socketio.emit(
+            "controllerMessage", {"data": message}, namespace="/MaslowCNC"
+        )
 
     def sendPositionMessage(self, position):
         socketio.emit(

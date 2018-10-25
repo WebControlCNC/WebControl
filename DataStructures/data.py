@@ -57,6 +57,7 @@ class Data:
     # sets a flag if the gcode is being uploaded currently
     uploadFlag = 0
     previousUploadStatus = 0
+    manualZAxisAdjust = False
     # this is used to determine the first time the position is received from the machine
     firstTimePosFlag = 0
     # report if the serial connection is open

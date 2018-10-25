@@ -140,7 +140,7 @@
             "section": "Advanced Settings",
             "title": "Home Position Y Coordinate",
             "type": "string",
-            "value": -1.9999999999999996
+            "value": -50.79999999999998
         },
         {
             "default": 0,
@@ -517,7 +517,7 @@
             "default": 1.0,
             "key": "distToMove",
             "type": "float",
-            "value": 2.0
+            "value": 50.8
         },
         {
             "default": 0.5,
@@ -529,7 +529,7 @@
             "default": "MM",
             "key": "units",
             "type": "string",
-            "value": "INCHES"
+            "value": "MM"
         },
         {
             "default": "MM",
