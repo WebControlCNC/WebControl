@@ -35,7 +35,7 @@ RUN sed -i '/opencv-python.*/d' /requirements.txt
 RUN pip install -r /requirements.txt 
 
 # Remove no-longer-needed gevent compilation libraries
-RUN apt-get purge -y --auto-remove gcc libevent-dev wget unzip sed
+RUN apt-get purge -y --auto-remove --allow-remove-essential gcc libevent-dev wget unzip sed
 
 # Copy the source
 ADD . /WebControl
