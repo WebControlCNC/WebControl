@@ -140,7 +140,7 @@
             "section": "Advanced Settings",
             "title": "Home Position Y Coordinate",
             "type": "string",
-            "value": "0.0"
+            "value": "-0.15748031496062992"
         },
         {
             "default": 0,
@@ -517,7 +517,7 @@
             "default": 1.0,
             "key": "distToMove",
             "type": "float",
-            "value": 24.0
+            "value": 51.0
         },
         {
             "default": 0.5,
@@ -529,7 +529,7 @@
             "default": "MM",
             "key": "units",
             "type": "string",
-            "value": "INCHES"
+            "value": "MM"
         },
         {
             "default": "MM",
@@ -546,7 +546,7 @@
             "section": "Maslow Settings",
             "title": "Serial Connection",
             "type": "string",
-            "value": "COM5"
+            "value": "/dev/ttyACM0"
         },
         {
             "default": 2978.4,
