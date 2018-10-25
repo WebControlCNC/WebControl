@@ -175,12 +175,9 @@ class GCodeFile(MakesmithInitFuncs):
 
                 if command == "G00":
                     # draw a dashed line
-                    print("G00 issued so first points are added")
                     self.line.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line[-1].type = "line"
                     self.line[-1].dashed = True
-                    print("xPos,yPos:"+str(self.xPosition)+", "+str(self.yPosition))
-                    print("xTgt,yTgt:" + str(xTarget) + ", " + str(yTarget))
                     self.addPoint(self.xPosition, self.yPosition)
                     self.addPoint(xTarget, yTarget)
                 else:
