@@ -81,6 +81,10 @@
             }
           });
 
+          $("#notificationModal").on('hidden.bs.modal', function(e){
+              console.log("modal closing");
+              socket.emit('modalClose');
+          });
       });
       function action(command, arg, arg1){
         console.log("action="+command);
@@ -122,10 +126,7 @@
           isMobile = true;
       }
 
-      $("#notificationModal").on('hidden.bs.modal', function(e){
-          console.log("modal closing");
-          socket.emit('modalClose');
-      });
+
   </script>
 
 </head>
