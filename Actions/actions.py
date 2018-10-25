@@ -114,8 +114,8 @@ class Actions(MakesmithInitFuncs):
             else:
                 scaleFactor = 1.0
             self.data.gcodeShift = [
-                self.data.gcodeShift[0] / scaleFactor,
-                self.data.gcodeShift[0] / scaleFactor,
+                self.data.xval / scaleFactor,
+                self.data.yval / scaleFactor,
             ]
             self.data.config.setValue("Advanced Settings", "homeX", str(self.data.xval))
             self.data.config.setValue("Advanced Settings", "homeY", str(self.data.yval))
