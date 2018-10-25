@@ -1,14 +1,9 @@
 {% block content %}
 <div class="container-fluid">
   <form id="gcodeForm" method="post" enctype=multipart/form-data>
-    <div class="input-group mb-3">
-      <select class="custom-select" name="selectedGCode" data-group="{{title}}">
-        {% for file in files %}
-          <option value="{{file}}" {{'selected' if file == lastSelectedFile else ''}}>
-            {{file}}
-          </option>
-        {% endfor %}
-      </select>
+    <div class="form-group">
+      <label for="gcodeFile">GCode File</label>
+      <input type="file" class="form-control-file" name="file" id="gcodeFile" accept="{{validExtensions}}">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
@@ -24,7 +19,7 @@ $(document).ready(function () {
         var formdata = new FormData(this);
 
         $.ajax({
-            url : '/openGCode',
+            url : '/uploadGCode',
             type: "POST",
             data: formdata,
             mimeTypes:"multipart/form-data",

@@ -1,6 +1,5 @@
 # main.py
 from app import app, socketio
-
 from gevent import monkey
 
 monkey.patch_all()
@@ -9,28 +8,15 @@ import schedule
 import time
 import threading
 import json
-import re
-import queue
 
-from threading import Thread
 from flask import Flask, jsonify, render_template, current_app, request, flash
-from flask_mobility import Mobility
 from flask_mobility.decorators import mobile_template
-from flask_socketio import SocketIO
 from werkzeug import secure_filename
-
-
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
-
-# from Background.scheduler           import    ScheduleThread
 from DataStructures.data import Data
-
-# from Connection.serialPort import SerialPort
-# from config.config import Config
-# from DataStructures.logger import Logger
-# from DataStructures.loggingQueue import LoggingQueue
 from Connection.nonVisibleWidgets import NonVisibleWidgets
-from Actions.actions import Actions
+from os import listdir
+from os.path import isfile, join
 
 
 app.data = Data()
@@ -128,12 +114,30 @@ def webControlSettings():
         return resp
 
 
-@app.route("/gcode", methods=["POST"])
-def gcode():
+@app.route("/uploadGCode", methods=["POST"])
+def uploadGCode():
     if request.method == "POST":
         f = request.files["file"]
         app.data.gcodeFile.filename = "gcode/" + secure_filename(f.filename)
         f.save(app.data.gcodeFile.filename)
+        returnVal = app.data.gcodeFile.loadUpdateFile()
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+
+@app.route("/openGCode", methods=["POST"])
+def openGCode():
+    if request.method == "POST":
+        f = request.form["selectedGCode"]
+        app.data.gcodeFile.filename = "gcode/" + f
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
             message = {"status": 200}
@@ -296,7 +300,19 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "openGCode":
-        page = render_template("openGCode.html")
+        lastSelectedFile = app.data.config.getValue("Maslow Settings", "openFile")
+        files = [f for f in listdir("gcode") if isfile(join("gcode", f))]
+        page = render_template(
+            "openGCode.html", files=files, lastSelectedFile=lastSelectedFile
+        )
+        socketio.emit(
+            "activateModal", {"title": "GCode", "message": page}, namespace="/MaslowCNC"
+        )
+    elif msg["data"]["page"] == "uploadGCode":
+        validExtensions = app.data.config.getValue(
+            "WebControl Settings", "validExtensions"
+        )
+        page = render_template("uploadGCode.html", validExtensions=validExtensions)
         socketio.emit(
             "activateModal", {"title": "GCode", "message": page}, namespace="/MaslowCNC"
         )
