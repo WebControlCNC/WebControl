@@ -117,7 +117,7 @@ class UIProcessor:
                         elif message == "ok\r\n":
                             pass  # displaying all the 'ok' messages clutters up the display
                         else:
-                            print("UIProcessor:"+message)
+                            #print("UIProcessor:"+message)
                             self.sendControllerMessage(message)
 
     def setPosOnScreen(self, message):

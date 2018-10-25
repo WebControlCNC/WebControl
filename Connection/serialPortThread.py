@@ -39,7 +39,7 @@ class SerialPortThread(MakesmithInitFuncs):
 
         message = message + "\n"
         # message = message.encode()
-        print("Sending: " + str(message))
+        print("Sending: " + str(message).rstrip('\n'))
 
         self.bufferSpace = self.bufferSpace - len(
             message

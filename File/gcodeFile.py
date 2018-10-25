@@ -25,6 +25,7 @@ class GCodeFile(MakesmithInitFuncs):
     yPosition = 0
     zPosition = 0
 
+
     lineNumber = 0  # the line number currently being processed
 
     absoluteFlag = 0
@@ -41,7 +42,7 @@ class GCodeFile(MakesmithInitFuncs):
         return sendStr
 
     def loadUpdateFile(self):
-        if (self.data.units=="MM"):
+        if self.data.units == "MM":
             self.canvasScaleFactor = self.MILLIMETERS
         else:
             self.canvasScaleFactor = self.INCHES
@@ -174,9 +175,12 @@ class GCodeFile(MakesmithInitFuncs):
 
                 if command == "G00":
                     # draw a dashed line
+                    print("G00 issued so first points are added")
                     self.line.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line[-1].type = "line"
                     self.line[-1].dashed = True
+                    print("xPos,yPos:"+str(self.xPosition)+", "+str(self.yPosition))
+                    print("xTgt,yTgt:" + str(xTarget) + ", " + str(yTarget))
                     self.addPoint(self.xPosition, self.yPosition)
                     self.addPoint(xTarget, yTarget)
                 else:
@@ -461,8 +465,6 @@ class GCodeFile(MakesmithInitFuncs):
                     self.data.gcodeShift[0] * scaleFactor,
                     self.data.gcodeShift[1] * scaleFactor,
                 ]
-                self.xPosition *= scaleFactor
-                self.yPosition *= scaleFactor
                 self.data.tolerance = 0.020
                 value = float(self.data.config.getValue("Computed Settings", "distToMove"))/25.4
                 self.data.config.setValue("Computed Settings", "distToMove", value)
@@ -477,7 +479,6 @@ class GCodeFile(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G20 ")
                 print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
             self.canvasScaleFactor = self.INCHES
-            # self.data.units = "INCHES"
 
         if gString == "G21":
             '''
@@ -505,7 +506,6 @@ class GCodeFile(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G21 ")
                 print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
             self.canvasScaleFactor = self.MILLIMETERS
-            # self.data.units = "MM"
 
         if gString == "G90":
             self.absoluteFlag = 0
@@ -532,8 +532,13 @@ class GCodeFile(MakesmithInitFuncs):
 
         # reset variables
         self.data.backgroundRedraw = False
-        self.xPosition = self.data.gcodeShift[0] * self.canvasScaleFactor
-        self.yPosition = self.data.gcodeShift[1] * self.canvasScaleFactor
+        #print("canvasScaleFactor="+str(self.canvasScaleFactor))
+        if (self.data.units=="INCHES"):
+            scaleFactor = 1.0;
+        else:
+            scaleFactor = 1/25.4;
+        self.xPosition = self.data.gcodeShift[0] * scaleFactor
+        self.yPosition = self.data.gcodeShift[1] * scaleFactor
         self.zPosition = 0
 
         self.prependString = "G00 "
