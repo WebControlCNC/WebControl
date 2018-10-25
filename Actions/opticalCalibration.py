@@ -7,7 +7,6 @@ from imutils import perspective, contours
 # from imutils.video			import WebcamVideoStream
 import numpy as np
 import imutils
-import cv2
 import time
 import re
 import sys
@@ -16,6 +15,8 @@ import base64
 
 
 class OpticalCalibration(MakesmithInitFuncs):
+
+    '''
 
     camera = None
     time.sleep(2.0)
@@ -326,7 +327,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                     print("Releasing Camera")
                     self.camera.release()
                     print("Calibration Completed")
-
+'''
     def on_Calibrate(self, args):
         print("Initializing")
         self.setCalibrationSettings(args)
@@ -342,7 +343,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         )
         if self.camera is None:
             print("Starting Camera")
-            self.camera = cv2.VideoCapture(0)
+            #self.camera = cv2.VideoCapture(0)
         print("Analyzing Images")
-        self.on_AutoHome(False)
+        #self.on_AutoHome(False)
         return True
