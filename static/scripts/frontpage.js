@@ -130,27 +130,26 @@ function processRequestedSetting(msg){
 
 function processPositionMessage(msg){
   var json = JSON.parse(msg.data);
-  $('#positionMessage').html('<p>XPos:'+Math.round(json.xval,2)+' Ypos:'+Math.round(json.yval,2)+' ZPos:'+Math.round(json.zval,2)+'</p>');
+  $('#positionMessage').html('XPos:'+json.xval.toFixed(2)+' Ypos:'+json.yval.toFixed(2)+' ZPos:'+json.zval.toFixed(2));
   positionUpdate(json.xval,json.yval,json.zval);
 }
 
 function processHomePositionMessage(msg){
   var json = JSON.parse(msg.data);
-  $('#homePositionMessage').html('<p>XPos:'+Math.round(json.xval,2)+' Ypos:'+Math.round(json.yval,2)+'</p>');
+  $('#homePositionMessage').html('XPos:'+json.xval.toFixed(2)+' Ypos:'+json.yval.toFixed(2));
   homePositionUpdate(json.xval,json.yval);
 }
 
 function gcodeUpdate(msg){
   console.log("updating gcode");
   if (gcode!=null) {
-    console.log("removing gcode");
-    //gcode.remove();
+    //console.log("removing gcode");
     gcode.remove();
   }
   gcode = draw.group();
   var data = JSON.parse(msg.data)
   data.forEach(function(line) {
-    console.log(line)
+    //console.log(line)
     if (line.type=='line'){
       if (line.dashed==true) {
         gcode.add(draw.polyline(line.points).fill('none').stroke({width:.1, color: '#AA0'}))

@@ -14,19 +14,26 @@
         <div class="row align-items-center">
           <div class="col">
             {% if setting.key =="COMport" %}
-              <select name="{{setting.key}}" data-group="{{title}}">
-                {% if ports|length == 0 %}
-                  <option value="{{setting.value}}" 'selected'>
-                    {{setting.value}}
-                  </option>
-                {% else %}
-                  {% for port in ports %}
-                    <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
-                      {{port}}
+             <div class="input-group mb-3">
+                <select class="custom-select" name="{{setting.key}}" id="comPorts" data-group="{{title}}">
+                  {% if ports|length == 0 %}
+                    <option value="{{setting.value}}" 'selected'>
+                      {{setting.value}}
                     </option>
-                  {% endfor %}
-                {% endif %}
-              </select>
+                  {% else %}
+                    {% for port in ports %}
+                      <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
+                        {{port}}
+                      </option>
+                    {% endfor %}
+                  {% endif %}
+                </select>
+                <div class="input-group-append">
+                  <button class="btn" type="button" id="updateListofPorts">
+                    <i data-feather="refresh-cw"></i>
+                  </button>
+                </div>
+              </div>
             {% elif setting.type=="options" %}
               <select name="{{setting.key}}" data-group="{{title}}">
                 {% for option in setting.options %}
@@ -72,6 +79,31 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('#updateListofPorts').on('click',function(){ //bind click handler
+        event.preventDefault();
+        action('updatePorts');
+    });
 });
+
+function updatePorts(msg){
+  ports = JSON.parse(msg.data);
+  var selectedPort = $("#comPorts").find(":selected").text();
+  if ($("#comPorts").length){
+    $("#comPorts").empty()
+    ports.forEach(function(port){
+       var option = "";
+       if (port==selectedPort){
+          option = "<option value='"+port+"' 'selected'>"+port+"</option>";
+       }
+       else {
+          option = "<option value='"+port+"' >"+port+"</option>";
+       }
+       $("#comPorts").append(option);
+    });
+  }
+
+}
 </script>
+<script> feather.replace() </script>
 {% endblock %}
