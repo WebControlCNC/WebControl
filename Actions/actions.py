@@ -33,7 +33,10 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put("Message: Error with stopping Z-Axis movement")
         elif msg["data"]["command"] == "startRun":
             if not self.startRun():
-                self.data.ui_queue.put("Message: Error with starting run")
+                if len(self.data.gcode)>0:
+                    self.data.ui_queue.put("Message: Error with starting run.")
+                else:
+                    self.data.ui_queue.put("Message: No GCode file loaded.")
         elif msg["data"]["command"] == "stopRun":
             if not self.stopRun():
                 self.data.ui_queue.put("Message: Error with stopping run")
@@ -114,11 +117,16 @@ class Actions(MakesmithInitFuncs):
             else:
                 scaleFactor = 1.0
             self.data.gcodeShift = [
-                self.data.xval / scaleFactor,
-                self.data.yval / scaleFactor,
+                self.data.xval,
+                self.data.yval,
             ]
             self.data.config.setValue("Advanced Settings", "homeX", str(self.data.xval))
             self.data.config.setValue("Advanced Settings", "homeY", str(self.data.yval))
+            position = {"xval": self.data.xval, "yval": self.data.yval}
+            self.data.ui_queue.put(
+                "Action: homePositionMessage:_" + json.dumps(position)
+            )  # the "_" facilitates the parse
+            print("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
             self.data.gcodeFile.loadUpdateFile()
             return True
         except Exception as e:
@@ -178,10 +186,13 @@ class Actions(MakesmithInitFuncs):
 
     def startRun(self):
         try:
-            self.data.uploadFlag = 1
-            self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
-            self.data.gcodeIndex += 1
-            return True
+            if len(self.data.gcode)>0:
+                self.data.uploadFlag = 1
+                self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
+                self.data.gcodeIndex += 1
+                return True
+            else:
+                return False
         except Exception as e:
             print(e)
             self.data.uploadFlag = 0
@@ -432,7 +443,7 @@ class Actions(MakesmithInitFuncs):
             if setting == "toInches":
                 self.data.units = "INCHES"
                 self.data.config.setValue("Computed Settings", "units", self.data.units)
-                scaleFactor = 1.0
+                scaleFactor = 1.0/25.4
                 self.data.gcodeShift = [
                     self.data.gcodeShift[0] / scaleFactor,
                     self.data.gcodeShift[1] / scaleFactor,
@@ -440,6 +451,9 @@ class Actions(MakesmithInitFuncs):
                 self.data.tolerance = 0.020
                 self.data.gcode_queue.put("G20 ")
                 self.data.config.setValue("Computed Settings", "distToMove", value)
+                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
+                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
+                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
             elif setting == "toMM":
                 self.data.units = "MM"
                 self.data.config.setValue("Computed Settings", "units", self.data.units)
@@ -451,6 +465,9 @@ class Actions(MakesmithInitFuncs):
                 self.data.tolerance = 0.5
                 self.data.gcode_queue.put("G21")
                 self.data.config.setValue("Computed Settings", "distToMove", value)
+                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
+                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
+                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
             elif setting == "toInchesZ":
                 self.data.units = "INCHES"
                 self.data.config.setValue(

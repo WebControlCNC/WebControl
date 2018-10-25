@@ -48,6 +48,10 @@
               }
           });
 
+          socket.on('homePositionMessage', function(msg){
+              processHomePositionMessage(msg)
+          });
+
           socket.on('activateModal', function(msg){
             console.log("activateModal")
             $('#notificationModal').data('bs.modal',null);

@@ -27,80 +27,89 @@ class UIProcessor:
                     message = self.app.data.ui_queue.get()
                     # send message to web for display in appropriate column
                     if message != "":
-                        if message[0] != "[" and message[0] != "<":
+                        if message[0] == "<":
+                            # print message
+                            self.setPosOnScreen(message)
+                        elif message[0] == "[":
+                            if message[1:4] == "PE:":
+                                # todo:
+                                oo = 1
+                                # app.setErrorOnScreen(message)
+                        elif message[0:8] == "Message:":
+                            if message.find("adjust Z-Axis") != -1:
+                                print("found adjust Z-Axis in message")
+                                socketio.emit(
+                                    "requestedSetting",
+                                    {"setting": "pauseButtonSetting", "value": "Resume"},
+                                    namespace="/MaslowCNC",
+                                )
+                            self.activateModal("Notification:", message[9:])
+                        elif message[0:7] == "Action:":
+                            if message.find("unitsUpdate") != -1:
+                                units = self.app.data.config.getValue(
+                                    "Computed Settings", "units"
+                                )
+                                socketio.emit(
+                                    "requestedSetting",
+                                    {"setting": "units", "value": units},
+                                    namespace="/MaslowCNC",
+                                )
+                            if message.find("gcodeUpdate") != -1:
+                                socketio.emit(
+                                    "gcodeUpdate",
+                                    {
+                                        "data": json.dumps(
+                                            [
+                                                ob.__dict__
+                                                for ob in self.app.data.gcodeFile.line
+                                            ]
+                                        )
+                                    },
+                                    namespace="/MaslowCNC",
+                                )
+                            if message.find("setAsPause") != -1:
+                                socketio.emit(
+                                    "requestedSetting",
+                                    {"setting": "pauseButtonSetting", "value": "Pause"},
+                                    namespace="/MaslowCNC",
+                                )
+                            if message.find("setAsResume") != -1:
+                                socketio.emit(
+                                    "requestedSetting",
+                                    {"setting": "pauseButtonSetting", "value": "Resume"},
+                                    namespace="/MaslowCNC",
+                                )
+                            if message.find("positionUpdate") != -1:
+                                msg = message.split(
+                                    "_"
+                                )  # everything to the right of the "_" should be the position data already json.dumps'ed
+                                socketio.emit(
+                                    "positionMessage",
+                                    {"data": msg[1]},
+                                    namespace="/MaslowCNC",
+                                )
+                            if message.find("homePositionMessage") != -1:
+                                msg = message.split(
+                                    "_"
+                                )  # everything to the right of the "_" should be the position data already json.dumps'ed
+                                print("sending home position update")
+                                socketio.emit(
+                                    "homePositionMessage",
+                                    {"data": msg[1]},
+                                    namespace="/MaslowCNC",
+                                )
+                            if message.find("updatePorts") != -1:
+                                ports = json.dumps(self.app.data.comPorts)
+                                socketio.emit(
+                                    "updatePorts", {"data": ports}, namespace="/MaslowCNC"
+                                )
+                        elif message[0:6] == "ALARM:":
+                            self.activateModal("Notification:", message[7:])
+                        elif message == "ok\r\n":
+                            pass  # displaying all the 'ok' messages clutters up the display
+                        else:
+                            print("UIProcessor:"+message)
                             self.sendControllerMessage(message)
-                    if message[0] == "<":
-                        # print message
-                        self.setPosOnScreen(message)
-                    elif message[0] == "[":
-                        if message[1:4] == "PE:":
-                            # todo:
-                            oo = 1
-                            # app.setErrorOnScreen(message)
-                    elif message[0:8] == "Message:":
-                        if message.find("adjust Z-Axis") != -1:
-                            print("found adjust Z-Axis in message")
-                            socketio.emit(
-                                "requestedSetting",
-                                {"setting": "pauseButtonSetting", "value": "Resume"},
-                                namespace="/MaslowCNC",
-                            )
-                        self.activateModal("Notification:", message[9:])
-                    elif message[0:7] == "Action:":
-                        if message.find("unitsUpdate") != -1:
-                            units = self.app.data.config.getValue(
-                                "Computed Settings", "units"
-                            )
-                            socketio.emit(
-                                "requestedSetting",
-                                {"setting": "units", "value": units},
-                                namespace="/MaslowCNC",
-                            )
-                        if message.find("gcodeUpdate") != -1:
-                            socketio.emit(
-                                "gcodeUpdate",
-                                {
-                                    "data": json.dumps(
-                                        [
-                                            ob.__dict__
-                                            for ob in self.app.data.gcodeFile.line
-                                        ]
-                                    )
-                                },
-                                namespace="/MaslowCNC",
-                            )
-                        if message.find("setAsPause") != -1:
-                            socketio.emit(
-                                "requestedSetting",
-                                {"setting": "pauseButtonSetting", "value": "Pause"},
-                                namespace="/MaslowCNC",
-                            )
-                        if message.find("setAsResume") != -1:
-                            socketio.emit(
-                                "requestedSetting",
-                                {"setting": "pauseButtonSetting", "value": "Resume"},
-                                namespace="/MaslowCNC",
-                            )
-                        if message.find("positionUpdate") != -1:
-                            msg = message.split(
-                                "_"
-                            )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                            socketio.emit(
-                                "positionMessage",
-                                {"data": msg[1]},
-                                namespace="/MaslowCNC",
-                            )
-                        if message.find("updatePorts") != -1:
-                            ports = json.dumps(self.app.data.comPorts)
-                            socketio.emit(
-                                "updatePorts", {"data": ports}, namespace="/MaslowCNC"
-                            )
-                    elif message[0:6] == "ALARM:":
-                        self.activateModal("Notification:", message[7:])
-                    elif message == "ok\r\n":
-                        pass  # displaying all the 'ok' messages clutters up the display
-                    else:
-                        print(message)
 
     def setPosOnScreen(self, message):
         try:

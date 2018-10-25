@@ -25,13 +25,9 @@ app.nonVisibleWidgets.setUpData(app.data)
 app.data.config.computeSettings(None, None, None, True)
 app.data.units = app.data.config.getValue("Computed Settings", "units")
 app.data.comport = app.data.config.getValue("Maslow Settings", "COMport")
-if app.data.units == "INCHES":
-    scale = 1.0
-else:
-    scale = 25.4
 app.data.gcodeShift = [
-    float(app.data.config.getValue("Advanced Settings", "homeX")) / scale,
-    float(app.data.config.getValue("Advanced Settings", "homeY")) / scale,
+    float(app.data.config.getValue("Advanced Settings", "homeX")),
+    float(app.data.config.getValue("Advanced Settings", "homeY")),
 ]
 # app.previousPosX = 0.0
 # app.previousPosY = 0.0
@@ -463,6 +459,13 @@ def settingRequest(msg):
             {"setting": msg["data"], "value": distToMoveZ},
             namespace="/MaslowCNC",
         )
+    if msg["data"] == "homePosition":
+        homeX = app.data.config.getValue("Advanced Settings", "homeX")
+        homeY = app.data.config.getValue("Advanced Settings", "homeY")
+        position = {"xval": homeX, "yval": homeY}
+        app.data.ui_queue.put(
+            "Action: homePositionMessage:_" + json.dumps(position)
+        )  # the "_" facilitates the parse
 
 
 @socketio.on("updateSetting", namespace="/MaslowCNC")

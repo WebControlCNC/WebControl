@@ -34,6 +34,14 @@ sled.center(originX,originY)
 //sled.center(vx,vy)
 draw.zoom(10, {x:originX,y:originY});
 
+var home = draw.group()
+home.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:.1,color:"#0F0"}))
+home.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:.1,color:"#0F0"}))
+home.add(draw.circle(3*scale).stroke({width:.1,color:"#0F0"}).fill({color:"#fff",opacity:0}))
+home.center(originX,originY)
+//sled.center(vx,vy)
+draw.zoom(10, {x:originX,y:originY});
+
 function positionUpdate(x,y,z){
   var _x, _y =0
   //console.log(x)
@@ -45,8 +53,22 @@ function positionUpdate(x,y,z){
     _x = originX+x*scale;
     _y = originY-y*scale
   }
-
   sled.center(_x, _y);
+}
+
+function homePositionUpdate(x,y){
+  var _x, _y =0
+  //console.log(x)
+  if ($("#units").text()=="MM"){
+    _x = originX+x*scale/25.4
+    _y = originY-y*scale/25.4
+  }
+  else{
+    _x = originX+x*scale;
+    _y = originY-y*scale
+  }
+  //console.log("home:"+_x+", "+_y)
+  home.center(_x, _y);
 }
 
 function unitSwitch(){
@@ -66,6 +88,7 @@ function unitSwitch(){
 $(document).ready(function(){
     settingRequest("units");
     settingRequest("distToMove");
+    settingRequest("homePosition");
     checkForGCodeUpdate();
 });
 
@@ -81,6 +104,10 @@ function pauseRun(){
 function processRequestedSetting(msg){
   console.log(msg);
   if (msg.setting=="pauseButtonSetting"){
+    if(msg.value=="Resume")
+        $('#pauseButton').removeClass('btn-warning').addClass('btn-info');
+    else
+        $('#pauseButton').removeClass('btn-info').addClass('btn-warning');
     $("#pauseButton").text(msg.value);
   }
   if (msg.setting=="units"){
@@ -103,8 +130,14 @@ function processRequestedSetting(msg){
 
 function processPositionMessage(msg){
   var json = JSON.parse(msg.data);
-  $('#positionMessage').html('<p>XPos:'+json.xval+' Ypos:'+json.yval+' ZPos:'+json.zval+'</p>');
+  $('#positionMessage').html('<p>XPos:'+Math.round(json.xval,2)+' Ypos:'+Math.round(json.yval,2)+' ZPos:'+Math.round(json.zval,2)+'</p>');
   positionUpdate(json.xval,json.yval,json.zval);
+}
+
+function processHomePositionMessage(msg){
+  var json = JSON.parse(msg.data);
+  $('#homePositionMessage').html('<p>XPos:'+Math.round(json.xval,2)+' Ypos:'+Math.round(json.yval,2)+'</p>');
+  homePositionUpdate(json.xval,json.yval);
 }
 
 function gcodeUpdate(msg){
