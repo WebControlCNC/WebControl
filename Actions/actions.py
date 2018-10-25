@@ -441,18 +441,26 @@ class Actions(MakesmithInitFuncs):
             print(e)
             return False
 
-    def updateSetting(self, setting, value):
+    def updateSetting(self, setting, value, fromGcode = False):
         try:
-            if setting == "toInches":
-                self.data.units = "INCHES"
-                self.data.config.setValue("Computed Settings", "units", self.data.units)
-                scaleFactor = 1.0/25.4
+            if setting == "toInches" or setting == "toMM":
+                if fromGcode:
+                    value = float(self.data.config.getValue("Computed Settings", "distToMove")) * 25.4
+                if setting == "toInches":
+                    self.data.units = "INCHES"
+                    self.data.config.setValue("Computed Settings", "units", self.data.units)
+                    scaleFactor = 1.0/25.4
+                    self.data.tolerance = 0.020
+                    self.data.gcode_queue.put("G20 ")
+                else:
+                    self.data.units = "MM"
+                    self.data.config.setValue("Computed Settings", "units", self.data.units)
+                    scaleFactor = 25.4
+                    self.data.tolerance = 0.5
                 self.data.gcodeShift = [
-                    self.data.gcodeShift[0] / scaleFactor,
-                    self.data.gcodeShift[1] / scaleFactor,
+                  self.data.gcodeShift[0] * scaleFactor,
+                  self.data.gcodeShift[1] * scaleFactor,
                 ]
-                self.data.tolerance = 0.020
-                self.data.gcode_queue.put("G20 ")
                 self.data.config.setValue("Computed Settings", "distToMove", value)
                 self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
                 self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])

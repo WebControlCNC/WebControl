@@ -454,57 +454,13 @@ class GCodeFile(MakesmithInitFuncs):
             print("G18 not supported")
 
         if gString == "G20":
-            '''
-            TODO: Fix this.. this is sloppy programming
-            '''
             if self.data.units != "INCHES":
-                self.data.units = "INCHES"
-                self.data.config.setValue("Computed Settings", "units", self.data.units)
-                scaleFactor = 1.0 / 25.4
-                self.data.gcodeShift = [
-                    self.data.gcodeShift[0] * scaleFactor,
-                    self.data.gcodeShift[1] * scaleFactor,
-                ]
-                self.data.tolerance = 0.020
-                value = float(self.data.config.getValue("Computed Settings", "distToMove"))/25.4
-                self.data.config.setValue("Computed Settings", "distToMove", value)
-                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
-                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
-                self.data.ui_queue.put("Action: unitsUpdate")
-                self.data.ui_queue.put("Action: distToMoveUpdate")
-                position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
-                self.data.ui_queue.put(
-                    "Action: homePositionMessage:_" + json.dumps(position)
-                )  # the "_" facilitates the parse
-                self.data.gcode_queue.put("G20 ")
-                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
+                self.data.actions.updateSetting("toInches", 0) # value = doesn't matter
             self.canvasScaleFactor = self.INCHES
 
         if gString == "G21":
-            '''
-            TODO: Fix this.. this is sloppy programming
-            '''
             if self.data.units != "MM":
-                self.data.units = "MM"
-                self.data.config.setValue("Computed Settings", "units", self.data.units)
-                scaleFactor = 25.4
-                self.data.gcodeShift = [
-                    self.data.gcodeShift[0] * scaleFactor,
-                    self.data.gcodeShift[1] * scaleFactor,
-                ]
-                self.data.tolerance = 0.50
-                value = float(self.data.config.getValue("Computed Settings", "distToMove"))*25.4
-                self.data.config.setValue("Computed Settings", "distToMove", value)
-                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
-                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
-                self.data.ui_queue.put("Action: unitsUpdate")
-                self.data.ui_queue.put("Action: distToMoveUpdate")
-                position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
-                self.data.ui_queue.put(
-                    "Action: homePositionMessage:_" + json.dumps(position)
-                )  # the "_" facilitates the parse
-                self.data.gcode_queue.put("G21 ")
-                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
+                self.data.actions.updateSetting("toMM", 0) #value = doesn't matter
             self.canvasScaleFactor = self.MILLIMETERS
 
         if gString == "G90":
@@ -515,9 +471,7 @@ class GCodeFile(MakesmithInitFuncs):
 
     def callBackMechanism(self):
         """
-
         Call the loadNextLine function in background.
-
         """
 
         for _ in range(min(len(self.data.gcode), self.maxNumberOfLinesToRead)):
@@ -528,11 +482,8 @@ class GCodeFile(MakesmithInitFuncs):
         updateGcode parses the gcode commands and calls the appropriate drawing function for the
         specified command.
         """
-        # print "Here at updateGcode"
-
         # reset variables
         self.data.backgroundRedraw = False
-        #print("canvasScaleFactor="+str(self.canvasScaleFactor))
         if (self.data.units=="INCHES"):
             scaleFactor = 1.0;
         else:
