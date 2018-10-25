@@ -437,6 +437,8 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcodeShift[0] / scaleFactor,
                     self.data.gcodeShift[1] / scaleFactor,
                 ]
+                self.data.config.setValue("Advanced Settings", "homeX", str(self.data.gcodeShift[0]))
+                self.data.config.setValue("Advanced Settings", "homeY", str(self.data.gcodeShift[1]))
                 self.data.tolerance = 0.020
                 self.data.gcode_queue.put("G20 ")
                 self.data.config.setValue("Computed Settings", "distToMove", value)
@@ -448,6 +450,8 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcodeShift[0] / scaleFactor,
                     self.data.gcodeShift[1] / scaleFactor,
                 ]
+                self.data.config.setValue("Advanced Settings", "homeX", str(self.data.gcodeShift[0]))
+                self.data.config.setValue("Advanced Settings", "homeY", str(self.data.gcodeShift[1]))
                 self.data.tolerance = 0.5
                 self.data.gcode_queue.put("G21")
                 self.data.config.setValue("Computed Settings", "distToMove", value)
@@ -463,6 +467,7 @@ class Actions(MakesmithInitFuncs):
                     "Computed Settings", "unitsZ", self.data.units
                 )
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
+
             return True
         except Exception as e:
             print(e)
