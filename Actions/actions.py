@@ -434,8 +434,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.config.setValue("Computed Settings", "units", self.data.units)
                 scaleFactor = 1.0
                 self.data.gcodeShift = [
-                    self.data.gcodeShift[0] / scaleFactor,
-                    self.data.gcodeShift[1] / scaleFactor,
+                  self.data.gcodeShift[0] / scaleFactor,
+                  self.data.gcodeShift[1] / scaleFactor,
                 ]
                 self.data.tolerance = 0.020
                 self.data.gcode_queue.put("G20 ")
@@ -445,8 +445,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.config.setValue("Computed Settings", "units", self.data.units)
                 scaleFactor = 25.4
                 self.data.gcodeShift = [
-                    self.data.gcodeShift[0] / scaleFactor,
-                    self.data.gcodeShift[1] / scaleFactor,
+                  self.data.gcodeShift[0] / scaleFactor,
+                  self.data.gcodeShift[1] / scaleFactor,
                 ]
                 self.data.tolerance = 0.5
                 self.data.gcode_queue.put("G21")
