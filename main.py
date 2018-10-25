@@ -225,6 +225,10 @@ def quickConfigure():
 def my_event(msg):
     print(msg["data"])
 
+@socketio.on("modalClosed", namespace="/MaslowCNC")
+def modelClosed(msg):
+    print("modal closed")
+
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
