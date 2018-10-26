@@ -3,6 +3,7 @@ from DataStructures.data import Data
 import serial
 import time
 from collections import deque
+import json
 
 
 class SerialPortThread(MakesmithInitFuncs):
@@ -122,6 +123,9 @@ class SerialPortThread(MakesmithInitFuncs):
             pass
         else:
             print("\r\nConnected on port " + self.data.comport + "\r\n")
+            self.data.ui_queue.put(
+                "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
+            )  # the "_" facilitates the parse
             self.data.ui_queue.put(
                 "\r\nConnected on port " + self.data.comport + "\r\n"
             )

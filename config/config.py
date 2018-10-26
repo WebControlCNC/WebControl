@@ -36,7 +36,7 @@ class Config(MakesmithInitFuncs):
         self.setValue("Advanced Settings", "motorOffsetY", result["motorOffsetY"])
         return True
 
-    def setValue(self, section, key, value, recursionBreaker=False):
+    def setValue(self, section, key, value, recursionBreaker=False, isImporting = False):
         updated = False
         found = False
         for x in range(len(self.settings[section])):
@@ -49,7 +49,7 @@ class Config(MakesmithInitFuncs):
                         updated = True
                         if "firmwareKey" in self.settings[section][x]:
                             self.syncFirmwareKey(
-                                self.settings[section][x]["firmwareKey"], storedValue
+                                self.settings[section][x]["firmwareKey"], storedValue, isImporting,
                             )
                     except:
                         pass
@@ -63,6 +63,7 @@ class Config(MakesmithInitFuncs):
                                 self.syncFirmwareKey(
                                     self.settings[section][x]["firmwareKey"],
                                     storedValue,
+                                    isImporting,
                                 )
                     except:
                         pass
@@ -81,6 +82,7 @@ class Config(MakesmithInitFuncs):
                                 self.syncFirmwareKey(
                                     self.settings[section][x]["firmwareKey"],
                                     storedValue,
+                                    isImporting,
                                 )
                         else:
                             storedValue = self.settings[section][x]["value"]
@@ -90,6 +92,7 @@ class Config(MakesmithInitFuncs):
                                 self.syncFirmwareKey(
                                     self.settings[section][x]["firmwareKey"],
                                     storedValue,
+                                    isImporting,
                                 )
 
                     except:
@@ -100,7 +103,7 @@ class Config(MakesmithInitFuncs):
                     updated = True
                     if "firmwareKey" in self.settings[section][x]:
                         self.syncFirmwareKey(
-                            self.settings[section][x]["firmwareKey"], storedValue
+                            self.settings[section][x]["firmwareKey"], storedValue, isImporting,
                         )
         if not found:
             print("Did not find " + str(section) + ", " + str(key) + ", " + str(value))
@@ -283,7 +286,7 @@ class Config(MakesmithInitFuncs):
                     break
         return ret
 
-    def syncFirmwareKey(self, firmwareKey, value, data=None):
+    def syncFirmwareKey(self, firmwareKey, value, isImporting=False, useStored=False, data=None):
         # print "firmwareKey from sync:"+str(firmwareKey)
         # print "value from sync:"+str(value)
         for section in self.settings:
@@ -316,11 +319,16 @@ class Config(MakesmithInitFuncs):
                         # if storedValue != "":
                         #    self.sendErrorArray(firmwareKey, storedValue, data)
                         pass
-                    elif not self.isClose(float(storedValue), float(value)):
-                        # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
+                    elif useStored is True:
                         app.data.gcode_queue.put(
                             "$" + str(firmwareKey) + "=" + str(storedValue)
                         )
+                    elif not self.isClose(float(storedValue), float(value)):
+                        # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
+                        if not isImporting:
+                            app.data.gcode_queue.put(
+                                "$" + str(firmwareKey) + "=" + str(storedValue)
+                            )
                     else:
                         break
         return

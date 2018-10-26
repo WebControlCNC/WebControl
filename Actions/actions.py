@@ -1,5 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
+import os
 import sys
 import threading
 import re
@@ -98,7 +100,6 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "macro2":
             if not self.macro(2):
                 self.data.ui_queue.put("Message: Error with performing macro")
-        '''
         elif msg["data"]["command"] == "optical_onStart":
             if not self.data.opticalCalibration.on_Start():
                 self.data.ui_queue.put(
@@ -110,7 +111,9 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put(
                     "Message: Error with starting optical calibration"
                 )
-        '''
+        elif msg["data"]["command"] == "restartWebControl":
+            print("restarting WebControl")
+            os._exit()
 
     def defineHome(self):
         try:
@@ -147,11 +150,13 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G00 Z" + "%.3f" % (safeHeightInches))
             else:
                 self.data.gcode_queue.put("G00 Z" + str(safeHeightMM))
+            homeX = self.data.config.getValue("Advanced Settings", "homeX")
+            homeY = self.data.config.getValue("Advanced Settings", "homeY")
             self.data.gcode_queue.put(
                 "G00 X"
-                + str(self.data.gcodeShift[0])
+                + str(homeX)
                 + " Y"
-                + str(self.data.gcodeShift[1])
+                + str(homeY)
                 + " "
             )
             self.data.gcode_queue.put("G00 Z0 ")
@@ -226,6 +231,12 @@ class Actions(MakesmithInitFuncs):
                 "B09 R" + str(chainLength) + " L" + str(chainLength) + " "
             )
             self.data.gcode_queue.put("G91 ")
+
+            # the firmware doesn't update sys.xPosition or sys.yPosition during a singleAxisMove
+            # therefore, the machine doesn't know where it is.
+            # so let tell the machine where it's at by sending a reset chain length
+            self.data.gcode_queue.put("B08 ")
+
             return True
         except Exception as e:
             print(e)
@@ -242,8 +253,8 @@ class Actions(MakesmithInitFuncs):
     def wipeEEPROM(self):
         try:
             self.data.gcode_queue.put("$RST=* ")
-            timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
-            timer.start()
+            #timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
+            #timer.start()
             return True
         except Exception as e:
             print(e)
@@ -466,21 +477,14 @@ class Actions(MakesmithInitFuncs):
                 self.data.config.setValue("Computed Settings", "distToMove", value)
                 self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
                 self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
-                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
-            elif setting == "toMM":
-                self.data.units = "MM"
-                self.data.config.setValue("Computed Settings", "units", self.data.units)
-                scaleFactor = 25.4
-                self.data.gcodeShift = [
-                    self.data.gcodeShift[0] / scaleFactor,
-                    self.data.gcodeShift[1] / scaleFactor,
-                ]
-                self.data.tolerance = 0.5
-                self.data.gcode_queue.put("G21")
-                self.data.config.setValue("Computed Settings", "distToMove", value)
-                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
-                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
-                print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
+                #print("gcodeShift=" + str(self.data.gcodeShift[0]) + ", " + str(self.data.gcodeShift[1]))
+                #sending this out updates all the attached clients.
+                self.data.ui_queue.put("Action: unitsUpdate")
+                self.data.ui_queue.put("Action: distToMoveUpdate")
+                position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
+                self.data.ui_queue.put(
+                    "Action: homePositionMessage:_" + json.dumps(position)
+                )  # the "_" facilitates the parse
             elif setting == "toInchesZ":
                 self.data.units = "INCHES"
                 self.data.config.setValue(

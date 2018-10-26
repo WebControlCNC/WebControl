@@ -48,12 +48,15 @@ function positionUpdate(x,y,z){
   if ($("#units").text()=="MM"){
     _x = originX+x*scale/25.4
     _y = originY-y*scale/25.4
+    _z = z*scale/25.4/2*360
   }
   else{
     _x = originX+x*scale;
     _y = originY-y*scale
+    _z = z*scale/2*360
   }
   sled.center(_x, _y);
+  //sled.rotate(_z);
 }
 
 function homePositionUpdate(x,y){
@@ -118,26 +121,24 @@ function processRequestedSetting(msg){
     console.log("requestedSetting for distToMove:"+msg.value);
     $("#distToMove").val(msg.value)
   }
-  if (msg.setting=="unitsZ"){
-    console.log("requestedSetting:"+msg.value);
-    $("#unitsZ").text(msg.value)
-  }
-  if (msg.setting=="distToMoveZ"){
-    console.log("requestedSetting for distToMoveZ:"+msg.value);
-    $("#distToMoveZ").val(msg.value)
+  if ((msg.setting=="unitsZ") || (msg.setting=="distToMoveZ")){
+    if (typeof processZAxisRequestedSetting === "function") {
+       processZAxisRequestedSetting(msg)
+    }
   }
 }
 
 function processPositionMessage(msg){
-  var json = JSON.parse(msg.data);
-  $('#positionMessage').html('XPos:'+json.xval.toFixed(2)+' Ypos:'+json.yval.toFixed(2)+' ZPos:'+json.zval.toFixed(2));
-  positionUpdate(json.xval,json.yval,json.zval);
+  var _json = JSON.parse(msg.data);
+  $('#positionMessage').html('XPos:'+_json.xval.toFixed(2)+' Ypos:'+_json.yval.toFixed(2)+' ZPos:'+_json.zval.toFixed(2));
+  positionUpdate(_json.xval,_json.yval,_json.zval);
 }
 
 function processHomePositionMessage(msg){
-  var json = JSON.parse(msg.data);
-  $('#homePositionMessage').html('XPos:'+json.xval.toFixed(2)+' Ypos:'+json.yval.toFixed(2));
-  homePositionUpdate(json.xval,json.yval);
+  var _json = JSON.parse(msg.data);
+  console.log(_json.xval)
+  $('#homePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
+  homePositionUpdate(_json.xval,_json.yval);
 }
 
 function gcodeUpdate(msg){

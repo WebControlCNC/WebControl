@@ -227,7 +227,7 @@ def my_event(msg):
 
 @socketio.on("modalClosed", namespace="/MaslowCNC")
 def modalClosed(msg):
-    socketio.emit("closeModals",{"data": "closeModals"},namespace="/MaslowCNC")
+    socketio.emit("closeModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
@@ -331,13 +331,17 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "zAxis":
-        page = render_template("zaxis.html")
+        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+        distToMoveZ = app.data.config.getValue("Computed Settings", "distToMoveZ")
+        unitsZ = app.data.config.getValue("Computed Settings", "unitsZ")
+        page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
         socketio.emit(
             "activateModal",
             {"title": "Z-Axis", "message": page},
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "setSprockets":
+        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
         page = render_template("setSprockets.html")
         socketio.emit(
             "activateModal",
@@ -345,6 +349,7 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "triangularCalibration":
+        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
         motorYoffset = app.data.config.getValue("Maslow Settings", "motorOffsetY")
         rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
         chainSagCorrection = app.data.config.getValue(
@@ -363,6 +368,7 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "opticalCalibration":
+        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
         page = render_template("opticalCalibration.html", pageID="opticalCalibration")
         socketio.emit(
             "activateModal",
@@ -370,6 +376,7 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     elif msg["data"]["page"] == "quickConfigure":
+        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
         motorOffsetY = app.data.config.getValue("Maslow Settings", "motorOffsetY")
         rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
         kinematicsType = app.data.config.getValue("Advanced Settings", "kinematicsType")

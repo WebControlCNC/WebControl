@@ -112,6 +112,9 @@ class UIProcessor:
                                 socketio.emit(
                                     "updatePorts", {"data": ports}, namespace="/MaslowCNC"
                                 )
+                            if message.find("connectionStatus") != -1:
+                                msg = message.split("_")
+                                socketio.emit("controllerStatus", msg[1], namespace="/MaslowCNC")
                         elif message[0:6] == "ALARM:":
                             self.activateModal("Notification:", message[7:])
                         elif message == "ok\r\n":

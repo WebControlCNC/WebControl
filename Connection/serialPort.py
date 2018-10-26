@@ -7,7 +7,7 @@ import serial.tools.list_ports
 import threading
 import schedule
 import time
-
+import json
 
 class SerialPort(MakesmithInitFuncs):
     """
@@ -63,8 +63,17 @@ class SerialPort(MakesmithInitFuncs):
         if not self.data.connectionStatus:
             # self.data.message_queue is the queue which handles passing CAN messages between threads
             # print "serialport.self.app.logger="+str(self.app.logger)
+            self.data.ui_queue.put(
+                "Message: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
+            )  # the "_" facilitates the parse
             x = SerialPortThread()
             x.data = self.data
             self.th = threading.Thread(target=x.getmessage)
             self.th.daemon = True
             self.th.start()
+        else:
+            self.data.ui_queue.put(
+                "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
+            )  # the "_" facilitates the parse
+
+

@@ -19,7 +19,15 @@
 
           socket.on('connect', function(msg) {
               socket.emit('my event', {data: 'I\'m connected!'});
+              $("#clientStatus").text("Connected");
+              $("#clientStatus").removeClass('btn-outline-danger').addClass('btn-success');
               checkForGCodeUpdate();
+          });
+
+
+          socket.on('disconnect', function(msg) {
+              $("#clientStatus").text("Not Connected");
+              $("#clientStatus").removeClass('btn-success').addClass('btn-outline-danger');
           });
 
           socket.on('message', function(msg){
@@ -35,6 +43,20 @@
               controllerMessages.forEach(function(message){
                 $('#controllerMessage').append(message+"<br>");
               });
+          });
+
+          socket.on('controllerStatus', function(msg){
+            msg = JSON.parse(msg);
+            console.log(msg.status);
+            if (msg.status=="disconnected"){
+              $("#controllerStatus").text("Not Connected");
+              $("#controllerStatus").removeClass('btn-success').addClass('btn-outline-danger');
+            }
+            else
+            {
+              $("#controllerStatus").text(msg.port);
+              $("#controllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
+            }
           });
 
           socket.on('calibrationMessage', function(msg){
@@ -53,8 +75,9 @@
           });
 
           socket.on('activateModal', function(msg){
-            console.log("activateModal")
+            //console.log("activateModal")
             $('#notificationModal').data('bs.modal',null);
+            $('#notificationModal').data('name',msg.title);
             $('#notificationModalTitle').html("<h3>"+msg.title+"</h3");
             $('#notificationModalText').html("<p>"+msg.message+"</p>");
             if (msg.mode=="static"){
@@ -82,13 +105,19 @@
           });
 
           socket.on('closeModals', function(msg){
-            //console.log("closeModal")
-            $('#notificationModal').modal('hide');
+            //console.log("received notice to close: "+msg.data.title);
+            //console.log("active modal has name: "+$("#notificationModal").data('name'));
+            if ($('#notificationModal').data('name') == msg.data.title)
+            {
+              //console.log("closeModal")
+              $('#notificationModal').modal('hide');
+             }
           });
 
           $("#notificationModal").on('hidden.bs.modal', function(e){
-              //console.log("modal closing");
-              socket.emit('modalClosed', {data:"modalClosed"});
+              var name = $('#notificationModal').data('name');
+              //console.log("modal "+name+" is closing");
+              socket.emit('modalClosed', {data:name});
           });
 
       });
@@ -136,7 +165,7 @@
   </script>
 
 </head>
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" data-name="">
     <a class="navbar-brand" href="#">WebControl</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -167,6 +196,8 @@
           </div>
         </li>
       </ul>
+      <button id="clientStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button">Not Connect</button>
+      <button id="controllerStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button">Not Connect</button>
     </div>
 </nav>
 <body>
