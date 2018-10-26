@@ -1,4 +1,4 @@
-FROM python:3.5.6-slim-stretch
+FROM arm32v7/python:3.5.6-slim-stretch
 
 # Install dependencies needed for building and running OpenCV
 RUN apt-get update
@@ -17,6 +17,8 @@ RUN apt-get install -y --no-install-recommends \
     # libtbb2 libtbb-dev \
     # for gevent
     libevent-dev \
+    # for numpy (installs libf77blas.so.3)
+    libatlas-base-dev \
     # cleanup
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -y autoremove
@@ -30,8 +32,8 @@ RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv
 
 # Get other python dependencies
 ADD requirements.txt /requirements.txt
-# Remove opencv from requirements (use the compiled one)
-RUN sed -i '/opencv-python.*/d' /requirements.txt
+# Remove opencv and numpy from requirements (since they're already installed)
+RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/numpy.*/d' /requirements.txt
 RUN pip install -r /requirements.txt 
 
 # Remove no-longer-needed gevent compilation libraries
