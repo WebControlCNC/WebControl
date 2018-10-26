@@ -64,7 +64,7 @@ class SerialPort(MakesmithInitFuncs):
             # self.data.message_queue is the queue which handles passing CAN messages between threads
             # print "serialport.self.app.logger="+str(self.app.logger)
             self.data.ui_queue.put(
-                "Message: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
+                "Action: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
             )  # the "_" facilitates the parse
             x = SerialPortThread()
             x.data = self.data

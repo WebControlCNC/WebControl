@@ -130,7 +130,7 @@ function processRequestedSetting(msg){
 
 function processPositionMessage(msg){
   var _json = JSON.parse(msg.data);
-  $('#positionMessage').html('XPos:'+_json.xval.toFixed(2)+' Ypos:'+_json.yval.toFixed(2)+' ZPos:'+_json.zval.toFixed(2));
+  $('#positionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2)+' ZPos:'+parseFloat(_json.zval).toFixed(2));
   positionUpdate(_json.xval,_json.yval,_json.zval);
 }
 
