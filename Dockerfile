@@ -37,7 +37,8 @@ RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/numpy.*/d' /requir
 RUN pip install -r /requirements.txt 
 
 # Remove no-longer-needed gevent compilation libraries
-RUN apt-get purge -y --auto-remove --allow-remove-essential gcc libevent-dev wget unzip sed
+# TODO: This seems to also remove libatlas-base-dev which is required by numpy
+#RUN apt-get purge -y --auto-remove --allow-remove-essential gcc libevent-dev wget unzip sed
 
 # Copy the source
 ADD . /WebControl
