@@ -226,9 +226,8 @@ def my_event(msg):
     print(msg["data"])
 
 @socketio.on("modalClosed", namespace="/MaslowCNC")
-def modelClosed(msg):
-    print("modal closed")
-
+def modalClosed(msg):
+    socketio.emit("closeModals",{"data": "closeModals"},namespace="/MaslowCNC")
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):

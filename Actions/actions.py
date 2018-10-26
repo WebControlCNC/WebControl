@@ -98,6 +98,7 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "macro2":
             if not self.macro(2):
                 self.data.ui_queue.put("Message: Error with performing macro")
+        '''
         elif msg["data"]["command"] == "optical_onStart":
             if not self.data.opticalCalibration.on_Start():
                 self.data.ui_queue.put(
@@ -109,6 +110,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put(
                     "Message: Error with starting optical calibration"
                 )
+        '''
 
     def defineHome(self):
         try:

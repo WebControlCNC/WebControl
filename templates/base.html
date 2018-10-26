@@ -81,10 +81,16 @@
             }
           });
 
-          $("#notificationModal").on('hidden.bs.modal', function(e){
-              console.log("modal closing");
-              socket.emit('modalClose');
+          socket.on('closeModals', function(msg){
+            //console.log("closeModal")
+            $('#notificationModal').modal('hide');
           });
+
+          $("#notificationModal").on('hidden.bs.modal', function(e){
+              //console.log("modal closing");
+              socket.emit('modalClosed', {data:"modalClosed"});
+          });
+
       });
       function action(command, arg, arg1){
         console.log("action="+command);
