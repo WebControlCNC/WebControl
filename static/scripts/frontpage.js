@@ -31,20 +31,18 @@ sled.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:.1,co
 sled.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:.1,color:"#F00"}))
 sled.add(draw.circle(3*scale).stroke({width:.1,color:"#F00"}).fill({color:"#fff",opacity:0}))
 sled.center(originX,originY)
-//sled.center(vx,vy)
-draw.zoom(10, {x:originX,y:originY});
 
 var home = draw.group()
 home.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:.1,color:"#0F0"}))
 home.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:.1,color:"#0F0"}))
 home.add(draw.circle(3*scale).stroke({width:.1,color:"#0F0"}).fill({color:"#fff",opacity:0}))
 home.center(originX,originY)
-//sled.center(vx,vy)
+/
+
 draw.zoom(10, {x:originX,y:originY});
 
 function positionUpdate(x,y,z){
   var _x, _y =0
-  //console.log(x)
   if ($("#units").text()=="MM"){
     _x = originX+x*scale/25.4
     _y = originY-y*scale/25.4
@@ -55,8 +53,8 @@ function positionUpdate(x,y,z){
     _y = originY-y*scale
     _z = z*scale/2*360
   }
-  sled.center(_x, _y);
-  //sled.rotate(_z);
+  sled.center(_x, _y)
+
 }
 
 function homePositionUpdate(x,y){
@@ -70,7 +68,6 @@ function homePositionUpdate(x,y){
     _x = originX+x*scale;
     _y = originY-y*scale
   }
-  //console.log("home:"+_x+", "+_y)
   home.center(_x, _y);
 }
 
