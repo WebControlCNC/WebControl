@@ -32,9 +32,10 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
   -D BUILD_TESTS=OFF \
   -D INSTALL_PYTHON_EXAMPLES=OFF \
   -D BUILD_EXAMPLES=OFF \
+  -D BUILD_PERF_TESTS=OFF \
   ..
 
-make -j4
+make -j$(python3 -c 'import multiprocessing as mp; print(int(mp.cpu_count() * 1.5))')
 
 make install
 ldconfig

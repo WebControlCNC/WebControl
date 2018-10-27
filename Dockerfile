@@ -1,4 +1,4 @@
-FROM arm32v7/python:3.5.6-slim-stretch
+FROM arm32v7/python:3.5.6-slim-stretch as builder
 
 # Install dependencies needed for building and running OpenCV
 RUN apt-get update
@@ -34,14 +34,36 @@ RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv
 ADD requirements.txt /requirements.txt
 # Remove opencv and numpy from requirements (since they're already installed)
 RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/numpy.*/d' /requirements.txt
-RUN pip install -r /requirements.txt 
-
-# Remove no-longer-needed gevent compilation libraries
-# TODO: This seems to also remove libatlas-base-dev which is required by numpy
-#RUN apt-get purge -y --auto-remove --allow-remove-essential gcc libevent-dev wget unzip sed
-
-# Copy the source
+# TODO: Maybe we can cache wheel files outside this container, for more granular reuse when requiremnts.txt changes
+RUN pip install -r /requirements.txt
 ADD . /WebControl
+# Clean up the /WebControl dir a bit to slim it down
+# TODO: Is there a more automatic way to do this?
+RUN rm -rf /WebControl/.venv && rm -rf /WebControl/.git
+# Pre-compile the pyc files (for faster Docker image startup)
+RUN python -m compileall /WebControl
+
+
+FROM arm32v7/python:3.5.6-slim-stretch
+
+# Pip wheels compiled in the builder
+COPY --from=builder /root/.cache /root/.cache
+# requirements.txt with opencv and numpy removed
+COPY --from=builder /requirements.txt /requirements.txt
+# Required shared libraries
+COPY --from=builder /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so
+COPY --from=builder /usr/lib/libf77blas.so /usr/lib/libf77blas.so
+COPY --from=builder /usr/lib/libf77blas.so.3 /usr/lib/libf77blas.so.3
+COPY --from=builder /usr/lib/libcblas.so.3 /usr/lib/libcblas.so.3
+COPY --from=builder /usr/lib/libatlas.so.3 /usr/lib/libatlas.so.3
+COPY --from=builder /usr/lib/libblas.so.3 /usr/lib/libblas.so.3
+COPY --from=builder /usr/lib/arm-linux-gnueabihf/libgfortran.so.3 /usr/lib/arm-linux-gnueabihf/libgfortran.so.3
+COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
+
+RUN pip install numpy && pip install -r /requirements.txt && rm -rf /root/.cache
+
+# Copy the pre-compiled source from the builder
+COPY --from=builder /WebControl /WebControl
 
 WORKDIR /WebControl
 EXPOSE 5000/tcp
