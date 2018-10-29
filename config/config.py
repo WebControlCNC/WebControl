@@ -7,16 +7,28 @@ and using the data in this dict.
 """
 import json
 import re
+import os
+from shutil import copyfile
+from pathlib import Path
+
 from __main__ import app
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 class Config(MakesmithInitFuncs):
     settings = {}
+    home = ""
 
     def __init__(self):
+        self.home = str(Path.home())
         print("Initializing Configuration")
-        with open("webcontrol.json", "r") as infile:
+        if not os.path.isdir(self.home+"/.WebControl"):
+            print("creating "+self.home+"/.WebControl directory")
+            os.mkdir(self.home+"/.WebControl")
+        if not os.path.exists(self.home+"/.WebControl/webcontrol.json"):
+            print("copying webcontrol.json to "+self.home+"/.WebControl/")
+            copyfile("webcontrol.json",self.home+"/.WebControl/webcontrol.json")
+        with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
             # self.computeSettings(None, None, None, True);
 
@@ -32,8 +44,8 @@ class Config(MakesmithInitFuncs):
         self.setValue(
             "Advanced Settings", "chainOverSprocket", result["chainOverSprocket"]
         )
-        self.setValue("Advanced Settings", "motorSpacingX", result["motorSpacingX"])
-        self.setValue("Advanced Settings", "motorOffsetY", result["motorOffsetY"])
+        self.setValue("Maslow Settings", "motorSpacingX", result["motorSpacingX"])
+        self.setValue("Maslow Settings", "motorOffsetY", result["motorOffsetY"])
         return True
 
     def setValue(self, section, key, value, recursionBreaker=False, isImporting = False):
@@ -110,7 +122,7 @@ class Config(MakesmithInitFuncs):
         if updated:
             if not recursionBreaker:
                 self.computeSettings(None, None, None, True)
-            with open("webcontrol.json", "w") as outfile:
+            with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
                 # print ("writing file")
                 json.dump(
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
@@ -218,7 +230,7 @@ class Config(MakesmithInitFuncs):
                     updated = True
         if updated:
             self.computeSettings(None, None, None, True)
-            with open("webcontrol.json", "w") as outfile:
+            with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
                 json.dump(
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )

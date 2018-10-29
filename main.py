@@ -220,6 +220,15 @@ def quickConfigure():
         resp.status_code = 200
         return resp
 
+@socketio.on("checkInRequested", namespace="/WebMCP")
+def checkInRequested(msg):
+    socketio.emit("checkIn")
+
+@socketio.on("connect", namespace="/WebMCP")
+def watchdog_connect():
+    print("connected")
+    print(request.sid)
+    socketio.emit("my response")
 
 @socketio.on("my event", namespace="/MaslowCNC")
 def my_event(msg):
@@ -411,6 +420,8 @@ def test_connect():
     print("connected")
     print(request.sid)
     socketio.emit("my response", {"data": "Connected", "count": 0})
+
+
 
 
 @socketio.on("disconnect", namespace="/MaslowCNC")

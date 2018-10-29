@@ -91,6 +91,11 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put(
                     "Message: Error with setting sprockets zero value"
                 )
+        elif msg["data"]["command"] == "setSprocketsDefault":
+            if not self.setSprocketsDefault():
+                self.data.ui_queue.put(
+                    "Message: Error with setting sprockets as default"
+                )
         elif msg["data"]["command"] == "updatePorts":
             if not self.updatePorts():
                 self.data.ui_queue.put("Message: Error with updating list of ports")
@@ -514,11 +519,10 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G91 ")
             if (
                 self.data.config.getValue("Advanced Settings", "chainOverSprocket")
-                == "Top"
+                == "Bottom"
             ):
-                self.data.gcode_queue.put("B09 " + sprocket + str(degValue) + " ")
-            else:
-                self.data.gcode_queue.put("B09 " + sprocket + "-" + str(degValue) + " ")
+                degValue *= -1.0
+            self.data.gcode_queue.put("B09 " + sprocket + str(degValue) + " ")
             self.data.gcode_queue.put("G90 ")
             return True
         except Exception as e:
@@ -564,6 +568,14 @@ class Actions(MakesmithInitFuncs):
         # mark that the sprockets are straight up
         try:
             self.data.gcode_queue.put("B06 L0 R0 ")
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def setSprocketsDefault(self):
+        try:
+            self.data.gcode_queue.put("B08 ")
             return True
         except Exception as e:
             print(e)

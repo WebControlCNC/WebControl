@@ -44,6 +44,11 @@ class OpticalCalibration(MakesmithInitFuncs):
     def midpoint(self, ptA, ptB):
         return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
+    def distance(self, ptA, ptB):
+        a = ptA[0]-ptB[0]
+        b = ptA[1]-ptB[1]
+        return (math.sqrt((a*a+b*b)))
+
     def removeOutliersAndAverage(self, data):
         mean = np.mean(data)
         sd = np.std(data)
@@ -186,8 +191,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                 (trbrX, trbrY) = self.midpoint(tr, br)
                 (tltrX, tltrY) = self.midpoint(tl, tr)
                 (blbrX, blbrY) = self.midpoint(bl, br)
-                xD = dist.euclidean((tlblX, tlblY), (trbrX, trbrY)) / self.markerX
-                yD = dist.euclidean((tltrX, tltrY), (blbrX, blbrY)) / self.markerY
+                xD = self.distance((tlblX, tlblY), (trbrX, trbrY)) / self.markerX
+                yD = self.distance((tltrX, tltrY), (blbrX, blbrY)) / self.markerY
                 if xD == 0:  # doing this to catch bad calibrations and stop crashing
                     xD = 1.0
                 if yD == 0:
