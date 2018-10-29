@@ -35,21 +35,21 @@ class ImportFile(MakesmithInitFuncs):
                     if section != "":
                         setting = [x.strip() for x in line.split("=")]
                         # print(section+"->"+setting[0]+":"+setting[1])
-                        if setting[0] != "comport" and setting[0] != "homex" and setting[0] != "homey":
+                        if True: #if setting[0] != "comport" and setting[0] != "homex" and setting[0] != "homey":
                             self.data.config.setValue(
                                 section, setting[0], setting[1], True, isImporting=True,
-                            )  # True to prevent recomputing settings everytime.
+                            )
             print("computing settings")
             self.data.config.computeSettings(None, None, None, True)
             #self.data.config.setValue("Advanced Settings","positionErrorLimit", 2000)
             ##go through and manually push the critical settings so position can be calculated.
-            print("syncing specific values")
-            self.data.config.syncFirmwareKey(11, 0, isImporting=False, useStored=True)
-            self.data.config.syncFirmwareKey(2, 0, isImporting=False, useStored=True)
-            self.data.config.syncFirmwareKey(3, 0, isImporting=False, useStored=True)
-            self.data.config.syncFirmwareKey(8, 0, isImporting=False, useStored=True)
-            self.data.config.syncFirmwareKey(37, 0, isImporting=False, useStored=True)
-            print("synced specific values")
+            #print("syncing specific values")
+            #self.data.config.syncFirmwareKey(11, 0, isImporting=False, useStored=True)
+            #self.data.config.syncFirmwareKey(2, 0, isImporting=False, useStored=True)
+            #self.data.config.syncFirmwareKey(3, 0, isImporting=False, useStored=True)
+            #self.data.config.syncFirmwareKey(8, 0, isImporting=False, useStored=True)
+            #self.data.config.syncFirmwareKey(37, 0, isImporting=False, useStored=True)
+            #print("synced specific values")
             self.data.gcode_queue.put("$$")
         except:
             print("Import File Error")

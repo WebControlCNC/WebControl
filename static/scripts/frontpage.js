@@ -33,9 +33,9 @@ sled.add(draw.circle(3*scale).stroke({width:.1,color:"#F00"}).fill({color:"#fff"
 sled.center(originX,originY)
 
 var home = draw.group()
-home.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:.1,color:"#0F0"}))
-home.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:.1,color:"#0F0"}))
-home.add(draw.circle(3*scale).stroke({width:.1,color:"#0F0"}).fill({color:"#fff",opacity:0}))
+home.add(draw.line(0.75*scale,-0.0*scale,0.75*scale,1.5*scale).stroke({width:.1,color:"#0F0"}))
+home.add(draw.line(-0.0*scale,0.75*scale,1.5*scale,0.75*scale).stroke({width:.1,color:"#0F0"}))
+home.add(draw.circle(1.5*scale).stroke({width:.1,color:"#0F0"}).fill({color:"#fff",opacity:0}))
 home.center(originX,originY)
 /
 

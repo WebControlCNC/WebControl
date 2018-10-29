@@ -19,6 +19,7 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 class Config(MakesmithInitFuncs):
     settings = {}
     home = ""
+    firstRun = False
 
     def __init__(self):
         self.home = str(Path.home())
@@ -27,8 +28,9 @@ class Config(MakesmithInitFuncs):
             print("creating "+self.home+"/.WebControl directory")
             os.mkdir(self.home+"/.WebControl")
         if not os.path.exists(self.home+"/.WebControl/webcontrol.json"):
-            print("copying webcontrol.json to "+self.home+"/.WebControl/")
-            copyfile("webcontrol.json",self.home+"/.WebControl/webcontrol.json")
+            print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
+            copyfile("defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
+            self.firstRun = True
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
             # self.computeSettings(None, None, None, True);

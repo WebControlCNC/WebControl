@@ -12,9 +12,16 @@ class UIProcessor:
     def start(self, _app):
 
         self.app = _app
+        print("starting UI")
         with self.app.app_context():
             while True:
                 time.sleep(0.001)
+                if self.app.data.config.firstRun:
+                    print("here at firstRun")
+                    self.app.data.config.firstRun = False
+                    time.sleep(2)
+                    self.activateModal("Notification:",
+                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.")
                 if self.app.data.opticalCalibrationImageUpdated is True:
                     self.sendCalibrationMessage(
                         "OpticalCalibrationImageUpdated",
@@ -41,10 +48,10 @@ class UIProcessor:
                                 print("found adjust Z-Axis in message")
                                 socketio.emit(
                                     "requestedSetting",
-                                    {"setting": "pauseButtonSetting", "value": "Resume", "resume": "resume"},
+                                    {"setting": "pauseButtonSetting", "value": "Resume"},
                                     namespace="/MaslowCNC",
                                 )
-                            self.activateModal("Notification:", message[9:])
+                            self.activateModal("Notification:", message[9:], "resume")
                         elif message[0:7] == "Action:":
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(

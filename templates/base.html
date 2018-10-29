@@ -80,17 +80,17 @@
             $('#notificationModal').data('name',msg.title);
             $('#notificationModalTitle').html("<h3>"+msg.title+"</h3");
             $('#notificationModalText').html("<p>"+msg.message+"</p>");
+            console.log(msg.resume)
+            if (msg.resume=="resume"){
+                $('#resumeButton').show();
+            } else {
+                $('#resumeButton').hide();
+            }
             if (msg.mode=="static"){
                 console.log("Static Modal")
                 $('#notificationModal').modal({backdrop: 'static', keyboard: false})
             } else {
-                if (msg.resume="resume"){
-                    $('#resumeButton').show();
-                    $('#notificationModal').modal();
-                } else {
-                    $('#resumeButton').hide();
-                    $('#notificationModal').modal();
-                }
+                $('#notificationModal').modal();
             }
           });
 

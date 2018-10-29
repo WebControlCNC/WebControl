@@ -29,6 +29,7 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")),
     float(app.data.config.getValue("Advanced Settings", "homeY")),
 ]
+app.data.firstRun = False
 # app.previousPosX = 0.0
 # app.previousPosY = 0.0
 
@@ -50,6 +51,8 @@ app.th1 = threading.Thread(target=app.data.messageProcessor.start)
 app.th1.daemon = True
 app.th1.start()
 
+app.uithread = None
+
 # write settings file to disk:
 # from settings import settings
 # settings = settings.getJSONSettings()
@@ -64,10 +67,12 @@ app.th1.start()
 def index(template):
     # print template
     current_app._get_current_object()
-    thread = socketio.start_background_task(
-        app.UIProcessor.start, current_app._get_current_object()
-    )
-    thread.start()
+    if app.uithread == None:
+        app.uithread = socketio.start_background_task(
+            app.UIProcessor.start, current_app._get_current_object()
+        )
+        app.uithread.start()
+
     if not app.data.connectionStatus:
         app.data.serialPort.openConnection()
     if template == "mobile/":
