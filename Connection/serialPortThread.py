@@ -80,6 +80,9 @@ class SerialPortThread(MakesmithInitFuncs):
         else:
             self.data.gcode_queue.put("G21 ")
 
+    def _requestSettingsUpdate(self):
+        self.data.gcode_queue.put("$$")
+
     def sendNextLine(self):
         """
             Sends the next line of gcode to the machine
@@ -147,9 +150,13 @@ class SerialPortThread(MakesmithInitFuncs):
             # print self.serialInstance.isOpen()
             self.lastMessageTime = time.time()
             self.data.connectionStatus = 1
-
+            print("here0")
             self._getFirmwareVersion()
+            print("here1")
             self._setupMachineUnits()
+            print("here2")
+            self._requestSettingsUpdate()
+            print("here3")
 
             while True:
 

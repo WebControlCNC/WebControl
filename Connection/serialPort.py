@@ -57,12 +57,8 @@ class SerialPort(MakesmithInitFuncs):
 
     def openConnection(self, *args):
         # This function opens the thread which handles the input from the serial port
-        # It only needs to be run once, it is run by connecting to the machine
 
-        # print("Attempting to open connection to controller")
         if not self.data.connectionStatus:
-            # self.data.message_queue is the queue which handles passing CAN messages between threads
-            # print "serialport.self.app.logger="+str(self.app.logger)
             self.data.ui_queue.put(
                 "Action: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
             )  # the "_" facilitates the parse

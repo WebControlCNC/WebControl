@@ -84,7 +84,13 @@
                 console.log("Static Modal")
                 $('#notificationModal').modal({backdrop: 'static', keyboard: false})
             } else {
-                $('#notificationModal').modal()
+                if (msg.resume="resume"){
+                    $('#resumeButton').show();
+                    $('#notificationModal').modal();
+                } else {
+                    $('#resumeButton').hide();
+                    $('#notificationModal').modal();
+                }
             }
           });
 
@@ -224,12 +230,12 @@
           <p>Modal body text goes here.</p>
         </div>
         <div class="modal-footer">
+          <button id="resumeButton" type="button" class="btn btn-info" onclick="pauseRun()" data-dismiss="modal">Resume</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
-
 
 </body>
 

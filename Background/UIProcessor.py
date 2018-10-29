@@ -26,6 +26,7 @@ class UIProcessor:
                 ):  # if there is new data to be read
                     message = self.app.data.ui_queue.get()
                     # send message to web for display in appropriate column
+                    zAxisMessage = False
                     if message != "":
                         if message[0] == "<":
                             # print message
@@ -40,7 +41,7 @@ class UIProcessor:
                                 print("found adjust Z-Axis in message")
                                 socketio.emit(
                                     "requestedSetting",
-                                    {"setting": "pauseButtonSetting", "value": "Resume"},
+                                    {"setting": "pauseButtonSetting", "value": "Resume", "resume": "resume"},
                                     namespace="/MaslowCNC",
                                 )
                             self.activateModal("Notification:", message[9:])
@@ -155,10 +156,10 @@ class UIProcessor:
         }
         self.sendPositionMessage(position)
 
-    def activateModal(self, title, message):
+    def activateModal(self, title, message, resume="false"):
         socketio.emit(
             "activateModal",
-            {"title": title, "message": message},
+            {"title": title, "message": message, "resume": resume},
             namespace="/MaslowCNC",
         )
 

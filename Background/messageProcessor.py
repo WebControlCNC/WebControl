@@ -49,6 +49,8 @@ class MessageProcessor(MakesmithInitFuncs):
                         if message.find("adjust Z-Axis") != -1:
                             self.data.manualZAxisAdjust = True
                             self.data.ui_queue.put(message)
+                        if message[0:15] == "Message: Unable":
+                            self.data.ui_queue.put(message)
                     elif message[0:6] == "ALARM:":
                         self.data.previousUploadStatus = self.data.uploadFlag
                         self.data.uploadFlag = 0

@@ -51,7 +51,7 @@ class Actions(MakesmithInitFuncs):
             if not self.testMotors():
                 self.data.ui_queue.put("Message: Error with testing motors")
         elif msg["data"]["command"] == "wipeEEPROM":
-            if not self.wipeEEPROM():
+            if not self.wipeEEPROM(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with wiping EEPROM")
         elif msg["data"]["command"] == "pauseRun":
             if not self.pauseRun():
@@ -173,6 +173,10 @@ class Actions(MakesmithInitFuncs):
     def resetChainLengths(self):
         try:
             self.data.gcode_queue.put("B08 ")
+            if self.data.units == "INCHES":
+                self.data.gcode_queue.put("G20 ")
+            else:
+                self.data.gcode_queue.put("G21 ")
             return True
         except Exception as e:
             print(e)
@@ -255,9 +259,16 @@ class Actions(MakesmithInitFuncs):
             print(e)
             return False
 
-    def wipeEEPROM(self):
+    def wipeEEPROM(self, extent):
         try:
-            self.data.gcode_queue.put("$RST=* ")
+            if extent == "All":
+                self.data.gcode_queue.put("$RST=* ")
+            elif extent == "Settings":
+                self.data.gcode_queue.put("$RST=$ ")
+            elif extent == "Maslow":
+                self.data.gcode_queue.put("$RST=# ")
+            else:
+                return False
             #timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
             #timer.start()
             return True
