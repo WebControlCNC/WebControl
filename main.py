@@ -53,28 +53,10 @@ app.th1.start()
 
 app.uithread = None
 
-# write settings file to disk:
-# from settings import settings
-# settings = settings.getJSONSettings()
-# with open('webcontrol.json', 'w') as outfile:
-#    json.dump(settings,outfile, sort_keys=True, indent=4, ensure_ascii=False)
-
-# read settings file from disk:
-
-
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
-    # print template
     current_app._get_current_object()
-    if app.uithread == None:
-        app.uithread = socketio.start_background_task(
-            app.UIProcessor.start, current_app._get_current_object()
-        )
-        app.uithread.start()
-
-    if not app.data.connectionStatus:
-        app.data.serialPort.openConnection()
     if template == "mobile/":
         return render_template("frontpage_mobile.html")
     else:
@@ -86,7 +68,6 @@ def maslowSettings():
     if request.method == "POST":
         result = request.form
         app.data.config.updateSettings("Maslow Settings", result)
-        # setValues = app.data.config.getJSONSettingSection("Maslow Settings")
         message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
@@ -229,19 +210,23 @@ def quickConfigure():
 def checkInRequested(msg):
     socketio.emit("checkIn")
 
+
 @socketio.on("connect", namespace="/WebMCP")
 def watchdog_connect():
     print("connected")
     print(request.sid)
     socketio.emit("my response")
 
+
 @socketio.on("my event", namespace="/MaslowCNC")
 def my_event(msg):
     print(msg["data"])
 
+
 @socketio.on("modalClosed", namespace="/MaslowCNC")
 def modalClosed(msg):
     socketio.emit("closeModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
+
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
@@ -424,9 +409,16 @@ def requestPage(msg):
 def test_connect():
     print("connected")
     print(request.sid)
+    if app.uithread == None:
+        app.uithread = socketio.start_background_task(
+            app.UIProcessor.start, current_app._get_current_object()
+        )
+        app.uithread.start()
+
+    if not app.data.connectionStatus:
+        app.data.serialPort.openConnection()
+
     socketio.emit("my response", {"data": "Connected", "count": 0})
-
-
 
 
 @socketio.on("disconnect", namespace="/MaslowCNC")

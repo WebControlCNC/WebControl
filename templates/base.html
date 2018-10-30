@@ -3,7 +3,7 @@
   <title>{% block title %}{% endblock %} - WebControl</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/switches.css', version='10262018a') }}" crossorigin="anonymous">
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
@@ -12,18 +12,20 @@
       var controllerMessages = [];
       $(document).ready(function(){
           namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
-
           // the socket.io documentation recommends sending an explicit package upon connection
           // this is specially important when using the global namespace
-          socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+          socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {'forceNew':true});
+          setListeners();
+      });
 
+      function setListeners(){
+          console.log("setting Listeners");
           socket.on('connect', function(msg) {
               socket.emit('my event', {data: 'I\'m connected!'});
               $("#clientStatus").text("Connected");
               $("#clientStatus").removeClass('btn-outline-danger').addClass('btn-success');
               checkForGCodeUpdate();
           });
-
 
           socket.on('disconnect', function(msg) {
               $("#clientStatus").text("Not Connected");
@@ -126,7 +128,8 @@
               socket.emit('modalClosed', {data:name});
           });
 
-      });
+      }
+
       function action(command, arg, arg1){
         console.log("action="+command);
         socket.emit('action',{data:{command:command,arg:arg, arg1:arg1}});

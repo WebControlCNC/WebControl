@@ -520,22 +520,22 @@
             "value": 1.0
         },
         {
-            "default": 0.5,
+            "default": 0.1,
             "key": "distToMoveZ",
             "type": "float",
-            "value": 0.5
+            "value": 0.1
         },
         {
-            "default": "MM",
+            "default": "INCHES",
             "key": "units",
             "type": "string",
-            "value": "MM"
+            "value": "INCHES"
         },
         {
-            "default": "MM",
+            "default": "INCHES",
             "key": "unitsZ",
             "type": "string",
-            "value": "MM"
+            "value": "INCHES"
         }
     ],
     "Maslow Settings": [
