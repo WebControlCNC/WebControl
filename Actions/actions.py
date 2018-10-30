@@ -16,6 +16,12 @@ class Actions(MakesmithInitFuncs):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
                 self.data.ui_queue.put("Message: Error with resetting chain lengths.")
+        elif msg["data"]["command"] == "move":
+            if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                self.data.ui_queue.put("Message: Error with initiating move.")
+        elif msg["data"]["command"] == "move":
+            if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                self.data.ui_queue.put("Message: Error with initiating Z-Axis move.")
         elif msg["data"]["command"] == "reportSettings":
             self.data.gcode_queue.put("$$")
         elif msg["data"]["command"] == "home":

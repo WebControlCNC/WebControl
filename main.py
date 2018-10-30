@@ -35,13 +35,13 @@ app.data.firstRun = False
 
 app.UIProcessor = UIProcessor()
 
-## this runs the scheduler to check for connections
+## this defines the schedule for running the serial port open connection
 def run_schedule():
     while 1:
         schedule.run_pending()
         time.sleep(1)
 
-
+## this runs the scheduler to check for connections
 app.th = threading.Thread(target=run_schedule)
 app.th.daemon = True
 app.th.start()
@@ -51,6 +51,7 @@ app.th1 = threading.Thread(target=app.data.messageProcessor.start)
 app.th1.daemon = True
 app.th1.start()
 
+## uithread set to None.. will be activated upon first websocket connection
 app.uithread = None
 
 @app.route("/")
@@ -206,11 +207,12 @@ def quickConfigure():
         resp.status_code = 200
         return resp
 
+#Watchdog socketio.. not working yet.
 @socketio.on("checkInRequested", namespace="/WebMCP")
 def checkInRequested(msg):
     socketio.emit("checkIn")
 
-
+#Watchdog socketio.. not working yet.
 @socketio.on("connect", namespace="/WebMCP")
 def watchdog_connect():
     print("connected")
@@ -431,25 +433,9 @@ def command(msg):
     app.data.actions.processAction(msg)
 
 
-@socketio.on("move", namespace="/MaslowCNC")
-def move(msg):
-    if not app.data.actions.move(
-        msg["data"]["direction"], float(msg["data"]["distToMove"])
-    ):
-        app.data.ui_queue.put("Message: Error with move")
-
-
-@socketio.on("moveZ", namespace="/MaslowCNC")
-def moveZ(msg):
-    if not app.data.actions.moveZ(
-        msg["data"]["direction"], float(msg["data"]["distToMoveZ"])
-    ):
-        app.data.ui_queue.put("Message: Error with Z-Axis move")
-
-
 @socketio.on("settingRequest", namespace="/MaslowCNC")
 def settingRequest(msg):
-    # didn't move to actions.. this request is just to send it computed values
+    # didn't move to actions.. this request is just to send it computed values.. keeping it here makes it faster than putting it through the UIProcessor
     if msg["data"] == "units":
         units = app.data.config.getValue("Computed Settings", "units")
         socketio.emit(
