@@ -351,3 +351,17 @@ class OpticalCalibration(MakesmithInitFuncs):
         print("Analyzing Images")
         self.on_AutoHome(False)
         return True
+
+    def testImage(self):
+        if self.camera is None:
+            print("Starting Camera")
+            self.camera = cv2.VideoCapture(0)
+        (grabbed, image) = self.camera.read()
+        imgencode = cv2.imencode(".png", image)[1]
+        stringData = base64.b64encode(imgencode).decode()
+        self.data.opticalCalibrationImage = stringData
+        self.data.opticalCalibrationImageUpdated = True
+        print("Releasing Camera")
+        self.camera.release()
+        self.camera = None
+        return True

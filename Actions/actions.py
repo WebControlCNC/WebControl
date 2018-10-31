@@ -16,6 +16,9 @@ class Actions(MakesmithInitFuncs):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
                 self.data.ui_queue.put("Message: Error with resetting chain lengths.")
+        elif msg["data"]["command"] == "testImage":
+            if not self.testImage():
+                self.data.ui_queue.put("Message: Error with test image.")
         elif msg["data"]["command"] == "move":
             if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating move.")
@@ -668,3 +671,12 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             print(e)
             return False
+
+    def testImage(self):
+        try:
+            self.data.opticalCalibration.testImage()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+      

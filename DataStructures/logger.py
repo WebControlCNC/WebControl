@@ -48,7 +48,7 @@ class Logger(MakesmithInitFuncs):
             except:
                 pass
 
-        if len(self.messageBuffer) > 0:
+        if len(self.messageBuffer) > 500:
             t = threading.Thread(
                 target=self.writeToFile, args=(self.messageBuffer, True, "write")
             )
@@ -56,7 +56,7 @@ class Logger(MakesmithInitFuncs):
             t.start()
             self.messageBuffer = ""
 
-        if len(self.amessageBuffer) > 0:
+        if len(self.amessageBuffer) > 500:
             t = threading.Thread(
                 target=self.writeToFile, args=(self.amessageBuffer, False, "write")
             )
