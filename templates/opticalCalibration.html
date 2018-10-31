@@ -159,7 +159,19 @@
             </select>
           </div>
           <div class="col-6">
-              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('testImage');">Test</button>
+            <div class="row">
+              <div class="col-6">
+                <button type="button" class="btn btn-lg btn-block btn-secondary mb-1" onclick="action('adjustCenter', 5);">Center Up</button>
+              </div>
+              <div class="col-6">
+                <button type="button" class="btn btn-lg btn-block btn-secondary mb-1" onclick="action('adjustCenter', -5);">Center Down</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="process('testImage');">Test</button>
           </div>
         </div>
         <div class="card">
@@ -178,18 +190,18 @@
       <h4 class="card-title">Calibration</h4>
       <div class="row">
           <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('optical_Calibrate');">Start Automatic Calibration</button>
+              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="process('optical_Calibrate');">Start Automatic Calibration</button>
           </div>
           <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">Stop</button>
+              <button type="button" class="btn btn-lg btn-block btn-danger m-1" onclick="action('stopRun');">Stop</button>
           </div>
       </div>
       <div class="row">
           <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');">Return to Center</button>
+              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('returnToCenter');">Return to Center</button>
           </div>
           <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('saveAndSendOpticalCalibration');">Save and Send</button>
+              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('saveAndSendOpticalCalibration');">Save and Send</button>
           </div>
       </div>
     </div>

@@ -131,6 +131,9 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "testOpticalCalibration":
             if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with test image.")
+        elif msg["data"]["command"] == "adjustCenter":
+            if not self.adjustCenter(msg["data"]["arg"]):
+                self.data.ui_queue.put("Message: Error with adjusting center.")
 
     def defineHome(self):
         try:
@@ -682,4 +685,14 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             print(e)
             return False
-      
+
+    def adjustCenter(self, dist):
+        try:
+            motorOffsetY = float(self.data.config.getValue("Maslow Settings","motorOffsetY"))+dist
+            self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorOffsetY))
+            if not self.returnToCenter():
+                return False
+            return True
+        except Exception as e:
+            print(e)
+            return False
