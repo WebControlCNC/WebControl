@@ -88,7 +88,7 @@
             } else {
                 $('#resumeButton').hide();
             }
-            if (msg.mode=="static"){
+            if (msg.isStatic==true){
                 console.log("Static Modal")
                 $('#notificationModal').modal({backdrop: 'static', keyboard: false})
             } else {

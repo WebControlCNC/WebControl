@@ -15,6 +15,7 @@ from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
+from WebPageProcessor.webPageProcessor import WebPageProcessor
 from os import listdir
 from os.path import isfile, join
 
@@ -34,6 +35,7 @@ app.data.firstRun = False
 # app.previousPosY = 0.0
 
 app.UIProcessor = UIProcessor()
+app.webPageProcessor = WebPageProcessor(app.data)
 
 ## this defines the schedule for running the serial port open connection
 def run_schedule():
@@ -232,180 +234,15 @@ def modalClosed(msg):
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
-    if msg["data"]["page"] == "maslowSettings":
-        setValues = app.data.config.getJSONSettingSection("Maslow Settings")
-        # because this page allows you to select the comport from a list that is not stored in webcontrol.json, we need to package and send the list of comports
-        # Todo:? change it to store the list?
-        ports = app.data.comPorts
-        if msg["data"]["isMobile"]:
-            page = render_template(
-                "settings_mobile.html",
-                title="Maslow Settings",
-                settings=setValues,
-                ports=ports,
-                pageID="maslowSettings",
-            )
-        else:
-            page = render_template(
-                "settings.html",
-                title="Maslow Settings",
-                settings=setValues,
-                ports=ports,
-                pageID="maslowSettings",
-            )
+    try:
+        page, title, isStatic = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"])
         socketio.emit(
             "activateModal",
-            {"title": "Maslow Settings", "message": page},
+            {"title": title, "message": page, "isStatic": isStatic},
             namespace="/MaslowCNC",
         )
-    elif msg["data"]["page"] == "advancedSettings":
-        setValues = app.data.config.getJSONSettingSection("Advanced Settings")
-        if msg["data"]["isMobile"]:
-            page = render_template(
-                "settings_mobile.html",
-                title="Advanced Settings",
-                settings=setValues,
-                pageID="advancedSettings",
-            )
-        else:
-            page = render_template(
-                "settings.html",
-                title="Advanced Settings",
-                settings=setValues,
-                pageID="advancedSettings",
-            )
-        socketio.emit(
-            "activateModal",
-            {"title": "Advanced Settings", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "webControlSettings":
-        setValues = app.data.config.getJSONSettingSection("WebControl Settings")
-        if msg["data"]["isMobile"]:
-            page = render_template(
-                "settings_mobile.html",
-                title="WebControl Settings",
-                settings=setValues,
-                pageID="webControlSettings",
-            )
-        else:
-            page = render_template(
-                "settings.html",
-                title="WebControl Settings",
-                settings=setValues,
-                pageID="webControlSettings",
-            )
-        socketio.emit(
-            "activateModal",
-            {"title": "WebControl Settings", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "openGCode":
-        lastSelectedFile = app.data.config.getValue("Maslow Settings", "openFile")
-        files = [f for f in listdir("gcode") if isfile(join("gcode", f))]
-        page = render_template(
-            "openGCode.html", files=files, lastSelectedFile=lastSelectedFile
-        )
-        socketio.emit(
-            "activateModal", {"title": "GCode", "message": page}, namespace="/MaslowCNC"
-        )
-    elif msg["data"]["page"] == "uploadGCode":
-        validExtensions = app.data.config.getValue(
-            "WebControl Settings", "validExtensions"
-        )
-        page = render_template("uploadGCode.html", validExtensions=validExtensions)
-        socketio.emit(
-            "activateModal", {"title": "GCode", "message": page}, namespace="/MaslowCNC"
-        )
-    elif msg["data"]["page"] == "importGCini":
-        page = render_template("importFile.html")
-        socketio.emit(
-            "activateModal",
-            {"title": "Import File", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "actions":
-        page = render_template("actions.html")
-        socketio.emit(
-            "activateModal",
-            {"title": "Actions", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "zAxis":
-        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-        distToMoveZ = app.data.config.getValue("Computed Settings", "distToMoveZ")
-        unitsZ = app.data.config.getValue("Computed Settings", "unitsZ")
-        page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
-        socketio.emit(
-            "activateModal",
-            {"title": "Z-Axis", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "setSprockets":
-        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-        page = render_template("setSprockets.html")
-        socketio.emit(
-            "activateModal",
-            {"title": "Z-Axis", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "triangularCalibration":
-        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-        motorYoffset = app.data.config.getValue("Maslow Settings", "motorOffsetY")
-        rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
-        chainSagCorrection = app.data.config.getValue(
-            "Advanced Settings", "chainSagCorrection"
-        )
-        page = render_template(
-            "triangularCalibration.html",
-            pageID="triangularCalibration",
-            motorYoffset=motorYoffset,
-            rotationRadius=rotationRadius,
-            chainSagCorrection=chainSagCorrection,
-        )
-        socketio.emit(
-            "activateModal",
-            {"title": "Triangular Calibration", "message": page},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "opticalCalibration":
-        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-        page = render_template("opticalCalibration.html", pageID="opticalCalibration")
-        socketio.emit(
-            "activateModal",
-            {"title": "Optical Calibration", "message": page, "mode": "static"},
-            namespace="/MaslowCNC",
-        )
-    elif msg["data"]["page"] == "quickConfigure":
-        socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-        motorOffsetY = app.data.config.getValue("Maslow Settings", "motorOffsetY")
-        rotationRadius = app.data.config.getValue("Advanced Settings", "rotationRadius")
-        kinematicsType = app.data.config.getValue("Advanced Settings", "kinematicsType")
-        if kinematicsType != "Quadrilateral":
-            if abs(float(rotationRadius) - 138.4) < 0.01:
-                kinematicsType = "Ring"
-            else:
-                kinematicsType = "Custom"
-        motorSpacingX = app.data.config.getValue("Maslow Settings", "motorSpacingX")
-        chainOverSprocket = app.data.config.getValue(
-            "Advanced Settings", "chainOverSprocket"
-        )
-        print("MotorOffsetY=" + str(motorOffsetY))
-        page = render_template(
-            "quickConfigure.html",
-            pageID="quickConfigure",
-            motorOffsetY=motorOffsetY,
-            rotationRadius=rotationRadius,
-            kinematicsType=kinematicsType,
-            motorSpacingX=motorSpacingX,
-            chainOverSprocket=chainOverSprocket,
-        )
-        socketio.emit(
-            "activateModal",
-            {"title": "Quick Configure", "message": page},
-            namespace="/MaslowCNC",
-        )
-
+    except Exception as e:
+        print(e)
 
 @socketio.on("connect", namespace="/MaslowCNC")
 def test_connect():
@@ -436,42 +273,13 @@ def command(msg):
 @socketio.on("settingRequest", namespace="/MaslowCNC")
 def settingRequest(msg):
     # didn't move to actions.. this request is just to send it computed values.. keeping it here makes it faster than putting it through the UIProcessor
-    if msg["data"] == "units":
-        units = app.data.config.getValue("Computed Settings", "units")
+    setting, value = app.webPageProcessor.processSettingRequest(msg["data"])
+    if setting is not None:
         socketio.emit(
             "requestedSetting",
-            {"setting": msg["data"], "value": units},
+            {"setting": setting, "value": value},
             namespace="/MaslowCNC",
         )
-    if msg["data"] == "distToMove":
-        distToMove = app.data.config.getValue("Computed Settings", "distToMove")
-        socketio.emit(
-            "requestedSetting",
-            {"setting": msg["data"], "value": distToMove},
-            namespace="/MaslowCNC",
-        )
-    if msg["data"] == "unitsZ":
-        unitsZ = app.data.config.getValue("Computed Settings", "unitsZ")
-        socketio.emit(
-            "requestedSetting",
-            {"setting": msg["data"], "value": unitsZ},
-            namespace="/MaslowCNC",
-        )
-    if msg["data"] == "distToMoveZ":
-        distToMoveZ = app.data.config.getValue("Computed Settings", "distToMoveZ")
-        socketio.emit(
-            "requestedSetting",
-            {"setting": msg["data"], "value": distToMoveZ},
-            namespace="/MaslowCNC",
-        )
-    if msg["data"] == "homePosition":
-        homeX = app.data.config.getValue("Advanced Settings", "homeX")
-        homeY = app.data.config.getValue("Advanced Settings", "homeY")
-        position = {"xval": homeX, "yval": homeY}
-        app.data.ui_queue.put(
-            "Action: homePositionMessage:_" + json.dumps(position)
-        )  # the "_" facilitates the parse
-
 
 @socketio.on("updateSetting", namespace="/MaslowCNC")
 def updateSetting(msg):

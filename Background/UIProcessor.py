@@ -3,7 +3,7 @@ from __main__ import socketio
 import time
 import math
 import json
-
+from flask import render_template
 
 class UIProcessor:
 
@@ -184,3 +184,4 @@ class UIProcessor:
         socketio.emit(
             "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
         )
+
