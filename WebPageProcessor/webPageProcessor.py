@@ -116,7 +116,22 @@ class WebPageProcessor:
             return page, "Triangular Calibration", True
         elif pageID == "opticalCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            page = render_template("opticalCalibration.html", pageID="opticalCalibration")
+            opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
+            opticalCenterY = self.data.config.getValue("Optical Calibration Settings", "opticalCenterY")
+            scaleX = self.data.config.getValue("Optical Calibration Settings", "scaleX")
+            scaleY = self.data.config.getValue("Optical Calibration Settings", "scaleY")
+            gaussianBlurValue = self.data.config.getValue("Optical Calibration Settings", "gaussianBlurValue")
+            cannyLowValue = self.data.config.getValue("Optical Calibration Settings", "cannyLowValue")
+            cannyHighValue = self.data.config.getValue("Optical Calibration Settings", "cannyHighValue")
+            autoScanDirection = self.data.config.getValue("Optical Calibration Settings", "autoScanDirection")
+            markerX = self.data.config.getValue("Optical Calibration Settings", "markerX")
+            markerY = self.data.config.getValue("Optical Calibration Settings", "markerY")
+            tlX = self.data.config.getValue("Optical Calibration Settings", "tlX")
+            tlY = self.data.config.getValue("Optical Calibration Settings", "tlY")
+            brX = self.data.config.getValue("Optical Calibration Settings", "brX")
+            brY = self.data.config.getValue("Optical Calibration Settings", "brY")
+            calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
+            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents)
             return page, "Optical Calibration", True
         elif pageID == "quickConfigure":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")

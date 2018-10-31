@@ -73,6 +73,9 @@ class Data:
     opticalCalibration = None  # points to the optical calibration object
     opticalCalibrationImage = None  # stores the current image
     opticalCalibrationImageUpdated = False  # stores whether its been updated or not
+    opticalCalibrationTestImage = None  # stores the current image
+    opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
+
     """
 
     Colors

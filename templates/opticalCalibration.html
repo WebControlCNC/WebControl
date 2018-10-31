@@ -13,14 +13,14 @@
           <div class="col">
             <div class="form-group">
               <label for="markerX">Horizontal Size of Marker</label>
-              <input class="form-control" name="markerX" id="markerX" value="0.6">
+              <input class="form-control" name="markerX" id="markerX" value="{{markerX}}">
               <small class="form-text text-muted">Enter value in inches only</small>
             </div>
           </div>
           <div class="col">
             <div class="form-group">
               <label for="markerY">Vertical Size of Marker</label>
-              <input class="form-control" name="markerY" id="markerY" value="0.6">
+              <input class="form-control" name="markerY" id="markerY" value="{{markerY}}">
               <small class="form-text text-muted">Enter value in inches only</small>
             </div>
           </div>
@@ -29,14 +29,14 @@
           <div class="col">
             <div class="form-group">
               <label for="scaleX">Horizontal Scale Factor</label>
-              <input class="form-control" name="scaleX" id="scaleX" value="1.0">
+              <input class="form-control" name="scaleX" id="scaleX" value="{{scaleX}}">
               <small class="form-text text-muted">Enter something like 1.0028</small>
             </div>
           </div>
           <div class="col">
             <div class="form-group">
               <label for="scaleY">Vertical Scale Factor</label>
-              <input class="form-control" name="scaleY" id="scaleY" value="1.0">
+              <input class="form-control" name="scaleY" id="scaleY" value="{{scaleY}}">
               <small class="form-text text-muted">Enter something like 1.0028</small>
             </div>
           </div>
@@ -44,19 +44,20 @@
         <div class="row">
           <div class="col">
             <div class="form-group">
-              <label for="centerX">X Coordinate of Center</label>
-              <input class="form-control" name="centerX" id="centerX" value="300">
+              <label for="opticalCenterX">X Coordinate of Center</label>
+              <input class="form-control" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
               <small class="form-text text-muted">Enter something like 300</small>
             </div>
           </div>
           <div class="col">
             <div class="form-group">
-              <label for="centerY">Y Coordinate of Center</label>
-              <input class="form-control" name="centerY" id="centerY" value="200">
+              <label for="opticalCenterY">Y Coordinate of Center</label>
+              <input class="form-control" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
               <small class="form-text text-muted">Enter something like 200</small>
             </div>
          </div>
         </div>
+        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
       </div>
     </div>
   </div>
@@ -72,21 +73,22 @@
           <option value="Bottom Left" {{'selected' if calibrationExtents=='Bottom Left' else '' }}>48 x 36 Bottom Left</option>
           <option value="Top Right" {{'selected' if calibrationExtents=='Rop Right' else '' }}>48 x 36 Top Right</option>
           <option value="Bottom Right" {{'selected' if calibrationExtents=='Bottom Right' else ''}}>48 x 36 Bottom Right</option>
-          <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Aera</option>
+          <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Area</option>
+          <option value="Custom" {{'selected' if calibrationExtents=='Custom' else ''}}>Custom</option>
         </select>
         <div class="row">
         <div class="col">
           <div class="form-group">
             <label for="tlX">X Coordinate of Top Left</label>
-            <input class="form-control" name="tlX" id="tlX" value="-15">
-            <small class="form-text text-muted">Enter something like -15</small>
+            <input class="form-control" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
+            <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
           </div>
         </div>
         <div class="col">
           <div class="form-group">
             <label for="tlY">Y Coordinate of Top Left</label>
-            <input class="form-control" name="tlY" id="tlY" value="7">
-            <small class="form-text text-muted">Enter something like 7</small>
+            <input class="form-control" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
+            <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
           </div>
         </div>
         </div>
@@ -94,31 +96,86 @@
           <div class="col">
             <div class="form-group">
               <label for="brX">X Coordinate of Bottom Right</label>
-              <input class="form-control" name="brX" id="brX" value="15">
-              <small class="form-text text-muted">Enter something like 15</small>
+              <input class="form-control" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
+              <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
             </div>
           </div>
           <div class="col">
             <div class="form-group">
               <label for="brY">Y Coordinate of Bottom Right</label>
-              <input class="form-control" name="brY" id="brY" value="-7">
-              <small class="form-text text-muted">Enter something like -7</small>
+              <input class="form-control" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
+              <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
             </div>
           </div>
         </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="form-group">
+              <label for="autoScanDirection">Auto Scan Direction</label>
+              <select class="custom-select" name="autoScanDirection" id="autoScanDirection">
+                <option value=0 {{'selected' if autoScanDirection==0 else ''}}>Horizontally</option>
+                <option value=1 {{'selected' if autoScanDirection==1 else ''}}>Vertically</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="opticalRecognitionAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseOpticalRecognition" aria-expanded="false" aria-controls="collapseOpticalRecognition">
+      <h4 class="card-title" id="opticalRecognitionHeader">
+        Optical Recognition...
+      </h4>
+    </button>
+    <div id="collapseOpticalRecognition" class="collapse" aria-labelledby="opticalRecognitionHeader" data-parent="#opticalRecognitionAccordion">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="cannyLowValue">Canny Low Value</label>
+              <input class="form-control" name="cannyLowValue" id="cannyLowValue" value="{{cannyLowValue}}">
+              <small class="form-text text-muted">0-255</small>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="cannyHighValue">Canny High Value</label>
+              <input class="form-control" name="cannyHighValue" id="cannyHighValue" value="{{cannyHighValue}}">
+              <small class="form-text text-muted">0-255</small>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <select class="custom-select" name="gaussianBlurValue" id="gaussianBlurValue">
+              <option value=1 {{'selected' if gaussianBlurValue==1 else ''}}>1 x 1</option>
+              <option value=3 {{'selected' if gaussianBlurValue==3 else ''}}>3 x 3</option>
+              <option value=5 {{'selected' if gaussianBlurValue==5 else '' }}>5 x 5</option>
+              <option value=7 {{'selected' if gaussianBlurValue==7 else '' }}>7 x 7</option>
+              <option value=9 {{'selected' if gaussianBlurValue==9 else ''}}>9 x 9</option>
+              <option value=11 {{'selected' if gaussianBlurValue==11 else ''}}>11 x 11</option>
+            </select>
+          </div>
+          <div class="col-6">
+              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('testImage');">Test</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+               <div id="testImageDiv"></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
       </div>
     </div>
   </div>
   <div class="card">
     <div class="card-body">
       <h4 class="card-title">Calibration</h4>
-      <div class="row">
-          <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('testImage');">Test Image</button>
-          </div>
-          <div class="col">
-          </div>
-      </div>
       <div class="row">
           <div class="col">
               <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="process('optical_Calibrate');">Start Automatic Calibration</button>
@@ -160,32 +217,47 @@
 function process(processName){
   var markerX = $("#markerX").val();
   var markerY = $("#markerY").val();
-  var centerX = $("#centerX").val();
-  var centerY = $("#centerY").val();
+  var opticalCenterX = $("#opticalCenterX").val();
+  var opticalCenterY = $("#opticalCenterY").val();
   var scaleX = $("#scaleX").val();
   var scaleY = $("#scaleY").val();
   var tlX = $("#tlX").val();
   var tlY = $("#tlY").val();
   var brX = $("#brX").val();
   var brY = $("#brY").val();
+  var calibrationExtents = $("#calibrationExtents option:selected").val()
+  var cannyLowValue = $("#cannyLowValue").val();
+  var cannyHighValue = $("#cannyHighValue").val();
+  var gaussianBlurValue = $("#gaussianBlurValue option:selected").val()
+  var autoScanDirection = $("#autoScanDirection option:selected").val()
   var parameters = {markerX:markerX,
                     markerY:markerY,
-                    centerX:centerX,
-                    centerY:centerY,
+                    opticalCenterX:opticalCenterX,
+                    opticalCenterY:opticalCenterY,
                     scaleX:scaleX,
                     scaleY:scaleY,
                     tlX:tlX,
                     tlY:tlY,
                     brX:brX,
-                    brY:brY};
-  action('optical_Calibrate',parameters);
+                    brY:brY,
+                    calibrationExtents:calibrationExtents,
+                    cannyLowValue:cannyLowValue,
+                    cannyHighValue:cannyHighValue,
+                    gaussianBlurValue:gaussianBlurValue,
+                    autoScanDirection:autoScanDirection
+                    };
+  if (processName=="testImage")
+    action('testOpticalCalibration', parameters)
+  else
+    action('optical_Calibrate',parameters);
 }
 
 function processCalibrationMessage(msg){
-    //console.log(msg.msg)
-    //console.log(msg.data)
-    $("#imageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>")
-    //console.log(msg.data.length)
+    console.log(msg.msg);
+    if(msg.msg=="OpticalCalibrationImageUpdated")
+      $("#imageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>")
+    if(msg.msg=="OpticalCalibrationTestImageUpdated")
+      $("#testImageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>")
 }
 
 $(document).ready(function () {
@@ -198,31 +270,40 @@ $(document).ready(function () {
           $("#tlY").val(7);
           $("#brX").val(0);
           $("#brY").val(0);
+          enableCustomExtents(true);
           break;
         case "Bottom Left":
           $("#tlX").val(-15);
           $("#tlY").val(0);
           $("#brX").val(0);
           $("#brY").val(-7);
+          enableCustomExtents(true);
           break;
         case "Top Right":
           $("#tlX").val(0);
           $("#tlY").val(7);
           $("#brX").val(15);
           $("#brY").val(0);
+          enableCustomExtents(true);
           break;
         case "Bottom Right":
           $("#tlX").val(0);
           $("#tlY").val(0);
           $("#brX").val(15);
           $("#brY").val(-7);
+          enableCustomExtents(true);
           break;
         case "Full Area":
           $("#tlX").val(-15);
           $("#tlY").val(7);
           $("#brX").val(15);
           $("#brY").val(-7);
+          enableCustomExtents(true);
           break;
+        case "Custom":
+          enableCustomExtents(false);
+          break;
+
         default:
           $("#tlX").val(-15);
           $("#tlY").val(7);
@@ -234,5 +315,48 @@ $(document).ready(function () {
     console.log("here1");
     drawCalibration();
 });
+
+function enableCustomExtents(value){
+    $("#tlX").prop("disabled", value);
+    $("#tlY").prop("disabled", value);
+    $("#brX").prop("disabled", value);
+    $("#brY").prop("disabled", value);
+}
+
+function saveConfiguration(){
+  var markerX = $("#markerX").val();
+  var markerY = $("#markerY").val();
+  var opticalCenterX = $("#opticalCenterX").val();
+  var opticalCenterY = $("#opticalCenterY").val();
+  var scaleX = $("#scaleX").val();
+  var scaleY = $("#scaleY").val();
+  var tlX = $("#tlX").val();
+  var tlY = $("#tlY").val();
+  var brX = $("#brX").val();
+  var brY = $("#brY").val();
+  var calibrationExtents = $("#calibrationExtents option:selected").val()
+  var cannyLowValue = $("#cannyLowValue").val();
+  var cannyHighValue = $("#cannyHighValue").val();
+  var gaussianBlurValue = $("#gaussianBlurValue option:selected").val();
+  var autoScanDirection = $("#autoScanDirection option:selected").val();
+  var parameters = {markerX:markerX,
+                    markerY:markerY,
+                    opticalCenterX:opticalCenterX,
+                    opticalCenterY:opticalCenterY,
+                    scaleX:scaleX,
+                    scaleY:scaleY,
+                    tlX:tlX,
+                    tlY:tlY,
+                    brX:brX,
+                    brY:brY,
+                    calibrationExtents:calibrationExtents,
+                    cannyLowValue:cannyLowValue,
+                    cannyHighValue:cannyHighValue,
+                    gaussianBlurValue:gaussianBlurValue,
+                    autoScanDirection:autoScanDirection
+                    };
+  action('saveOpticalCalibrationConfiguration',parameters);
+}
+
 </script>
 {% endblock %}

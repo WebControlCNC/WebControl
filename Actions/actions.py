@@ -16,9 +16,6 @@ class Actions(MakesmithInitFuncs):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
                 self.data.ui_queue.put("Message: Error with resetting chain lengths.")
-        elif msg["data"]["command"] == "testImage":
-            if not self.testImage():
-                self.data.ui_queue.put("Message: Error with test image.")
         elif msg["data"]["command"] == "move":
             if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating move.")
@@ -125,9 +122,15 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put(
                     "Message: Error with starting optical calibration"
                 )
-        elif msg["data"]["command"] == "restartWebControl":
-            print("restarting WebControl")
-            os._exit()
+        elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
+            print("here")
+            if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
+                self.data.ui_queue.put(
+                    "Message: Error with saving optical calibration configuration"
+                )
+        elif msg["data"]["command"] == "testOpticalCalibration":
+            if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
+                self.data.ui_queue.put("Message: Error with test image.")
 
     def defineHome(self):
         try:

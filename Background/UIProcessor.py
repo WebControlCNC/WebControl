@@ -28,6 +28,12 @@ class UIProcessor:
                         self.app.data.opticalCalibrationImage,
                     )
                     self.app.data.opticalCalibrationImageUpdated = False
+                if self.app.data.opticalCalibrationTestImageUpdated is True:
+                    self.sendCalibrationMessage(
+                        "OpticalCalibrationTestImageUpdated",
+                        self.app.data.opticalCalibrationTestImage,
+                    )
+                    self.app.data.opticalCalibrationTestImageUpdated = False
                 while (
                     not self.app.data.ui_queue.empty()
                 ):  # if there is new data to be read

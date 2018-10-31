@@ -795,16 +795,16 @@
             "value": "0"
         },
         {
-            "default": "0",
+            "default": "320",
             "key": "opticalCenterX",
             "type": "string",
-            "value": "0"
+            "value": "320"
         },
         {
-            "default": "0",
+            "default": "240",
             "key": "opticalCenterY",
             "type": "string",
-            "value": "0"
+            "value": "240"
         },
         {
             "default": "1.0",
@@ -843,16 +843,46 @@
             "value": 0
         },
         {
-            "default": 15.24,
+            "default": 0.6,
             "key": "markerX",
             "type": "float",
-            "value": 15.24
+            "value": 0.6
         },
         {
-            "default": 15.24,
+            "default": 0.6,
             "key": "markerY",
             "type": "float",
-            "value": 15.24
+            "value": 0.6
+        },
+        {
+            "default": -15,
+            "key": "tlX",
+            "type": "int",
+            "value": -15
+        },
+        {
+            "default": 7,
+            "key": "tlY",
+            "type": "int",
+            "value": 7
+        },
+        {
+            "default": 15,
+            "key": "brX",
+            "type": "int",
+            "value": 15
+        },
+        {
+            "default": -7,
+            "key": "brY",
+            "type": "int",
+            "value": -7
+        },
+        {
+            "default": "Full Area",
+            "key": "calibrationExtents",
+            "type": "string",
+            "value": "Full Area"
         }
     ],
     "WebControl Settings": [
