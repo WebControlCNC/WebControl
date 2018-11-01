@@ -159,24 +159,4 @@ class WebPageProcessor:
             )
             return page, "Quick Configure", False
 
-    def processSettingRequest(self, setting):
-        if setting == "units":
-            units = self.data.config.getValue("Computed Settings", "units")
-            return setting,units
-        if setting == "distToMove":
-            distToMove = self.data.config.getValue("Computed Settings", "distToMove")
-            return setting, distToMove
-        if setting == "unitsZ":
-            unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
-            return setting, unitsZ
-        if setting == "distToMoveZ":
-            distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
-            return setting, distToMoveZ
-        if setting == "homePosition":
-            homeX = self.data.config.getValue("Advanced Settings", "homeX")
-            homeY = self.data.config.getValue("Advanced Settings", "homeY")
-            position = {"xval": homeX, "yval": homeY}
-            self.data.ui_queue.put(
-                "Action: homePositionMessage:_" + json.dumps(position)
-            )  # the "_" facilitates the parse
-            return None, None
+

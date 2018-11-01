@@ -1,6 +1,7 @@
 <!doctype html>
 <head>
-  <title>{% block title %}{% endblock %} - WebControl</title>
+  <title>{% block title %}{% endblock %}WebControl</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/switches.css', version='10262018a') }}" crossorigin="anonymous">
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
@@ -146,9 +147,9 @@
           socket.emit('moveZ',{data:{direction:direction,distToMoveZ:distToMoveZ}});
       }
 
-      function settingRequest(setting){
+      function settingRequest(section,setting){
           console.log("requesting..")
-          socket.emit('settingRequest',{data:setting});
+          socket.emit('settingRequest',{data:{section:section,setting:setting}});
       }
 
       function requestPage(page){

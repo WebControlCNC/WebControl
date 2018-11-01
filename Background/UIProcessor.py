@@ -129,6 +129,13 @@ class UIProcessor:
                             if message.find("connectionStatus") != -1:
                                 msg = message.split("_")
                                 socketio.emit("controllerStatus", msg[1], namespace="/MaslowCNC")
+                            if message.find("updateOpticalCalibrationCurve") != -1:
+                                msg = message.split("_")
+                                self.sendCalibrationMessage("updateOpticalCalibrationCurve", msg[1])
+                            if message.find("updateOpticalCalibrationError") != -1:
+                                msg = message.split("_")
+                                self.sendCalibrationMessage("updateOpticalCalibrationError", msg[1])
+
                         elif message[0:6] == "ALARM:":
                             self.activateModal("Notification:", message[7:])
                         elif message == "ok\r\n":

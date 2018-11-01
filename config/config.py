@@ -228,9 +228,9 @@ class Config(MakesmithInitFuncs):
                         else:
                             value = 0
                     if firmwareKey == 45:
-                        # print "firmwareKey = 45"
-                        # if storedValue != "":
-                        #    self.sendErrorArray(firmwareKey, storedValue, data)
+                        print("firmwareKey = 45")
+                        if storedValue != "":
+                            self.sendErrorArray(firmwareKey, storedValue, data)
                         pass
                     elif useStored is True:
                         app.data.gcode_queue.put(

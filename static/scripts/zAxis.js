@@ -25,6 +25,6 @@ function processZAxisRequestedSetting(msg){
 }
 
 $(document).ready(function(){
-    settingRequest("unitsZ");
-    settingRequest("distToMoveZ");
+    settingRequest("Computed Settings","unitsZ");
+    settingRequest("Computed Settings","distToMoveZ");
 });

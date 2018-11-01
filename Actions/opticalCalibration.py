@@ -30,9 +30,50 @@ class OpticalCalibration(MakesmithInitFuncs):
     matrixSize = (31, 15)
     calErrorsX = np.zeros(matrixSize)
     calErrorsY = np.zeros(matrixSize)
+    xCurve = np.zeros(shape=(6))  # coefficients for quadratic curve
+    yCurve = np.zeros(shape=(6))  # coefficients for quadratic curve
     inAutoMode = False
     inMeasureOnlyMode = False
     autoScanDirection = 0
+
+    def __init__(self):
+        # can't do much because data hasn't been initialized yet
+        pass
+
+    def reloadCalibration(self):
+        try:
+            xyErrors = self.data.config.getValue('Optical Calibration Settings', 'xyErrorArray')
+            self.calErrorsX, self.calErrorsY = self.data.config.parseErrorArray(xyErrors, True)
+            self.xCurve[0] = float(self.data.config.getValue('Optical Calibration Settings', 'calX0'))
+            self.xCurve[1] = float(self.data.config.getValue('Optical Calibration Settings', 'calX1'))
+            self.xCurve[2] = float(self.data.config.getValue('Optical Calibration Settings', 'calX2'))
+            self.xCurve[3] = float(self.data.config.getValue('Optical Calibration Settings', 'calX3'))
+            self.xCurve[4] = float(self.data.config.getValue('Optical Calibration Settings', 'calX4'))
+            self.xCurve[5] = float(self.data.config.getValue('Optical Calibration Settings', 'calX5'))
+            self.yCurve[0] = float(self.data.config.getValue('Optical Calibration Settings', 'calY0'))
+            self.yCurve[1] = float(self.data.config.getValue('Optical Calibration Settings', 'calY1'))
+            self.yCurve[2] = float(self.data.config.getValue('Optical Calibration Settings', 'calY2'))
+            self.yCurve[3] = float(self.data.config.getValue('Optical Calibration Settings', 'calY3'))
+            self.yCurve[4] = float(self.data.config.getValue('Optical Calibration Settings', 'calY4'))
+            self.yCurve[5] = float(self.data.config.getValue('Optical Calibration Settings', 'calY5'))
+            print("reloaded calibration data")
+            return self.calErrorsX, self.calErrorsY, self.xCurve, self.yCurve
+        except Exception as e:
+            print(e)
+            return None, None, None, None
+
+
+    def clearCalibration(self):
+        try:
+            self.calErrorsX = np.zeros(self.matrixSize)
+            self.calErrorsY = np.zeros(self.matrixSize)
+            self.xCurve = np.zeros(shape=(6))  # coefficients for quadratic curve
+            self.yCurve = np.zeros(shape=(6))  # coefficients for quadratic curve
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
 
     def stopCut(self):
         self.data.quick_queue.put("!")
@@ -135,6 +176,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                 self.HomingPosX * 3.0, self.HomingPosY * 3.0, _posX, _posY
             )
         )
+        self.on_AutoHome()
+        '''
         self.data.units = "INCHES"
         self.data.gcode_queue.put("G20 ")
         self.data.gcode_queue.put("G90  ")
@@ -143,6 +186,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.data.measureRequest = self.on_CenterOnSquare
         # request a measurement
         self.data.gcode_queue.put("B10 L")
+        '''
 
     def processImage(self, findCenter=False):
 
@@ -297,67 +341,70 @@ class OpticalCalibration(MakesmithInitFuncs):
             return False
 
     def on_AutoHome(self, measureMode=False):
-
-        minX = self.tlX
-        maxX = self.brX
-        minY = self.tlY
-        maxY = self.brY
-        if measureMode == True:
-            print("Measure Only")
-            self.inMeasureOnlyMode = True
-        if self.inAutoMode == False:
-            self.HomingX = 0.0
-            self.HomingY = 0.0
-            self.HomingPosX = minX
-            self.HomingPosY = minY
-            self.HomingScanDirection = 1
-            self.inAutoMode = True
-            self.HomeIn()
-        else:
-            # note, the self.HomingX and self.HomingY are not reinitialzed here
-            # The rationale is that the offset for the previous registration point is
-            # probably a good starting point for this registration point..
-            if self.autoScanDirection == 0:  # horizontal
-                print("Horizontal Scan")
-                if self.inMeasureOnlyMode:
-                    self.HomingX = 0.0
-                    self.HomingY = 0.0
-                self.HomingPosX += self.HomingScanDirection
-                if (self.HomingPosX == maxX + 1) or (self.HomingPosX == minX - 1):
-                    if self.HomingPosX == maxX + 1:
-                        self.HomingPosX = maxX
+        try:
+            minX = self.tlX
+            maxX = self.brX
+            minY = self.tlY
+            maxY = self.brY
+            if measureMode == True:
+                print("Measure Only")
+                self.inMeasureOnlyMode = True
+            if self.inAutoMode == False:
+                self.HomingX = 0.0
+                self.HomingY = 0.0
+                self.HomingPosX = minX
+                self.HomingPosY = minY
+                self.HomingScanDirection = 1
+                self.inAutoMode = True
+                self.HomeIn()
+            else:
+                # note, the self.HomingX and self.HomingY are not reinitialzed here
+                # The rationale is that the offset for the previous registration point is
+                # probably a good starting point for this registration point..
+                if self.autoScanDirection == 0:  # horizontal
+                    if self.inMeasureOnlyMode:
+                        self.HomingX = 0.0
+                        self.HomingY = 0.0
+                    self.HomingPosX += self.HomingScanDirection
+                    if (self.HomingPosX == maxX + 1) or (self.HomingPosX == minX - 1):
+                        if self.HomingPosX == maxX + 1:
+                            self.HomingPosX = maxX
+                        else:
+                            self.HomingPosX = minX
+                        self.HomingScanDirection *= -1
+                        self.HomingPosY -= 1
+                    if self.HomingPosY >= maxY:
+                        self.HomingY -= 7.0  # drop down 7 mm for next square's guess (only)
+                        self.HomeIn()
                     else:
-                        self.HomingPosX = minX
-                    self.HomingScanDirection *= -1
-                    self.HomingPosY -= 1
-                if self.HomingPosY > maxY - 1:
-                    self.HomingY -= 7.0  # drop down 7 mm for next square's guess (only)
-                    self.HomeIn()
-                else:
-                    self.inAutoMode = False
-                    print("Calibration Completed")
-                    # self.printCalibrationErrorValue()
-            else:  # vertical
-                print("Vertical Scan")
-                if self.inMeasureOnlyMode:
-                    self.HomingX = 0.0
-                    self.HomingY = 0.0
-                self.HomingPosY -= self.HomingScanDirection
-                if (self.HomingPosY == maxY - 1) or (self.HomingPosY == minY + 1):
-                    if self.HomingPosY == minY + 1:
-                        self.HomingPosY = minY
+                        self.inAutoMode = False
+                        print("Releasing Camera")
+                        self.camera.release()
+                        print("Calibration Completed")
+                        # self.printCalibrationErrorValue()
+                else:  # vertical
+                    print("Vertical Scan")
+                    if self.inMeasureOnlyMode:
+                        self.HomingX = 0.0
+                        self.HomingY = 0.0
+                    self.HomingPosY -= self.HomingScanDirection
+                    if (self.HomingPosY == maxY - 1) or (self.HomingPosY == minY + 1):
+                        if self.HomingPosY == minY + 1:
+                            self.HomingPosY = minY
+                        else:
+                            self.HomingPosY = maxY
+                        self.HomingScanDirection *= -1
+                        self.HomingPosX += 1
+                    if self.HomingPosX <= maxX:
+                        self.HomingY -= 7.0  # drop down 7 mm for next square's guess (only)
+                        self.HomeIn()
                     else:
-                        self.HomingPosY = maxY
-                    self.HomingScanDirection *= -1
-                    self.HomingPosX += 1
-                if self.HomingPosX != maxX + 1:
-                    self.HomingY -= 7.0  # drop down 7 mm for next square's guess (only)
-                    self.HomeIn()
-                else:
-                    self.inAutoMode = False
-                    print("Releasing Camera")
-                    self.camera.release()
-                    print("Calibration Completed")
+                        self.inAutoMode = False
+                        print("Releasing Camera")
+                        self.camera.release()
+                        print("Calibration Completed")
+        except Exception as e:
+            print(e)
 
     def on_Calibrate(self, args):
         print("Initializing")
@@ -402,4 +449,103 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.opticalCalibrationTestImage = stringData
             self.data.opticalCalibrationTestImageUpdated = True
             return True
+
+    def on_SaveCSV(self):
+        outFile = open("calibrationValues.csv","w")
+        line = ""
+        for y in range(7, -8, -1):
+            line = ""
+            for x in range(-15, 16, +1):
+                line += "{:.2f},".format(self.calErrorsX[x+15][7-y])
+            line +="\n"
+            outFile.write(line)
+        outFile.write("\n")
+        for y in range(7, -8, -1):
+            line = ""
+            for x in range(-15, 16, +1):
+                line += "{:.2f},".format(self.calErrorsY[x+15][7-y])
+            line +="\n"
+            outFile.write(line)
+        outFile.close()
+
+
+    def saveAndSend(self):
+        try:
+            _str = ""
+            _strcomma = ""
+            for z in range(2):
+                for y in range(15):
+                    for x in range(31):
+                        if ((x == 30) and (y == 14) and (z == 1)):
+                            _strcomma = ""
+                        else:
+                            _strcomma = ","
+                        if (z == 0):
+                            _str += str(int(self.calErrorsX[x][y] * 1000)) + _strcomma
+                        else:
+                            _str += str(int(self.calErrorsY[x][y] * 1000)) + _strcomma
+            # print _str
+
+            self.data.config.setValue('Optical Calibration Settings', 'calX0', str(self.xCurve[0]))
+            self.data.config.setValue('Optical Calibration Settings', 'calX1', str(self.xCurve[1]))
+            self.data.config.setValue('Optical Calibration Settings', 'calX2', str(self.xCurve[2]))
+            self.data.config.setValue('Optical Calibration Settings', 'calX3', str(self.xCurve[3]))
+            self.data.config.setValue('Optical Calibration Settings', 'calX4', str(self.xCurve[4]))
+            self.data.config.setValue('Optical Calibration Settings', 'calX5', str(self.xCurve[5]))
+            self.data.config.setValue('Optical Calibration Settings', 'calY0', str(self.yCurve[0]))
+            self.data.config.setValue('Optical Calibration Settings', 'calY1', str(self.yCurve[1]))
+            self.data.config.setValue('Optical Calibration Settings', 'calY2', str(self.yCurve[2]))
+            self.data.config.setValue('Optical Calibration Settings', 'calY3', str(self.yCurve[3]))
+            self.data.config.setValue('Optical Calibration Settings', 'calY4', str(self.yCurve[4]))
+            self.data.config.setValue('Optical Calibration Settings', 'calY5', str(self.yCurve[5]))
+
+            self.data.config.setValue('Optical Calibration Settings', 'xyErrorArray', _str)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def surfaceFit(self):
+        # set data into proper format
+        try:
+            dataX = np.zeros(((15 * 31), 3))
+            dataY = np.zeros(((15 * 31), 3))
+            for y in range(7, -8, -1):
+                for x in range(-15, 16, +1):
+                    dataX[(7 - y) * 31 + (x + 15)][0] = float(x * 3.0 * 25.4)
+                    dataY[(7 - y) * 31 + (x + 15)][0] = float(x * 3.0 * 25.4)
+                    dataX[(7 - y) * 31 + (x + 15)][1] = float(y * 3.0 * 25.4)
+                    dataY[(7 - y) * 31 + (x + 15)][1] = float(y * 3.0 * 25.4)
+                    dataX[(7 - y) * 31 + (x + 15)][2] = self.calErrorsX[x + 15][7 - y]
+                    dataY[(7 - y) * 31 + (x + 15)][2] = self.calErrorsY[x + 15][7 - y]
+            # surface fit X Errors
+            xA = np.c_[np.ones(dataX.shape[0]), dataX[:, :2], np.prod(dataX[:, :2], axis=1), dataX[:, :2] ** 2]
+            self.xCurve, _, _, _ = np.linalg.lstsq(xA, dataX[:, 2], rcond=None)
+            xB = dataX[:, 2]
+            xSStot = ((xB - xB.mean()) ** 2).sum()
+            xSSres = ((xB - np.dot(xA, self.xCurve)) ** 2).sum()
+            if (xSStot != 0):
+                xR2 = 1.0 - xSSres / xSStot
+            else:
+                xR2 = 0.0
+            # surface fit Y Errors
+
+            yA = np.c_[np.ones(dataY.shape[0]), dataY[:, :2], np.prod(dataY[:, :2], axis=1), dataY[:, :2] ** 2]
+            self.yCurve, _, _, _ = np.linalg.lstsq(yA, dataY[:, 2], rcond=None)
+            yB = dataY[:, 2]
+            ySStot = ((yB - yB.mean()) ** 2).sum()
+            ySSres = ((yB - np.dot(yA, self.yCurve)) ** 2).sum()
+            if (ySStot != 0):
+                yR2 = 1.0 - ySSres / ySStot
+            else:
+                yR2 = 0.0
+
+            print(self.xCurve)
+            print(xR2)
+            print(self.yCurve)
+            print(yR2)
+            return self.xCurve.tolist(), self.yCurve.tolist()
+        except Exception as e:
+            print(e)
+            return None, None
 

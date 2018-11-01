@@ -131,6 +131,34 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "testOpticalCalibration":
             if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with test image.")
+        elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
+            if not self.data.opticalCalibration.saveAndSend():
+                self.data.ui_queue.put("Message: Error with saving and sending calibration matrix.")
+        elif msg["data"]["command"] == "reloadCalibration":
+            errorX, errorY, curveX, curveY = self.data.opticalCalibration.reloadCalibration()
+            if errorX is None or errorY is None or curveX is None or curveY is None:
+                self.data.ui_queue.put("Message: Error with (re)loading calibration.")
+            else:
+                data = {"errorX": errorX, "errorY": errorY}
+                self.data.ui_queue.put(
+                    "Action: updateOpticalCalibrationError:_" + json.dumps(data)
+                )
+                #data = {"curveX": curveX, "curveY": curveY}
+                #self.data.ui_queue.put(
+                #    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
+                #)
+        elif msg["data"]["command"] == "clearCalibration":
+            if not self.data.opticalCalibration.clearCalibration():
+                self.data.ui_queue.put("Message: Error with clearing calibration.")
+        elif msg["data"]["command"] == "curveFitOpticalCalibration":
+            curveX, curveY = self.data.opticalCalibration.surfaceFit()
+            if curveX is None or curveY is None:
+                self.data.ui_queue.put("Message: Error with curve fitting calibration data.")
+            else:
+                data = {"curveX":curveX, "curveY":curveY}
+                self.data.ui_queue.put(
+                    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
+                )
         elif msg["data"]["command"] == "adjustCenter":
             if not self.adjustCenter(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with adjusting center.")
@@ -696,3 +724,20 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             print(e)
             return False
+
+    def processSettingRequest(self, section, setting):
+        try:
+            if setting == "homePosition":
+                homeX = self.data.config.getValue("Advanced Settings", "homeX")
+                homeY = self.data.config.getValue("Advanced Settings", "homeY")
+                position = {"xval": homeX, "yval": homeY}
+                self.data.ui_queue.put(
+                    "Action: homePositionMessage:_" + json.dumps(position)
+                )  # the "_" facilitates the parse
+                return None, None
+            else:
+                retval = self.data.config.getValue(section, setting)
+                return setting, retval
+        except Exception as e:
+            pass
+        return None, None

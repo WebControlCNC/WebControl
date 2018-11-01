@@ -273,7 +273,7 @@ def command(msg):
 @socketio.on("settingRequest", namespace="/MaslowCNC")
 def settingRequest(msg):
     # didn't move to actions.. this request is just to send it computed values.. keeping it here makes it faster than putting it through the UIProcessor
-    setting, value = app.webPageProcessor.processSettingRequest(msg["data"])
+    setting, value = app.data.actions.processSettingRequest(msg["data"]["section"],msg["data"]["setting"])
     if setting is not None:
         socketio.emit(
             "requestedSetting",

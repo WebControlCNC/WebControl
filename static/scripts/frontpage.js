@@ -86,9 +86,9 @@ function unitSwitch(){
 }
 
 $(document).ready(function(){
-    settingRequest("units");
-    settingRequest("distToMove");
-    settingRequest("homePosition");
+    settingRequest("Computed Settings","units");
+    settingRequest("Computed Settings","distToMove");
+    settingRequest("Computed Settings","homePosition");
     checkForGCodeUpdate();
 });
 

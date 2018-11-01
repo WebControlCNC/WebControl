@@ -185,6 +185,67 @@
       </div>
     </div>
   </div>
+  <div class="card" id="curveFitAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseCurveFit" aria-expanded="false" aria-controls="collapseCurveFit">
+      <h4 class="card-title" id="curveFitHeader">
+        Curve Fitting...
+      </h4>
+    </button>
+    <div id="collapseCurveFit" class="collapse" aria-labelledby="curveFitHeader" data-parent="#curveFitAccordion">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="action('curveFitOpticalCalibration');">Curve Fit Data</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <H4>X-Curve</H4>
+            <div id="xCurvePlot" style="width:100%; height:400px;"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <H4>Y-Curve</H4>
+            <div id="yCurvePlot" style="width:100%; height:400px;"></div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();" disabled>Save</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="calibrationMatrixAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationMatrix" aria-expanded="false" aria-controls="collapseCalibrationMatrix"">
+      <h4 class="card-title" id="calibrationMatrixHeader">
+        Calibration Matrix...
+      </h4>
+    </button>
+    <div id="collapseCalibrationMatrix" class="collapse" aria-labelledby="calibrationMatrixHeader" data-parent="#calibrationMatrixAccordion">
+      <div class="card-body">
+        <button type="button" class="btn btn-lg btn-primary" onclick="redrawErrorCharts('all');" >Draw Charts</button>
+        <div class="row">
+          <div class="col">
+            <H4>X-Error</H4>
+            <div id="xErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <H4>Y-Error</H4>
+            <div id="yErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <H4>XY-Error</H4>
+            <div id="xyErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();" disabled>Save</button>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-body">
       <h4 class="card-title">Calibration</h4>
@@ -194,6 +255,14 @@
           </div>
           <div class="col">
               <button type="button" class="btn btn-lg btn-block btn-danger m-1" onclick="action('stopRun');">Stop</button>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('reloadCalibration');">(Re)Load Calibration</button>
+          </div>
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('clearCalibration');">Clear Calibration</button>
           </div>
       </div>
       <div class="row">
@@ -224,8 +293,12 @@
 
 {% block javascript %}
 <script src="{{ url_for('static',filename='scripts/opticalCalibration.js', version='10262018a') }}" crossorigin="anonymous"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
+var _xError = [];
+var _yError = [];
+var _xValues = [];
 function process(processName){
   var markerX = $("#markerX").val();
   var markerY = $("#markerY").val();
@@ -265,11 +338,106 @@ function process(processName){
 }
 
 function processCalibrationMessage(msg){
-    console.log(msg.msg);
+    //console.log(msg.msg);
+    //console.log(msg.data);
     if(msg.msg=="OpticalCalibrationImageUpdated")
-      $("#imageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>")
+      $("#imageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>");
     if(msg.msg=="OpticalCalibrationTestImageUpdated")
-      $("#testImageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>")
+      $("#testImageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>");
+    if(msg.msg=="updateOpticalCalibrationCurve"){
+      data = JSON.parse(msg.data);
+      console.log(data)
+      var x = data.curveX;
+      console.log(x);
+      var y = data.curveY;
+      xCurvePlot = document.getElementById('xCurvePlot');
+      yCurvePlot = document.getElementById('yCurvePlot');
+      var _x = [];
+      var _y = [];
+      for(var i = 0; i<15; i++){
+        _y[i]=[]
+        for(var j =0; j<31; j++){
+          var temp=calSurface(x, i, j);
+          _y[i][j]=temp
+          _x[j]=j
+        }
+        Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {margin: { t: 0 } } );
+      }
+
+      for(var i = 0; i<15; i++){
+        _y[i]=[]
+        for(var j =0; j<31; j++){
+          var temp=calSurface(y, i, j);
+          _y[i][j]=temp
+          _x[j]=j
+        }
+        Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {margin: { t: 0 } } );
+      }
+    }
+
+    if(msg.msg=="updateOpticalCalibrationError"){
+      console.log("here")
+      data = JSON.parse(msg.data);
+      var x = data.errorX;
+      var y = data.errorY;
+      xErrorPlot = document.getElementById('xErrorPlot');
+      yErrorPlot = document.getElementById('yErrorPlot');
+      for(var i = 0; i<15; i++){
+        _xError[i]=[];
+        _yError[i]=[];
+        for(var j =0; j<31; j++){
+          _xError[i][j]=x[j][i];
+          _yError[i][j]=y[j][i];
+          _xValues[j]=j;
+        }
+      }
+    }
+}
+
+function redrawErrorCharts(chart){
+    if ( (chart == "xError") || (chart=="all") ){
+      xErrorPlot = document.getElementById('xErrorPlot');
+      for(var i = 0; i<15; i++){
+        Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {margin: { t: 0 } } );
+      }
+    }
+    if ( (chart == "yError") || (chart=="all") ){
+      yErrorPlot = document.getElementById('yErrorPlot');
+      for(var i = 0; i<15; i++){
+        Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {margin: { t: 0 } } );
+      }
+    }
+    if ( (chart == "xyError") || (chart=="all") ){
+      xyErrorPlot = document.getElementById('xyErrorPlot');
+      x0 = []
+      y0 = []
+      for(var i=0; i<15; i++){
+         for(var j=0; j<31; j++){
+            x0[i*31+j]=3*j*25.4;
+            y0[i*31+j]=3*i*25.4;
+         }
+      }
+      x1 = []
+      y1 = []
+      Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {margin: { t: 0 } } );
+
+      for(var i=0; i<15; i++){
+         for(var j=0; j<31; j++){
+            x1[i*31+j]=3*j*25.4+_xError[i][j]
+            y1[i*31+j]=3*i*25.4+_yError[i][j]
+         }
+      }
+      Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {margin: { t: 0 } } );
+
+    }
+
+}
+
+function calSurface(x, i, j){
+   i = i*3*25.4
+   j = j*3*25.4
+   retVal = x[4]*i**2.0 + x[5]*j**2.0 + x[3]*i*j + x[1]*i + x[2]*j + x[0]
+   return retVal
 }
 
 $(document).ready(function () {
