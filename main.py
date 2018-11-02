@@ -61,9 +61,9 @@ app.uithread = None
 def index(template):
     current_app._get_current_object()
     if template == "mobile/":
-        return render_template("frontpage_mobile.html")
+        return render_template("frontpage_mobile.html", modalStyle="modal-lg")
     else:
-        return render_template("frontpage.html")
+        return render_template("frontpage.html", modalStyle="mw-100 w-75")
 
 
 @app.route("/maslowSettings", methods=["POST"])

@@ -1,127 +1,263 @@
 
 {% block content %}
 <div class="container-fluid">
-  <div class="card" id="configurationAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
-      <h4 class="card-title" id="configurationHeader">
-        Configuration...
-      </h4>
-    </button>
-    <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-parent="#configurationAccordion">
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label for="markerX">Horizontal Size of Marker</label>
-              <input class="form-control" name="markerX" id="markerX" value="{{markerX}}">
-              <small class="form-text text-muted">Enter value in inches only</small>
+  <div class="row">
+    {% if isMobile == true %}
+    <div class="col-12">
+      <div class="card" id="configurationAccordion">
+        <button class="btn text-left" data-toggle="collapse" data-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
+          <h4 class="card-title" id="configurationHeader">
+            Configuration...
+          </h4>
+        </button>
+        <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-parent="#configurationAccordion">
+          <div class="card-body">
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="markerX">Horizontal Size of Marker</label>
+                  <input class="form-control" name="markerX" id="markerX" value="{{markerX}}">
+                  <small class="form-text text-muted">Enter value in inches only</small>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="markerY">Vertical Size of Marker</label>
+                  <input class="form-control" name="markerY" id="markerY" value="{{markerY}}">
+                  <small class="form-text text-muted">Enter value in inches only</small>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label for="markerY">Vertical Size of Marker</label>
-              <input class="form-control" name="markerY" id="markerY" value="{{markerY}}">
-              <small class="form-text text-muted">Enter value in inches only</small>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="scaleX">Horizontal Scale Factor</label>
+                  <input class="form-control" name="scaleX" id="scaleX" value="{{scaleX}}">
+                  <small class="form-text text-muted">Enter something like 1.0028</small>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="scaleY">Vertical Scale Factor</label>
+                  <input class="form-control" name="scaleY" id="scaleY" value="{{scaleY}}">
+                  <small class="form-text text-muted">Enter something like 1.0028</small>
+                </div>
+              </div>
             </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="opticalCenterX">X Coordinate of Center</label>
+                  <input class="form-control" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
+                  <small class="form-text text-muted">Enter something like 300</small>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="opticalCenterY">Y Coordinate of Center</label>
+                  <input class="form-control" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
+                  <small class="form-text text-muted">Enter something like 200</small>
+                </div>
+             </div>
+            </div>
+            <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
           </div>
         </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label for="scaleX">Horizontal Scale Factor</label>
-              <input class="form-control" name="scaleX" id="scaleX" value="{{scaleX}}">
-              <small class="form-text text-muted">Enter something like 1.0028</small>
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label for="scaleY">Vertical Scale Factor</label>
-              <input class="form-control" name="scaleY" id="scaleY" value="{{scaleY}}">
-              <small class="form-text text-muted">Enter something like 1.0028</small>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label for="opticalCenterX">X Coordinate of Center</label>
-              <input class="form-control" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
-              <small class="form-text text-muted">Enter something like 300</small>
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label for="opticalCenterY">Y Coordinate of Center</label>
-              <input class="form-control" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
-              <small class="form-text text-muted">Enter something like 200</small>
-            </div>
-         </div>
-        </div>
-        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
       </div>
     </div>
-  </div>
-  <div class="card" id="calibrationExtentsAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationExtents" aria-expanded="false" aria-controls="collapseCalibrationExtents">
-      <h4 class="card-title" id="calibrationExtentsHeader">Calibration Extents...</h4>
-    </button>
-    <div id="collapseCalibrationExtents" class="collapse" aria-labelledby="calibrationExtentsHeader" data-parent="#calibrationExtentsAccordion">
-      <div class="card-body">
-        <h4 class="card-title">Calibration Extents</h4>
-        <select class="custom-select" name="calibrationExtents" id="calibrationExtents">
-          <option value="Top Left" {{'selected' if calibrationExtents=='Top Left' else ''}}>48 x 36 Top Left</option>
-          <option value="Bottom Left" {{'selected' if calibrationExtents=='Bottom Left' else '' }}>48 x 36 Bottom Left</option>
-          <option value="Top Right" {{'selected' if calibrationExtents=='Rop Right' else '' }}>48 x 36 Top Right</option>
-          <option value="Bottom Right" {{'selected' if calibrationExtents=='Bottom Right' else ''}}>48 x 36 Bottom Right</option>
-          <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Area</option>
-          <option value="Custom" {{'selected' if calibrationExtents=='Custom' else ''}}>Custom</option>
-        </select>
-        <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="tlX">X Coordinate of Top Left</label>
-            <input class="form-control" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
-            <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
-          </div>
-        </div>
-        <div class="col">
-          <div class="form-group">
-            <label for="tlY">Y Coordinate of Top Left</label>
-            <input class="form-control" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
-            <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
-          </div>
-        </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label for="brX">X Coordinate of Bottom Right</label>
-              <input class="form-control" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
-              <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
+    <div class="col-12">
+      <div class="card" id="calibrationExtentsAccordion">
+        <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationExtents" aria-expanded="false" aria-controls="collapseCalibrationExtents">
+          <h4 class="card-title" id="calibrationExtentsHeader">Calibration Extents...</h4>
+        </button>
+        <div id="collapseCalibrationExtents" class="collapse" aria-labelledby="calibrationExtentsHeader" data-parent="#calibrationExtentsAccordion">
+          <div class="card-body">
+            <h4 class="card-title">Calibration Extents</h4>
+            <select class="custom-select" name="calibrationExtents" id="calibrationExtents">
+              <option value="Top Left" {{'selected' if calibrationExtents=='Top Left' else ''}}>48 x 36 Top Left</option>
+              <option value="Bottom Left" {{'selected' if calibrationExtents=='Bottom Left' else '' }}>48 x 36 Bottom Left</option>
+              <option value="Top Right" {{'selected' if calibrationExtents=='Rop Right' else '' }}>48 x 36 Top Right</option>
+              <option value="Bottom Right" {{'selected' if calibrationExtents=='Bottom Right' else ''}}>48 x 36 Bottom Right</option>
+              <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Area</option>
+              <option value="Custom" {{'selected' if calibrationExtents=='Custom' else ''}}>Custom</option>
+            </select>
+            <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="tlX">X Coordinate of Top Left</label>
+                <input class="form-control" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
+                <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
+              </div>
             </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label for="brY">Y Coordinate of Bottom Right</label>
-              <input class="form-control" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
-              <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
+            <div class="col">
+              <div class="form-group">
+                <label for="tlY">Y Coordinate of Top Left</label>
+                <input class="form-control" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
+                <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
+              </div>
             </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="brX">X Coordinate of Bottom Right</label>
+                  <input class="form-control" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
+                  <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="brY">Y Coordinate of Bottom Right</label>
+                  <input class="form-control" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
+                  <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="autoScanDirection">Auto Scan Direction</label>
+                  <select class="custom-select" name="autoScanDirection" id="autoScanDirection">
+                    <option value=0 {{'selected' if autoScanDirection==0 else ''}}>Horizontally</option>
+                    <option value=1 {{'selected' if autoScanDirection==1 else ''}}>Vertically</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-6">
-            <div class="form-group">
-              <label for="autoScanDirection">Auto Scan Direction</label>
-              <select class="custom-select" name="autoScanDirection" id="autoScanDirection">
-                <option value=0 {{'selected' if autoScanDirection==0 else ''}}>Horizontally</option>
-                <option value=1 {{'selected' if autoScanDirection==1 else ''}}>Vertically</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
       </div>
     </div>
+    {% else %}
+    <div class="col-12">
+      <div class="card" id="configurationAccordion">
+        <button class="btn text-left" data-toggle="collapse" data-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
+          <h4 class="card-title" id="configurationHeader">
+            Configuration and Calibration Extents...
+          </h4>
+        </button>
+        <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-parent="#configurationAccordion">
+          <div class="row">
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                <div class="card-title"><h3>Configuration</h3></div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="markerX">Horizontal Size of Marker</label>
+                      <input class="form-control" name="markerX" id="markerX" value="{{markerX}}">
+                      <small class="form-text text-muted">Enter value in inches only</small>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="markerY">Vertical Size of Marker</label>
+                      <input class="form-control" name="markerY" id="markerY" value="{{markerY}}">
+                      <small class="form-text text-muted">Enter value in inches only</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="scaleX">Horizontal Scale Factor</label>
+                      <input class="form-control" name="scaleX" id="scaleX" value="{{scaleX}}">
+                      <small class="form-text text-muted">Enter something like 1.0028</small>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="scaleY">Vertical Scale Factor</label>
+                      <input class="form-control" name="scaleY" id="scaleY" value="{{scaleY}}">
+                      <small class="form-text text-muted">Enter something like 1.0028</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="opticalCenterX">X Coordinate of Center</label>
+                      <input class="form-control" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
+                      <small class="form-text text-muted">Enter something like 300</small>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="opticalCenterY">Y Coordinate of Center</label>
+                      <input class="form-control" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
+                      <small class="form-text text-muted">Enter something like 200</small>
+                    </div>
+                 </div>
+                </div>
+              </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Calibration Extents</h4>
+                  <select class="custom-select" name="calibrationExtents" id="calibrationExtents">
+                    <option value="Top Left" {{'selected' if calibrationExtents=='Top Left' else ''}}>48 x 36 Top Left</option>
+                    <option value="Bottom Left" {{'selected' if calibrationExtents=='Bottom Left' else '' }}>48 x 36 Bottom Left</option>
+                    <option value="Top Right" {{'selected' if calibrationExtents=='Rop Right' else '' }}>48 x 36 Top Right</option>
+                    <option value="Bottom Right" {{'selected' if calibrationExtents=='Bottom Right' else ''}}>48 x 36 Bottom Right</option>
+                    <option value="Full Area" {{'selected' if calibrationExtents=='Full Area' else ''}}>96 x 48 Full Area</option>
+                    <option value="Custom" {{'selected' if calibrationExtents=='Custom' else ''}}>Custom</option>
+                  </select>
+                  <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="tlX">X Coordinate of Top Left</label>
+                      <input class="form-control" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
+                      <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="tlY">Y Coordinate of Top Left</label>
+                      <input class="form-control" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
+                      <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="brX">X Coordinate of Bottom Right</label>
+                        <input class="form-control" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
+                        <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="brY">Y Coordinate of Bottom Right</label>
+                        <input class="form-control" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
+                        <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label for="autoScanDirection">Auto Scan Direction</label>
+                        <select class="custom-select" name="autoScanDirection" id="autoScanDirection">
+                          <option value=0 {{'selected' if autoScanDirection==0 else ''}}>Horizontally</option>
+                          <option value=1 {{'selected' if autoScanDirection==1 else ''}}>Vertically</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
   <div class="card" id="opticalRecognitionAccordion">
     <button class="btn text-left" data-toggle="collapse" data-target="#collapseOpticalRecognition" aria-expanded="false" aria-controls="collapseOpticalRecognition">
@@ -132,52 +268,62 @@
     <div id="collapseOpticalRecognition" class="collapse" aria-labelledby="opticalRecognitionHeader" data-parent="#opticalRecognitionAccordion">
       <div class="card-body">
         <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label for="cannyLowValue">Canny Low Value</label>
-              <input class="form-control" name="cannyLowValue" id="cannyLowValue" value="{{cannyLowValue}}">
-              <small class="form-text text-muted">0-255</small>
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label for="cannyHighValue">Canny High Value</label>
-              <input class="form-control" name="cannyHighValue" id="cannyHighValue" value="{{cannyHighValue}}">
-              <small class="form-text text-muted">0-255</small>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <select class="custom-select" name="gaussianBlurValue" id="gaussianBlurValue">
-              <option value=1 {{'selected' if gaussianBlurValue==1 else ''}}>1 x 1</option>
-              <option value=3 {{'selected' if gaussianBlurValue==3 else ''}}>3 x 3</option>
-              <option value=5 {{'selected' if gaussianBlurValue==5 else '' }}>5 x 5</option>
-              <option value=7 {{'selected' if gaussianBlurValue==7 else '' }}>7 x 7</option>
-              <option value=9 {{'selected' if gaussianBlurValue==9 else ''}}>9 x 9</option>
-              <option value=11 {{'selected' if gaussianBlurValue==11 else ''}}>11 x 11</option>
-            </select>
-          </div>
-          <div class="col-6">
-            <div class="row">
-              <div class="col-6">
-                <button type="button" class="btn btn-lg btn-block btn-secondary mb-1" onclick="action('adjustCenter', 5);">Center Up</button>
+          <div class={{"col-12" if isMobile==true else "col-6"}}>
+            <div class="card">
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label for="cannyLowValue">Canny Low Value</label>
+                    <input class="form-control" name="cannyLowValue" id="cannyLowValue" value="{{cannyLowValue}}">
+                    <small class="form-text text-muted">0-255</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label for="cannyHighValue">Canny High Value</label>
+                    <input class="form-control" name="cannyHighValue" id="cannyHighValue" value="{{cannyHighValue}}">
+                    <small class="form-text text-muted">0-255</small>
+                  </div>
+                </div>
               </div>
-              <div class="col-6">
-                <button type="button" class="btn btn-lg btn-block btn-secondary mb-1" onclick="action('adjustCenter', -5);">Center Down</button>
+              <div class="row">
+                <div class="col-6">
+                  <label for="gaussianBlurValue">Gaussian Value</label>
+                  <select class="custom-select" name="gaussianBlurValue" id="gaussianBlurValue">
+                    <option value=1 {{'selected' if gaussianBlurValue==1 else ''}}>1 x 1</option>
+                    <option value=3 {{'selected' if gaussianBlurValue==3 else ''}}>3 x 3</option>
+                    <option value=5 {{'selected' if gaussianBlurValue==5 else '' }}>5 x 5</option>
+                    <option value=7 {{'selected' if gaussianBlurValue==7 else '' }}>7 x 7</option>
+                    <option value=9 {{'selected' if gaussianBlurValue==9 else ''}}>9 x 9</option>
+                    <option value=11 {{'selected' if gaussianBlurValue==11 else ''}}>11 x 11</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label >Adjust Height</label>
+                  <div class="row">
+                    <div class="col-6">
+                      <button type="button" class="btn btn-lg btn-block btn-secondary mb-1" onclick="action('adjustCenter', 5);"><i data-feather="arrow-up"></i></button>
+                    </div>
+                    <div class="col-6">
+                      <button type="button" class="btn btn-lg btn-block btn-secondary mb-1" onclick="action('adjustCenter', -5);"><i data-feather="arrow-down"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                    <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="process('testImage');">Test</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="process('testImage');">Test</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <div class="row">
-               <div id="testImageDiv"></div>
+          <div class={{"col-12" if isMobile==true else "col-6"}}>
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div id="testImageDiv"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -186,66 +332,59 @@
     </div>
   </div>
   <div class="card" id="curveFitAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseCurveFit" aria-expanded="false" aria-controls="collapseCurveFit">
-      <h4 class="card-title" id="curveFitHeader">
-        Curve Fitting...
-      </h4>
-    </button>
-    <div id="collapseCurveFit" class="collapse" aria-labelledby="curveFitHeader" data-parent="#curveFitAccordion">
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="action('curveFitOpticalCalibration');">Curve Fit Data</button>
+      <button class="btn text-left" data-toggle="collapse" data-target="#collapseCurveFit" aria-expanded="false" aria-controls="collapseCurveFit">
+        <h4 class="card-title" id="curveFitHeader">
+          Curve Fitting...
+        </h4>
+      </button>
+      <div id="collapseCurveFit" class="collapse" aria-labelledby="curveFitHeader" data-parent="#curveFitAccordion">
+          <div class="card-body">
+            <button id="curveFitButton" type="button" class="btn btn-lg btn-secondary mt-1" onclick="action('curveFitOpticalCalibration');">Do Curve Fit</button>
+            <button id="curveChartButton" type="button" class="btn btn-lg btn-primary mt-1" onclick="redrawCurveCharts('all');">Draw Charts</button>
+            <div class="row">
+              {% if isMobile==false %}
+                <div class="col">
+                  <div id="xCurvePlot" style="width:100%; height:400px;"></div>
+                </div>
+                <div class="col">
+                  <div id="yCurvePlot" style="width:100%; height:400px;"></div>
+                </div>
+              {% else %}
+                  <div id="xCurvePlot" style="width:100%; height:400px;"></div>
+                  <div id="yCurvePlot" style="width:100%; height:400px;"></div>
+              {% endif %}
+            </div>
+            <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();" disabled>Save</button>
           </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <H4>X-Curve</H4>
-            <div id="xCurvePlot" style="width:100%; height:400px;"></div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <H4>Y-Curve</H4>
-            <div id="yCurvePlot" style="width:100%; height:400px;"></div>
-          </div>
-        </div>
-        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();" disabled>Save</button>
       </div>
-    </div>
   </div>
   <div class="card" id="calibrationMatrixAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationMatrix" aria-expanded="false" aria-controls="collapseCalibrationMatrix"">
-      <h4 class="card-title" id="calibrationMatrixHeader">
-        Calibration Matrix...
-      </h4>
-    </button>
-    <div id="collapseCalibrationMatrix" class="collapse" aria-labelledby="calibrationMatrixHeader" data-parent="#calibrationMatrixAccordion">
-      <div class="card-body">
-        <button type="button" class="btn btn-lg btn-primary" onclick="redrawErrorCharts('all');" >Draw Charts</button>
-        <div class="row">
-          <div class="col">
-            <H4>X-Error</H4>
-            <div id="xErrorPlot" style="width:100%; height:400px;"></div>
+        <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationMatrix" aria-expanded="false" aria-controls="collapseCalibrationMatrix"">
+          <h4 class="card-title" id="calibrationMatrixHeader">
+            Calibration Matrix...
+          </h4>
+        </button>
+        <div id="collapseCalibrationMatrix" class="collapse" aria-labelledby="calibrationMatrixHeader" data-parent="#calibrationMatrixAccordion">
+          <div class="card-body">
+            <button id="errorChartButton" type="button" class="btn btn-lg btn-primary" onclick="redrawErrorCharts('all');" >Draw Charts</button>
+            <div class="row">
+              {% if isMobile==false %}
+                <div class="col">
+                  <div id="xErrorPlot" style="width:100%; height:400px;"></div>
+                </div>
+                <div class="col">
+                  <div id="yErrorPlot" style="width:100%; height:400px;"></div>
+                </div>
+              {% else %}
+                  <div id="xErrorPlot" style="width:100%; height:400px;"></div>
+                  <div id="yErrorPlot" style="width:100%; height:400px;"></div>
+              {% endif %}
+              <div id="xyErrorPlot" style="width:100%; height:400px;"></div>
+            </div>
+            <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();" disabled>Save</button>
           </div>
         </div>
-        <div class="row">
-          <div class="col">
-            <H4>Y-Error</H4>
-            <div id="yErrorPlot" style="width:100%; height:400px;"></div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <H4>XY-Error</H4>
-            <div id="xyErrorPlot" style="width:100%; height:400px;"></div>
-          </div>
-        </div>
-
-        <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();" disabled>Save</button>
       </div>
-    </div>
-  </div>
   <div class="card">
     <div class="card-body">
       <h4 class="card-title">Calibration</h4>
@@ -275,30 +414,44 @@
       </div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-body">
-      <h4 class="card-title">Active Image</h4>
-      <div id="imageDiv"></div>
+  <div class="row">
+    <div class={{"col-12" if isMobile==true else "col-6"}}>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Active Image</h4>
+          <div id="imageDiv"></div>
+        </div>
+      </div>
+    </div>
+    <div class={{"col-12" if isMobile==true else "col-6"}}>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Sled Position</h4>
+          <div id="workareaOptical" style="height:400px"></div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-body">
-      <h4 class="card-title">Sled Position</h4>
-      <div id="workareaOptical" style="height:400px">
-    </div>
-  </div>  
-
 </div>
+
 {% endblock %}
 
 {% block javascript %}
 <script src="{{ url_for('static',filename='scripts/opticalCalibration.js', version='10262018a') }}" crossorigin="anonymous"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
+<script> feather.replace() </script>
 <script>
 var _xError = [];
 var _yError = [];
 var _xValues = [];
+var xCurve = [];
+var yCurve = [];
+
+
+settingRequest('Optical Calibration Settings','calibrationCurve');
+settingRequest('Optical Calibration Settings','calibrationError');
+
+
 function process(processName){
   var markerX = $("#markerX").val();
   var markerY = $("#markerY").val();
@@ -337,46 +490,20 @@ function process(processName){
     action('optical_Calibrate',parameters);
 }
 
+
 function processCalibrationMessage(msg){
-    //console.log(msg.msg);
-    //console.log(msg.data);
     if(msg.msg=="OpticalCalibrationImageUpdated")
-      $("#imageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>");
+      $("#imageDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
     if(msg.msg=="OpticalCalibrationTestImageUpdated")
-      $("#testImageDiv").html("<img src='data:image/png;base64,"+msg.data+"'></html>");
+      $("#testImageDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
     if(msg.msg=="updateOpticalCalibrationCurve"){
       data = JSON.parse(msg.data);
-      console.log(data)
-      var x = data.curveX;
-      console.log(x);
-      var y = data.curveY;
-      xCurvePlot = document.getElementById('xCurvePlot');
-      yCurvePlot = document.getElementById('yCurvePlot');
-      var _x = [];
-      var _y = [];
-      for(var i = 0; i<15; i++){
-        _y[i]=[]
-        for(var j =0; j<31; j++){
-          var temp=calSurface(x, i, j);
-          _y[i][j]=temp
-          _x[j]=j
-        }
-        Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {margin: { t: 0 } } );
-      }
-
-      for(var i = 0; i<15; i++){
-        _y[i]=[]
-        for(var j =0; j<31; j++){
-          var temp=calSurface(y, i, j);
-          _y[i][j]=temp
-          _x[j]=j
-        }
-        Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {margin: { t: 0 } } );
-      }
+      xCurve = data.curveX;
+      yCurve = data.curveY;
+      $('#curveChartButton').removeClass('btn-secondary').addClass('btn-primary');
+      $('#curveFitButton').removeClass('btn-primary').addClass('btn-secondary');
     }
-
     if(msg.msg=="updateOpticalCalibrationError"){
-      console.log("here")
       data = JSON.parse(msg.data);
       var x = data.errorX;
       var y = data.errorY;
@@ -391,24 +518,87 @@ function processCalibrationMessage(msg){
           _xValues[j]=j;
         }
       }
+      $('#errorChartButton').removeClass('btn-secondary').addClass('btn-primary');
+      $('#curveFitButton').removeClass('btn-secondary').addClass('btn-primary');
     }
 }
+
+function redrawCurveCharts(chart){
+      xCurvePlot = document.getElementById('xCurvePlot');
+      yCurvePlot = document.getElementById('yCurvePlot');
+      if ($("#xCurvePlot").html()!="")
+          while (xCurvePlot.data.length>0)
+              Plotly.deleteTraces(xCurvePlot, [0]);
+      if ($("#yCurvePlot").html()!="")
+          while (yCurvePlot.data.length>0)
+              Plotly.deleteTraces(yCurvePlot, [0]);
+      var _x = [];
+      var _y = [];
+      console.log(xCurve)
+      for(var i = 0; i<15; i++){
+        _y[i]=[]
+        for(var j =0; j<31; j++){
+          var temp=calSurface(xCurve, i, j);
+          _y[i][j]=temp
+          _x[j]=j
+        }
+        {% if isMobile == true %}
+          Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+        {% else %}
+          Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve" } );
+        {% endif %}
+      }
+
+      for(var i = 0; i<15; i++){
+        _y[i]=[]
+        for(var j =0; j<31; j++){
+          var temp=calSurface(yCurve, i, j);
+          _y[i][j]=temp
+          _x[j]=j
+        }
+        {% if isMobile == true %}
+          Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+        {% else %}
+          Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve" } );
+        {% endif %}
+      }
+
+      $('#curveChartButton').removeClass('btn-primary').addClass('btn-secondary');
+}
+
 
 function redrawErrorCharts(chart){
     if ( (chart == "xError") || (chart=="all") ){
       xErrorPlot = document.getElementById('xErrorPlot');
+      if ($("#xErrorPlot").html()!="")
+         while (xErrorPlot.data.length>0)
+              Plotly.deleteTraces(xErrorPlot, [0]);
       for(var i = 0; i<15; i++){
-        Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {margin: { t: 0 } } );
+        {% if isMobile == true %}
+          Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+        {% else %}
+          Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error" } );
+        {% endif %}
       }
     }
     if ( (chart == "yError") || (chart=="all") ){
       yErrorPlot = document.getElementById('yErrorPlot');
+      if ($("#yErrorPlot").html()!="")
+          while (yErrorPlot.data.length>0)
+              Plotly.deleteTraces(yErrorPlot, [0]);
       for(var i = 0; i<15; i++){
-        Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {margin: { t: 0 } } );
+        {% if isMobile == true %}
+          Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+        {% else %}
+          Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error" } );
+        {% endif %}
       }
     }
     if ( (chart == "xyError") || (chart=="all") ){
       xyErrorPlot = document.getElementById('xyErrorPlot');
+      if ($("#xyErrorPlot").html()!="")
+          while (xyErrorPlot.data.length>0)
+              Plotly.deleteTraces(xyErrorPlot, [0]);
       x0 = []
       y0 = []
       for(var i=0; i<15; i++){
@@ -419,7 +609,12 @@ function redrawErrorCharts(chart){
       }
       x1 = []
       y1 = []
-      Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {margin: { t: 0 } } );
+      //Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error" } );
+      {% if isMobile == true %}
+        Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+      {% else %}
+        Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error"} );
+      {% endif %}
 
       for(var i=0; i<15; i++){
          for(var j=0; j<31; j++){
@@ -427,10 +622,14 @@ function redrawErrorCharts(chart){
             y1[i*31+j]=3*i*25.4+_yError[i][j]
          }
       }
-      Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {margin: { t: 0 } } );
-
+      //Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}] );
+      {% if isMobile == true %}
+        Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {title: "XY-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+      {% else %}
+        Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {title: "XY-Error"} );
+      {% endif %}
     }
-
+    $('#errorChartButton').removeClass('btn-primary').addClass('btn-secondary');
 }
 
 function calSurface(x, i, j){

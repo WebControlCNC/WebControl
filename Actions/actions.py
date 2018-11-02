@@ -735,6 +735,40 @@ class Actions(MakesmithInitFuncs):
                     "Action: homePositionMessage:_" + json.dumps(position)
                 )  # the "_" facilitates the parse
                 return None, None
+            elif setting == "calibrationCurve":
+                try:
+                    xCurve = [0,0,0,0,0,0]
+                    yCurve = [0,0,0,0,0,0]
+                    xCurve[0] = float(self.data.config.getValue('Optical Calibration Settings', 'calX0'))
+                    xCurve[1] = float(self.data.config.getValue('Optical Calibration Settings', 'calX1'))
+                    xCurve[2] = float(self.data.config.getValue('Optical Calibration Settings', 'calX2'))
+                    xCurve[3] = float(self.data.config.getValue('Optical Calibration Settings', 'calX3'))
+                    xCurve[4] = float(self.data.config.getValue('Optical Calibration Settings', 'calX4'))
+                    xCurve[5] = float(self.data.config.getValue('Optical Calibration Settings', 'calX5'))
+                    yCurve[0] = float(self.data.config.getValue('Optical Calibration Settings', 'calY0'))
+                    yCurve[1] = float(self.data.config.getValue('Optical Calibration Settings', 'calY1'))
+                    yCurve[2] = float(self.data.config.getValue('Optical Calibration Settings', 'calY2'))
+                    yCurve[3] = float(self.data.config.getValue('Optical Calibration Settings', 'calY3'))
+                    yCurve[4] = float(self.data.config.getValue('Optical Calibration Settings', 'calY4'))
+                    yCurve[5] = float(self.data.config.getValue('Optical Calibration Settings', 'calY5'))
+                    data = {"curveX": xCurve, "curveY": yCurve}
+                    self.data.ui_queue.put(
+                        "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
+                    )
+                except Exception as e:
+                    print(e)
+            elif setting == "calibrationError":
+                try:
+                    print("setting request calibration error-1")
+                    xyErrorArray = self.data.config.getValue("Optical Calibration Settings","xyErrorArray")
+                    errorX, errorY = self.data.config.parseErrorArray(xyErrorArray, True)
+                    data = {"errorX": errorX, "errorY": errorY}
+                    print("setting request calibration error-2")
+                    self.data.ui_queue.put(
+                        "Action: updateOpticalCalibrationError:_" + json.dumps(data)
+                    )
+                except Exception as e:
+                    print(e)
             else:
                 retval = self.data.config.getValue(section, setting)
                 return setting, retval
