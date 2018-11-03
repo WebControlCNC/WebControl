@@ -488,7 +488,6 @@ class Actions(MakesmithInitFuncs):
 
     def moveZ(self, direction, distToMoveZ):
         try:
-            # distToMoveZ = float(msg['data']['distToMoveZ'])
             self.data.config.setValue("Computed Settings", "distToMoveZ", distToMoveZ)
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             if unitsZ == "MM":
@@ -529,6 +528,7 @@ class Actions(MakesmithInitFuncs):
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
                     scaleFactor = 25.4
                     self.data.tolerance = 0.5
+                    self.data.gcode_queue.put("G21 ")
                 self.data.gcodeShift = [
                   self.data.gcodeShift[0] * scaleFactor,
                   self.data.gcodeShift[1] * scaleFactor,
