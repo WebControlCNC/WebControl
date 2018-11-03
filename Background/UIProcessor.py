@@ -49,14 +49,24 @@ class UIProcessor:
                                 # todo:
                                 oo = 1
                                 # app.setErrorOnScreen(message)
-                        elif message[0:8] == "Message:":
-                            if message.find("adjust Z-Axis") != -1:
-                                print("found adjust Z-Axis in message")
+                        elif message[0:13] == "Maslow Paused":
+                                print("caught maslow paused")
                                 socketio.emit(
                                     "requestedSetting",
                                     {"setting": "pauseButtonSetting", "value": "Resume"},
                                     namespace="/MaslowCNC",
                                 )
+                        elif message[0:12] == "Tool Change:":
+                            print("found tool change in message")
+                            self.activateModal("Notification:", message[13:], "resume")
+                        elif message[0:8] == "Message:":
+                            if message.find("adjust Z-Axis") != -1:
+                                print("found adjust Z-Axis in message")
+                                #socketio.emit(
+                                #    "requestedSetting",
+                                #    {"setting": "pauseButtonSetting", "value": "Resume"},
+                                #    namespace="/MaslowCNC",
+                                #)
                             self.activateModal("Notification:", message[9:], "resume")
                         elif message[0:7] == "Action:":
                             if message.find("unitsUpdate") != -1:

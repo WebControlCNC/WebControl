@@ -53,6 +53,7 @@ function positionUpdate(x,y,z){
     _y = originY-y*scale
     _z = z*scale/2*360
   }
+  sled.front()
   sled.center(_x, _y)
 
 }

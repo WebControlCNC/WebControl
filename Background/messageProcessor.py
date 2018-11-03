@@ -37,7 +37,7 @@ class MessageProcessor(MakesmithInitFuncs):
                                 print("No function has requested a measurement")
                     elif message[0:13] == "Maslow Paused":
                         self.data.uploadFlag = 0
-                        print(message)
+                        self.data.ui_queue.put(message)
                     elif message[0:8] == "Message:":
                         if (
                             self.data.calibrationInProcess
