@@ -11,7 +11,7 @@
           <button id="unitsZ" type="button" class="btn  btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">{{unitsZ}}</button>
         </div>
         <div class="col-4 mb-1">
-          <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="moveZ('raise')">Raise</button>
+          <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('moveZ','raise',$('#distToMoveZ').val())">Raise</button>
         </div>
       </div>
       <div class="row">
@@ -22,7 +22,7 @@
           <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('defineZ0');">Define Zero</button>
         </div>
         <div class="col-4 mb-1">
-          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="moveZ('lower');">Lower</button>
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('moveZ','lower',$('#distToMoveZ').val())">Lower</button>
         </div>
       </div>
     </div>

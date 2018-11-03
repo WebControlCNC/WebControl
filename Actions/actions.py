@@ -19,7 +19,7 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "move":
             if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating move.")
-        elif msg["data"]["command"] == "move":
+        elif msg["data"]["command"] == "moveZ":
             if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating Z-Axis move.")
         elif msg["data"]["command"] == "reportSettings":
