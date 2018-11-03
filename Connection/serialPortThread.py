@@ -220,7 +220,7 @@ class SerialPortThread(MakesmithInitFuncs):
 
                         # Check for serial connection loss
                 # -------------------------------------------------------------------------------------
-                if time.time() - self.lastMessageTime > 2:
+                if time.time() - self.lastMessageTime > 5:
                     print("Connection Timed Out")
                     self.data.ui_queue.put("Connection Timed Out\n")
                     if self.data.uploadFlag:

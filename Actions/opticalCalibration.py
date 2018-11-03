@@ -13,6 +13,7 @@ import re
 import sys
 import math
 import base64
+import json
 
 
 class OpticalCalibration(MakesmithInitFuncs):
@@ -176,8 +177,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                 self.HomingPosX * 3.0, self.HomingPosY * 3.0, _posX, _posY
             )
         )
-        self.on_AutoHome()
-        '''
+        #self.on_AutoHome()
+        
         self.data.units = "INCHES"
         self.data.gcode_queue.put("G20 ")
         self.data.gcode_queue.put("G90  ")
@@ -186,7 +187,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.data.measureRequest = self.on_CenterOnSquare
         # request a measurement
         self.data.gcode_queue.put("B10 L")
-        '''
+        
 
     def processImage(self, findCenter=False):
 
@@ -264,8 +265,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                 (trbrX, trbrY) = self.midpoint(tr, br)
                 (tltrX, tltrY) = self.midpoint(tl, tr)
                 (blbrX, blbrY) = self.midpoint(bl, br)
-                xD = self.distance((tlblX, tlblY), (trbrX, trbrY)) / self.markerX
-                yD = self.distance((tltrX, tltrY), (blbrX, blbrY)) / self.markerY
+                xD = self.distance((tlblX, tlblY), (trbrX, trbrY)) / (self.markerX*25.4)
+                yD = self.distance((tltrX, tltrY), (blbrX, blbrY)) / (self.markerY*25.4)
                 if xD == 0:  # doing this to catch bad calibrations and stop crashing
                     xD = 1.0
                 if yD == 0:
@@ -303,13 +304,13 @@ class OpticalCalibration(MakesmithInitFuncs):
             avgDi, stdDi = self.removeOutliersAndAverage(diList)
             avgxB, stdxB = self.removeOutliersAndAverage(xBList)
             avgyB, stdyB = self.removeOutliersAndAverage(yBList)
-            return avgDx, avgDy, avgDi, orig
+            return avgDx, avgDy, avgDi, avgxB, avgyB, orig
         else:
-            return None, None, None, edged
+            return None, None, None, None, None, edged
 
     def on_CenterOnSquare(self, _dist, findCenter=False):
 
-        avgDx, avgDy, avgDi, image = self.processImage(findCenter)
+        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
 
         if avgDx is not None:
             imgencode = cv2.imencode(".png", image)[1]
@@ -330,6 +331,9 @@ class OpticalCalibration(MakesmithInitFuncs):
                 elif not findCenter:
                     self.calErrorsX[self.HomingPosX + 15][7 - self.HomingPosY] = xS
                     self.calErrorsY[self.HomingPosX + 15][7 - self.HomingPosY] = yS
+                else:
+                    self.opticalCenter = (avgxB, avgyB)
+                    print(str(avgxB)+", "+str(avgyB))
                 if self.inAutoMode:
                     self.on_AutoHome()
                 else:
@@ -380,7 +384,14 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.inAutoMode = False
                         print("Releasing Camera")
                         self.camera.release()
+                        self.camera=None
                         print("Calibration Completed")
+                        #send ui updated data
+                        data = {"errorX": self.calErrorsX.tolist(), "errorY": self.calErrorsY.tolist()}
+                        self.data.ui_queue.put(
+                             "Action: updateOpticalCalibrationError:_" + json.dumps(data)
+                        )
+                        print("sent")
                         # self.printCalibrationErrorValue()
                 else:  # vertical
                     print("Vertical Scan")
@@ -402,6 +413,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.inAutoMode = False
                         print("Releasing Camera")
                         self.camera.release()
+                        self.camera=None
                         print("Calibration Completed")
         except Exception as e:
             print(e)
@@ -433,7 +445,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         if self.camera is None:
             print("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-        avgDx, avgDy, avgDi, image = self.processImage(False)
+        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(False)
         print("Releasing Camera")
         self.camera.release()
         self.camera = None
@@ -442,6 +454,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationTestImage = stringData
             self.data.opticalCalibrationTestImageUpdated = True
+            print(str(avgxB)+", "+str(avgyB))
             return True
         else:
             imgencode = cv2.imencode(".png", image)[1]
