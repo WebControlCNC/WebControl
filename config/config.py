@@ -86,6 +86,7 @@ class Config(MakesmithInitFuncs):
                         break
                 elif self.settings[section][x]["type"] == "bool":
                     try:
+                        #print(str(self.settings[section][x]["key"])+" found")
                         if isinstance(value, bool):
                             if value:
                                 value = "on"
@@ -123,17 +124,18 @@ class Config(MakesmithInitFuncs):
                             self.settings[section][x]["firmwareKey"], storedValue, isImporting,
                         )
                     break
-            if not found:
-                # must be a turned off checkbox.. what a pain to figure out
-                if self.settings[section][x]["type"] == "bool":
-                    storedValue = self.settings[section][x]["value"]
-                    self.settings[section][x]["value"] = 0
-                    if "firmwareKey" in self.settings[section][x]:
-                        # print "syncing3 false bool at:"+str(self.settings[section][x]['firmwareKey'])
-                        self.syncFirmwareKey(
-                            self.settings[section][x]["firmwareKey"], storedValue
-                        )
-                    updated = True
+        if not found:
+            # must be a turned off checkbox.. what a pain to figure out
+            #print(str(self.settings[section][x]["key"])+" not found")
+            if self.settings[section][x]["type"] == "bool":
+                storedValue = self.settings[section][x]["value"]
+                self.settings[section][x]["value"] = 0
+                if "firmwareKey" in self.settings[section][x]:
+                    # print "syncing3 false bool at:"+str(self.settings[section][x]['firmwareKey'])
+                    self.syncFirmwareKey(
+                        self.settings[section][x]["firmwareKey"], storedValue
+                    )
+                updated = True
         if updated:
             if not recursionBreaker:
                 self.computeSettings(None, None, None, True)
