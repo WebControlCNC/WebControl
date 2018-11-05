@@ -145,6 +145,9 @@ class UIProcessor:
                             if message.find("updateOpticalCalibrationError") != -1:
                                 msg = message.split("_")
                                 self.sendCalibrationMessage("updateOpticalCalibrationError", msg[1])
+                            if message.find("updateOpticalCalibrationFindCenter") != -1:
+                                msg = message.split("_")
+                                self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
 
                         elif message[0:6] == "ALARM:":
                             self.activateModal("Notification:", message[7:])

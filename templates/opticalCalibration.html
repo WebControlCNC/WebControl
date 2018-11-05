@@ -314,6 +314,10 @@
                 <div class="col">
                     <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="process('testImage');">Test</button>
                 </div>
+                <div class="col">
+                    <button type="button" class="btn btn-lg btn-block btn-secondary mt-1" onclick="process('findCenter');">Find Center</button>
+                </div>
+
               </div>
             </div>
           </div>
@@ -393,7 +397,7 @@
               <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="process('optical_Calibrate');">Start Automatic Calibration</button>
           </div>
           <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-danger m-1" onclick="action('stopRun');">Stop</button>
+              <button type="button" class="btn btn-lg btn-block btn-danger m-1" onclick="action('stopOpticalCalibration');">Stop</button>
           </div>
       </div>
       <div class="row">
@@ -486,12 +490,17 @@ function process(processName){
                     };
   if (processName=="testImage")
     action('testOpticalCalibration', parameters)
+  else if (processName=="findCenter")
+    action('findCenterOpticalCalibration', parameters)
   else
     action('optical_Calibrate',parameters);
 }
 
 
 function processCalibrationMessage(msg){
+    if(msg.msg=="updateOpticalCalibrationFindCenter"){
+      console.log(msg.data)
+    }
     if(msg.msg=="OpticalCalibrationImageUpdated")
       $("#imageDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
     if(msg.msg=="OpticalCalibrationTestImageUpdated")

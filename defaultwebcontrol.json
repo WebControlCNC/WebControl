@@ -795,16 +795,16 @@
             "value": "0"
         },
         {
-            "default": "320",
+            "default": "0",
             "key": "opticalCenterX",
             "type": "string",
-            "value": "320"
+            "value": "0"
         },
         {
-            "default": "240",
+            "default": "0",
             "key": "opticalCenterY",
             "type": "string",
-            "value": "240"
+            "value": "0"
         },
         {
             "default": "1.0",

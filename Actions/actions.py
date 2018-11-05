@@ -128,6 +128,9 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put(
                     "Message: Error with saving optical calibration configuration"
                 )
+        elif msg["data"]["command"] == "stopOpticalCalibration":
+            if not self.data.opticalCalibration.stopOpticalCalibration():
+                self.data.ui_queue.put("Message: Error with stopping optical calibration.")
         elif msg["data"]["command"] == "testOpticalCalibration":
             if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with test image.")

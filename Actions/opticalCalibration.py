@@ -23,7 +23,7 @@ class OpticalCalibration(MakesmithInitFuncs):
     gaussianBlurValue = 5
     cannyLowValue = 50
     cannyHighValue = 100
-    opticalCenter = (None, None)
+    opticalCenter = (0, 0)
     HomingPosX = 0
     HomingPosY = 0
     HomingX = 0
@@ -76,12 +76,18 @@ class OpticalCalibration(MakesmithInitFuncs):
             return False
 
 
-    def stopCut(self):
-        self.data.quick_queue.put("!")
-        with self.data.gcode_queue.mutex:
-            self.data.gcode_queue.queue.clear()
-        self.inAutoMode = False
-        self.inMeasureOnlyMode = False
+    def stopOpticalCalibration(self):
+        try:
+            self.data.quick_queue.put("!")
+            with self.data.gcode_queue.mutex:
+                self.data.gcode_queue.queue.clear()
+            self.inAutoMode = False
+            self.inMeasureOnlyMode = False
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
 
     def midpoint(self, ptA, ptB):
         return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
@@ -177,8 +183,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 self.HomingPosX * 3.0, self.HomingPosY * 3.0, _posX, _posY
             )
         )
-        #self.on_AutoHome()
-        
+
         self.data.units = "INCHES"
         self.data.gcode_queue.put("G20 ")
         self.data.gcode_queue.put("G90  ")
@@ -213,16 +218,8 @@ class OpticalCalibration(MakesmithInitFuncs):
             )
             cnts = cnts[0] if imutils.is_cv2() else cnts[1]
             (cnts, _) = contours.sort_contours(cnts)
-            colors = (
-                (0, 0, 255),
-                (240, 0, 159),
-                (0, 165, 255),
-                (255, 255, 0),
-                (255, 0, 255),
-            )
-            refObj = None
             height, width, channels = image.shape
-            if self.opticalCenter[0] is None or self.opticalCenter[1] is None:
+            if self.opticalCenter[0] == 0 or self.opticalCenter[1] == 0:
                 xA = int(width / 2)
                 yA = int(height / 2)
             else:
@@ -445,13 +442,13 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.on_AutoHome(False)
         return True
 
-    def testImage(self, args):
+    def testImage(self, args, findCenter=False):
         print("at Test Image")
         self.setCalibrationSettings(args)
         if self.camera is None:
             print("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(False)
+        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(False, findCenter)
         print("Releasing Camera")
         self.camera.release()
         self.camera = None
@@ -461,13 +458,29 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.opticalCalibrationTestImage = stringData
             self.data.opticalCalibrationTestImageUpdated = True
             print(str(avgxB)+", "+str(avgyB))
-            return True
+            if findCenter:
+                return avgxB, avgyB
+            else:
+                return True
         else:
             imgencode = cv2.imencode(".png", image)[1]
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationTestImage = stringData
             self.data.opticalCalibrationTestImageUpdated = True
-            return True
+            if findCenter:
+                return None, None
+            else:
+                return True
+
+    def findCenter(self, args):
+        print("at Find Center")
+        avgxB, avgyB = self.testImage(args, True)
+        if avgxB is not None and avgyB is not None:
+            # return optical center values, but don't use them until returned by user
+            data = {"opticalCenterX": avgxB, "opticalCenterY": avgyB}
+            self.data.ui_queue.put(
+                "Action: updateOpticalCalibrationFindCenter:_" + json.dumps(data)
+            )
 
     def on_SaveCSV(self):
         outFile = open("calibrationValues.csv","w")
