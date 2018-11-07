@@ -91,6 +91,10 @@ $(document).ready(function(){
     settingRequest("Computed Settings","distToMove");
     settingRequest("Computed Settings","homePosition");
     checkForGCodeUpdate();
+    var controllerMessage = document.getElementById('controllerMessage');
+    controllerMessage.scrollTop = controllerMessage.scrollHeight;
+    //var $controllerMessage = $("#controllerMessage");
+    //$controllerMessage.scrollTop($controllerMessage[0].scrollHeight);
 });
 
 function pauseRun(){

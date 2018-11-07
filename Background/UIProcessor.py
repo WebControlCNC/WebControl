@@ -67,7 +67,9 @@ class UIProcessor:
                                 #    {"setting": "pauseButtonSetting", "value": "Resume"},
                                 #    namespace="/MaslowCNC",
                                 #)
-                            self.activateModal("Notification:", message[9:], "resume")
+                                self.activateModal("Notification:", message[9:], "resume")
+                            else:
+                                self.activateModal("Notification:", message[9:])
                         elif message[0:7] == "Action:":
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(

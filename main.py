@@ -211,15 +211,16 @@ def quickConfigure():
 
 #Watchdog socketio.. not working yet.
 @socketio.on("checkInRequested", namespace="/WebMCP")
-def checkInRequested(msg):
-    socketio.emit("checkIn")
+def checkInRequested():
+    socketio.emit("checkIn", namespace="/WebMCP")
+    print("sent checkIn")
 
 #Watchdog socketio.. not working yet.
 @socketio.on("connect", namespace="/WebMCP")
 def watchdog_connect():
-    print("connected")
+    print("watchdog connected")
     print(request.sid)
-    socketio.emit("my response")
+    socketio.emit("connect", namespace="/WebMCP")
 
 
 @socketio.on("my event", namespace="/MaslowCNC")

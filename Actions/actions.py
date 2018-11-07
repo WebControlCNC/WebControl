@@ -41,7 +41,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put("Message: Error with stopping Z-Axis movement")
         elif msg["data"]["command"] == "startRun":
             if not self.startRun():
-                if len(self.data.gcode)>0:
+                if len(self.data.gcode) > 0:
                     self.data.ui_queue.put("Message: Error with starting run.")
                 else:
                     self.data.ui_queue.put("Message: No GCode file loaded.")
@@ -134,6 +134,10 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "testOpticalCalibration":
             if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with test image.")
+        elif msg["data"]["command"] == "findCenterOpticalCalibration":
+            print("here at find Center")
+            if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
+                self.data.ui_queue.put("Message: Error with find Center.")
         elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
             if not self.data.opticalCalibration.saveAndSend():
                 self.data.ui_queue.put("Message: Error with saving and sending calibration matrix.")

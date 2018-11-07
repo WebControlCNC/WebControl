@@ -448,11 +448,15 @@ class OpticalCalibration(MakesmithInitFuncs):
         if self.camera is None:
             print("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(False, findCenter)
+            print("Camera Started")
+        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
         print("Releasing Camera")
         self.camera.release()
         self.camera = None
         if avgDx is not None:
+            cv2.putText(image, "(" + str(self.HomingPosX) + ", " + str(self.HomingPosY) + ")", (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
+            cv2.putText(image, "Dx:{:.3f}, Dy:{:.3f}->Di:{:.3f}mm".format(avgDx, avgDy, avgDi), (15, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
+            cv2.putText(image, "({:.3f}, {:.3f})".format(avgxB, avgyB), (15, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
             imgencode = cv2.imencode(".png", image)[1]
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationTestImage = stringData
@@ -481,6 +485,8 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.ui_queue.put(
                 "Action: updateOpticalCalibrationFindCenter:_" + json.dumps(data)
             )
+            return True
+        return False
 
     def on_SaveCSV(self):
         outFile = open("calibrationValues.csv","w")
