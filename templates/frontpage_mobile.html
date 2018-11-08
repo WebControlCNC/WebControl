@@ -9,7 +9,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage.js', version='10262018a') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage.js', version='11082018a') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -131,13 +131,21 @@
     </div>
   </div>
   <div class="row">
-  <div class="col-3 mb-1">
-    <h5>Home:</h5>
+    <div class="col-3 mb-1">
+      <h5>Home:</h5>
+    </div>
+    <div class="col-9 mb-1">
+      <div id='homePositionMessage'></div>
+    </div>
+    <div class="row">
+      <div class="col-3 mb-1">
+        <h5>Complete:</h5>
+      </div>
+      <div class="col-9 mb-1">
+        <div id='percentComplete'></div>
+      </div>
+    </div>
   </div>
-  <div class="col-9 mb-1">
-    <div id='homePositionMessage'></div>
-  </div>
-</div>
   <div id="workarea" class="row" style="height:400px">
   </div>
   <div class="row">

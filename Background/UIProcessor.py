@@ -184,10 +184,13 @@ class UIProcessor:
             print("One Machine Position Report Command Misread")
             return
 
+        percentComplete = '%.1f' % (100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
+
         position = {
             "xval": self.app.data.xval,
             "yval": self.app.data.yval,
             "zval": self.app.data.zval,
+            "pcom": percentComplete,
         }
         self.sendPositionMessage(position)
 

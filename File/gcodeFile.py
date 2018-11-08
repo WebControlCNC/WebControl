@@ -24,7 +24,7 @@ class GCodeFile(MakesmithInitFuncs):
     xPosition = 0
     yPosition = 0
     zPosition = 0
-
+    truncate = -1 #do this to truncate after shift of home position
 
     lineNumber = 0  # the line number currently being processed
 
@@ -75,6 +75,9 @@ class GCodeFile(MakesmithInitFuncs):
                 filtersparsed = re.sub(
                     r"([+-]?\d*\.\d{1," + digits + "})(\d*)", r"\g<1>", filtersparsed
                 )  # truncates all long floats to 4 decimal places, leaves shorter floats
+                self.truncate = int(digits)
+            else:
+                self.truncate = -1
             filtersparsed = re.split(
                 "\n", filtersparsed
             )  # splits the gcode into elements to be added to the list
@@ -315,16 +318,27 @@ class GCodeFile(MakesmithInitFuncs):
             gCodeLine = gCodeLine.upper() + " "
             x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if x:
-                #                 xTarget = '%f' % (float(x.groups()[0]) + self.data.gcodeShift[0]) # not used any more...
+                q = abs(float(x.groups()[0])+self.data.gcodeShift[0])
+                if self.truncate >= 0:
+                    q = str(round(q, self.truncate))
+                else:
+                    q = str(q)
 
-                eNtnX = re.sub(
-                    "\-?\d\.|\d*e-",
-                    "",
-                    str(abs(float(x.groups()[0]) + self.data.gcodeShift[0])),
-                )  # strip off everything but the decimal part or e-notation exponent
-                e = re.search(
-                    ".*e-", str(abs(float(x.groups()[0]) + self.data.gcodeShift[0]))
-                )
+                #                 xTarget = '%f' % (float(x.groups()[0]) + self.data.gcodeShift[0]) # not used any more...
+                #eNtnX = re.sub(
+                #    "\-?\d\.|\d*e-",
+                #    "",
+                #    str(abs(float(x.groups()[0]) + self.data.gcodeShift[0])),
+                #)  # strip off everything but the decimal part or e-notation exponent
+
+                eNtnX = re.sub("\-?\d\.|\d*e-","",q,)  # strip off everything but the decimal part or e-notation exponent
+
+                #e = re.search(
+                #    ".*e-", str(abs(float(x.groups()[0]) + self.data.gcodeShift[0]))
+                #)
+
+                e = re.search(".*e-", q)
+
                 if e:
                     fmtX = (
                         "%0%.%sf" % eNtnX
@@ -342,14 +356,24 @@ class GCodeFile(MakesmithInitFuncs):
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
                 #                 yTarget = '%f' % (float(y.groups()[0]) + self.data.gcodeShift[1]) # not used any more...
-                eNtnY = re.sub(
-                    "\-?\d\.|\d*e-",
-                    "",
-                    str(abs(float(y.groups()[0]) + self.data.gcodeShift[1])),
-                )
-                e = re.search(
-                    ".*e-", str(abs(float(y.groups()[0]) + self.data.gcodeShift[1]))
-                )
+                q = abs(float(y.groups()[0])+self.data.gcodeShift[1])
+                if self.truncate >= 0:
+                    q = str(round(q, self.truncate))
+                else:
+                    q = str(q)
+
+                #eNtnY = re.sub(
+                #    "\-?\d\.|\d*e-",
+                #    "",
+                #    str(abs(float(y.groups()[0]) + self.data.gcodeShift[1])),
+                #)
+                eNtnY = re.sub("\-?\d\.|\d*e-", "", q, )
+
+                #e = re.search(
+                #    ".*e-", str(abs(float(y.groups()[0]) + self.data.gcodeShift[1]))
+                #)
+                e = re.search(".*e-", q )
+
                 if e:
                     fmtY = "%0%.%sf" % eNtnY
                 else:
@@ -359,7 +383,7 @@ class GCodeFile(MakesmithInitFuncs):
                     + (fmtY % (float(y.groups()[0]) + self.data.gcodeShift[1]))
                     + gCodeLine[y.end() :]
                 )
-
+            #print(gCodeLine)
             return gCodeLine
         except ValueError:
             print("line could not be moved:")

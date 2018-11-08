@@ -888,30 +888,12 @@
     "WebControl Settings": [
         {
             "default": 0,
-            "desc": "When resizing the window, automatically reset the Gcode canvas to be centered and zoomed out. Program must be restarted to take effect.\ndefault setting: 0",
-            "key": "centerCanvasOnResize",
+            "desc": "When pressing the diagonal buttons in the main screen, use the distance to move as the total amount, not the amount for X and Y independently\ndefault setting: 0",
+            "key": "diagonalMove",
             "section": "WebControl Settings",
-            "title": "Center Canvas on Window Resize",
+            "title": "Diagonal Move Method",
             "type": "bool",
             "value": 0
-        },
-        {
-            "default": "pageup",
-            "desc": "Pressing this key will zoom in. Note combinations of keys like 'shift' + '=' may not work as expected. Program must be restarted to take effect.\ndefault setting: pageup",
-            "key": "zoomIn",
-            "section": "WebControl Settings",
-            "title": "Zoom In",
-            "type": "string",
-            "value": "pageup"
-        },
-        {
-            "default": "pagedown",
-            "desc": "Pressing this key will zoom in. Note combinations of keys like 'shift' + '=' may not work as expected. Program must be restarted to take effect.\ndefault setting: pagedown",
-            "key": "zoomOut",
-            "section": "WebControl Settings",
-            "title": "Zoom Out",
-            "type": "string",
-            "value": "pagedown"
         },
         {
             "default": ".nc, .ngc, .text, .gcode",
@@ -921,15 +903,6 @@
             "title": "Valid File Extensions",
             "type": "string",
             "value": ".nc, .ngc, .text, .gcode"
-        },
-        {
-            "default": ".45",
-            "desc": "Zoom scale for 'Reset View' command.\ndefault setting: .45",
-            "key": "viewScale",
-            "section": "WebControl Settings",
-            "title": "Reset View Scale",
-            "type": "string",
-            "value": ".45"
         }
     ]
 }

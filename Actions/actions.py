@@ -177,11 +177,11 @@ class Actions(MakesmithInitFuncs):
             else:
                 scaleFactor = 1.0
             self.data.gcodeShift = [
-                self.data.xval,
-                self.data.yval,
+                round(self.data.xval, 4),
+                round(self.data.yval, 4),
             ]
-            self.data.config.setValue("Advanced Settings", "homeX", str(self.data.xval))
-            self.data.config.setValue("Advanced Settings", "homeY", str(self.data.yval))
+            self.data.config.setValue("Advanced Settings", "homeX", str(round(self.data.xval,4)))
+            self.data.config.setValue("Advanced Settings", "homeY", str(round(self.data.yval,4)))
             position = {"xval": self.data.xval, "yval": self.data.yval}
             self.data.ui_queue.put(
                 "Action: homePositionMessage:_" + json.dumps(position)
@@ -447,20 +447,25 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def move(self, direction, distToMove):
+
+        if self.data.config.getValue("WebControl Settings","diagonalMove") == 1:
+            diagMove = round(math.sqrt(distToMove*distToMove/2.0), 4)
+        else:
+            diagMove = distToMove
         try:
             if direction == "upLeft":
                 self.data.gcode_queue.put(
                     "G91 G00 X"
-                    + str(-1.0 * distToMove)
+                    + str(-1.0 * diagMove)
                     + " Y"
-                    + str(distToMove)
+                    + str(diagMove)
                     + " G90 "
                 )
             elif direction == "up":
                 self.data.gcode_queue.put("G91 G00 Y" + str(distToMove) + " G90 ")
             elif direction == "upRight":
                 self.data.gcode_queue.put(
-                    "G91 G00 X" + str(distToMove) + " Y" + str(distToMove) + " G90 "
+                    "G91 G00 X" + str(diagMove) + " Y" + str(diagMove) + " G90 "
                 )
             elif direction == "left":
                 self.data.gcode_queue.put(
@@ -471,9 +476,9 @@ class Actions(MakesmithInitFuncs):
             elif direction == "downLeft":
                 self.data.gcode_queue.put(
                     "G91 G00 X"
-                    + str(-1.0 * distToMove)
+                    + str(-1.0 * diagMove)
                     + " Y"
-                    + str(-1.0 * distToMove)
+                    + str(-1.0 * diagMove)
                     + " G90 "
                 )
             elif direction == "down":
@@ -483,9 +488,9 @@ class Actions(MakesmithInitFuncs):
             elif direction == "downRight":
                 self.data.gcode_queue.put(
                     "G91 G00 X"
-                    + str(distToMove)
+                    + str(diagMove)
                     + " Y"
-                    + str(-1.0 * distToMove)
+                    + str(-1.0 * diagMove)
                     + " G90 "
                 )
             return True

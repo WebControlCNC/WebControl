@@ -8,7 +8,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage.js', version='11072018b') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage.js', version='11082018a') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -48,7 +48,7 @@
           </div>
           <div class="w-100"></div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','left',$('#downLeft').val())"><i data-feather="arrow-down-left"></i></button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())"><i data-feather="arrow-down-left"></i></button>
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())"><i data-feather="arrow-down"></i></button>
@@ -118,7 +118,14 @@
             <div id='homePositionMessage'></div>
           </div>
         </div>
-
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Complete:</h5>
+          </div>
+          <div class="col-9 mb-1">
+            <div id='percentComplete'></div>
+          </div>
+        </div>
         <div class="row">
           <div class="col mb-1">
             <h3>Controller Messages</h3>
