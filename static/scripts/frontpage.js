@@ -168,15 +168,16 @@ function gcodeUpdate(msg){
     //console.log("removing gcode");
     gcode.remove();
   }
+  width = startWidth*startZoom/draw.zoom();
   gcode = draw.group();
   var data = JSON.parse(msg.data)
   data.forEach(function(line) {
     //console.log(line)
     if (line.type=='line'){
       if (line.dashed==true) {
-        gcode.add(draw.polyline(line.points).fill('none').stroke({width:.1, color: '#AA0'}))
+        gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#AA0'}))
       } else {
-        gcode.add(draw.polyline(line.points).fill('none').stroke({width:.1, color: '#00F'}))
+        gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#00F'}))
       }
     }
     gcode.move(originX,originY)

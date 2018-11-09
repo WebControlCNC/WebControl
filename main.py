@@ -292,6 +292,7 @@ def updateSetting(msg):
 def checkForGCodeUpdate(msg):
     # this currently doesn't check for updated gcode, it just resends it..
     ## the gcode file might change the active units so we need to inform the UI of the change.
+    print("Check for GCode Update Received")
     units = app.data.config.getValue("Computed Settings", "units")
     socketio.emit(
         "requestedSetting", {"setting": "units", "value": units}, namespace="/MaslowCNC"
