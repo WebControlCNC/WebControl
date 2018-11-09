@@ -18,6 +18,7 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 class Config(MakesmithInitFuncs):
     settings = {}
+    defaults = {}
     home = ""
     firstRun = False
 
@@ -33,7 +34,49 @@ class Config(MakesmithInitFuncs):
             self.firstRun = True
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
-            # self.computeSettings(None, None, None, True);
+        # load default and see if there is anything missing.. if so, add it
+        with open("defaultwebcontrol.json", "r") as infile:
+            self.defaults = json.load(infile)
+        updated = False
+        for section in self.defaults:
+            for x in range(len(self.defaults[section])):
+                found = False
+                for _section in self.settings:
+                    if _section == section:
+                        for y in range(len(self.settings[_section])):
+                           if self.defaults[section][x]["key"] == self.settings[_section][y]["key"]:
+                               found = True
+                               break
+                if found == False:
+                    print(section+"->"+self.defaults[section][x]["key"])
+                    t = {}
+                    if "default" in self.defaults[section][x]:
+                        t["default"]=self.defaults[section][x]["default"]
+                    if "desc" in self.defaults[section][x]:
+                        t["desc"]=self.defaults[section][x]["desc"]
+                    if "firmwareKey" in self.defaults[section][x]:
+                        t["firmwareKey"]=self.defaults[section][x]["firmwareKey"]
+                    if "key" in self.defaults[section][x]:
+                        t["key"]=self.defaults[section][x]["key"]
+                    if "section" in self.defaults[section][x]:
+                        t["section"]=self.defaults[section][x]["section"]
+                    if "title" in self.defaults[section][x]:
+                        t["title"]=self.defaults[section][x]["title"]
+                    if "type" in self.defaults[section][x]:
+                        t["type"]=self.defaults[section][x]["type"]
+                    if "value" in self.defaults[section][x]:
+                        t["value"]=self.defaults[section][x]["value"]
+                    self.settings[section].append(t)
+                    print("adding "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
+                    updated = True
+
+        if updated:
+            with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
+                # print ("writing file")
+                json.dump(
+                    self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
+                )
+
 
     def getJSONSettings(self):
         return self.settings
