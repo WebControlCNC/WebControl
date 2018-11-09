@@ -236,10 +236,10 @@ def modalClosed(msg):
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
     try:
-        page, title, isStatic = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"])
+        page, title, isStatic, modalSize = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"])
         socketio.emit(
             "activateModal",
-            {"title": title, "message": page, "isStatic": isStatic},
+            {"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize},
             namespace="/MaslowCNC",
         )
     except Exception as e:

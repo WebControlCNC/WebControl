@@ -184,7 +184,7 @@ class UIProcessor:
             print("One Machine Position Report Command Misread")
             return
 
-        percentComplete = '%.1f' % (100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
+        percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
 
         position = {
             "xval": self.app.data.xval,
@@ -197,7 +197,7 @@ class UIProcessor:
     def activateModal(self, title, message, resume="false"):
         socketio.emit(
             "activateModal",
-            {"title": title, "message": message, "resume": resume},
+            {"title": title, "message": message, "resume": resume, "modalSize": "small"},
             namespace="/MaslowCNC",
         )
 

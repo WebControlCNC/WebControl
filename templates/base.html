@@ -80,7 +80,20 @@
           });
 
           socket.on('activateModal', function(msg){
-            //console.log("activateModal")
+            console.log("modal size requested="+msg.modalSize)
+            $('#notificationDialog').removeClass('modal-lg');
+            $('#notificationDialog').removeClass('modal-sm');
+            $('#notificationDialog').removeClass('mw-100 w-75');
+            if (msg.modalSize=="large"){
+              if (isMobile)
+                $("#notificationDialog").addClass('modal-lg');
+              else
+                $("#notificationDialog").addClass('mw-100 w-75');
+            }
+            if (msg.modalSize=="medium")
+              $("#notificationDialog").addClass('modal-lg');
+            if (msg.modalSize=="small")
+              $("#notificationDialog").addClass('modal-sm');
             $('#notificationModal').data('bs.modal',null);
             $('#notificationModal').data('name',msg.title);
             $('#notificationModalTitle').html("<h3>"+msg.title+"</h3");
@@ -228,7 +241,7 @@
   </section>
 
   <div class="modal" id="notificationModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog {{modalStyle}}" role="document">
+    <div id="notificationDialog" class="modal-dialog {{modalStyle}}" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 id="notificationModalTitle" class="modal-title">Modal title</h5>

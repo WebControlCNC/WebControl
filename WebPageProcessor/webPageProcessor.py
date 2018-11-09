@@ -37,7 +37,7 @@ class WebPageProcessor:
                     ports=ports,
                     pageID="maslowSettings",
                 )
-            return page, "Maslow Settings", False
+            return page, "Maslow Settings", False, "medium"
         elif pageID == "advancedSettings":
             setValues = self.data.config.getJSONSettingSection("Advanced Settings")
             if isMobile:
@@ -54,7 +54,7 @@ class WebPageProcessor:
                     settings=setValues,
                     pageID="advancedSettings",
                 )
-            return page, "Advanced Settings", False
+            return page, "Advanced Settings", False, "medium"
         elif pageID == "webControlSettings":
             setValues = self.data.config.getJSONSettingSection("WebControl Settings")
             if isMobile:
@@ -71,36 +71,36 @@ class WebPageProcessor:
                     settings=setValues,
                     pageID="webControlSettings",
                 )
-            return page, "WebControl Settings", False
+            return page, "WebControl Settings", False, "medium"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             files = [f for f in listdir("gcode") if isfile(join("gcode", f))]
             page = render_template(
                 "openGCode.html", files=files, lastSelectedFile=lastSelectedFile
             )
-            return page, "Open GCode", False
+            return page, "Open GCode", False, "medium"
         elif pageID == "uploadGCode":
             validExtensions = self.data.config.getValue(
                 "WebControl Settings", "validExtensions"
             )
             page = render_template("uploadGCode.html", validExtensions=validExtensions)
-            return page, "Upload GCode", False
+            return page, "Upload GCode", False, "medium"
         elif pageID == "importGCini":
             page = render_template("importFile.html")
-            return page, "Import groundcontrol.ini", False
+            return page, "Import groundcontrol.ini", False, "medium"
         elif pageID == "actions":
             page = render_template("actions.html")
-            return page, "Actions", False
+            return page, "Actions", False, "large"
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
-            return page, "Z-Axis", False
+            return page, "Z-Axis", False, "medium"
         elif pageID == "setSprockets":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             page = render_template("setSprockets.html")
-            return page, "Set Sprockets", False
+            return page, "Set Sprockets", False, "medium"
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -115,7 +115,7 @@ class WebPageProcessor:
                 rotationRadius=rotationRadius,
                 chainSagCorrection=chainSagCorrection,
             )
-            return page, "Triangular Calibration", True
+            return page, "Triangular Calibration", True, "large"
         elif pageID == "opticalCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
@@ -134,7 +134,7 @@ class WebPageProcessor:
             brY = self.data.config.getValue("Optical Calibration Settings", "brY")
             calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
             page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile)
-            return page, "Optical Calibration", True
+            return page, "Optical Calibration", True, "large"
         elif pageID == "quickConfigure":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorOffsetY = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -159,6 +159,6 @@ class WebPageProcessor:
                 motorSpacingX=motorSpacingX,
                 chainOverSprocket=chainOverSprocket,
             )
-            return page, "Quick Configure", False
+            return page, "Quick Configure", False, "medium"
 
 
