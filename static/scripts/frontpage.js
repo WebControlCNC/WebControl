@@ -3,7 +3,7 @@
 //setInterval(function(){ alert("Hello"); }, 3000);
 
 var scale = 1;
-
+var startWidth = 0.1
 var draw = SVG('workarea').size('100%','100%').panZoom({zoomMin: 1, zoomMax: 500, zoomFactor:2.5});
 var viewbox = draw.viewbox();
 var originX = viewbox.width/2;
@@ -15,31 +15,49 @@ var gcode = null;
 //var sheet = draw.image('/static/images/materials/Plywood_texture.JPG',96,48).center(originX,originY)
 
 var gridLines = draw.group()
-gridLines.add(draw.line(0*scale,0*scale,96*scale,0*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(0*scale,48*scale,96*scale,48*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(0*scale,24*scale,96*scale,24*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(0*scale,0*scale,0*scale,48*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(24*scale,0*scale,24*scale,48*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(48*scale,0*scale,48*scale,48*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(72*scale,0*scale,72*scale,48*scale).stroke({width:.1, color: '#000'}))
-gridLines.add(draw.line(96*scale,0*scale,96*scale,48*scale).stroke({width:.1, color: '#000'}))
+gridLines.add(draw.line(0*scale,0*scale,96*scale,0*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(0*scale,48*scale,96*scale,48*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(0*scale,24*scale,96*scale,24*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(0*scale,0*scale,0*scale,48*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(24*scale,0*scale,24*scale,48*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(48*scale,0*scale,48*scale,48*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(72*scale,0*scale,72*scale,48*scale).stroke({width:startWidth, color: '#000'}))
+gridLines.add(draw.line(96*scale,0*scale,96*scale,48*scale).stroke({width:startWidth, color: '#000'}))
 gridLines.center(originX,originY)
 //gridLines.scale(scale,scale)
 
 var sled = draw.group()
-sled.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:.1,color:"#F00"}))
-sled.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:.1,color:"#F00"}))
-sled.add(draw.circle(3*scale).stroke({width:.1,color:"#F00"}).fill({color:"#fff",opacity:0}))
+sled.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:startWidth,color:"#F00"}))
+sled.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:startWidth,color:"#F00"}))
+sled.add(draw.circle(3*scale).stroke({width:startWidth,color:"#F00"}).fill({color:"#fff",opacity:0}))
 sled.center(originX,originY)
 
 var home = draw.group()
-home.add(draw.line(0.75*scale,-0.0*scale,0.75*scale,1.5*scale).stroke({width:.1,color:"#0F0"}))
-home.add(draw.line(-0.0*scale,0.75*scale,1.5*scale,0.75*scale).stroke({width:.1,color:"#0F0"}))
-home.add(draw.circle(1.5*scale).stroke({width:.1,color:"#0F0"}).fill({color:"#fff",opacity:0}))
+home.add(draw.line(0.75*scale,-0.0*scale,0.75*scale,1.5*scale).stroke({width:startWidth,color:"#0F0"}))
+home.add(draw.line(-0.0*scale,0.75*scale,1.5*scale,0.75*scale).stroke({width:startWidth,color:"#0F0"}))
+home.add(draw.circle(1.5*scale).stroke({width:startWidth,color:"#0F0"}).fill({color:"#fff",opacity:0}))
 home.center(originX,originY)
 /
 
 draw.zoom(10, {x:originX,y:originY});
+var startZoom = draw.zoom();
+
+draw.on('pinchZoomEnd', function(ev){
+    setTimeout(rescale,0.01)
+})
+
+draw.on('zoom', function(box, focus){
+  setTimeout(rescale,0.01)
+})
+
+function rescale(){
+  width = startWidth*startZoom/draw.zoom();
+  draw.each(function(_i, _children){
+      this.each(function(i,children){
+        this.attr({'stroke-width':width});
+      })
+  })
+}
 
 function positionUpdate(x,y,z){
   var _x, _y =0
@@ -55,8 +73,8 @@ function positionUpdate(x,y,z){
   }
   sled.front()
   sled.center(_x, _y)
-
 }
+
 
 function homePositionUpdate(x,y){
   var _x, _y =0
