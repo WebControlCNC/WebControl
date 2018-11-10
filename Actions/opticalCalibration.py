@@ -448,6 +448,8 @@ class OpticalCalibration(MakesmithInitFuncs):
         if self.camera is None:
             print("Starting Camera")
             self.camera = cv2.VideoCapture(0)
+            self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
             print("Camera Started")
         avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
         print("Releasing Camera")
