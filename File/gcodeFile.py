@@ -5,6 +5,8 @@ import threading
 import json
 import re
 import math
+import gzip
+import io
 
 
 class Line:
@@ -36,6 +38,7 @@ class GCodeFile(MakesmithInitFuncs):
 
     filename = ""
     line = []
+
 
     def serializeGCode(self):
         sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
@@ -117,6 +120,23 @@ class GCodeFile(MakesmithInitFuncs):
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
         return True
+
+    def compressStringToBytes(self, inputString):
+        """
+        read the given string, encode it in utf-8,
+        compress the data and return it as a byte array.
+        """
+        bio = BytesIO()
+        bio.write(inputString.encode("utf-8"))
+        bio.seek(0)
+        stream = BytesIO()
+        compressor = gzip.GzipFile(fileobj=stream, mode='w')
+        while True:  # until EOF
+            chunk = bio.read(8192)
+            if not chunk:  # EOF?
+                compressor.close()
+                return stream.getvalue()
+            compressor.write(chunk)
 
     def isClose(self, a, b):
         return abs(a - b) <= self.data.tolerance
@@ -402,6 +422,7 @@ class GCodeFile(MakesmithInitFuncs):
                 self.data.gcode[self.lineNumber]
             )  # move the line if the gcode has been moved
             fullString = self.data.gcode[self.lineNumber]
+            #print(fullString)
         except:
             return  # we have reached the end of the file
 
@@ -497,6 +518,16 @@ class GCodeFile(MakesmithInitFuncs):
 
         for _ in range(min(len(self.data.gcode), self.maxNumberOfLinesToRead)):
             self.loadNextLine()
+
+        tstr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
+        #self.data.compressedGCode = self.compressStringToBytes(tstr)
+        out = io.BytesIO()
+        with gzip.GzipFile(fileobj=out, mode="w") as f:
+            f.write(tstr.encode())
+        self.data.compressedGCode = out.getvalue()
+        print("uncompressed:"+str(len(tstr)))
+        print("compressed:"+str(len(self.data.compressedGCode)))
+        #print(self.data.compressedGCode)
 
     def updateGcode(self):
         """

@@ -183,3 +183,31 @@ function gcodeUpdate(msg){
     gcode.move(originX,originY)
   });
 }
+
+function gcodeUpdateCompressed(msg){
+  console.log("updating gcode compressed");
+  if (gcode!=null) {
+    //console.log("removing gcode");
+    gcode.remove();
+  }
+  width = startWidth*startZoom/draw.zoom();
+  gcode = draw.group();
+  //console.log(msg.data);
+  if (msg.data!=null){
+    var uncompressed = pako.inflate(msg.data)
+    var _str = new TextDecoder("utf-8").decode(uncompressed);
+    //console.log(_str);
+    var data = JSON.parse(_str)
+    data.forEach(function(line) {
+      //console.log(line)
+      if (line.type=='line'){
+        if (line.dashed==true) {
+          gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#AA0'}))
+        } else {
+          gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#00F'}))
+        }
+      }
+      gcode.move(originX,originY)
+    });
+  }
+}

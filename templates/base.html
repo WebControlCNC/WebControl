@@ -117,7 +117,13 @@
           });
 
           socket.on('gcodeUpdate', function(msg){
+            console.log("gcodeUpdate Message Received")
             gcodeUpdate(msg);
+          });
+
+          socket.on('gcodeUpdateCompressed', function(msg){
+            console.log("gcodeUpdate Compressed Message Received")
+            gcodeUpdateCompressed(msg);
           });
 
           socket.on('updatePorts', function(msg){

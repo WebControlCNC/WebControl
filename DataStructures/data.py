@@ -22,6 +22,7 @@ class Data:
     # Gcodes contains all of the lines of gcode in the opened file
     clients = []
     gcode = []
+    compressedGCode = None
     version = "1.23"
     # all of the available COM ports
     comPorts = []

@@ -298,11 +298,14 @@ def checkForGCodeUpdate(msg):
         "requestedSetting", {"setting": "units", "value": units}, namespace="/MaslowCNC"
     )
     ## send updated gcode to UI
-    socketio.emit(
-        "gcodeUpdate",
-        {"data": json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])},
-        namespace="/MaslowCNC",
-    )
+    print("Sending Gcode compressed")
+    socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode}, namespace="/MaslowCNC")
+    print("Sent Gcode compressed")
+    #socketio.emit(
+    #    "gcodeUpdate",
+    #    {"data": json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])},
+    #    namespace="/MaslowCNC",
+    #)
 
 
 @socketio.on_error_default
