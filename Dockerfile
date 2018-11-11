@@ -1,8 +1,7 @@
 FROM arm32v7/python:3.5.6-slim-stretch as builder
 
 # Install dependencies needed for building and running OpenCV
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     # to build and install
     unzip wget sed \
     build-essential cmake pkg-config \
