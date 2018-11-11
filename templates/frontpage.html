@@ -5,54 +5,57 @@
 {% endblock %}
 
 {% block javascript %}
+  <script src="{{ url_for('static',filename='scripts/pako.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage.js', version='11102018a') }}" crossorigin="anonymous"></script>
+  <script> feather.replace() </script>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid d-flex h-100 flex-column">
-  <div class="row flex-fill d-flex justify-content-start">
+<div class="container-fluid h-100">
+  <div class="row justify-content-start h-100">
     <div id="workarea" class="col">
     </div>
     <div class="col my-sidebar">
-      <div class="container">
+      <div class="h-100 d-flex flex-column">
         <h3>Controls</h3>
         <div class="row">
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('upLeft')">upleft</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','upLeft',$('#distToMove').val())"><i data-feather="arrow-up-left"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('up')";>up</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','up',$('#distToMove').val())";><i data-feather="arrow-up"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('upRight')">upright</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','upRight',$('#distToMove').val())"><i data-feather="arrow-up-right"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-primary btn-block" >Macro1</button>
-          </div>
-          <div class="w-100"></div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('left')">left</button>
-          </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('home')">home</button>
-          </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('right')">right</button>
-          </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-primary btn-block">Macro2</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">Macro1</button>
           </div>
           <div class="w-100"></div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('downLeft')">dleft</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','left',$('#distToMove').val())"><i data-feather="arrow-left"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="move('down')">down</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="action('home')"><i data-feather="home"></i></button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="move('downRight')">dright</button>
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','right',$('#distToMove').val())"><i data-feather="arrow-right"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">Macro2</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())"><i data-feather="arrow-down-left"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())"><i data-feather="arrow-down"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downRight',$('#distToMove').val())"><i data-feather="arrow-down-right"></i></button>
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
@@ -80,7 +83,7 @@
             <button type="button" id="pauseButton" class="btn btn-block btn-warning" onclick="pauseRun()">Pause</button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-block btn-danger onclick="action('stopRun')"">Stop</button>
+            <button type="button" class="btn btn-block btn-danger" onclick="action('stopRun')">Stop</button>
           </div>
         </div>
         <div class="row">
@@ -101,11 +104,27 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-4 mb-1">
-            <h4>Position</h4>
+          <div class="col-3">
+            <h5>Sled:</h5>
           </div>
-          <div class="col-8 mb-1">
-            <p id='positionMessage'></p>
+          <div class="col-9">
+            <div id='positionMessage'></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Home:</h5>
+          </div>
+          <div class="col-9 mb-1">
+            <div id='homePositionMessage'></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Complete:</h5>
+          </div>
+          <div class="col-9 mb-1">
+            <div id='percentComplete'></div>
           </div>
         </div>
         <div class="row">
@@ -113,10 +132,7 @@
             <h3>Controller Messages</h3>
           </div>
         </div>
-        <div class="row">
-          <div class="col mb-1">
-            <div class="scrollText" id='controllerMessage'></div>
-          </div>
+        <div class="row scrollText flex-grow-1" id='controllerMessage'>
         </div>
       </div>
     </div>

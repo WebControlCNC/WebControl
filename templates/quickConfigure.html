@@ -1,0 +1,131 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+  <form id="quickConfigureForm">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Kinematics Kit</h4>
+        <p>Select your type of kit or provide a custom value for rotational radius.  Note: Quadrilateral kits have no rotational radius, you can leave it zero.
+        If you've come back to this page and see your setting is custom, don't worry.  Custom means a triangular kit.  As long as its marked custom and has a
+        rotational radius entered, you're good to go (unless of course you are using a quadrilateral kit for some reason)</p>
+        <h5>Ring</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/ring.png') }}" height="300" width="300">
+        <h5>Linkage</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/linkage.png') }}" height="300" width="300">
+        <h5>Pantograph</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/pantograph.png') }}" height="300" width="300">
+        <h5>Quadrilateral</h5>
+        <img src="{{ url_for('static',filename='images/quickConfig/quadrilateral.png') }}" height="300" width="300">
+        <p></p>
+        <select class="custom-select" name="kinematicsType" id="kinematicsType">
+          <option value="Ring" {{'selected' if kinematicsType=='Ring' else ''}}>Ring</option>
+          <option value="Linkage" {{'selected' if kinematicsType=='Linkage' else '' }}>45 Degree Linkage</option>
+          <option value="Pantograph" {{'selected' if kinematicsType=='Pantograph' else '' }}>Top Mounted Pantograph</option>
+          <option value="Custom" {{'selected' if kinematicsType=='Custom' else ''}}>Custom</option>
+          <option value="Quadrilateral" {{'selected' if kinematicsType=='Quadrilateral' else ''}}>Quadrilateral</option>
+        </select>
+        <p></p>
+        <label for="rotationRadius">Rotational Radius</label>
+        <input class="form-control" name="rotationRadius" id="rotationRadius" value="{{rotationRadius}}">
+        <small class="form-text text-muted">Enter value in mm only</small>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Chain Around Sprocket</h4>
+        <p>Your setup is configured either with the chain from the slack side and wrapping around the sprocket clockwise to go to the sled(Top):</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/chainofftop.png') }}" height="300" width="300">
+        <p>Or coming from the slack side and wrapping around the sprocket counterclockwise to go to the sled (Bottom):</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/chainoffbottom.png') }}" height="300" width="300">
+        <p></p>
+        <select name="chainOverSprocket">
+          <option value="Top" {{'selected' if chainOverSprocket=='Top' else ''}}>Top</option>
+          <option value="Bottom" {{'selected' if chainOverSprocket=='Bottom' else ''}}>Bottom</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Distance Between Motors</h4>
+        <p>Break out your tape measure and measure the distance between the center of the sprockets.
+           Note, if you have the motors positioned in a normal fashion, you can measure from the outside
+           edge of the two gearboxes and then subtract 40.4 mm from that measurement to get sprocket center
+           to sprocket center.  There's a handy button you can press to make that subtraction for you if you like.
+           Your choice.</p>
+        <p>Measure sprocket to sprocket:</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/sprocket2sprocket.png') }}" height="300" width="300">
+        <p>Or measure gearbox to gearbox (and don't forget to subtract 40.4 mm!):</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/gearbox2gearbox.png') }}" height="300" width="300">
+        <p></p>
+        <label for="motorSpacingX">Distance Between Motors</label>
+        <input class="form-control" name="motorSpacingX" id="motorSpacingX" value="{{motorSpacingX}}">
+        <small class="form-text text-muted">Enter value in mm only</small>
+        <button type="button" onclick="subtract40p4();">Subtract 40.4 mm</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Height of Motors Above Workspace</h4>
+        <p>One last measurement.  Make a reasonable measurement of how high the motors
+           are above the top of the workspace.  Just get close because this value will get adjusted during calibration.
+           but it needs to be reasonably close so the first stage of calibration can get close to where it needs to be. </p>
+        <p>Height of Motors Above Workspace:</p>
+        <img src="{{ url_for('static',filename='images/quickConfig/motorOffsetY.png') }}" height="300" width="300">
+        <p></p>
+        <label for="motorOffsetY">Height of Motors Above Workspace</label>
+        <input class="form-control" name="motorOffsetY" id="motorOffSetY" value="{{motorOffsetY}}">
+        <small class="form-text text-muted">Enter value in mm only</small>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+function subtract40p4(){
+   $("#motorSpacingX").val($("#motorSpacingX").val()-40.4);
+}
+$(document).ready(function () {
+    $('#quickConfigureForm').on('submit', function(e) {
+        e.preventDefault();
+        var url = $("#pageID").val()
+        $.ajax({
+            url : '/'+url,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (data) {
+              console.log("success");
+                $('#notificationModal').modal('toggle')
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+    $('#kinematicsType').change(function(){
+      selected = $("#kinematicsType option:selected").val()
+      console.log(selected);
+      switch(selected) {
+        case "Ring":
+          rotationRadius = 138.4;
+          break;
+        case "Linkage":
+          rotationRadius = 273;
+          break;
+        case "Pantograph":
+          rotationRadius = 100;
+          break;
+        case "Quadrilateral":
+          rotationRadius = 0;
+          break;
+        default:
+          rotationRadius = 0;
+          break;
+      }
+      $("#rotationRadius").val(rotationRadius);
+    });
+});
+</script>
+{% endblock %}

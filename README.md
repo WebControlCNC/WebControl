@@ -1,6 +1,8 @@
 # WebControl
 
-WebControl is a browser-based implementation of Ground Control (see https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
+WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
+
+![Screenshot](https://user-images.githubusercontent.com/218876/47197523-ac1d9e00-d31b-11e8-93c8-93a84a7eb0cf.png)
 
 ## Getting Started
 
@@ -77,6 +79,64 @@ This is on the TODO list
 * [Schedule](https://github.com/dbader/schedule) - Library used to schedule checking connection with arduino
 * [Ground Control](https://github.com/maslowcnc/groundcontrol) - Much of this was adapted from the Kivy-based Ground Control
 
+
+## Developing
+
+### Virtualenv
+
+You can use virtualenv to set up a local development environment for running the code without installing packages in the system Python installation.
+
+    # Create a virtual environment
+    virtualenv -p python3 .venv 
+    # Activate the virtual environment
+    source .venv/bin/activate
+    # Install the prerequisites
+    pip install -r requirements.txt
+
+Then you can run the code with.
+
+    python main.py
+
+The server will then be available at http://localhost:5000
+
+### Docker
+
+You can build a Docker image with
+
+    docker build -t madgrizzle/webcontrol .
+
+Then you can run it directly
+
+    docker run -it -p 5000:5000 -v $HOME/.WebControl:/root/.WebControl --privileged madgrizzle/webcontrol
+
+Or push it up to Docker Hub
+
+    docker push madgrizzle/webcontrol
+
+Note that the image can only be run from the same architecture it was built from. For example, an image built on an x86 laptop cannot be run on a RaspberryPi.
+
+### Automatic code formatting
+
+This project uses [black](https://github.com/ambv/black) to automatically format python code. To run the autoformatter, simply install black locally with `pip`.
+
+    pip install black
+
+Subsequently, you can just run `black .` to format all files in the current directory. 
+
+    black .
+
+If you don't have python3.6+ locally (to be able to run `black`), you can run `black` in a Docker container.
+
+    docker run -v $(pwd):/code johnboiles/python-black .
+
+### IDE
+
+[Pycharm Community Edition](https://www.jetbrains.com/pycharm/download) is a free, well-featured Python IDE.
+
+With the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) and [BlackPycharm](https://plugins.jetbrains.com/plugin/10563-black-pycharm) plugins you can set up your editor to automatically format your code on save. Then you never have to think about code formatting again :tada:
+
+![PyCharm Screenshot](https://user-images.githubusercontent.com/218876/47197011-817e1600-d318-11e8-8172-eb2c1ffe2d21.png)
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
@@ -95,4 +155,3 @@ See also the list of [contributors](https://github.com/your/project/contributors
 ## License
 
 TBD..
-
