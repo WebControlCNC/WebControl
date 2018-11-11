@@ -31,7 +31,7 @@ You can build a Docker image with
 
 Then you can run it directly
 
-    docker run -it -p 5000:5000 --privileged madgrizzle/webcontrol
+    docker run -it -p 5000:5000 -v $HOME/.WebControl:/root/.WebControl --privileged madgrizzle/webcontrol
 
 Or push it up to Docker Hub
 
