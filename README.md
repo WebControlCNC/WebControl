@@ -155,4 +155,4 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## License
 
-TBD..
+See [LICENSE](https://github.com/madgrizzle/WebControl/blob/master/LICENSE)
