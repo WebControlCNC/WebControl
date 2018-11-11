@@ -12,10 +12,8 @@ These instructions are based upon using a Raspberry Pi (RPi) for running WebCont
 
 What things you need to install the software and how to install them
 
-```
-Maslow CNC
-Raspberry Pi configured for Internet access and SSH capability
-```
+* Maslow CNC
+* Raspberry Pi configured for Internet access and SSH capability
 
 ### Installing Docker onto Raspberry Pi
 
@@ -46,11 +44,16 @@ docker pull madgrizzle/webmcp
 docker run -it -v $HOME/.WebControl:/root/.WebControl -v /var/run/docker.sock:/var/run/docker.sock -p 5001:5001 -e HOST_HOME=$HOME --network=“host” --privileged madgrizzle/webmcp
 ```
 
-You can put the long "docker run" command into a script and run the script instead of typing it in ##add content about doing all this upon boot#
-
 ### Setting Up WebMCP to Run on Boot
 
-Added to the TODO List
+You can configure WebMCP to start at boot using the example systemd unit file included in the [WebMCP repo](https://www.github.com/madgrizzle/WebMCP).
+
+```
+# TODO this line will eventually pull from madgrizzle/WebMCP directly when that repo is publicly available
+sudo curl -fsSL https://gist.githubusercontent.com/johnboiles/da4f3fac73105c82d900e8118dae1ec4/raw/f5bf24641e7ce6c000b5d79dc0c5ed68477566f7/webmcp.service -o /etc/systemd/system/webmcp.service
+sudo systemctl start webmcp
+sudo systemctl enable webmcp
+```
 
 ### Not Using WebMCP But Want To Run WebControl?
 
@@ -60,10 +63,6 @@ So, if you don't want to use WebMCP, you can issue the following command to down
 docker pull madgrizzle/webcontrol
 docker run -it -v $HOME/.WebControl:/root/.WebControl -p 5000:5000 --privileged madgrizzle/webcontrol python main.py
 ```
-
-### How to Download from Github and Run WebControl
-
-This is on the TODO list
 
 ## Built With
 
@@ -93,6 +92,8 @@ You can use virtualenv to set up a local development environment for running the
     # Install the prerequisites
     pip install -r requirements.txt
 
+When running on the Pi, you'll also need some extra dependencies and will need to build OpenCV from source. See the Dockerfile for details. (TODO: add instructions here)
+
 Then you can run the code with.
 
     python main.py
@@ -101,7 +102,7 @@ The server will then be available at http://localhost:5000
 
 ### Docker
 
-You can build a Docker image with
+You can build a Docker image with (takes ~2-3 hours)
 
     docker build -t madgrizzle/webcontrol .
 
@@ -113,7 +114,7 @@ Or push it up to Docker Hub
 
     docker push madgrizzle/webcontrol
 
-Note that the image can only be run from the same architecture it was built from. For example, an image built on an x86 laptop cannot be run on a RaspberryPi.
+Note that you'll need to build the Docker image either on an ARM platform (e.g. RaspberryPi), or on a version of Docker that supports ARM emulation (either Docker for Mac or on Linux with binfmt_misc/qemu configured).
 
 ### Automatic code formatting
 
