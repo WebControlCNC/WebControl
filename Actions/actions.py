@@ -117,13 +117,11 @@ class Actions(MakesmithInitFuncs):
                     "Message: Error with starting optical calibration"
                 )
         elif msg["data"]["command"] == "optical_Calibrate":
-            print("here")
             if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
                 self.data.ui_queue.put(
                     "Message: Error with starting optical calibration"
                 )
         elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
-            print("here")
             if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
                 self.data.ui_queue.put(
                     "Message: Error with saving optical calibration configuration"
@@ -135,7 +133,6 @@ class Actions(MakesmithInitFuncs):
             if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with test image.")
         elif msg["data"]["command"] == "findCenterOpticalCalibration":
-            print("here at find Center")
             if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with find Center.")
         elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
@@ -186,11 +183,11 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue.put(
                 "Action: homePositionMessage:_" + json.dumps(position)
             )  # the "_" facilitates the parse
-            print("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
+            self.data.console_queue.put("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
             self.data.gcodeFile.loadUpdateFile()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def home(self):
@@ -217,7 +214,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G00 Z0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def resetChainLengths(self):
@@ -229,7 +226,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G21 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def defineZ0(self):
@@ -237,7 +234,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G10 Z0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def stopZ(self):
@@ -247,7 +244,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def startRun(self):
@@ -260,24 +257,24 @@ class Actions(MakesmithInitFuncs):
             else:
                 return False
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             return False
 
     def stopRun(self):
         try:
-            print("trying to stop run")
+            self.data.console_queue.put("stopping run")
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
             # TODO: app.onUploadFlagChange(self.stopRun, 0)
-            print("Gcode Stopped")
+            self.data.console_queue.put("Gcode stopped")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveToDefault(self):
@@ -298,7 +295,7 @@ class Actions(MakesmithInitFuncs):
 
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def testMotors(self):
@@ -306,7 +303,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B04 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def wipeEEPROM(self, extent):
@@ -323,17 +320,17 @@ class Actions(MakesmithInitFuncs):
             #timer.start()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def pauseRun(self):
         try:
             self.data.uploadFlag = 0
-            print("Run Paused")
+            self.data.console_queue.put("Run Paused")
             self.data.ui_queue.put("Action: setAsResume")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def resumeRun(self):
@@ -347,7 +344,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue.put("Action: setAsPause")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def returnToCenter(self):
@@ -364,7 +361,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G00 X0.0 Y0.0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def clearGCode(self):
@@ -372,7 +369,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcodeFile.clearGcode()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveGcodeZ(self, moves):
@@ -390,7 +387,7 @@ class Actions(MakesmithInitFuncs):
             else:
                 return False
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveGcodeIndex(self, dist):
@@ -438,12 +435,12 @@ class Actions(MakesmithInitFuncs):
                     "Action: positionMessage:_" + json.dumps(position)
                 )  # the "_" facilitates the parse
             except Exception as e:
-                print(e)
-                print("Unable to update position for new gcode line")
+                self.data.console_queue.put(str(e))
+                self.data.console_queue.put("Unable to update position for new gcode line")
                 return False
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def move(self, direction, distToMove):
@@ -495,7 +492,7 @@ class Actions(MakesmithInitFuncs):
                 )
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveZ(self, direction, distToMoveZ):
@@ -521,7 +518,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G20 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
@@ -570,7 +567,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def setSprockets(self, sprocket, degrees):
@@ -592,7 +589,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def setVerticalAutomatic(self):
@@ -603,7 +600,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B10 L")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def getLeftChainLength(self, dist):
@@ -636,7 +633,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B06 L0 R0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def setSprocketsDefault(self):
@@ -644,7 +641,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B08 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def updatePorts(self):
@@ -670,7 +667,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue.put("Action: updatePorts")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def calibrate(self, result):
@@ -678,9 +675,6 @@ class Actions(MakesmithInitFuncs):
             motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
                 result
             )
-            print(motorYoffsetEst)
-            print(rotationRadiusEst)
-            print(chainSagCorrectionEst)
             if motorYoffsetEst == False:
                 return False
             return (
@@ -703,7 +697,7 @@ class Actions(MakesmithInitFuncs):
             """
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def macro(self, number):
@@ -715,7 +709,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put(macro)
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def testImage(self):
@@ -723,7 +717,7 @@ class Actions(MakesmithInitFuncs):
             self.data.opticalCalibration.testImage()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def adjustCenter(self, dist):
@@ -734,7 +728,7 @@ class Actions(MakesmithInitFuncs):
                 return False
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def processSettingRequest(self, section, setting):
@@ -768,19 +762,17 @@ class Actions(MakesmithInitFuncs):
                         "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
                     )
                 except Exception as e:
-                    print(e)
+                    self.data.console_queue.put(str(e))
             elif setting == "calibrationError":
                 try:
-                    print("setting request calibration error-1")
                     xyErrorArray = self.data.config.getValue("Optical Calibration Settings","xyErrorArray")
                     errorX, errorY = self.data.config.parseErrorArray(xyErrorArray, True)
                     data = {"errorX": errorX, "errorY": errorY}
-                    print("setting request calibration error-2")
                     self.data.ui_queue.put(
                         "Action: updateOpticalCalibrationError:_" + json.dumps(data)
                     )
                 except Exception as e:
-                    print(e)
+                    self.data.console_queue.put(str(e))
             else:
                 retval = self.data.config.getValue(section, setting)
                 return setting, retval

@@ -101,6 +101,9 @@ class Data:
     """
     message_queue = LoggingQueue(logger)
     ui_queue = queue.Queue()
+    console_queue = queue.Queue() # used for printing to terminal
+    mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
+    webMCPActive = False  # start false until WebMCP connects
     gcode_queue = queue.Queue()
     quick_queue = queue.Queue()
 

@@ -13,6 +13,8 @@ from flask import Flask, jsonify, render_template, current_app, request, flash
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
+from Background.WebMCPProcessor import WebMCPProcessor
+from Background.WebMCPProcessor import ConsoleProcessor
 from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
@@ -53,8 +55,16 @@ app.th1 = threading.Thread(target=app.data.messageProcessor.start)
 app.th1.daemon = True
 app.th1.start()
 
-## uithread set to None.. will be activated upon first websocket connection
+## this runs the thread that sends debugging messages to the terminal and webmcp (if active)
+app.th2 = threading.Thread(target=app.data.consoleProcessor.start)
+app.th2.daemon = True
+app.th2.start()
+
+## uithread set to None.. will be activated upon first websocket connection from browser
 app.uithread = None
+
+## uithread set to None.. will be activated upon first websocket connection from webmcp
+app.mcpthread = None
 
 @app.route("/")
 @mobile_template("{mobile/}")
@@ -213,7 +223,7 @@ def quickConfigure():
 @socketio.on("checkInRequested", namespace="/WebMCP")
 def checkInRequested():
     socketio.emit("checkIn", namespace="/WebMCP")
-    print("sent checkIn")
+    #print("sent checkIn")
 
 #Watchdog socketio.. not working yet.
 @socketio.on("connect", namespace="/WebMCP")
@@ -221,6 +231,14 @@ def watchdog_connect():
     print("watchdog connected")
     print(request.sid)
     socketio.emit("connect", namespace="/WebMCP")
+    if app.mcpthread == None:
+        print("going to start mcp thread")
+        app.mcpthread = socketio.start_background_task(
+            app.data.mcpProcessor.start, current_app._get_current_object()
+        )
+        print("created mcp thread")
+        app.mcpthread.start()
+        print("started mcp thread")
 
 
 @socketio.on("my event", namespace="/MaslowCNC")
@@ -292,7 +310,7 @@ def updateSetting(msg):
 def checkForGCodeUpdate(msg):
     # this currently doesn't check for updated gcode, it just resends it..
     ## the gcode file might change the active units so we need to inform the UI of the change.
-    print("Check for GCode Update Received")
+    app.data.console_queue.put("Check for GCode Update Received")
     units = app.data.config.getValue("Computed Settings", "units")
     socketio.emit(
         "requestedSetting", {"setting": "units", "value": units}, namespace="/MaslowCNC"

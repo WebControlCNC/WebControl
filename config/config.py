@@ -48,7 +48,7 @@ class Config(MakesmithInitFuncs):
                                found = True
                                break
                 if found == False:
-                    print(section+"->"+self.defaults[section][x]["key"])
+                    print(section+"->"+self.defaults[section][x]["key"]+" was not found..")
                     t = {}
                     if "default" in self.defaults[section][x]:
                         t["default"]=self.defaults[section][x]["default"]
@@ -67,7 +67,7 @@ class Config(MakesmithInitFuncs):
                     if "value" in self.defaults[section][x]:
                         t["value"]=self.defaults[section][x]["value"]
                     self.settings[section].append(t)
-                    print("adding "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
+                    print("added "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
                     updated = True
 
         if updated:
@@ -189,10 +189,9 @@ class Config(MakesmithInitFuncs):
                 )
 
     def updateSettings(self, section, result):
-        print("at updateSettings")
         for setting in result:
             self.setValue(section, setting, result[setting], recursionBreaker=False, isImporting = False)
-        print("settings updated")
+        self.data.console_queue.put("settings updated")
 
     def getJSONSettingSection(self, section):
         """
@@ -282,7 +281,7 @@ class Config(MakesmithInitFuncs):
                         else:
                             value = 0
                     if firmwareKey == 45:
-                        print("firmwareKey = 45")
+                        self.data.console_queue.put("firmwareKey = 45")
                         if storedValue != "":
                             self.sendErrorArray(firmwareKey, storedValue, data)
                         pass

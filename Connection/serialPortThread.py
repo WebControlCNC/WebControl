@@ -40,8 +40,9 @@ class SerialPortThread(MakesmithInitFuncs):
 
         message = message + "\n"
         # message = message.encode()
-        print("Sending: " + str(message).rstrip('\n'))
-
+        #print("Sending: " + str(message).rstrip('\n'))
+        self.data.console_queue.put("Sending: " + str(message).rstrip('\n'))
+        
         self.bufferSpace = self.bufferSpace - len(
             message
         )  # shrink the available buffer space by the length of the line
@@ -66,7 +67,8 @@ class SerialPortThread(MakesmithInitFuncs):
             self.serialInstance.write(message)
             self.data.logger.writeToLog("Sent: " + str(message))
         except:
-            print("write issue")
+            #print("write issue")
+            self.data.console_queue.put("write issue")
             self.data.logger.writeToLog("Send FAILED: " + str(message))
 
         self.lastWriteTime = time.time()
@@ -97,7 +99,8 @@ class SerialPortThread(MakesmithInitFuncs):
                 else:
                     self.data.uploadFlag = 0
                     self.data.gcodeIndex = 0
-                    print("Gcode Ended")
+                    self.data.console_queue.put("Gcode Ended")
+                    #print("Gcode Ended")
 
     def getmessage(self):
         # opens a serial connection called self.serialInstance
@@ -115,24 +118,26 @@ class SerialPortThread(MakesmithInitFuncs):
         )
 
         try:
-            print("connecting")
+            self.data.console_queue.put("connecting")
+            #print("connecting")
             self.data.comport = self.data.config.getValue("Maslow Settings", "COMport")
             self.serialInstance = serial.Serial(
                 self.data.comport, 57600, timeout=0.25
             )  # self.data.comport is the com port which is opened
         except:
-            print(self.data.comport + " is unavailable or in use")
+            #print(self.data.comport + " is unavailable or in use")
+            self.data.console_queue.put(self.data.comport + " is unavailable or in use")
             # self.data.ui_queue.put("\n" + self.data.comport + " is unavailable or in use")
             pass
         else:
-            print("\r\nConnected on port " + self.data.comport + "\r\n")
+            #print("\r\nConnected on port " + self.data.comport + "\r\n")
+            self.data.console_queue.put("\r\nConnected on port " + self.data.comport + "\r\n")
             self.data.ui_queue.put(
                 "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
             )  # the "_" facilitates the parse
             self.data.ui_queue.put(
                 "\r\nConnected on port " + self.data.comport + "\r\n"
             )
-            print("\r\nConnected on port " + self.data.comport + "\r\n")
             gcode = ""
             msg = ""
             subReadyFlag = True
@@ -150,13 +155,9 @@ class SerialPortThread(MakesmithInitFuncs):
             # print self.serialInstance.isOpen()
             self.lastMessageTime = time.time()
             self.data.connectionStatus = 1
-            print("here0")
             self._getFirmwareVersion()
-            print("here1")
             self._setupMachineUnits()
-            print("here2")
             self._requestSettingsUpdate()
-            print("here3")
 
             while True:
 
@@ -208,9 +209,9 @@ class SerialPortThread(MakesmithInitFuncs):
                         ):  # if there is space in the buffer keep sending lines
                             self.sendNextLine()
                     except IndexError:
-                        print(
-                            "index error when reading gcode"
-                        )  # we don't want the whole serial thread to close if the gcode can't be sent because of an index error (file deleted...etc)
+                        self.data.console_queue.put("index error when reading gcode")
+                        #print("index error when reading gcode")
+                        # we don't want the whole serial thread to close if the gcode can't be sent because of an index error (file deleted...etc)
                 else:
                     if (
                         self.bufferSpace == self.bufferSize
@@ -221,7 +222,8 @@ class SerialPortThread(MakesmithInitFuncs):
                         # Check for serial connection loss
                 # -------------------------------------------------------------------------------------
                 if time.time() - self.lastMessageTime > 5:
-                    print("Connection Timed Out")
+                    self.data.console_queue.put("Connection Timed Out")
+                    #print("Connection Timed Out")
                     self.data.ui_queue.put("Connection Timed Out\n")
                     if self.data.uploadFlag:
                         self.data.ui_queue.put(

@@ -57,10 +57,10 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.yCurve[3] = float(self.data.config.getValue('Optical Calibration Settings', 'calY3'))
             self.yCurve[4] = float(self.data.config.getValue('Optical Calibration Settings', 'calY4'))
             self.yCurve[5] = float(self.data.config.getValue('Optical Calibration Settings', 'calY5'))
-            print("reloaded calibration data")
+            self.data.console_queue.put("reloaded calibration data")
             return self.calErrorsX, self.calErrorsY, self.xCurve, self.yCurve
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return None, None, None, None
 
 
@@ -72,7 +72,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.yCurve = np.zeros(shape=(6))  # coefficients for quadratic curve
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
 
@@ -85,7 +85,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.inMeasureOnlyMode = False
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
 
@@ -138,9 +138,8 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.cannyHighValue = float(args["cannyHighValue"])
 
     def saveOpticalCalibrationConfiguration(self, args):
-        print("Saving Configuration")
+        self.data.console_queue.put("Saving Configuration")
         try:
-            print(args)
             self.data.config.setValue("Optical Calibration Settings", "opticalCenterX", float(args["opticalCenterX"]))
             self.data.config.setValue("Optical Calibration Settings", "opticalCenterY", float(args["opticalCenterY"]))
             self.data.config.setValue("Optical Calibration Settings", "scaleX", float(args["scaleX"]))
@@ -159,7 +158,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.config.setValue("Optical Calibration Settings", "brY", int(args["brY"]))
             self.data.config.setValue("Optical Calibration Settings", "calibrationExtents", args["calibrationExtents"])
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
         return True
 
@@ -178,11 +177,10 @@ class OpticalCalibration(MakesmithInitFuncs):
         _posX = round(self.HomingPosX * 3.0 + self.HomingX / 25.4, 4)
         _posY = round(self.HomingPosY * 3.0 + self.HomingY / 25.4, 4)
         # self.updateTargetIndicator(_posX,_posY,"INCHES")
-        print(
-            "Moving to ({},{}) by trying [{}, {}]".format(
+        message = "Moving to ({},{}) by trying [{}, {}]".format(
                 self.HomingPosX * 3.0, self.HomingPosY * 3.0, _posX, _posY
             )
-        )
+        self.data.console_queue.put("message")
 
         self.data.units = "INCHES"
         self.data.gcode_queue.put("G20 ")
@@ -294,7 +292,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 falseCounter += 1
                 if falseCounter == 10:
                     break
-        print("Got 10 images processed, " + str(falseCounter) + " images were bad")
+        self.data.console_queue.put("Got 10 images processed, " + str(falseCounter) + " images were bad")
         if dxList.ndim != 0:
             avgDx, stdDx = self.removeOutliersAndAverage(dxList)
             avgDy, stdDy = self.removeOutliersAndAverage(dyList)
@@ -323,7 +321,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.HomingX += avgDx
             self.HomingY += avgDy
             if ((abs(avgDx) >= 0.125) or (abs(avgDy) >= 0.125)) and ( not findCenter ):
-                print("Adjusting Location")
+                self.data.console_queue.put("Adjusting Location")
                 self.HomeIn()
             else:
                 xS = self.HomingX + self.HomingPosX * 3 * 25.4 * (1.0 - self.scaleX)
@@ -336,14 +334,14 @@ class OpticalCalibration(MakesmithInitFuncs):
                     self.calErrorsY[self.HomingPosX + 15][7 - self.HomingPosY] = yS
                 else:
                     self.opticalCenter = (avgxB, avgyB)
-                    print(str(avgxB)+", "+str(avgyB))
+                    self.data.console_queue.put(str(avgxB)+", "+str(avgyB))
                 if self.inAutoMode:
                     self.on_AutoHome()
                 else:
-                    print("avgDx,Dy:" + str(avgDx) + ", " + str(avgDy))
-                    print("Releasing Camera")
+                    self.data.console_queue.put("avgDx,Dy:" + str(avgDx) + ", " + str(avgDy))
+                    self.data.console_queue.put("Releasing Camera")
                     self.camera.release()
-                    print("Done")
+                    self.data.console_queue.put("Done")
         else:
             return False
 
@@ -354,7 +352,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             minY = self.tlY
             maxY = self.brY
             if measureMode == True:
-                print("Measure Only")
+                self.data.console_queue.put("Measure Only")
                 self.inMeasureOnlyMode = True
             if self.inAutoMode == False:
                 self.HomingX = 0.0
@@ -385,19 +383,19 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomeIn()
                     else:
                         self.inAutoMode = False
-                        print("Releasing Camera")
+                        self.data.console_queue.put("Releasing Camera")
                         self.camera.release()
                         self.camera=None
-                        print("Calibration Completed")
+                        self.data.console_queue.put("Calibration Completed")
                         #send ui updated data
                         data = {"errorX": self.calErrorsX.tolist(), "errorY": self.calErrorsY.tolist()}
                         self.data.ui_queue.put(
                              "Action: updateOpticalCalibrationError:_" + json.dumps(data)
                         )
-                        print("sent")
+                        self.data.console_queue.put("sent")
                         # self.printCalibrationErrorValue()
                 else:  # vertical
-                    print("Vertical Scan")
+                    self.data.console_queue.put("Vertical Scan")
                     if self.inMeasureOnlyMode:
                         self.HomingX = 0.0
                         self.HomingY = 0.0
@@ -414,18 +412,18 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomeIn()
                     else:
                         self.inAutoMode = False
-                        print("Releasing Camera")
+                        self.data.console_queue.put("Releasing Camera")
                         self.camera.release()
                         self.camera=None
-                        print("Calibration Completed")
+                        self.data.console_queue.put("Calibration Completed")
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
 
     def on_Calibrate(self, args):
-        print("Initializing")
+        self.data.console_queue.put("Initializing")
         self.setCalibrationSettings(args)
         self.saveOpticalCalibrationConfiguration(args)
-        print(
+        self.data.console_queue.put(
             "Extents:"
             + str(self.tlX)
             + ", "
@@ -436,21 +434,21 @@ class OpticalCalibration(MakesmithInitFuncs):
             + str(self.brY)
         )
         if self.camera is None:
-            print("Starting Camera")
+            self.data.console_queue.put("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-        print("Analyzing Images")
+        self.data.console_queue.put("Analyzing Images")
         self.on_AutoHome(False)
         return True
 
     def testImage(self, args, findCenter=False):
-        print("at Test Image")
+        self.data.console_queue.put("at Test Image")
         self.setCalibrationSettings(args)
         if self.camera is None:
-            print("Starting Camera")
+            self.data.console_queue.put("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-            print("Camera Started")
+            self.data.console_queue.put("Camera Started")
         avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
-        print("Releasing Camera")
+        self.data.console_queue.put("Releasing Camera")
         self.camera.release()
         self.camera = None
         if avgDx is not None:
@@ -461,7 +459,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationTestImage = stringData
             self.data.opticalCalibrationTestImageUpdated = True
-            print(str(avgxB)+", "+str(avgyB))
+            self.data.console_queue.put(str(avgxB)+", "+str(avgyB))
             if findCenter:
                 return avgxB, avgyB
             else:
@@ -477,7 +475,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 return True
 
     def findCenter(self, args):
-        print("at Find Center")
+        self.data.console_queue.put("at Find Center")
         avgxB, avgyB = self.testImage(args, True)
         if avgxB is not None and avgyB is not None:
             # return optical center values, but don't use them until returned by user
@@ -540,7 +538,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.config.setValue('Optical Calibration Settings', 'xyErrorArray', _str)
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def surfaceFit(self):
@@ -548,6 +546,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         try:
             dataX = np.zeros(((15 * 31), 3))
             dataY = np.zeros(((15 * 31), 3))
+            print(self.calErrorsX)
             for y in range(7, -8, -1):
                 for x in range(-15, 16, +1):
                     dataX[(7 - y) * 31 + (x + 15)][0] = float(x * 3.0 * 25.4)
@@ -584,6 +583,6 @@ class OpticalCalibration(MakesmithInitFuncs):
             print(yR2)
             return self.xCurve.tolist(), self.yCurve.tolist()
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return None, None
 
