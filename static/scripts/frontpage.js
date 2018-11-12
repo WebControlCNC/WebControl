@@ -194,8 +194,9 @@ function gcodeUpdateCompressed(msg){
   gcode = draw.group();
   //console.log(msg.data);
   if (msg.data!=null){
-    var uncompressed = pako.inflate(msg.data)
-    var _str = new TextDecoder("utf-8").decode(uncompressed);
+    var uncompressed = pako.inflate(msg.data);
+    var _str = ab2str(uncompressed);
+    //var _str = new TextDecoder("utf-8").decode(uncompressed);
     //console.log(_str);
     var data = JSON.parse(_str)
     data.forEach(function(line) {
@@ -210,4 +211,13 @@ function gcodeUpdateCompressed(msg){
       gcode.move(originX,originY)
     });
   }
+}
+
+function ab2str(buf) {
+    var bufView = new Uint16Array(buf);
+    var unis =""
+    for (var i = 0; i < bufView.length; i++) {
+        unis=unis+String.fromCharCode(bufView[i]);
+    }
+    return unis
 }
