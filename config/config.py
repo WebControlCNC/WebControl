@@ -171,6 +171,7 @@ class Config(MakesmithInitFuncs):
             # must be a turned off checkbox.. what a pain to figure out
             #print(str(self.settings[section][x]["key"])+" not found")
             if self.settings[section][x]["type"] == "bool":
+                print(self.settings[section][x]["key"])
                 storedValue = self.settings[section][x]["value"]
                 self.settings[section][x]["value"] = 0
                 if "firmwareKey" in self.settings[section][x]:
@@ -189,8 +190,14 @@ class Config(MakesmithInitFuncs):
                 )
 
     def updateSettings(self, section, result):
-        for setting in result:
-            self.setValue(section, setting, result[setting], recursionBreaker=False, isImporting = False)
+        for x in range(len(self.settings[section])):
+            setting = self.settings[section][x]["key"]
+            print(setting)
+            if setting in result:
+                resultValue = result[setting]
+            else:
+                resultValue = 0
+            self.setValue(section, setting, resultValue, recursionBreaker=False, isImporting = False)
         self.data.console_queue.put("settings updated")
 
     def getJSONSettingSection(self, section):

@@ -7,6 +7,8 @@ behavior.
 
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import threading
+import os
+from pathlib import Path
 from app import app, socketio
 
 
@@ -19,12 +21,19 @@ class Logger(MakesmithInitFuncs):
     messageBuffer = ""
     amessageBuffer = ""
 
-    # clear the old log file
-    with open("log.txt", "a") as logFile:
-        logFile.truncate()
+    def __init__(self):
+        print("Initializing Logger")
+        self.home = str(Path.home())
+        # clear the old log file
+        if not os.path.isdir(self.home + "/.WebControl"):
+            print("creating " + self.home + "/.WebControl directory")
+            os.mkdir(self.home + "/.WebControl")
+        print(self.home+"/.WebControl/"+"log.txt")
+        with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
+            logFile.truncate()
 
-    with open("alog.txt", "a") as logFile:
-        logFile.truncate()
+        with open(self.home+"/.WebControl/"+"alog.txt", "a") as logFile:
+            logFile.truncate()
 
     def writeToLog(self, message):
 
@@ -69,10 +78,10 @@ class Logger(MakesmithInitFuncs):
         Write to the log file
         """
         if log is True:
-            with open("log.txt", "a") as logFile:
+            with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
                 logFile.write(toWrite)
         else:
-            with open("alog.txt", "a") as logFile:
+            with open(self.home+"/.WebControl/"+"alog.txt", "a") as logFile:
                 logFile.write(toWrite)
 
         return
