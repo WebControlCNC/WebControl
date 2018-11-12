@@ -76,7 +76,7 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         try:
             distBetweenCuts12 = float(result["cut12"])
-            print(distBetweenCuts12)
+            self.data.console_queue.put(distBetweenCuts12)
         except:
             self.data.message_queue.put(
                 "Message: Please enter a number for the distance between cut 1 and cut 2."
@@ -85,7 +85,7 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         try:
             distBetweenCuts34 = float(result["cut34"])
-            print(distBetweenCuts34)
+            self.data.console_queue.put(distBetweenCuts34)
         except:
             self.data.message_queue.put(
                 "Message: Please enter a number for the distance between cut 3 and cut 4."
@@ -94,7 +94,7 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         try:
             distWorkareaTopToCut5 = float(result["cut5"])
-            print(distWorkareaTopToCut5)
+            self.data.console_queue.put(distWorkareaTopToCut5)
         except:
             self.data.message_queue.put(
                 "Message: Please enter a number for the distance between the top of the work area and cut 5."
@@ -103,7 +103,7 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         try:
             bitDiameter = float(result["bitDiameter"])
-            print(bitDiameter)
+            self.data.console_queue.put(bitDiameter)
         except:
             self.data.message_queue.put(
                 "Message: Please enter a number for the bit diameter."
@@ -329,8 +329,8 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         # Set up the iterative algorithm
 
-        print("Previous machine parameters:")
-        print(
+        self.data.console_queue.put("Previous machine parameters:")
+        self.data.console_queue.put(
             "Motor Spacing: "
             + str(motorSpacing)
             + ", Motor Y Offset: "
@@ -351,7 +351,7 @@ class TriangularCalibration(MakesmithInitFuncs):
         ChainErrorCut4 = acceptableTolerance
         n = 0
 
-        print("Iterating for new machine parameters")
+        self.data.console_queue.put("Iterating for new machine parameters")
 
         # Iterate until error tolerance is achieved or maximum number of iterations occurs
 
@@ -517,7 +517,7 @@ class TriangularCalibration(MakesmithInitFuncs):
                 motorYcoordEst - distWorkareaTopToCut5 - (bitDiameter / 2) - 12.7
             )
 
-            print(
+            self.data.console_queue.put(
                 "N: "
                 + str(n)
                 + ", Motor Spacing: "
@@ -529,7 +529,7 @@ class TriangularCalibration(MakesmithInitFuncs):
                 + ", Chain Sag Correction Value: "
                 + str(round(chainSagCorrectionEst, 6))
             )
-            print(
+            self.data.console_queue.put(
                 "  Chain Error Cut 1: "
                 + str(round(ChainErrorCut1, 4))
                 + ", Chain Error Cut 2: "
@@ -578,13 +578,13 @@ class TriangularCalibration(MakesmithInitFuncs):
                     chainSagCorrectionCorrectionScale / 2
                 )
                 cutYoffsetCorrectionScale = float(cutYoffsetCorrectionScale / 2)
-                print("Estimated values out of range, trying again with smaller steps")
+                self.data.console_queue.put("Estimated values out of range, trying again with smaller steps")
 
         if n == numberOfIterations:
             self.data.message_queue.put(
                 "Message: The machine was not able to be calibrated. Please ensure the work area dimensions are correct and try again."
             )
-            print("Machine parameters could not be determined")
+            self.data.console_queue.put("Machine parameters could not be determined")
 
             return False
 
@@ -593,7 +593,7 @@ class TriangularCalibration(MakesmithInitFuncs):
         # self.vertMeasureT1.disabled = True
         # self.enterValuesT.disabled = True
 
-        print("Machine parameters found:")
+        self.data.console_queue.put("Machine parameters found:")
 
         motorYoffsetEst = (
             motorYcoordEst - distWorkareaTopToCut5 - (bitDiameter / 2) - 12.7
@@ -603,7 +603,7 @@ class TriangularCalibration(MakesmithInitFuncs):
         rotationRadiusEst = round(rotationRadiusEst, 1)
         chainSagCorrectionEst = round(chainSagCorrectionEst, 6)
 
-        print(
+        self.data.console_queue.put(
             "Motor Spacing: "
             + str(motorSpacing)
             + ", Motor Y Offset: "

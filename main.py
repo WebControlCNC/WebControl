@@ -132,7 +132,7 @@ def uploadGCode():
 def openGCode():
     if request.method == "POST":
         f = request.form["selectedGCode"]
-        print("selectedGcode="+str(f))
+        app.data.console_queue.put("selectedGcode="+str(f))
         app.data.gcodeFile.filename = "gcode/" + f
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
@@ -228,22 +228,22 @@ def checkInRequested():
 #Watchdog socketio.. not working yet.
 @socketio.on("connect", namespace="/WebMCP")
 def watchdog_connect():
-    print("watchdog connected")
-    print(request.sid)
+    app.data.console_queue.put("watchdog connected")
+    app.data.console_queue.put(request.sid)
     socketio.emit("connect", namespace="/WebMCP")
     if app.mcpthread == None:
-        print("going to start mcp thread")
+        app.data.console_queue.put("going to start mcp thread")
         app.mcpthread = socketio.start_background_task(
             app.data.mcpProcessor.start, current_app._get_current_object()
         )
-        print("created mcp thread")
+        app.data.console_queue.put("created mcp thread")
         app.mcpthread.start()
-        print("started mcp thread")
+        app.data.console_queue.put("started mcp thread")
 
 
 @socketio.on("my event", namespace="/MaslowCNC")
 def my_event(msg):
-    print(msg["data"])
+    app.data.console_queue.put(msg["data"])
 
 
 @socketio.on("modalClosed", namespace="/MaslowCNC")
@@ -261,12 +261,12 @@ def requestPage(msg):
             namespace="/MaslowCNC",
         )
     except Exception as e:
-        print(e)
+        app.data.console_queue.put(e)
 
 @socketio.on("connect", namespace="/MaslowCNC")
 def test_connect():
-    print("connected")
-    print(request.sid)
+    app.data.console_queue.put("connected")
+    app.data.console_queue.put(request.sid)
     if app.uithread == None:
         app.uithread = socketio.start_background_task(
             app.UIProcessor.start, current_app._get_current_object()
@@ -281,7 +281,7 @@ def test_connect():
 
 @socketio.on("disconnect", namespace="/MaslowCNC")
 def test_disconnect():
-    print("Client disconnected")
+    app.data.console_queue.put("Client disconnected")
 
 
 @socketio.on("action", namespace="/MaslowCNC")
@@ -316,9 +316,9 @@ def checkForGCodeUpdate(msg):
         "requestedSetting", {"setting": "units", "value": units}, namespace="/MaslowCNC"
     )
     ## send updated gcode to UI
-    print("Sending Gcode compressed")
+    app.data.console_queue.put("Sending Gcode compressed")
     socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode}, namespace="/MaslowCNC")
-    print("Sent Gcode compressed")
+    app.data.console_queue.put("Sent Gcode compressed")
     #socketio.emit(
     #    "gcodeUpdate",
     #    {"data": json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])},
@@ -328,8 +328,8 @@ def checkForGCodeUpdate(msg):
 
 @socketio.on_error_default
 def default_error_handler(e):
-    print(request.event["message"])  # "my error event"
-    print(request.event["args"])  # (data,)1
+    app.data.console_queue.put(request.event["message"])  # "my error event"
+    app.data.console_queue.put(request.event["args"])  # (data,)1
 
 
 if __name__ == "__main__":

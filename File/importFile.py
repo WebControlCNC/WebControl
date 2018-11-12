@@ -8,7 +8,7 @@ import math
 
 class ImportFile(MakesmithInitFuncs):
     def importGCini(self, filename):
-        print(filename)
+        self.data.console_queue.put(filename)
         if filename is "":  # Blank file?
             return False
         try:
@@ -37,11 +37,11 @@ class ImportFile(MakesmithInitFuncs):
                         self.data.config.setValue(
                             section, setting[0], setting[1], True, isImporting=True,
                         )
-            print("computing settings")
+            self.data.console_queue.put("computing settings")
             self.data.config.computeSettings(None, None, None, True)
             self.data.gcode_queue.put("$$")
         except:
-            print("Import File Error")
+            self.data.console_queue.put("Import File Error")
             self.data.message_queue.put("Message: Cannot open import file.")
             return False
         return True

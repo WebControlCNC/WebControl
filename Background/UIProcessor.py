@@ -12,12 +12,12 @@ class UIProcessor:
     def start(self, _app):
 
         self.app = _app
-        print("starting UI")
+        self.app.data.console_queue.put("starting UI")
         with self.app.app_context():
             while True:
                 time.sleep(0.001)
                 if self.app.data.config.firstRun:
-                    print("here at firstRun")
+                    self.app.data.console_queue.put("here at firstRun")
                     self.app.data.config.firstRun = False
                     time.sleep(2)
                     self.activateModal("Notification:",
@@ -50,18 +50,18 @@ class UIProcessor:
                                 oo = 1
                                 # app.setErrorOnScreen(message)
                         elif message[0:13] == "Maslow Paused":
-                                print("caught maslow paused")
-                                socketio.emit(
-                                    "requestedSetting",
-                                    {"setting": "pauseButtonSetting", "value": "Resume"},
-                                    namespace="/MaslowCNC",
-                                )
+                            self.app.data.console_queue.put("caught maslow paused")
+                            socketio.emit(
+                                "requestedSetting",
+                                {"setting": "pauseButtonSetting", "value": "Resume"},
+                                namespace="/MaslowCNC",
+                            )
                         elif message[0:12] == "Tool Change:":
-                            print("found tool change in message")
+                            self.app.data.console_queue.put("found tool change in message")
                             self.activateModal("Notification:", message[13:], "resume")
                         elif message[0:8] == "Message:":
                             if message.find("adjust Z-Axis") != -1:
-                                print("found adjust Z-Axis in message")
+                                self.app.data.console_queue.put("found adjust Z-Axis in message")
                                 #socketio.emit(
                                 #    "requestedSetting",
                                 #    {"setting": "pauseButtonSetting", "value": "Resume"},
@@ -128,7 +128,7 @@ class UIProcessor:
                                 msg = message.split(
                                     "_"
                                 )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                                print("sending home position update")
+                                self.app.data.console_queue.put("sending home position update")
                                 socketio.emit(
                                     "homePositionMessage",
                                     {"data": msg[1]},
@@ -182,7 +182,7 @@ class UIProcessor:
                     self.sendControllerMessage("Unable to resolve z Kinematics.")
                     self.app.data.zval = 0
         except:
-            print("One Machine Position Report Command Misread")
+            self.app.data.console_queue.put("One Machine Position Report Command Misread")
             return
 
         percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"

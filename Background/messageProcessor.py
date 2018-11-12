@@ -33,8 +33,8 @@ class MessageProcessor(MakesmithInitFuncs):
                             try:
                                 self.data.measureRequest(measuredDist)
                             except Exception as e:
-                                print(e)
-                                print("No function has requested a measurement")
+                                self.data.console_queue.put(str(e))
+                                self.data.console_queue.put("No function has requested a measurement")
                     elif message[0:13] == "Maslow Paused":
                         self.data.uploadFlag = 0
                         self.data.ui_queue.put(message)
@@ -59,7 +59,7 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.logger.writeToLog(
                             "Ground Control Version " + str(self.data.version) + "\n"
                         )
-                        print(
+                        self.data.console_queue.put(
                             "Ground Control "
                             + str(self.data.version)
                             + "\r\n"

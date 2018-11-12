@@ -26,7 +26,7 @@
               socket.emit('my event', {data: 'I\'m connected!'});
               $("#clientStatus").text("Connected");
               $("#clientStatus").removeClass('btn-outline-danger').addClass('btn-success');
-              checkForGCodeUpdate();
+              //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
           });
 
           socket.on('disconnect', function(msg) {

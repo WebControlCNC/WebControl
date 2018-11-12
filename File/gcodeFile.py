@@ -113,7 +113,7 @@ class GCodeFile(MakesmithInitFuncs):
                     else:
                         self.data.zMoves.append(index)
         except:
-            print("Gcode File Error")
+            self.data.console_queue.put("Gcode File Error")
             self.data.ui_queue.put("Message: Cannot open gcode file.")
             self.data.gcodeFile.filename = ""
             return False
@@ -406,8 +406,8 @@ class GCodeFile(MakesmithInitFuncs):
             #print(gCodeLine)
             return gCodeLine
         except ValueError:
-            print("line could not be moved:")
-            print(originalLine)
+            self.data.console_queue.put("line could not be moved:")
+            self.data.console_queue.put(originalLine)
             return originalLine
 
     def loadNextLine(self):
@@ -493,7 +493,7 @@ class GCodeFile(MakesmithInitFuncs):
             pass
 
         if gString == "G18":
-            print("G18 not supported")
+            self.data.console_queue.put("G18 not supported")
 
         if gString == "G20":
             if self.data.units != "INCHES":
@@ -525,8 +525,8 @@ class GCodeFile(MakesmithInitFuncs):
         with gzip.GzipFile(fileobj=out, mode="w") as f:
             f.write(tstr.encode())
         self.data.compressedGCode = out.getvalue()
-        print("uncompressed:"+str(len(tstr)))
-        print("compressed:"+str(len(self.data.compressedGCode)))
+        self.data.console_queue.put("uncompressed:"+str(len(tstr)))
+        self.data.console_queue.put("compressed:"+str(len(self.data.compressedGCode)))
         #print(self.data.compressedGCode)
 
     def updateGcode(self):
@@ -560,7 +560,7 @@ class GCodeFile(MakesmithInitFuncs):
                 + str(self.maxNumberOfLinesToRead)
                 + "lines are shown here.\nThe complete program will cut if you choose to do so unless the home position is moved from (0,0)."
             )
-            print(errorText)
+            self.data.console_queue.put(errorText)
             self.data.ui_queue.put("Message: " + errorText)
 
         th = threading.Thread(target=self.callBackMechanism)
