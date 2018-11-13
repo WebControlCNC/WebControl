@@ -153,6 +153,9 @@ class UIProcessor:
                                 self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
 
                         elif message[0:6] == "ALARM:":
+                            if message.find("The sled is not keeping up") != -1:
+                                #change color of stop button
+                                pass
                             self.activateModal("Notification:", message[7:])
                         elif message == "ok\r\n":
                             pass  # displaying all the 'ok' messages clutters up the display
@@ -198,7 +201,7 @@ class UIProcessor:
     def activateModal(self, title, message, resume="false"):
         socketio.emit(
             "activateModal",
-            {"title": title, "message": message, "resume": resume, "modalSize": "small"},
+            {"title": title, "message": message, "resume": resume, "modalSize": "small", "modalType": "notification"},
             namespace="/MaslowCNC",
         )
 
