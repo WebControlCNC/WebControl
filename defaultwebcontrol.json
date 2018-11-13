@@ -44,7 +44,8 @@
             "section": "Advanced Settings",
             "title": "Chain Tolerance, Left Chain",
             "type": "string",
-            "value": "0"
+            "value": "0",
+            "firmwareKey": 40
         },
         {
             "default": 0,
@@ -53,7 +54,8 @@
             "section": "Advanced Settings",
             "title": "Chain Tolerance, Right Chain",
             "type": "string",
-            "value": "0"
+            "value": "0",
+            "firmwareKey": 41
         },
         {
             "default": "Top",
@@ -500,18 +502,6 @@
             "key": "fPWMComputed",
             "type": "string",
             "value": 3
-        },
-        {
-            "firmwareKey": 40,
-            "key": "distPerRotLeftChainTolerance",
-            "type": "string",
-            "value": "63.50000"
-        },
-        {
-            "firmwareKey": 41,
-            "key": "distPerRotRightChainTolerance",
-            "type": "string",
-            "value": "63.50000"
         },
         {
             "default": 1.0,

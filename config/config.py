@@ -426,42 +426,13 @@ class Config(MakesmithInitFuncs):
                 if currentValue != "2":
                     self.setValue("Computed Settings", "kinematicsTypeComputed", "2", True)
 
-        if key == "gearTeeth" or key == "chainPitch" or key == "leftChainTolerance" or key == "rightChainTolerance" or doAll is True:
-            if key == "gearTeeth" or key == "chainPitch" or doAll is True:
-                gearTeeth = float(self.getValue("Advanced Settings", "gearTeeth"))
-                chainPitch = float(self.getValue("Advanced Settings", "chainPitch"))
-                distPerRot = gearTeeth * chainPitch
-                currentdistPerRot = self.getValue("Computed Settings", "distPerRot")
-                if currentdistPerRot != str(distPerRot):
-                    self.setValue("Computed Settings", "distPerRot", str(distPerRot), True)
-
-                leftChainTolerance = float(
-                    self.getValue("Advanced Settings", "leftChainTolerance")
-                )
-            else:
-                distPerRot = self.getValue("Computed Settings", "distPerRot")
-
-            if key != "rightChainTolerance" or doAll is True: #i.e., its gearTeeth, chainPitch, leftChainTolerance or doAll is True
-                currentdistPerRotLeftChainTolerance = self.getValue("Computed Settings", "distPerRotLeftChainTolerance")
-                distPerRotLeftChainTolerance = (1 + leftChainTolerance / 100.0) * distPerRot
-                if currentdistPerRotLeftChainTolerance != str("{0:.5f}".format(distPerRotLeftChainTolerance)):
-                    self.setValue(
-                        "Computed Settings",
-                        "distPerRotLeftChainTolerance",
-                        str("{0:.5f}".format(distPerRotLeftChainTolerance)),
-                        True,
-                    )
-            if key != "leftChainTolerance" or doAll is True:
-                currentdistPerRotRightChainTolerance = self.getValue("Computed Settings", "distPerRotRightChainTolerance")
-                rightChainTolerance = float(self.getValue("Advanced Settings", "rightChainTolerance"))
-                distPerRotRightChainTolerance = (1 + rightChainTolerance / 100.0) * distPerRot
-                if currentdistPerRotRightChainTolerance != str("{0:.5f}".format(distPerRotRightChainTolerance)):
-                    self.setValue(
-                        "Computed Settings",
-                        "distPerRotRightChainTolerance",
-                        str("{0:.5f}".format(distPerRotRightChainTolerance)),
-                        True,
-                    )
+        if key == "gearTeeth" or key == "chainPitch" or doAll is True:
+            gearTeeth = float(self.getValue("Advanced Settings", "gearTeeth"))
+            chainPitch = float(self.getValue("Advanced Settings", "chainPitch"))
+            distPerRot = gearTeeth * chainPitch
+            currentdistPerRot = self.getValue("Computed Settings", "distPerRot")
+            if currentdistPerRot != str(distPerRot):
+                self.setValue("Computed Settings", "distPerRot", str(distPerRot), True)
 
         if key == "enablePosPIDValues" or doAll is True:
             for key in ("KpPos", "KiPos", "KdPos", "propWeight"):
