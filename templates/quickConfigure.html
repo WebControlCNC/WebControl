@@ -97,7 +97,7 @@ $(document).ready(function () {
             data: $(this).serialize(),
             success: function (data) {
               console.log("success");
-                $('#notificationModal').modal('toggle')
+                $('#contentModal').modal('toggle')
             },
             error: function (jXHR, textStatus, errorThrown) {
                 alert(errorThrown);

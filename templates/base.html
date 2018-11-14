@@ -81,53 +81,56 @@
 
           socket.on('activateModal', function(msg){
             console.log("modal size requested="+msg.modalSize)
-            msgmodalType = "notification"
-            console.log("modal type ="+msgmodalType);
+            console.log("modal type ="+msg.modalType);
             var $modal, $modalTitle, $modalText
-            if (msgmodalType == "content"){
-              $modal = $('#contentDialog');
+            if (msg.modalType == "content"){
+              $modal = $('#contentModal');
+              $modalDialog = $('#contentDialog');
               $modalTitle = $('#contentModalTitle');
               $modalText = $('#contentModalText');
             }
-            else if (msgmodalType == "alarm") {
-              $modal = $('#alarmDialog');
+            else if (msg.modalType == "alarm") {
+              $modal = $('#alarmModal');
+              $modalDialog = $('#alarmDialog');
               $modalTitle = $('#alarmModalTitle');
               $modalText = $('#alarmModalText');
+              if (msg.resume=="clear"){
+                  $('#clearButton').show();
+              } else {
+                  $('#clearButton').hide();
+              }
             }
             else{
-              $modal = $('#notificationDialog');
+              $modal = $('#notificationModal');
+              $modalDialog = $('#notificationDialog');
               $modalTitle = $('#notificationModalTitle');
               $modalText = $('#notificationModalText');
+              if (msg.resume=="resume"){
+                $('#resumeButton').show();
+              } else {
+                $('#resumeButton').hide();
+              }
             }
-            $modal.removeClass('modal-lg');
-            $modal.removeClass('modal-sm');
-            $modal.removeClass('mw-100 w-75');
+            $modalDialog.removeClass('modal-lg');
+            $modalDialog.removeClass('modal-sm');
+            $modalDialog.removeClass('mw-100 w-75');
             if (msg.modalSize=="large"){
               if (isMobile)
-                $modal.addClass('modal-lg');
+                $modalDialog.addClass('modal-lg');
               else
-                $modal.addClass('mw-100 w-75');
+                $modalDialog.addClass('mw-100 w-75');
             }
             if (msg.modalSize=="medium")
-              $modal.addClass('modal-lg');
+              $modalDialog.addClass('modal-lg');
             if (msg.modalSize=="small")
-              $modal.addClass('modal-sm');
+              $modalDialog.addClass('modal-sm');
             $modal.data('bs.modal',null);
             $modal.data('name',msg.title);
 
             $modalTitle.html("<h3>"+msg.title+"</h3");
             $modalText.html("<p>"+msg.message+"</p>");
             console.log(msg.resume)
-            if (msg.resume=="resume"){
-                $('#resumeButton').show();
-            } else {
-                $('#resumeButton').hide();
-            }
-            if (msg.resume=="clear"){
-                $('#clearButton').show();
-            } else {
-                $('#clearButton').hide();
-            }
+
             if (msg.isStatic==true){
                 console.log("Static Modal")
                 $modal.modal({backdrop: 'static', keyboard: false})
@@ -191,19 +194,17 @@
               socket.emit('modalClosed', {data:name});
           });
 
+          $("#actionModal").on('hidden.bs.modal', function(e){
+              var name = $('#actionModal').data('name');
+              //console.log("action modal "+name+" is closing");
+              socket.emit('actionModalClosed', {data:name});
+          });
+
           $("#contentModal").on('hidden.bs.modal', function(e){
-              var name = $('#conentModal').data('name');
-              //console.log("content modal "+name+" is closing");
+              var name = $('#contentModal').data('name');
+              console.log("content modal "+name+" is closing");
               socket.emit('contentModalClosed', {data:name});
           });
-
-          $("#alarmModal").on('hidden.bs.modal', function(e){
-              var name = $('#alarmModal').data('name');
-              //console.log("alarm modal "+name+" is closing");
-              socket.emit('alarmModalClosed', {data:name});
-          });
-
-
       }
 
       function action(command, arg, arg1){
@@ -339,7 +340,7 @@
     </div>
   </div>
 
- <div class="modal" id="alarmModal" tabindex="-1" role="dialog">
+  <div class="modal" id="alarmModal" tabindex="-1" role="dialog">
     <div id="alarmDialog" class="modal-dialog {{modalStyle}}" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -352,7 +353,7 @@
           <p>Modal body text goes here.</p>
         </div>
         <div class="modal-footer">
-          <button id="clearButton" type="button" class="btn btn-info" onclick="stopRun()" data-dismiss="modal">Clear Alarm</button>
+          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alarm</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

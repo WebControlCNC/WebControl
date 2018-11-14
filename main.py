@@ -84,6 +84,7 @@ def maslowSettings():
         message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
+        print("here")
         return resp
 
 
@@ -249,6 +250,16 @@ def my_event(msg):
 @socketio.on("modalClosed", namespace="/MaslowCNC")
 def modalClosed(msg):
     socketio.emit("closeModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
+
+
+@socketio.on("contentModalClosed", namespace="/MaslowCNC")
+def contentModalClosed(msg):
+    socketio.emit("closeContentModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
+
+
+@socketio.on("actionModalClosed", namespace="/MaslowCNC")
+def actionModalClosed(msg):
+    socketio.emit("closeActionModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
 
 
 @socketio.on("requestPage", namespace="/MaslowCNC")

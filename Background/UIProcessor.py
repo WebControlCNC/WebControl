@@ -21,7 +21,7 @@ class UIProcessor:
                     self.app.data.config.firstRun = False
                     time.sleep(2)
                     self.activateModal("Notification:",
-                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.")
+                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.","notification")
                 if self.app.data.opticalCalibrationImageUpdated is True:
                     self.sendCalibrationMessage(
                         "OpticalCalibrationImageUpdated",
@@ -58,7 +58,7 @@ class UIProcessor:
                             )
                         elif message[0:12] == "Tool Change:":
                             self.app.data.console_queue.put("found tool change in message")
-                            self.activateModal("Notification:", message[13:], "resume")
+                            self.activateModal("Notification:", message[13:],"notification", "resume")
                         elif message[0:8] == "Message:":
                             if message.find("adjust Z-Axis") != -1:
                                 self.app.data.console_queue.put("found adjust Z-Axis in message")
@@ -67,9 +67,9 @@ class UIProcessor:
                                 #    {"setting": "pauseButtonSetting", "value": "Resume"},
                                 #    namespace="/MaslowCNC",
                                 #)
-                                self.activateModal("Notification:", message[9:], "resume")
+                                self.activateModal("Notification:", message[9:], "notification", "resume")
                             else:
-                                self.activateModal("Notification:", message[9:])
+                                self.activateModal("Notification:", message[9:], "notification")
                         elif message[0:7] == "Action:":
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(
@@ -156,7 +156,7 @@ class UIProcessor:
                             if message.find("The sled is not keeping up") != -1:
                                 #change color of stop button
                                 pass
-                            self.activateModal("Notification:", message[7:])
+                            self.activateModal("Alarm:", message[7:], "alarm", "clear")
                         elif message == "ok\r\n":
                             pass  # displaying all the 'ok' messages clutters up the display
                         else:
@@ -198,10 +198,10 @@ class UIProcessor:
         }
         self.sendPositionMessage(position)
 
-    def activateModal(self, title, message, resume="false"):
+    def activateModal(self, title, message, modalType, resume="false"):
         socketio.emit(
             "activateModal",
-            {"title": title, "message": message, "resume": resume, "modalSize": "small", "modalType": "notification"},
+            {"title": title, "message": message, "resume": resume, "modalSize": "small", "modalType": modalType},
             namespace="/MaslowCNC",
         )
 

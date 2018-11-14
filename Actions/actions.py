@@ -646,6 +646,7 @@ class Actions(MakesmithInitFuncs):
 
     def updatePorts(self):
         # refresh the list of available comports
+        self.data.console_queue.put("at Update Ports")
         portsList = []
         try:
             if sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
