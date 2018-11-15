@@ -11,16 +11,27 @@
       </select>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
+    <div id="gcCircle">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </form>
 </div>
 {% endblock %}
 
 {% block javascript %}
 <script>
+$('#gcCircle').hide();
 $(document).ready(function () {
     $('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
-
+        $('#gcCircle').show();
         var formdata = new FormData(this);
 
         $.ajax({
@@ -35,9 +46,11 @@ $(document).ready(function () {
               console.log("success");
                 $('#contentModal').modal('toggle')
                 checkForGCodeUpdate();
+                $('#gcCircle').hide();
             },
             error: function (jXHR, textStatus, errorThrown) {
                 alert(errorThrown);
+                $('#gcCircle').hide();
             }
         });
     });

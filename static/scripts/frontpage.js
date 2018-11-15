@@ -211,6 +211,7 @@ function gcodeUpdateCompressed(msg){
       gcode.move(originX,originY)
     });
   }
+  $("#fpCircle").hide();
 }
 
 function ab2str(buf) {
@@ -220,4 +221,8 @@ function ab2str(buf) {
         unis=unis+String.fromCharCode(bufView[i]);
     }
     return unis
+}
+
+function showFPSpinner(msg){
+    $("#fpCircle").show();
 }

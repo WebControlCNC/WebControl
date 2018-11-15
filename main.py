@@ -328,6 +328,8 @@ def checkForGCodeUpdate(msg):
     )
     ## send updated gcode to UI
     app.data.console_queue.put("Sending Gcode compressed")
+    socketio.emit("showFPSpinner", {"data": len(app.data.compressedGCode)}, namespace="/MaslowCNC")
+    time.sleep(0.25)
     socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode}, namespace="/MaslowCNC")
     app.data.console_queue.put("Sent Gcode compressed")
     #socketio.emit(

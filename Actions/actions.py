@@ -789,7 +789,7 @@ class Actions(MakesmithInitFuncs):
         return None, None
 
     def upgradeFirmware(self):
-        self.data.ui_queue.put("Message: Firmware Update in Progress, Please Wait.")
+        self.data.ui_queue.put("SpinnerMessage: Firmware Update in Progress, Please Wait.")
         time.sleep(.5)
         cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P/dev/ttyACM0 -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
         os.system(cmd)

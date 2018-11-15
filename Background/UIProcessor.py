@@ -58,7 +58,16 @@ class UIProcessor:
                             )
                         elif message[0:12] == "Tool Change:":
                             self.app.data.console_queue.put("found tool change in message")
-                            self.activateModal("Notification:", message[13:],"notification", "resume")
+                            self.activateModal("Notification:", message[13:],"notification", resume="resume")
+                        elif message[0:13] == "showFPSpinner":
+                            socketio.emit("showFPSpinner", {"data": ""}, namespace="/MaslowCNC")
+                        elif message[0:12] == "closeModals:":
+                            msg = message.split("_")
+                            socketio.emit(
+                                "closeModals",
+                                {"data": {"title": msg[1]}},
+                                namespace="/MaslowCNC",
+                            )
                         elif message[0:8] == "Message:":
                             if message.find("adjust Z-Axis") != -1:
                                 self.app.data.console_queue.put("found adjust Z-Axis in message")
@@ -67,9 +76,13 @@ class UIProcessor:
                                 #    {"setting": "pauseButtonSetting", "value": "Resume"},
                                 #    namespace="/MaslowCNC",
                                 #)
-                                self.activateModal("Notification:", message[9:], "notification", "resume")
+                                self.activateModal("Notification:", message[9:], "notification", resume="resume")
                             else:
                                 self.activateModal("Notification:", message[9:], "notification")
+                        elif message[0:16] == "ProgressMessage:":
+                                self.activateModal("Notification:", message[17:], "notification", progress="enable")
+                        elif message[0:15] == "SpinnerMessage:":
+                                self.activateModal("Notification:", message[17:], "notification", progress="spinner")
                         elif message[0:7] == "Action:":
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(
@@ -156,7 +169,7 @@ class UIProcessor:
                             if message.find("The sled is not keeping up") != -1:
                                 #change color of stop button
                                 pass
-                            self.activateModal("Alarm:", message[7:], "alarm", "clear")
+                            self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                         elif message == "ok\r\n":
                             pass  # displaying all the 'ok' messages clutters up the display
                         else:
@@ -198,10 +211,10 @@ class UIProcessor:
         }
         self.sendPositionMessage(position)
 
-    def activateModal(self, title, message, modalType, resume="false"):
+    def activateModal(self, title, message, modalType, resume="false", progress="false"):
         socketio.emit(
             "activateModal",
-            {"title": title, "message": message, "resume": resume, "modalSize": "small", "modalType": modalType},
+            {"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType},
             namespace="/MaslowCNC",
         )
 

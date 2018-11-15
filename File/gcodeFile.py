@@ -527,7 +527,6 @@ class GCodeFile(MakesmithInitFuncs):
         self.data.compressedGCode = out.getvalue()
         self.data.console_queue.put("uncompressed:"+str(len(tstr)))
         self.data.console_queue.put("compressed:"+str(len(self.data.compressedGCode)))
-        #print(self.data.compressedGCode)
 
     def updateGcode(self):
         """
@@ -561,6 +560,7 @@ class GCodeFile(MakesmithInitFuncs):
                 + "lines are shown here.\nThe complete program will cut if you choose to do so unless the home position is moved from (0,0)."
             )
             self.data.console_queue.put(errorText)
+            self.data.ui_queue.put("closeModals:_Notification:")
             self.data.ui_queue.put("Message: " + errorText)
 
         th = threading.Thread(target=self.callBackMechanism)

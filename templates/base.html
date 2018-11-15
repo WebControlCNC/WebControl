@@ -110,6 +110,17 @@
               } else {
                 $('#resumeButton').hide();
               }
+              if (msg.progress=="true"){
+                $('#progressBarDiv').show();
+              } else {
+                $('#progressBarDiv').hide();
+              }
+              if (msg.progress=="spinner"){
+                $('#notificationCircle').show();
+              } else {
+                $('#notificationCircle').hide();
+              }
+
             }
             $modalDialog.removeClass('modal-lg');
             $modalDialog.removeClass('modal-sm');
@@ -150,6 +161,12 @@
             gcodeUpdate(msg);
           });
 
+          socket.on('showFPSpinner', function(msg){
+            console.log("showFPSpinner")
+            showFPSpinner(msg);
+          });
+
+
           socket.on('gcodeUpdateCompressed', function(msg){
             console.log("gcodeUpdate Compressed Message Received")
             gcodeUpdateCompressed(msg);
@@ -164,11 +181,11 @@
           });
 
           socket.on('closeModals', function(msg){
-            //console.log("received notice to close: "+msg.data.title);
-            //console.log("active modal has name: "+$("#notificationModal").data('name'));
+            console.log("received notice to close: "+msg.data.title);
+            console.log("active modal has name: "+$("#notificationModal").data('name'));
             if ($('#notificationModal').data('name') == msg.data.title)
             {
-              //console.log("closeModal")
+              console.log("closeModal")
               $('#notificationModal').modal('hide');
              }
           });
@@ -312,6 +329,19 @@
         </div>
         <div id="notificationModalText" class="modal-body">
           <p>Modal body text goes here.</p>
+        </div>
+        <div class="progress" id="progressBarDiv" >
+          <div id="progressBar" class="progress-bar w-75" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div id="notificationCircle">
+          <div class="loader">
+            <div class="loader">
+              <div class="loader">
+                <div class="loader">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button id="resumeButton" type="button" class="btn btn-info" onclick="pauseRun()" data-dismiss="modal">Resume</button>
