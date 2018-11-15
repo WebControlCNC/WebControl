@@ -9,6 +9,7 @@ import math
 import serial.tools.list_ports
 import glob
 import json
+import time
 
 
 class Actions(MakesmithInitFuncs):
@@ -166,6 +167,12 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "adjustCenter":
             if not self.adjustCenter(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with adjusting center.")
+        elif msg["data"]["command"] == "upgradeFirmware":
+            if not self.upgradeFirmware():
+                self.data.ui_queue.put("Message: Error with upgrading firmware.")
+            else:
+                self.data.ui_queue.put("Message: Firmware update complete.")
+
 
     def defineHome(self):
         try:
@@ -780,3 +787,11 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             pass
         return None, None
+
+    def upgradeFirmware(self):
+        self.data.ui_queue.put("Message: Firmware Update in Progress, Please Wait.")
+        time.sleep(.5)
+        cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P/dev/ttyACM0 -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
+        os.system(cmd)
+        self.data.console_queue.put("Firmware update complete.")
+        return True

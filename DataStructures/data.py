@@ -23,7 +23,7 @@ class Data:
     clients = []
     gcode = []
     compressedGCode = None
-    version = "1.23"
+    version = "1.25"
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used

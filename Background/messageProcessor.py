@@ -69,19 +69,21 @@ class MessageProcessor(MakesmithInitFuncs):
                         # Check that version numbers match
                         if float(message[-7:]) < float(self.data.version):
                             self.data.ui_queue.put(
-                                "Message: Warning, your firmware is out of date and may not work correctly with this version of Ground Control\n\n"
+                                "Message: <p>Warning, your firmware is out of date and may not work correctly with this version of Ground Control\n\n"
                                 + "Ground Control Version "
                                 + str(self.data.version)
                                 + "\r\n"
                                 + message
+                                + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest web-compatible code.</p>"
                             )
                         if float(message[-7:]) > float(self.data.version):
                             self.data.ui_queue.put(
-                                "Message: Warning, your version of Ground Control is out of date and may not work with this firmware version\n\n"
+                                "Message: <p>Warning, your version of Ground Control is out of date and may not work with this firmware version\n\n"
                                 + "Ground Control Version "
                                 + str(self.data.version)
                                 + "\r\n"
                                 + message
+                                + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest web-compatible code.</p>"
                             )
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
