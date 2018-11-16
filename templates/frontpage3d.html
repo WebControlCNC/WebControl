@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
+  <!--<style> #workarea {background-color: #AAA; width: 100%; height: 100%; border: 1px solid black;}</style>-->
+{% endblock %}
+
+{% block javascript %}
+  <script src="{{ url_for('static',filename='scripts/pako.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018a') }}" crossorigin="anonymous"></script>
+  <script> feather.replace() </script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+  <div class="row justify-content-start h-100">
+    <div id="workarea" class="col">
+    </div>
+    <div id="fpCircle" style="display: none;">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col my-sidebar">
+      <div class="h-100 d-flex flex-column">
+        <h3>Controls</h3>
+        <div class="row">
+          <div class="col mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','upLeft',$('#distToMove').val())"><i data-feather="arrow-up-left"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','up',$('#distToMove').val())";><i data-feather="arrow-up"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','upRight',$('#distToMove').val())"><i data-feather="arrow-up-right"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">Macro1</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','left',$('#distToMove').val())"><i data-feather="arrow-left"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="action('home')"><i data-feather="home"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','right',$('#distToMove').val())"><i data-feather="arrow-right"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-primary btn-block" onclick="action('macro2')">Macro2</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())"><i data-feather="arrow-down-left"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())"><i data-feather="arrow-down"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downRight',$('#distToMove').val())"><i data-feather="arrow-down-right"></i></button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-1">
+            <label>Dist To Move</label>
+          </div>
+          <div class="col mb-1">
+            <input class="form-control" id="distToMove" value="0.01">
+          </div>
+          <div class="col mb-1">
+            <button id="units" type="button" class="btn btn-secondary" onclick="unitSwitch();">--</button>
+          </div>
+          <div class="col-4 mb-1">
+            <button type="button" class="btn btn-primary btn-block" onclick="action('defineHome')" >Def. Home</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-success" onclick="action('startRun')">Play</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" id="pauseButton" class="btn btn-block btn-warning" onclick="pauseRun()">Pause</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-danger" onclick="action('stopRun')">Stop</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeZ',-1);">&lt;Z</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeIndex',1);">&lt;1</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary">Goto</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeIndex',1);">1&gt;</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeZ',-1);">Z&gt;</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3">
+            <h5>Sled:</h5>
+          </div>
+          <div class="col-9">
+            <div id='positionMessage'></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Home:</h5>
+          </div>
+          <div class="col-9 mb-1">
+            <div id='homePositionMessage'></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Complete:</h5>
+          </div>
+          <div class="col-9 mb-1">
+            <div id='percentComplete'></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-1">
+            <h3>Controller Messages</h3>
+          </div>
+        </div>
+        <div class="row scrollText flex-grow-1" id='controllerMessage'>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
