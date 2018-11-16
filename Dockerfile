@@ -74,6 +74,13 @@ COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
 
 RUN pip install numpy && pip install -r /requirements.txt && rm -rf /root/.cache
 
+# Install avrdude
+# TODO: to speed up incremental docker builds, we can probably do this in the builder image if we can figure out
+# which files we need to copy over
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    avrdude \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y autoremove
 # Copy in the pre-compiled firmware
 COPY --from=builder /firmware/.pioenvs/megaatmega2560/firmware.hex /firmware/firmware.hex
 
