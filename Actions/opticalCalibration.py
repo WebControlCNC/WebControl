@@ -1,5 +1,5 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from scipy.spatial import distance as dist
+#from scipy.spatial import distance as dist
 
 # from imutils.video                      import VideoStream
 # from Background.webcamVideoStream       import WebcamVideoStream

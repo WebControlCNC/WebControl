@@ -192,6 +192,7 @@ class Actions(MakesmithInitFuncs):
             )  # the "_" facilitates the parse
             self.data.console_queue.put("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
             self.data.gcodeFile.loadUpdateFile()
+            #self.data.message_queue.put("Action: gcodeUpdate")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
