@@ -82,7 +82,7 @@ class UIProcessor:
                         elif message[0:16] == "ProgressMessage:":
                                 self.activateModal("Notification:", message[17:], "notification", progress="enable")
                         elif message[0:15] == "SpinnerMessage:":
-                                self.activateModal("Notification:", message[17:], "notification", progress="spinner")
+                                self.activateModal("Notification:", message[15:], "notification", progress="spinner")
                         elif message[0:7] == "Action:":
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(

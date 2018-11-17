@@ -1,12 +1,11 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from scipy.spatial import distance as dist
-from imutils import perspective, contours
 
 # from imutils.video                      import VideoStream
 # from Background.webcamVideoStream       import WebcamVideoStream
 # from imutils.video			import WebcamVideoStream
 import numpy as np
-import imutils
+#import imutils
 import cv2
 import time
 import re
@@ -214,8 +213,14 @@ class OpticalCalibration(MakesmithInitFuncs):
             cnts = cv2.findContours(
                 edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
             )
-            cnts = cnts[0] if imutils.is_cv2() else cnts[1]
-            (cnts, _) = contours.sort_contours(cnts)
+            #assume its not cv2
+            #cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+            cnts = cnts[1]
+            #self.data.console_queue.put(str(imutils.is_cv2()))
+            try:
+               (cnts, _) = self.sort_contours(cnts)
+            except Exception as e:
+               self.data.console_queue.put(str(e))
             height, width, channels = image.shape
             if self.opticalCenter[0] == 0 or self.opticalCenter[1] == 0:
                 xA = int(width / 2)
@@ -245,9 +250,11 @@ class OpticalCalibration(MakesmithInitFuncs):
                     _angle = angle + 90
                 else:
                     _angle = angle
-                box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+                #assume not cv2()
+                #box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+                box = cv2.boxPoints(box)
                 box = np.array(box, dtype="int")
-                box = perspective.order_points(box)
+                box = self.orderPoints(box)
                 cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
                 # cv2.imwrite('testing/image-out'+str(x)+".png",orig)
                 if findCenter == False:
@@ -272,12 +279,14 @@ class OpticalCalibration(MakesmithInitFuncs):
                     _angle = _angle * -1.0
                 if findCenter == False:
                     xB, yB = self.translatePoint(xB, yB, xA, yA, _angle)
-                Dx = dist.euclidean((xA, 0), (xB, 0)) / xD
-                if xA > xB:
-                    Dx *= -1
-                Dy = dist.euclidean((0, yA), (0, yB)) / yD
-                if yA < yB:
-                    Dy *= -1
+                #Dx = dist.euclidean((xA, 0), (xB, 0)) / xD
+                Dx = (xB-xA) / xD
+                #if xA > xB:
+                #    Dx *= -1
+                #Dy = dist.euclidean((0, yA), (0, yB)) / yD
+                Dy = (yB-yA) / yD
+                #if yA < yB:
+                #    Dy *= -1
                 Dist = math.sqrt(Dx ** 2.0 + Dy ** 2.0)
                 dxList[x] = Dx
                 dyList[x] = Dy
@@ -293,13 +302,12 @@ class OpticalCalibration(MakesmithInitFuncs):
                 if falseCounter == 10:
                     break
         self.data.console_queue.put("Got 10 images processed, " + str(falseCounter) + " images were bad")
-        if dxList.ndim != 0:
+        if falseCounter != 10:
             avgDx, stdDx = self.removeOutliersAndAverage(dxList)
             avgDy, stdDy = self.removeOutliersAndAverage(dyList)
             avgDi, stdDi = self.removeOutliersAndAverage(diList)
             avgxB, stdxB = self.removeOutliersAndAverage(xBList)
             avgyB, stdyB = self.removeOutliersAndAverage(yBList)
-
             if findCenter == False:
                 orig = cv2.warpAffine(orig, M, (width, height))
             return avgDx, avgDy, avgDi, avgxB, avgyB, orig
@@ -586,3 +594,35 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return None, None
 
+    def orderPoints(self, pts):
+        xSorted = pts[np.argsort(pts[:, 0]), :]
+ 
+        leftMost = xSorted[:2, :]
+        rightMost = xSorted[2:, :]
+ 
+        leftMost = leftMost[np.argsort(leftMost[:, 1]), :]
+        (tl, bl) = leftMost
+ 
+        rightMost = rightMost[np.argsort(rightMost[:, 1]), :]
+        (tr, br) = rightMost
+ 
+        return np.array([tl, tr, br, bl], dtype="float32")
+
+    def sort_contours(self, cnts, method="left-to-right"):
+        # initialize the reverse flag and sort index
+        reverse = False
+        i = 0
+        # handle if we need to sort in reverse
+        if method == "right-to-left" or method == "bottom-to-top":
+            reverse = True
+        # handle if we are sorting against the y-coordinate rather than
+        # the x-coordinate of the bounding box
+        if method == "top-to-bottom" or method == "bottom-to-top":
+            i = 1
+
+        # construct the list of bounding boxes and sort them from top to
+        # bottom
+        boundingBoxes = [cv2.boundingRect(c) for c in cnts]
+        (cnts, boundingBoxes) = zip(*sorted(zip(cnts, boundingBoxes), key=lambda b: b[1][i], reverse=reverse))
+        # return the list of sorted contours and bounding boxes
+        return cnts, boundingBoxes
