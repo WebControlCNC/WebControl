@@ -593,6 +593,12 @@ class Actions(MakesmithInitFuncs):
                 == "Bottom"
             ):
                 degValue *= -1.0
+            if self.data.config.getValue("Advanced Settings", "chainOverSprocket")=="Bottom":
+                if self.data.config.getValue("Computed Settings", "chainOverSprocketComputed") != 2:
+                   self.data.ui_queue.put("Message: mismatch between setting and computed setting. set for bottom feed, but computed !=2. report as issue on github please")
+            if self.data.config.getValue("Advanced Settings", "chainOverSprocket")=="Top":
+                if self.data.config.getValue("Computed Settings", "chainOverSprocketComputed") != 1:
+                   self.data.ui_queue.put("Message: mismatch between setting and computed setting. set for top feed, but computed != 1. report as issue on github please")
             self.data.gcode_queue.put("B09 " + sprocket + str(degValue) + " ")
             self.data.gcode_queue.put("G90 ")
             return True

@@ -284,7 +284,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 #if xA > xB:
                 #    Dx *= -1
                 #Dy = dist.euclidean((0, yA), (0, yB)) / yD
-                Dy = (yB-yA) / yD
+                Dy = (yA-yB) / yD
                 #if yA < yB:
                 #    Dy *= -1
                 Dist = math.sqrt(Dx ** 2.0 + Dy ** 2.0)
@@ -312,7 +312,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 orig = cv2.warpAffine(orig, M, (width, height))
             return avgDx, avgDy, avgDi, avgxB, avgyB, orig
         else:
-            return None, None, None, None, None, edged
+            return None, None, None, None, None, gray
 
     def on_CenterOnSquare(self, _dist, findCenter=False):
 

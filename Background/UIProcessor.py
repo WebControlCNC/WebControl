@@ -103,7 +103,8 @@ class UIProcessor:
                                     namespace="/MaslowCNC",
                                 )
                             if message.find("gcodeUpdate") != -1:
-                                socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode}, namespace="/MaslowCNC")
+                                if self.app.data.compressedGCode is not None:
+                                    socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode}, namespace="/MaslowCNC")
                             if message.find("setAsPause") != -1:
                                 socketio.emit(
                                     "requestedSetting",

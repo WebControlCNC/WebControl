@@ -84,7 +84,6 @@ def maslowSettings():
         message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
-        print("here")
         return resp
 
 
@@ -327,11 +326,12 @@ def checkForGCodeUpdate(msg):
         "requestedSetting", {"setting": "units", "value": units}, namespace="/MaslowCNC"
     )
     ## send updated gcode to UI
-    app.data.console_queue.put("Sending Gcode compressed")
-    socketio.emit("showFPSpinner", {"data": len(app.data.compressedGCode)}, namespace="/MaslowCNC")
-    time.sleep(0.25)
-    socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode}, namespace="/MaslowCNC")
-    app.data.console_queue.put("Sent Gcode compressed")
+    if app.data.compressedGCode is not None:
+        app.data.console_queue.put("Sending Gcode compressed")
+        socketio.emit("showFPSpinner", {"data": len(app.data.compressedGCode)}, namespace="/MaslowCNC")
+        time.sleep(0.25)
+        socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode}, namespace="/MaslowCNC")
+        app.data.console_queue.put("Sent Gcode compressed")
     #socketio.emit(
     #    "gcodeUpdate",
     #    {"data": json.dumps([ob.__dict__ for ob in app.data.gcodeFile.line])},
