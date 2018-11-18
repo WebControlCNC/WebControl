@@ -113,7 +113,8 @@ def webControlSettings():
 def uploadGCode():
     if request.method == "POST":
         f = request.files["file"]
-        app.data.gcodeFile.filename = "gcode/" + secure_filename(f.filename)
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + secure_filename(f.filename)
         f.save(app.data.gcodeFile.filename)
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
@@ -133,7 +134,8 @@ def openGCode():
     if request.method == "POST":
         f = request.form["selectedGCode"]
         app.data.console_queue.put("selectedGcode="+str(f))
-        app.data.gcodeFile.filename = "gcode/" + f
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
             message = {"status": 200}
@@ -151,7 +153,8 @@ def openGCode():
 def importFile():
     if request.method == "POST":
         f = request.files["file"]
-        secureFilename = "imports\\" + secure_filename(f.filename)
+        home = app.data.config.getHome()
+        secureFilename = home+"/.WebControl/imports/" + secure_filename(f.filename)
         f.save(secureFilename)
         returnVal = app.data.importFile.importGCini(secureFilename)
         if returnVal:

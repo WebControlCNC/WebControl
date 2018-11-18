@@ -32,6 +32,13 @@ class Config(MakesmithInitFuncs):
             print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
             copyfile("defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
+        if not os.path.isdir(self.home+"/.WebControl/gcode"):
+            print("creating "+self.home+"/.WebControl/gcode directory")
+            os.mkdir(self.home+"/.WebControl/gcode")
+        if not os.path.isdir(self.home+"/.WebControl/imports"):
+            print("creating "+self.home+"/.WebControl/imports directory")
+            os.mkdir(self.home+"/.WebControl/imports")
+
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it
@@ -77,6 +84,8 @@ class Config(MakesmithInitFuncs):
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )
 
+    def getHome(self):
+        return self.home
 
     def getJSONSettings(self):
         return self.settings

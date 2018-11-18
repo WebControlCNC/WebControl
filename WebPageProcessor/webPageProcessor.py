@@ -74,7 +74,9 @@ class WebPageProcessor:
             return page, "WebControl Settings", False, "medium", "content"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
-            files = [f for f in listdir("gcode") if isfile(join("gcode", f))]
+            home = self.data.config.getHome()
+            homedir = home+"/.WebControl/gcode"
+            files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
             page = render_template(
                 "openGCode.html", files=files, lastSelectedFile=lastSelectedFile
             )
