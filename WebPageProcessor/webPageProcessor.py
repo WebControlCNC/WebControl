@@ -6,6 +6,7 @@ import json
 from os import listdir
 from os.path import isfile, join
 from flask import render_template
+import os
 
 class WebPageProcessor:
 
@@ -74,18 +75,49 @@ class WebPageProcessor:
             return page, "WebControl Settings", False, "medium", "content"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"
-            files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory":_dir, "file":file})
+            except Exception as e:
+                print(e)
+           # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory="."
             page = render_template(
-                "openGCode.html", files=files, lastSelectedFile=lastSelectedFile
+                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory
             )
             return page, "Open GCode", False, "medium", "content"
         elif pageID == "uploadGCode":
             validExtensions = self.data.config.getValue(
                 "WebControl Settings", "validExtensions"
             )
-            page = render_template("uploadGCode.html", validExtensions=validExtensions)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
+            home = self.data.config.getHome()
+            homedir = home + "/.WebControl/gcode"
+            directories = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+            except Exception as e:
+                print(e)
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory = "."
+            page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
             return page, "Upload GCode", False, "medium", "content"
         elif pageID == "importGCini":
             page = render_template("importFile.html")

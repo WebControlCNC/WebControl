@@ -156,6 +156,10 @@
             processRequestedSetting(msg);
           });
 
+          socket.on('updateDirectories', function(msg){
+            updateDirectories(msg);
+          });
+
           socket.on('gcodeUpdate', function(msg){
             console.log("gcodeUpdate Message Received")
             gcodeUpdate(msg);

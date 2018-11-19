@@ -526,6 +526,12 @@
             "key": "unitsZ",
             "type": "string",
             "value": "INCHES"
+        },
+        {
+            "default": ".",
+            "key": "lastSelectedDirectory",
+            "type": "string",
+            "value": "."
         }
     ],
     "Maslow Settings": [

@@ -2,8 +2,22 @@
 <div class="container-fluid">
   <form id="gcodeForm" method="post" enctype=multipart/form-data>
     <div class="form-group">
-      <label for="gcodeFile">GCode File</label>
-      <input type="file" class="form-control-file" name="file" id="gcodeFile" accept="{{validExtensions}}">
+      <div class="row">
+        <label for="directorySelect">Directory</label>
+        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+          {% for directory in directories %}
+            <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
+              {{directory if directory != '.' else './'}}
+            </option>
+          {% endfor %}
+        </select>
+        <button type="button" class="btn btn-info" id="newDirectoryButton">New Directory</button>
+        <input type="input" name="newDirectory" id="newDirectory">
+      </div>
+      <div class="row">
+        <label for="gcodeFile" class="mt-1">GCode File</label>
+        <input type="file" class="form-control-file" name="file" id="gcodeFile" accept="{{validExtensions}}">
+      </div>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
@@ -12,7 +26,24 @@
 
 {% block javascript %}
 <script>
+
+function updateDirectories(msg){
+   var json = JSON.parse(msg.data);
+   var directory = json.directory;
+   console.log(directory);
+   $("#directorySelect").append($("<option></option>").attr("value",directory).text(directory));
+   $("#directorySelect option[value="+directory+"]").prop('selected', 'selected');
+   $("#newDirectory").val("");
+}
+
 $(document).ready(function () {
+
+    $('#newDirectoryButton').on('click',function(){ //bind click handler
+        event.preventDefault();
+        directory=$("#newDirectory").val();
+        action("createDirectory",directory);
+     });
+
     $('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
 

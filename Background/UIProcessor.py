@@ -84,6 +84,15 @@ class UIProcessor:
                         elif message[0:15] == "SpinnerMessage:":
                                 self.activateModal("Notification:", message[15:], "notification", progress="spinner")
                         elif message[0:7] == "Action:":
+                            if message.find("updateDirectories") != -1:
+                                msg = message.split(
+                                    "_"
+                                )  # everything to the right of the "_" should be the position data already json.dumps'ed
+                                socketio.emit(
+                                    "updateDirectories",
+                                    {"data": msg[1]},
+                                    namespace="/MaslowCNC",
+                                )
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(
                                     "Computed Settings", "units"

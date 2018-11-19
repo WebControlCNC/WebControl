@@ -17,6 +17,9 @@ class Actions(MakesmithInitFuncs):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
                 self.data.ui_queue.put("Message: Error with resetting chain lengths.")
+        elif msg["data"]["command"] == "createDirectory":
+            if not self.createDirectory(msg["data"]["arg"]):
+                self.data.ui_queue.put("Message: Error with creating directory.")
         elif msg["data"]["command"] == "move":
             if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating move.")
@@ -802,4 +805,19 @@ class Actions(MakesmithInitFuncs):
         cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
         os.system(cmd)
         self.data.ui_queue.put("closeModals:_Notification:")
+        return True
+
+    def createDirectory(self, _directory):
+        try:
+            home = self.data.config.getHome()
+            directory = home + "/.WebControl/gcode/" + _directory
+            if not os.path.isdir(directory):
+                print("creating "+directory)
+                os.mkdir(directory)
+            data = {"directory": _directory}
+            self.data.ui_queue.put(
+                "Action: updateDirectories:_" + json.dumps(data)
+            )
+        except Exception as e:
+            print(e)
         return True

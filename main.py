@@ -117,9 +117,13 @@ def webControlSettings():
 def uploadGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
+        result = request.form
+        directory = result["selectedDirectory"]
+        print(directory)
         f = request.files["file"]
         home = app.data.config.getHome()
-        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + secure_filename(f.filename)
+        app.data.config.setValue("Computed Settings", "lastSelectedDirectory", directory)
+        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory+"/"+secure_filename(f.filename)
         f.save(app.data.gcodeFile.filename)
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
@@ -140,6 +144,8 @@ def openGCode():
     if request.method == "POST":
         f = request.form["selectedGCode"]
         app.data.console_queue.put("selectedGcode="+str(f))
+        tDir = f.split("/")
+        app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
         home = app.data.config.getHome()
         app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
         returnVal = app.data.gcodeFile.loadUpdateFile()
