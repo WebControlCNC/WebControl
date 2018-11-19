@@ -69,6 +69,7 @@ app.mcpthread = None
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
+    app.data.logger.resetIdler()
     current_app._get_current_object()
     if template == "mobile/":
         return render_template("frontpage_mobile.html", modalStyle="modal-lg")
@@ -78,6 +79,7 @@ def index(template):
 
 @app.route("/maslowSettings", methods=["POST"])
 def maslowSettings():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
         app.data.config.updateSettings("Maslow Settings", result)
@@ -89,6 +91,7 @@ def maslowSettings():
 
 @app.route("/advancedSettings", methods=["POST"])
 def advancedSettings():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
         app.data.config.updateSettings("Advanced Settings", result)
@@ -100,6 +103,7 @@ def advancedSettings():
 
 @app.route("/webControlSettings", methods=["POST"])
 def webControlSettings():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
         app.data.config.updateSettings("WebControl Settings", result)
@@ -111,6 +115,7 @@ def webControlSettings():
 
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         f = request.files["file"]
         home = app.data.config.getHome()
@@ -131,6 +136,7 @@ def uploadGCode():
 
 @app.route("/openGCode", methods=["POST"])
 def openGCode():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         f = request.form["selectedGCode"]
         app.data.console_queue.put("selectedGcode="+str(f))
@@ -151,6 +157,7 @@ def openGCode():
 
 @app.route("/importFile", methods=["POST"])
 def importFile():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         f = request.files["file"]
         home = app.data.config.getHome()
@@ -171,6 +178,7 @@ def importFile():
 
 @app.route("/triangularCalibration", methods=["POST"])
 def triangularCalibration():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
         motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = app.data.actions.calibrate(
@@ -199,6 +207,7 @@ def triangularCalibration():
 
 @app.route("/opticalCalibration", methods=["POST"])
 def opticalCalibration():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
         message = {"status": 200}
@@ -214,6 +223,7 @@ def opticalCalibration():
 
 @app.route("/quickConfigure", methods=["POST"])
 def quickConfigure():
+    app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
         app.data.config.updateQuickConfigure(result)
@@ -251,21 +261,25 @@ def my_event(msg):
 
 @socketio.on("modalClosed", namespace="/MaslowCNC")
 def modalClosed(msg):
+    app.data.logger.resetIdler()
     socketio.emit("closeModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
 
 
 @socketio.on("contentModalClosed", namespace="/MaslowCNC")
 def contentModalClosed(msg):
+    app.data.logger.resetIdler()
     socketio.emit("closeContentModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
 
 
 @socketio.on("actionModalClosed", namespace="/MaslowCNC")
 def actionModalClosed(msg):
+    app.data.logger.resetIdler()
     socketio.emit("closeActionModals", {"data": {"title": msg["data"]}}, namespace="/MaslowCNC")
 
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
+    app.data.logger.resetIdler()
     try:
         page, title, isStatic, modalSize, modalType = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"])
         socketio.emit(
@@ -299,11 +313,13 @@ def test_disconnect():
 
 @socketio.on("action", namespace="/MaslowCNC")
 def command(msg):
+    app.data.logger.resetIdler()
     app.data.actions.processAction(msg)
 
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
 def settingRequest(msg):
+    app.data.logger.resetIdler()
     # didn't move to actions.. this request is just to send it computed values.. keeping it here makes it faster than putting it through the UIProcessor
     setting, value = app.data.actions.processSettingRequest(msg["data"]["section"],msg["data"]["setting"])
     if setting is not None:
@@ -315,12 +331,14 @@ def settingRequest(msg):
 
 @socketio.on("updateSetting", namespace="/MaslowCNC")
 def updateSetting(msg):
+    app.data.logger.resetIdler()
     if not app.data.actions.updateSetting(msg["data"]["setting"], msg["data"]["value"]):
         app.data.ui_queue.put("Message: Error updating setting")
 
 
 @socketio.on("checkForGCodeUpdate", namespace="/MaslowCNC")
 def checkForGCodeUpdate(msg):
+    app.data.logger.resetIdler()
     # this currently doesn't check for updated gcode, it just resends it..
     ## the gcode file might change the active units so we need to inform the UI of the change.
     app.data.console_queue.put("Check for GCode Update Received")

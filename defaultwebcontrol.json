@@ -886,6 +886,15 @@
             "value": 0
         },
         {
+            "default": 0,
+            "desc": "Timeout logging after specified seconds of user and gcode processing activity, 0 value disables timeout\ndefault setting: 0",
+            "key": "loggingTimeout",
+            "section": "WebControl Settings",
+            "title": "Logger Idle Timeout",
+            "type": "float",
+            "value": 0
+        },
+        {
             "default": ".nc, .ngc, .text, .gcode",
             "desc": "Valid file extensions for Ground Control to open. Comma separated list.\ndefault setting: .nc, .ngc, .text, .gcode",
             "key": "validExtensions",
