@@ -56,7 +56,6 @@ class Logger(MakesmithInitFuncs):
         self.idler = time.time()
 
     def setLoggingTimeout(self, timeOut):
-        self.data.console_queue("loggingTimeout set to "+str(timeOut))
         self.loggingTimeout = timeOut
 
     def writeToLog(self, message):
@@ -85,15 +84,17 @@ class Logger(MakesmithInitFuncs):
 
         if message[0] != "<" and message[0] != "[":
             try:
-                self.amessageBuffer += logTime+": "+ message
+                tmessage = message.rstrip('\r\n')
+                self.amessageBuffer += logTime+": " + tmessage+"\n"
                 if not self.suspendLogging:
-                    self.messageBuffer += logTime+": "+ message
+                    self.messageBuffer += logTime+": " + tmessage+"\n"
             except:
                 pass
         else:
             try:
                 if not self.suspendLogging:
-                    self.messageBuffer += logTime+": "+ message
+                    tmessage = message.rstrip('\r\n')
+                    self.messageBuffer += logTime+": "+ tmessage+"\n"
             except:
                 pass
 
