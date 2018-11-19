@@ -65,11 +65,11 @@ class SerialPortThread(MakesmithInitFuncs):
         message = message.encode()
         try:
             self.serialInstance.write(message)
-            self.data.logger.writeToLog("Sent: " + str(message))
+            self.data.logger.writeToLog("Sent: " + str(message.decode()))
         except:
             #print("write issue")
             self.data.console_queue.put("write issue")
-            self.data.logger.writeToLog("Send FAILED: " + str(message))
+            self.data.logger.writeToLog("Send FAILED: " + str(message.decode()))
 
         self.lastWriteTime = time.time()
 

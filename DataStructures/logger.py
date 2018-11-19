@@ -8,8 +8,11 @@ behavior.
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import threading
 import os
+import time
+import datetime
 from pathlib import Path
 from app import app, socketio
+
 
 
 class Logger(MakesmithInitFuncs):
@@ -17,6 +20,7 @@ class Logger(MakesmithInitFuncs):
     errorValues = []
     recordingPositionalErrors = False
     clients = []
+    logStartTime = 0
 
     messageBuffer = ""
     amessageBuffer = ""
@@ -34,6 +38,11 @@ class Logger(MakesmithInitFuncs):
 
         with open(self.home+"/.WebControl/"+"alog.txt", "a") as logFile:
             logFile.truncate()
+        
+        self.logStartTime = time.time()
+        dateTime = datetime.datetime.fromtimestamp(self.logStartTime).strftime('%Y-%m-%d %H:%M:%S')
+        self.amessageBuffer = "+++++\n"+dateTime+"\n+++++\n".format(self.logStartTime)
+        self.messageBuffer = "+++++\n"+dateTime+"\n+++++\n".format(self.logStartTime)
 
     def writeToLog(self, message):
 
@@ -45,15 +54,17 @@ class Logger(MakesmithInitFuncs):
         way slow
 
         """
+        logTime = "{:0.2f}".format(time.time()-self.logStartTime)
         if message[0] != "<" and message[0] != "[":
+            
             try:
-                self.amessageBuffer = self.amessageBuffer + message
-                self.messageBuffer = self.messageBuffer + message
+                self.amessageBuffer += logTime+": "+ message
+                self.messageBuffer += logTime+": "+ message
             except:
                 pass
         else:
             try:
-                self.messageBuffer = self.messageBuffer + message
+                self.messageBuffer += logTime+": "+ message
             except:
                 pass
 
