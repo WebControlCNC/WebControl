@@ -13,6 +13,9 @@ import sys
 import math
 import base64
 import json
+import time
+import os
+import datetime
 
 
 class OpticalCalibration(MakesmithInitFuncs):
@@ -494,23 +497,34 @@ class OpticalCalibration(MakesmithInitFuncs):
             return True
         return False
 
-    def on_SaveCSV(self):
-        outFile = open("calibrationValues.csv","w")
-        line = ""
-        for y in range(7, -8, -1):
+    def saveCalibrationToCSV(self):
+        try:
+            home = self.data.config.getHome()
+            currentTime = time.time()
+            dateTime = datetime.datetime.fromtimestamp(currentTime).strftime('%Y%m%d-%H%M%S')
+            directory = home + "/.WebControl/OpticalCalibrationResults"
+            if not os.path.isdir(directory):
+                print("creating "+directory)
+                os.mkdir(directory)
+            outFile = open(directory+"/calibrationValues"+dateTime+".csv","w")
             line = ""
-            for x in range(-15, 16, +1):
-                line += "{:.2f},".format(self.calErrorsX[x+15][7-y])
-            line +="\n"
-            outFile.write(line)
-        outFile.write("\n")
-        for y in range(7, -8, -1):
-            line = ""
-            for x in range(-15, 16, +1):
-                line += "{:.2f},".format(self.calErrorsY[x+15][7-y])
-            line +="\n"
-            outFile.write(line)
-        outFile.close()
+            for y in range(7, -8, -1):
+                line = ""
+                for x in range(-15, 16, +1):
+                    line += "{:.2f},".format(self.calErrorsX[x+15][7-y])
+                line +="\n"
+                outFile.write(line)
+            outFile.write("\n")
+            for y in range(7, -8, -1):
+                line = ""
+                for x in range(-15, 16, +1):
+                    line += "{:.2f},".format(self.calErrorsY[x+15][7-y])
+                line +="\n"
+                outFile.write(line)
+            outFile.close()
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
 
 
     def saveAndSend(self):
