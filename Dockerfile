@@ -45,7 +45,7 @@ RUN apt-get update \
     && pip2 install -U platformio \
     && pio platform install --with-package framework-arduinoavr atmelavr
 ARG firmware_repo=https://github.com/madgrizzle/Firmware.git
-ARG firmware_sha=a99e99225778d75537de0755f803db981643298b
+ARG firmware_sha=8286f4124109f08e5b8f0a533ae812c017740ff7
 RUN git clone $firmware_repo firmware && cd firmware && git checkout $firmware_sha && pio run -e megaatmega2560
 
 ADD . /WebControl
