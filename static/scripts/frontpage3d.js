@@ -13,17 +13,27 @@ console.log(w)
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
 
-
+var gcode = new THREE.Group();
 
 var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.screenSpacePanning = true;
+
 camera.position.set(0, 0, 100);
 camera.lookAt(0,0,0);
+var view3D = true;
+toggle3DView(); // makes it not true and applies appropriate settings
+//controls.update();
+controls.saveState();
 
 var scene = new THREE.Scene();
-scene.background= new THREE.Color(0xeeeeee);
+scene.background= new THREE.Color(0xdddddd);
 var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );
 var material = new THREE.LineBasicMaterial( {color:0x0000ff });
+var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00ff00 });
+var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
+var greenLineDashedMaterial = new THREE.LineDashedMaterial( {color:0x00ff00, dashSize:.1, gapSize: .1} );
 var dashedMaterial = new THREE.LineDashedMaterial( {color:0x0000ff, dashSize:.5, gapSize: .5} );
 var outerFrameShape = new THREE.Geometry();
 outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
@@ -47,88 +57,77 @@ innerFrame.computeLineDistances();
 
 scene.add(outerFrame);
 scene.add(innerFrame);
-renderer.render( scene, camera );
 
-/*var gcode = null;
-//var rect = draw.rect(100,100).attr({fill: '#f06'})
-//var sheet = draw.image('/static/images/materials/Plywood_texture.JPG',96,48).center(originX,originY)
 
-var gridLines = draw.group()
-gridLines.add(draw.line(0*scale,0*scale,96*scale,0*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(0*scale,48*scale,96*scale,48*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(0*scale,24*scale,96*scale,24*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(0*scale,0*scale,0*scale,48*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(24*scale,0*scale,24*scale,48*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(48*scale,0*scale,48*scale,48*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(72*scale,0*scale,72*scale,48*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.add(draw.line(96*scale,0*scale,96*scale,48*scale).stroke({width:startWidth, color: '#000'}))
-gridLines.center(originX,originY)
-//gridLines.scale(scale,scale)
+var sledHorizontalLineSegments = new THREE.Geometry();
+sledHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.5, 0, 0));
+sledHorizontalLineSegments.vertices.push(new THREE.Vector3(1.5, 0, 0));
+var sledHorizontalLine = new THREE.LineSegments(sledHorizontalLineSegments, redLineMaterial);
 
-var sled = draw.group()
-sled.add(draw.line(1.5*scale,-0.0*scale,1.5*scale,3.0*scale).stroke({width:startWidth,color:"#F00"}))
-sled.add(draw.line(-0.0*scale,1.5*scale,3.0*scale,1.5*scale).stroke({width:startWidth,color:"#F00"}))
-sled.add(draw.circle(3*scale).stroke({width:startWidth,color:"#F00"}).fill({color:"#fff",opacity:0}))
-sled.center(originX,originY)
+var sledVerticalLineSegments = new THREE.Geometry();
+sledVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.5, 0));
+sledVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.5, 0));
+var sledVerticalLine = new THREE.LineSegments(sledVerticalLineSegments, redLineMaterial);
 
-var home = draw.group()
-home.add(draw.line(0.75*scale,-0.0*scale,0.75*scale,1.5*scale).stroke({width:startWidth,color:"#0F0"}))
-home.add(draw.line(-0.0*scale,0.75*scale,1.5*scale,0.75*scale).stroke({width:startWidth,color:"#0F0"}))
-home.add(draw.circle(1.5*scale).stroke({width:startWidth,color:"#0F0"}).fill({color:"#fff",opacity:0}))
-home.center(originX,originY)
-/
+var sledCircleGeometry = new THREE.CircleGeometry(1,32);
+var sledCircleEdges = new THREE.EdgesGeometry(sledCircleGeometry)
+var sledCircle = new THREE.LineSegments(sledCircleEdges,redLineMaterial);
 
-draw.zoom(10, {x:originX,y:originY});
-var startZoom = draw.zoom();
+var sled = new THREE.Group();
+sled.add(sledHorizontalLine);
+sled.add(sledVerticalLine);
+sled.add(sledCircle);
+sled.position.set(0,0,0);
 
-draw.on('pinchZoomEnd', function(ev){
-    setTimeout(rescale,0.01)
-})
 
-draw.on('zoom', function(box, focus){
-  setTimeout(rescale,0.01)
-})
+var homeHorizontalLineSegments = new THREE.Geometry();
+homeHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.0, 0, 0));
+homeHorizontalLineSegments.vertices.push(new THREE.Vector3(1.0, 0, 0));
+var homeHorizontalLine = new THREE.LineSegments(homeHorizontalLineSegments, greenLineMaterial);
 
-function rescale(){
-  width = startWidth*startZoom/draw.zoom();
-  draw.each(function(_i, _children){
-      this.each(function(i,children){
-        this.attr({'stroke-width':width});
-      })
-  })
+var homeVerticalLineSegments = new THREE.Geometry();
+homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.0, 0));
+homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.0, 0));
+var homeVerticalLine = new THREE.LineSegments(homeVerticalLineSegments, greenLineMaterial);
+
+var homeCircleGeometry = new THREE.CircleGeometry(.5,32);
+var homeCircleEdges = new THREE.EdgesGeometry(homeCircleGeometry)
+var homeCircle = new THREE.LineSegments(homeCircleEdges,greenLineMaterial);
+
+var home = new THREE.Group();
+home.add(homeHorizontalLine);
+home.add(homeVerticalLine);
+home.add(homeCircle);
+home.position.set(0,0,0);
+
+
+scene.add(sled);
+scene.add(home);
+
+animate();
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render( scene, camera );
 }
 
 function positionUpdate(x,y,z){
-  var _x, _y =0
-  if ($("#units").text()=="MM"){
-    _x = originX+x*scale/25.4
-    _y = originY-y*scale/25.4
-    _z = z*scale/25.4/2*360
-  }
-  else{
-    _x = originX+x*scale;
-    _y = originY-y*scale
-    _z = z*scale/2*360
-  }
-  sled.front()
-  sled.center(_x, _y)
+    if ($("#units").text()=="MM"){
+        x /= 25.4
+        y /= 25.4
+    }
+    sled.position.set(x,y,z);
 }
 
 
 function homePositionUpdate(x,y){
-  var _x, _y =0
-  //console.log(x)
-  if ($("#units").text()=="MM"){
-    _x = originX+x*scale/25.4
-    _y = originY-y*scale/25.4
-  }
-  else{
-    _x = originX+x*scale;
-    _y = originY-y*scale
-  }
-  home.center(_x, _y);
+    if ($("#units").text()=="MM"){
+        x /= 25.4
+        y /= 25.4
+    }
+    home.position.set(x,y,0);
 }
-*/
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
@@ -192,14 +191,14 @@ function processPositionMessage(msg){
   var _json = JSON.parse(msg.data);
   $('#positionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2)+' ZPos:'+parseFloat(_json.zval).toFixed(2));
   $('#percentComplete').html(_json.pcom)
-//  positionUpdate(_json.xval,_json.yval,_json.zval);
+  positionUpdate(_json.xval,_json.yval,_json.zval);
 }
 
 function processHomePositionMessage(msg){
   var _json = JSON.parse(msg.data);
   console.log(_json.xval)
   $('#homePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
-//  homePositionUpdate(_json.xval,_json.yval);
+  homePositionUpdate(_json.xval,_json.yval);
 }
 
 function gcodeUpdate(msg){
@@ -227,33 +226,45 @@ function gcodeUpdate(msg){
 
 function gcodeUpdateCompressed(msg){
   console.log("updating gcode compressed");
-  /*if (gcode!=null) {
-    //console.log("removing gcode");
-    gcode.remove();
+  console.log(gcode.length);
+  if (gcode.children.length!=0) {
+    for (var i = gcode.children.length -1; i>=0; i--){
+        gcode.remove(gcode.children[i]);
+    }
   }
-  width = startWidth*startZoom/draw.zoom();
-  gcode = draw.group();
-  //console.log(msg.data);
+
+  var gcodeLineSegments = new THREE.Geometry();
+  var gcodeDashedLineSegments = new THREE.Geometry();
+
   if (msg.data!=null){
     var uncompressed = pako.inflate(msg.data);
     var _str = ab2str(uncompressed);
-    //var _str = new TextDecoder("utf-8").decode(uncompressed);
-    //console.log(_str);
     var data = JSON.parse(_str)
+    var pX, pY, pZ = -99999.9
     data.forEach(function(line) {
-      //console.log(line)
       if (line.type=='line'){
+        console.log("Line length="+line.points.length+", dashed="+line.dashed);
         if (line.dashed==true) {
-          gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#AA0'}))
+          line.points.forEach(function(point) {
+            gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+          })
         } else {
-          gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#00F'}))
+          line.points.forEach(function(point) {
+            gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+          })
         }
       }
-      gcode.move(originX,originY)
     });
+    //gcode.move(originX,originY)
+    var gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
+    gcodeDashed.computeLineDistances();
+    var gcodeUndashed = new THREE.Line(gcodeLineSegments, material)
+    gcode.add(gcodeDashed);
+    gcode.add(gcodeUndashed);
+    scene.add(gcode);
   }
   $("#fpCircle").hide();
-  */
+
 }
 
 function ab2str(buf) {
@@ -267,4 +278,33 @@ function ab2str(buf) {
 
 function showFPSpinner(msg){
     $("#fpCircle").show();
+}
+
+function toggle3DView()
+{
+    console.log("toggling");
+    if (view3D){
+        controls.enableRotate = false;
+        controls.mouseButtons = {
+            LEFT: THREE.MOUSE.RIGHT,
+            MIDDLE: THREE.MOUSE.MIDDLE,
+            RIGHT: THREE.MOUSE.LEFT
+        }
+        view3D=false;
+        console.log("toggled off");
+    } else {
+        controls.enableRotate = true;
+        controls.mouseButtons = {
+            LEFT: THREE.MOUSE.RIGHT,
+            MIDDLE: THREE.MOUSE.MIDDLE,
+            RIGHT: THREE.MOUSE.LEFT
+        }
+        view3D=true;
+        console.log("toggled on");
+    }
+    controls.update();
+}
+
+function resetView(){
+    controls.reset();
 }

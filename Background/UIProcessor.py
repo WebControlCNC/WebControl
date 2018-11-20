@@ -113,7 +113,13 @@ class UIProcessor:
                                 )
                             if message.find("gcodeUpdate") != -1:
                                 if self.app.data.compressedGCode is not None:
-                                    socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode}, namespace="/MaslowCNC")
+                                    enable3D = self.app.data.config.getValue("WebControl Settings", "enable3D")
+                                    if enable3D:
+                                        self.app.data.console_queue.put("sending compressed")
+                                        socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode3D}, namespace="/MaslowCNC")
+                                    else:
+                                        self.app.data.console_queue.put("sending compressed3D")
+                                        socketio.emit("gcodeUpdateCompressed", {"data": self.app.data.compressedGCode}, namespace="/MaslowCNC")
                             if message.find("setAsPause") != -1:
                                 socketio.emit(
                                     "requestedSetting",

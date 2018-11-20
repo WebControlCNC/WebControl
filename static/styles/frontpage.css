@@ -17,4 +17,18 @@ html, body{
   flex:1;
 }
 
+#button3D, #buttonReset {
+    position: absolute;
+    display: block;
+    z-index: 95;
+    top: 0%;
+}
+
+#button3D {
+    left: 1%;
+}
+
+#buttonReset {
+    left: 95%;
+}
 

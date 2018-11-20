@@ -38,10 +38,15 @@ class GCodeFile(MakesmithInitFuncs):
 
     filename = ""
     line = []
+    line3D = []
 
 
     def serializeGCode(self):
         sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
+        return sendStr
+
+    def serializeGCode3D(self):
+        sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line3D])
         return sendStr
 
     def loadUpdateFile(self):
@@ -53,6 +58,7 @@ class GCodeFile(MakesmithInitFuncs):
         filename = self.data.gcodeFile.filename
         # print(filename)
         del self.line[:]
+        del self.line3D[:]
         if filename is "":  # Blank the g-code if we're loading "nothing"
             self.data.gcode = ""
             return False
@@ -121,23 +127,6 @@ class GCodeFile(MakesmithInitFuncs):
         self.data.gcodeFile.isChanged = True
         return True
 
-    def compressStringToBytes(self, inputString):
-        """
-        read the given string, encode it in utf-8,
-        compress the data and return it as a byte array.
-        """
-        bio = BytesIO()
-        bio.write(inputString.encode("utf-8"))
-        bio.seek(0)
-        stream = BytesIO()
-        compressor = gzip.GzipFile(fileobj=stream, mode='w')
-        while True:  # until EOF
-            chunk = bio.read(8192)
-            if not chunk:  # EOF?
-                compressor.close()
-                return stream.getvalue()
-            compressor.write(chunk)
-
     def isClose(self, a, b):
         return abs(a - b) <= self.data.tolerance
 
@@ -149,6 +138,15 @@ class GCodeFile(MakesmithInitFuncs):
             #(x * self.canvasScaleFactor, y * self.canvasScaleFactor * -1.0)
             (x , y * -1.0)
         )
+
+    def addPoint3D(self, x, y, z):
+        """
+        Add a point to the line currently being plotted
+        """
+        self.line3D[-1].points.append(
+            (x, y, z)
+        )
+
 
     def isNotReallyClose(self, x0, x1):
         if abs(x0 - x1) > 0.0001:
@@ -203,20 +201,32 @@ class GCodeFile(MakesmithInitFuncs):
                     self.line[-1].dashed = True
                     self.addPoint(self.xPosition, self.yPosition)
                     self.addPoint(xTarget, yTarget)
+
+                    self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
+                    self.line3D[-1].type = "line"
+                    self.line3D[-1].dashed = True
+                    self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
+                    self.addPoint3D(xTarget, yTarget, zTarget)
+
                 else:
                     # print "here"
                     if (
-                        len(self.line) == 0
-                        or self.line[-1].dashed
-                        or self.line[-1].type != "line"
+                        len(self.line3D) == 0
+                        or self.line3D[-1].dashed
+                        or self.line3D[-1].type != "line"
                     ):
-                        self.line.append(
-                            Line()
-                        )  # points = (), width = 1, group = 'gcode')
+                        self.line.append( Line() )
                         self.line[-1].type = "line"
                         self.addPoint(self.xPosition, self.yPosition)
                         self.line[-1].dashed = False
+
+                        self.line3D.append( Line() )
+                        self.line3D[-1].type = "line"
+                        self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
+                        self.line3D[-1].dashed = False
+
                     self.addPoint(xTarget, yTarget)
+                    self.addPoint3D(xTarget, yTarget, zTarget)
 
             # If the zposition has changed, add indicators
             tol = 0.05  # Acceptable error in mm
@@ -234,8 +244,12 @@ class GCodeFile(MakesmithInitFuncs):
                     self.addPoint(self.xPosition, self.yPosition)
                     self.addPoint(radius, 0)
                     self.line[-1].dashed = False
-                    # Line(circle=(self.xPosition , self.yPosition, radius), group = 'gcode')
-                    # Color(self.data.drawingColor[0], self.data.drawingColor[1], self.data.drawingColor[2])
+
+                    self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
+                    self.line3D[-1].type = "circle"
+                    self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
+                    self.addPoint3D(radius, 0, self.zPosition)
+                    self.line3D[-1].dashed = False
 
             self.xPosition = xTarget
             self.yPosition = yTarget
@@ -255,6 +269,7 @@ class GCodeFile(MakesmithInitFuncs):
         if True:
             xTarget = self.xPosition
             yTarget = self.yPosition
+            zTarget = self.zPosition
             iTarget = 0
             jTarget = 0
 
@@ -299,26 +314,36 @@ class GCodeFile(MakesmithInitFuncs):
                 arcLen = 6.28313530718
 
             if (
-                len(self.line) == 0
-                or self.line[-1].dashed
-                or self.line[-1].type != "line"
+                len(self.line3D) == 0
+                or self.line3D[-1].dashed
+                or self.line3D[-1].type != "line"
             ):
                 self.line.append(Line())  # points = (), width = 1, group = 'gcode')
                 self.addPoint(self.xPosition, self.yPosition)
                 self.line[-1].type = "line"
                 self.line[-1].dashed = False
 
+                self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
+                self.addPoint3D(self.xPosition, self.yPosition, zTarget)
+                self.line3D[-1].type = "line"
+                self.line3D[-1].dashed = False
+
+
             i = 0
             while abs(i) < arcLen:
                 xPosOnLine = centerX + radius * math.cos(angle1 + i)
                 yPosOnLine = centerY + radius * math.sin(angle1 + i)
+                zPosOnline = zTarget
                 self.addPoint(xPosOnLine, yPosOnLine)
+                self.addPoint3D(xPosOnLine, yPosOnLine, zTarget)
                 i = i + 0.1 * direction  # this is going to need to be a direction
 
             self.addPoint(xTarget, yTarget)
+            self.addPoint3D(xTarget, yTarget, zTarget)
 
             self.xPosition = xTarget
             self.yPosition = yTarget
+            self.zPosition = zTarget
         # except:
         #    print "Unable to draw arc on screen: " + gCodeLine
 
@@ -329,6 +354,8 @@ class GCodeFile(MakesmithInitFuncs):
 
         """
         del self.line[:]
+        del self.line3D[:]
+
 
     def moveLine(self, gCodeLine):
 
@@ -520,13 +547,21 @@ class GCodeFile(MakesmithInitFuncs):
             self.loadNextLine()
 
         tstr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
-        #self.data.compressedGCode = self.compressStringToBytes(tstr)
         out = io.BytesIO()
         with gzip.GzipFile(fileobj=out, mode="w") as f:
             f.write(tstr.encode())
         self.data.compressedGCode = out.getvalue()
+
+        tstr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line3D])
+        out = io.BytesIO()
+        with gzip.GzipFile(fileobj=out, mode="w") as f:
+            f.write(tstr.encode())
+        self.data.compressedGCode3D = out.getvalue()
+
         self.data.console_queue.put("uncompressed:"+str(len(tstr)))
         self.data.console_queue.put("compressed:"+str(len(self.data.compressedGCode)))
+        self.data.console_queue.put("compressed3D:"+str(len(self.data.compressedGCode3D)))
+
 
     def updateGcode(self):
         """
