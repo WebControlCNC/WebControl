@@ -9,13 +9,17 @@ import math
 import serial.tools.list_ports
 import glob
 import json
-
+import time
+import datetime
 
 class Actions(MakesmithInitFuncs):
     def processAction(self, msg):
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
                 self.data.ui_queue.put("Message: Error with resetting chain lengths.")
+        elif msg["data"]["command"] == "createDirectory":
+            if not self.createDirectory(msg["data"]["arg"]):
+                self.data.ui_queue.put("Message: Error with creating directory.")
         elif msg["data"]["command"] == "move":
             if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating move.")
@@ -117,13 +121,11 @@ class Actions(MakesmithInitFuncs):
                     "Message: Error with starting optical calibration"
                 )
         elif msg["data"]["command"] == "optical_Calibrate":
-            print("here")
             if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
                 self.data.ui_queue.put(
                     "Message: Error with starting optical calibration"
                 )
         elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
-            print("here")
             if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
                 self.data.ui_queue.put(
                     "Message: Error with saving optical calibration configuration"
@@ -135,7 +137,6 @@ class Actions(MakesmithInitFuncs):
             if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with test image.")
         elif msg["data"]["command"] == "findCenterOpticalCalibration":
-            print("here at find Center")
             if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with find Center.")
         elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
@@ -154,6 +155,9 @@ class Actions(MakesmithInitFuncs):
                 #self.data.ui_queue.put(
                 #    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
                 #)
+        elif msg["data"]["command"] == "saveCalibrationToCSV":
+            if not self.data.opticalCalibration.saveCalibrationToCSV():
+                self.data.ui_queue.put("Message: Error with saving calibration to CSV.")
         elif msg["data"]["command"] == "clearCalibration":
             if not self.data.opticalCalibration.clearCalibration():
                 self.data.ui_queue.put("Message: Error with clearing calibration.")
@@ -169,6 +173,12 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "adjustCenter":
             if not self.adjustCenter(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with adjusting center.")
+        elif msg["data"]["command"] == "upgradeFirmware":
+            if not self.upgradeFirmware():
+                self.data.ui_queue.put("Message: Error with upgrading firmware.")
+            else:
+                self.data.ui_queue.put("Message: Firmware update complete.")
+
 
     def defineHome(self):
         try:
@@ -186,11 +196,12 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue.put(
                 "Action: homePositionMessage:_" + json.dumps(position)
             )  # the "_" facilitates the parse
-            print("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
+            self.data.console_queue.put("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
             self.data.gcodeFile.loadUpdateFile()
+            #self.data.message_queue.put("Action: gcodeUpdate")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def home(self):
@@ -217,7 +228,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G00 Z0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def resetChainLengths(self):
@@ -229,7 +240,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G21 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def defineZ0(self):
@@ -237,7 +248,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G10 Z0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def stopZ(self):
@@ -247,7 +258,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def startRun(self):
@@ -260,24 +271,24 @@ class Actions(MakesmithInitFuncs):
             else:
                 return False
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             return False
 
     def stopRun(self):
         try:
-            print("trying to stop run")
+            self.data.console_queue.put("stopping run")
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
             # TODO: app.onUploadFlagChange(self.stopRun, 0)
-            print("Gcode Stopped")
+            self.data.console_queue.put("Gcode stopped")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveToDefault(self):
@@ -298,7 +309,7 @@ class Actions(MakesmithInitFuncs):
 
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def testMotors(self):
@@ -306,7 +317,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B04 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def wipeEEPROM(self, extent):
@@ -323,17 +334,17 @@ class Actions(MakesmithInitFuncs):
             #timer.start()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def pauseRun(self):
         try:
             self.data.uploadFlag = 0
-            print("Run Paused")
+            self.data.console_queue.put("Run Paused")
             self.data.ui_queue.put("Action: setAsResume")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def resumeRun(self):
@@ -347,7 +358,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue.put("Action: setAsPause")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def returnToCenter(self):
@@ -364,7 +375,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G00 X0.0 Y0.0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def clearGCode(self):
@@ -372,7 +383,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcodeFile.clearGcode()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveGcodeZ(self, moves):
@@ -390,7 +401,7 @@ class Actions(MakesmithInitFuncs):
             else:
                 return False
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveGcodeIndex(self, dist):
@@ -438,12 +449,12 @@ class Actions(MakesmithInitFuncs):
                     "Action: positionMessage:_" + json.dumps(position)
                 )  # the "_" facilitates the parse
             except Exception as e:
-                print(e)
-                print("Unable to update position for new gcode line")
+                self.data.console_queue.put(str(e))
+                self.data.console_queue.put("Unable to update position for new gcode line")
                 return False
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def move(self, direction, distToMove):
@@ -495,7 +506,7 @@ class Actions(MakesmithInitFuncs):
                 )
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def moveZ(self, direction, distToMoveZ):
@@ -521,7 +532,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G20 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
@@ -570,7 +581,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def setSprockets(self, sprocket, degrees):
@@ -588,11 +599,17 @@ class Actions(MakesmithInitFuncs):
                 == "Bottom"
             ):
                 degValue *= -1.0
+            if self.data.config.getValue("Advanced Settings", "chainOverSprocket")=="Bottom":
+                if self.data.config.getValue("Computed Settings", "chainOverSprocketComputed") != 2:
+                   self.data.ui_queue.put("Message: mismatch between setting and computed setting. set for bottom feed, but computed !=2. report as issue on github please")
+            if self.data.config.getValue("Advanced Settings", "chainOverSprocket")=="Top":
+                if self.data.config.getValue("Computed Settings", "chainOverSprocketComputed") != 1:
+                   self.data.ui_queue.put("Message: mismatch between setting and computed setting. set for top feed, but computed != 1. report as issue on github please")
             self.data.gcode_queue.put("B09 " + sprocket + str(degValue) + " ")
             self.data.gcode_queue.put("G90 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def setVerticalAutomatic(self):
@@ -603,7 +620,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B10 L")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def getLeftChainLength(self, dist):
@@ -636,7 +653,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B06 L0 R0 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def setSprocketsDefault(self):
@@ -644,11 +661,12 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B08 ")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def updatePorts(self):
         # refresh the list of available comports
+        self.data.console_queue.put("at Update Ports")
         portsList = []
         try:
             if sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
@@ -670,7 +688,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue.put("Action: updatePorts")
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def calibrate(self, result):
@@ -678,9 +696,6 @@ class Actions(MakesmithInitFuncs):
             motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
                 result
             )
-            print(motorYoffsetEst)
-            print(rotationRadiusEst)
-            print(chainSagCorrectionEst)
             if motorYoffsetEst == False:
                 return False
             return (
@@ -703,7 +718,7 @@ class Actions(MakesmithInitFuncs):
             """
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def macro(self, number):
@@ -715,7 +730,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put(macro)
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def testImage(self):
@@ -723,7 +738,7 @@ class Actions(MakesmithInitFuncs):
             self.data.opticalCalibration.testImage()
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def adjustCenter(self, dist):
@@ -734,7 +749,7 @@ class Actions(MakesmithInitFuncs):
                 return False
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def processSettingRequest(self, section, setting):
@@ -768,22 +783,44 @@ class Actions(MakesmithInitFuncs):
                         "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
                     )
                 except Exception as e:
-                    print(e)
+                    self.data.console_queue.put(str(e))
             elif setting == "calibrationError":
                 try:
-                    print("setting request calibration error-1")
                     xyErrorArray = self.data.config.getValue("Optical Calibration Settings","xyErrorArray")
                     errorX, errorY = self.data.config.parseErrorArray(xyErrorArray, True)
                     data = {"errorX": errorX, "errorY": errorY}
-                    print("setting request calibration error-2")
                     self.data.ui_queue.put(
                         "Action: updateOpticalCalibrationError:_" + json.dumps(data)
                     )
                 except Exception as e:
-                    print(e)
+                    self.data.console_queue.put(str(e))
             else:
                 retval = self.data.config.getValue(section, setting)
                 return setting, retval
         except Exception as e:
             pass
         return None, None
+
+    def upgradeFirmware(self):
+        self.data.ui_queue.put("SpinnerMessage: Firmware Update in Progress, Please Wait.")
+        time.sleep(.5)
+        port = self.data.comport
+        cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
+        os.system(cmd)
+        self.data.ui_queue.put("closeModals:_Notification:")
+        return True
+
+    def createDirectory(self, _directory):
+        try:
+            home = self.data.config.getHome()
+            directory = home + "/.WebControl/gcode/" + _directory
+            if not os.path.isdir(directory):
+                print("creating "+directory)
+                os.mkdir(directory)
+            data = {"directory": _directory}
+            self.data.ui_queue.put(
+                "Action: updateDirectories:_" + json.dumps(data)
+            )
+        except Exception as e:
+            print(e)
+        return True

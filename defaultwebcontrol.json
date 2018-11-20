@@ -44,7 +44,8 @@
             "section": "Advanced Settings",
             "title": "Chain Tolerance, Left Chain",
             "type": "string",
-            "value": "0"
+            "value": "0",
+            "firmwareKey": 40
         },
         {
             "default": 0,
@@ -53,7 +54,8 @@
             "section": "Advanced Settings",
             "title": "Chain Tolerance, Right Chain",
             "type": "string",
-            "value": "0"
+            "value": "0",
+            "firmwareKey": 41
         },
         {
             "default": "Top",
@@ -502,18 +504,6 @@
             "value": 3
         },
         {
-            "firmwareKey": 40,
-            "key": "distPerRotLeftChainTolerance",
-            "type": "string",
-            "value": "63.50000"
-        },
-        {
-            "firmwareKey": 41,
-            "key": "distPerRotRightChainTolerance",
-            "type": "string",
-            "value": "63.50000"
-        },
-        {
             "default": 1.0,
             "key": "distToMove",
             "type": "float",
@@ -536,6 +526,12 @@
             "key": "unitsZ",
             "type": "string",
             "value": "INCHES"
+        },
+        {
+            "default": ".",
+            "key": "lastSelectedDirectory",
+            "type": "string",
+            "value": "."
         }
     ],
     "Maslow Settings": [
@@ -893,6 +889,15 @@
             "section": "WebControl Settings",
             "title": "Diagonal Move Method",
             "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
+            "desc": "Timeout logging after specified seconds of user and gcode processing activity, 0 value disables timeout\ndefault setting: 0",
+            "key": "loggingTimeout",
+            "section": "WebControl Settings",
+            "title": "Logger Idle Timeout",
+            "type": "float",
             "value": 0
         },
         {

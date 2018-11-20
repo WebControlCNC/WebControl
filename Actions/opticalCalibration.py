@@ -1,12 +1,11 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from scipy.spatial import distance as dist
-from imutils import perspective, contours
+#from scipy.spatial import distance as dist
 
 # from imutils.video                      import VideoStream
 # from Background.webcamVideoStream       import WebcamVideoStream
 # from imutils.video			import WebcamVideoStream
 import numpy as np
-import imutils
+#import imutils
 import cv2
 import time
 import re
@@ -14,6 +13,9 @@ import sys
 import math
 import base64
 import json
+import time
+import os
+import datetime
 
 
 class OpticalCalibration(MakesmithInitFuncs):
@@ -57,10 +59,10 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.yCurve[3] = float(self.data.config.getValue('Optical Calibration Settings', 'calY3'))
             self.yCurve[4] = float(self.data.config.getValue('Optical Calibration Settings', 'calY4'))
             self.yCurve[5] = float(self.data.config.getValue('Optical Calibration Settings', 'calY5'))
-            print("reloaded calibration data")
+            self.data.console_queue.put("reloaded calibration data")
             return self.calErrorsX, self.calErrorsY, self.xCurve, self.yCurve
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return None, None, None, None
 
 
@@ -72,7 +74,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.yCurve = np.zeros(shape=(6))  # coefficients for quadratic curve
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
 
@@ -85,7 +87,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.inMeasureOnlyMode = False
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
 
@@ -138,9 +140,8 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.cannyHighValue = float(args["cannyHighValue"])
 
     def saveOpticalCalibrationConfiguration(self, args):
-        print("Saving Configuration")
+        self.data.console_queue.put("Saving Configuration")
         try:
-            print(args)
             self.data.config.setValue("Optical Calibration Settings", "opticalCenterX", float(args["opticalCenterX"]))
             self.data.config.setValue("Optical Calibration Settings", "opticalCenterY", float(args["opticalCenterY"]))
             self.data.config.setValue("Optical Calibration Settings", "scaleX", float(args["scaleX"]))
@@ -159,7 +160,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.config.setValue("Optical Calibration Settings", "brY", int(args["brY"]))
             self.data.config.setValue("Optical Calibration Settings", "calibrationExtents", args["calibrationExtents"])
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
         return True
 
@@ -178,11 +179,10 @@ class OpticalCalibration(MakesmithInitFuncs):
         _posX = round(self.HomingPosX * 3.0 + self.HomingX / 25.4, 4)
         _posY = round(self.HomingPosY * 3.0 + self.HomingY / 25.4, 4)
         # self.updateTargetIndicator(_posX,_posY,"INCHES")
-        print(
-            "Moving to ({},{}) by trying [{}, {}]".format(
+        message = "Moving to ({},{}) by trying [{}, {}]".format(
                 self.HomingPosX * 3.0, self.HomingPosY * 3.0, _posX, _posY
             )
-        )
+        self.data.console_queue.put("message")
 
         self.data.units = "INCHES"
         self.data.gcode_queue.put("G20 ")
@@ -216,8 +216,14 @@ class OpticalCalibration(MakesmithInitFuncs):
             cnts = cv2.findContours(
                 edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
             )
-            cnts = cnts[0] if imutils.is_cv2() else cnts[1]
-            (cnts, _) = contours.sort_contours(cnts)
+            #assume its not cv2
+            #cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+            cnts = cnts[1]
+            #self.data.console_queue.put(str(imutils.is_cv2()))
+            try:
+               (cnts, _) = self.sort_contours(cnts)
+            except Exception as e:
+               self.data.console_queue.put(str(e))
             height, width, channels = image.shape
             if self.opticalCenter[0] == 0 or self.opticalCenter[1] == 0:
                 xA = int(width / 2)
@@ -247,9 +253,11 @@ class OpticalCalibration(MakesmithInitFuncs):
                     _angle = angle + 90
                 else:
                     _angle = angle
-                box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+                #assume not cv2()
+                #box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+                box = cv2.boxPoints(box)
                 box = np.array(box, dtype="int")
-                box = perspective.order_points(box)
+                box = self.orderPoints(box)
                 cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
                 # cv2.imwrite('testing/image-out'+str(x)+".png",orig)
                 if findCenter == False:
@@ -274,12 +282,14 @@ class OpticalCalibration(MakesmithInitFuncs):
                     _angle = _angle * -1.0
                 if findCenter == False:
                     xB, yB = self.translatePoint(xB, yB, xA, yA, _angle)
-                Dx = dist.euclidean((xA, 0), (xB, 0)) / xD
-                if xA > xB:
-                    Dx *= -1
-                Dy = dist.euclidean((0, yA), (0, yB)) / yD
-                if yA < yB:
-                    Dy *= -1
+                #Dx = dist.euclidean((xA, 0), (xB, 0)) / xD
+                Dx = (xB-xA) / xD
+                #if xA > xB:
+                #    Dx *= -1
+                #Dy = dist.euclidean((0, yA), (0, yB)) / yD
+                Dy = (yA-yB) / yD
+                #if yA < yB:
+                #    Dy *= -1
                 Dist = math.sqrt(Dx ** 2.0 + Dy ** 2.0)
                 dxList[x] = Dx
                 dyList[x] = Dy
@@ -294,19 +304,18 @@ class OpticalCalibration(MakesmithInitFuncs):
                 falseCounter += 1
                 if falseCounter == 10:
                     break
-        print("Got 10 images processed, " + str(falseCounter) + " images were bad")
-        if dxList.ndim != 0:
+        self.data.console_queue.put("Got 10 images processed, " + str(falseCounter) + " images were bad")
+        if falseCounter != 10:
             avgDx, stdDx = self.removeOutliersAndAverage(dxList)
             avgDy, stdDy = self.removeOutliersAndAverage(dyList)
             avgDi, stdDi = self.removeOutliersAndAverage(diList)
             avgxB, stdxB = self.removeOutliersAndAverage(xBList)
             avgyB, stdyB = self.removeOutliersAndAverage(yBList)
-
             if findCenter == False:
                 orig = cv2.warpAffine(orig, M, (width, height))
             return avgDx, avgDy, avgDi, avgxB, avgyB, orig
         else:
-            return None, None, None, None, None, edged
+            return None, None, None, None, None, gray
 
     def on_CenterOnSquare(self, _dist, findCenter=False):
 
@@ -323,7 +332,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.HomingX += avgDx
             self.HomingY += avgDy
             if ((abs(avgDx) >= 0.125) or (abs(avgDy) >= 0.125)) and ( not findCenter ):
-                print("Adjusting Location")
+                self.data.console_queue.put("Adjusting Location")
                 self.HomeIn()
             else:
                 xS = self.HomingX + self.HomingPosX * 3 * 25.4 * (1.0 - self.scaleX)
@@ -336,14 +345,14 @@ class OpticalCalibration(MakesmithInitFuncs):
                     self.calErrorsY[self.HomingPosX + 15][7 - self.HomingPosY] = yS
                 else:
                     self.opticalCenter = (avgxB, avgyB)
-                    print(str(avgxB)+", "+str(avgyB))
+                    self.data.console_queue.put(str(avgxB)+", "+str(avgyB))
                 if self.inAutoMode:
                     self.on_AutoHome()
                 else:
-                    print("avgDx,Dy:" + str(avgDx) + ", " + str(avgDy))
-                    print("Releasing Camera")
+                    self.data.console_queue.put("avgDx,Dy:" + str(avgDx) + ", " + str(avgDy))
+                    self.data.console_queue.put("Releasing Camera")
                     self.camera.release()
-                    print("Done")
+                    self.data.console_queue.put("Done")
         else:
             return False
 
@@ -354,7 +363,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             minY = self.tlY
             maxY = self.brY
             if measureMode == True:
-                print("Measure Only")
+                self.data.console_queue.put("Measure Only")
                 self.inMeasureOnlyMode = True
             if self.inAutoMode == False:
                 self.HomingX = 0.0
@@ -385,19 +394,19 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomeIn()
                     else:
                         self.inAutoMode = False
-                        print("Releasing Camera")
+                        self.data.console_queue.put("Releasing Camera")
                         self.camera.release()
                         self.camera=None
-                        print("Calibration Completed")
+                        self.data.console_queue.put("Calibration Completed")
                         #send ui updated data
                         data = {"errorX": self.calErrorsX.tolist(), "errorY": self.calErrorsY.tolist()}
                         self.data.ui_queue.put(
                              "Action: updateOpticalCalibrationError:_" + json.dumps(data)
                         )
-                        print("sent")
+                        self.data.console_queue.put("sent")
                         # self.printCalibrationErrorValue()
                 else:  # vertical
-                    print("Vertical Scan")
+                    self.data.console_queue.put("Vertical Scan")
                     if self.inMeasureOnlyMode:
                         self.HomingX = 0.0
                         self.HomingY = 0.0
@@ -414,18 +423,18 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomeIn()
                     else:
                         self.inAutoMode = False
-                        print("Releasing Camera")
+                        self.data.console_queue.put("Releasing Camera")
                         self.camera.release()
                         self.camera=None
-                        print("Calibration Completed")
+                        self.data.console_queue.put("Calibration Completed")
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
 
     def on_Calibrate(self, args):
-        print("Initializing")
+        self.data.console_queue.put("Initializing")
         self.setCalibrationSettings(args)
         self.saveOpticalCalibrationConfiguration(args)
-        print(
+        self.data.console_queue.put(
             "Extents:"
             + str(self.tlX)
             + ", "
@@ -436,21 +445,21 @@ class OpticalCalibration(MakesmithInitFuncs):
             + str(self.brY)
         )
         if self.camera is None:
-            print("Starting Camera")
+            self.data.console_queue.put("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-        print("Analyzing Images")
+        self.data.console_queue.put("Analyzing Images")
         self.on_AutoHome(False)
         return True
 
     def testImage(self, args, findCenter=False):
-        print("at Test Image")
+        self.data.console_queue.put("at Test Image")
         self.setCalibrationSettings(args)
         if self.camera is None:
-            print("Starting Camera")
+            self.data.console_queue.put("Starting Camera")
             self.camera = cv2.VideoCapture(0)
-            print("Camera Started")
+            self.data.console_queue.put("Camera Started")
         avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
-        print("Releasing Camera")
+        self.data.console_queue.put("Releasing Camera")
         self.camera.release()
         self.camera = None
         if avgDx is not None:
@@ -461,7 +470,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationTestImage = stringData
             self.data.opticalCalibrationTestImageUpdated = True
-            print(str(avgxB)+", "+str(avgyB))
+            self.data.console_queue.put(str(avgxB)+", "+str(avgyB))
             if findCenter:
                 return avgxB, avgyB
             else:
@@ -477,7 +486,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 return True
 
     def findCenter(self, args):
-        print("at Find Center")
+        self.data.console_queue.put("at Find Center")
         avgxB, avgyB = self.testImage(args, True)
         if avgxB is not None and avgyB is not None:
             # return optical center values, but don't use them until returned by user
@@ -488,23 +497,34 @@ class OpticalCalibration(MakesmithInitFuncs):
             return True
         return False
 
-    def on_SaveCSV(self):
-        outFile = open("calibrationValues.csv","w")
-        line = ""
-        for y in range(7, -8, -1):
+    def saveCalibrationToCSV(self):
+        try:
+            home = self.data.config.getHome()
+            currentTime = time.time()
+            dateTime = datetime.datetime.fromtimestamp(currentTime).strftime('%Y%m%d-%H%M%S')
+            directory = home + "/.WebControl/OpticalCalibrationResults"
+            if not os.path.isdir(directory):
+                print("creating "+directory)
+                os.mkdir(directory)
+            outFile = open(directory+"/calibrationValues"+dateTime+".csv","w")
             line = ""
-            for x in range(-15, 16, +1):
-                line += "{:.2f},".format(self.calErrorsX[x+15][7-y])
-            line +="\n"
-            outFile.write(line)
-        outFile.write("\n")
-        for y in range(7, -8, -1):
-            line = ""
-            for x in range(-15, 16, +1):
-                line += "{:.2f},".format(self.calErrorsY[x+15][7-y])
-            line +="\n"
-            outFile.write(line)
-        outFile.close()
+            for y in range(7, -8, -1):
+                line = ""
+                for x in range(-15, 16, +1):
+                    line += "{:.2f},".format(self.calErrorsX[x+15][7-y])
+                line +="\n"
+                outFile.write(line)
+            outFile.write("\n")
+            for y in range(7, -8, -1):
+                line = ""
+                for x in range(-15, 16, +1):
+                    line += "{:.2f},".format(self.calErrorsY[x+15][7-y])
+                line +="\n"
+                outFile.write(line)
+            outFile.close()
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
 
 
     def saveAndSend(self):
@@ -540,7 +560,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.config.setValue('Optical Calibration Settings', 'xyErrorArray', _str)
             return True
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return False
 
     def surfaceFit(self):
@@ -548,6 +568,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         try:
             dataX = np.zeros(((15 * 31), 3))
             dataY = np.zeros(((15 * 31), 3))
+            print(self.calErrorsX)
             for y in range(7, -8, -1):
                 for x in range(-15, 16, +1):
                     dataX[(7 - y) * 31 + (x + 15)][0] = float(x * 3.0 * 25.4)
@@ -584,6 +605,38 @@ class OpticalCalibration(MakesmithInitFuncs):
             print(yR2)
             return self.xCurve.tolist(), self.yCurve.tolist()
         except Exception as e:
-            print(e)
+            self.data.console_queue.put(str(e))
             return None, None
 
+    def orderPoints(self, pts):
+        xSorted = pts[np.argsort(pts[:, 0]), :]
+ 
+        leftMost = xSorted[:2, :]
+        rightMost = xSorted[2:, :]
+ 
+        leftMost = leftMost[np.argsort(leftMost[:, 1]), :]
+        (tl, bl) = leftMost
+ 
+        rightMost = rightMost[np.argsort(rightMost[:, 1]), :]
+        (tr, br) = rightMost
+ 
+        return np.array([tl, tr, br, bl], dtype="float32")
+
+    def sort_contours(self, cnts, method="left-to-right"):
+        # initialize the reverse flag and sort index
+        reverse = False
+        i = 0
+        # handle if we need to sort in reverse
+        if method == "right-to-left" or method == "bottom-to-top":
+            reverse = True
+        # handle if we are sorting against the y-coordinate rather than
+        # the x-coordinate of the bounding box
+        if method == "top-to-bottom" or method == "bottom-to-top":
+            i = 1
+
+        # construct the list of bounding boxes and sort them from top to
+        # bottom
+        boundingBoxes = [cv2.boundingRect(c) for c in cnts]
+        (cnts, boundingBoxes) = zip(*sorted(zip(cnts, boundingBoxes), key=lambda b: b[1][i], reverse=reverse))
+        # return the list of sorted contours and bounding boxes
+        return cnts, boundingBoxes

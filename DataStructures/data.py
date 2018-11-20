@@ -23,7 +23,7 @@ class Data:
     clients = []
     gcode = []
     compressedGCode = None
-    version = "1.23"
+    version = "1.25"
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used
@@ -70,6 +70,7 @@ class Data:
     Pointers to Objects
     """
     serialPort = None  # this is a pointer to the program serial port object
+    requestSerialClose = False  # this is used to request the serialThread to gracefully close the port
     triangularCalibration = None  # points to the triangular calibration object
     opticalCalibration = None  # points to the optical calibration object
     opticalCalibrationImage = None  # stores the current image
@@ -101,6 +102,9 @@ class Data:
     """
     message_queue = LoggingQueue(logger)
     ui_queue = queue.Queue()
+    console_queue = queue.Queue() # used for printing to terminal
+    mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
+    webMCPActive = False  # start false until WebMCP connects
     gcode_queue = queue.Queue()
     quick_queue = queue.Queue()
 

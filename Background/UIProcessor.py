@@ -12,16 +12,16 @@ class UIProcessor:
     def start(self, _app):
 
         self.app = _app
-        print("starting UI")
+        self.app.data.console_queue.put("starting UI")
         with self.app.app_context():
             while True:
                 time.sleep(0.001)
                 if self.app.data.config.firstRun:
-                    print("here at firstRun")
+                    self.app.data.console_queue.put("here at firstRun")
                     self.app.data.config.firstRun = False
                     time.sleep(2)
                     self.activateModal("Notification:",
-                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.")
+                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.","notification")
                 if self.app.data.opticalCalibrationImageUpdated is True:
                     self.sendCalibrationMessage(
                         "OpticalCalibrationImageUpdated",
@@ -50,27 +50,49 @@ class UIProcessor:
                                 oo = 1
                                 # app.setErrorOnScreen(message)
                         elif message[0:13] == "Maslow Paused":
-                                print("caught maslow paused")
-                                socketio.emit(
-                                    "requestedSetting",
-                                    {"setting": "pauseButtonSetting", "value": "Resume"},
-                                    namespace="/MaslowCNC",
-                                )
+                            self.app.data.console_queue.put("caught maslow paused")
+                            socketio.emit(
+                                "requestedSetting",
+                                {"setting": "pauseButtonSetting", "value": "Resume"},
+                                namespace="/MaslowCNC",
+                            )
                         elif message[0:12] == "Tool Change:":
-                            print("found tool change in message")
-                            self.activateModal("Notification:", message[13:], "resume")
+                            self.app.data.console_queue.put("found tool change in message")
+                            self.activateModal("Notification:", message[13:],"notification", resume="resume")
+                        elif message[0:13] == "showFPSpinner":
+                            socketio.emit("showFPSpinner", {"data": ""}, namespace="/MaslowCNC")
+                        elif message[0:12] == "closeModals:":
+                            msg = message.split("_")
+                            socketio.emit(
+                                "closeModals",
+                                {"data": {"title": msg[1]}},
+                                namespace="/MaslowCNC",
+                            )
                         elif message[0:8] == "Message:":
                             if message.find("adjust Z-Axis") != -1:
-                                print("found adjust Z-Axis in message")
+                                self.app.data.console_queue.put("found adjust Z-Axis in message")
                                 #socketio.emit(
                                 #    "requestedSetting",
                                 #    {"setting": "pauseButtonSetting", "value": "Resume"},
                                 #    namespace="/MaslowCNC",
                                 #)
-                                self.activateModal("Notification:", message[9:], "resume")
+                                self.activateModal("Notification:", message[9:], "notification", resume="resume")
                             else:
-                                self.activateModal("Notification:", message[9:])
+                                self.activateModal("Notification:", message[9:], "notification")
+                        elif message[0:16] == "ProgressMessage:":
+                                self.activateModal("Notification:", message[17:], "notification", progress="enable")
+                        elif message[0:15] == "SpinnerMessage:":
+                                self.activateModal("Notification:", message[15:], "notification", progress="spinner")
                         elif message[0:7] == "Action:":
+                            if message.find("updateDirectories") != -1:
+                                msg = message.split(
+                                    "_"
+                                )  # everything to the right of the "_" should be the position data already json.dumps'ed
+                                socketio.emit(
+                                    "updateDirectories",
+                                    {"data": msg[1]},
+                                    namespace="/MaslowCNC",
+                                )
                             if message.find("unitsUpdate") != -1:
                                 units = self.app.data.config.getValue(
                                     "Computed Settings", "units"
@@ -90,19 +112,8 @@ class UIProcessor:
                                     namespace="/MaslowCNC",
                                 )
                             if message.find("gcodeUpdate") != -1:
-                                socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode})
-                                #socketio.emit(
-                                #    "gcodeUpdate",
-                                #    {
-                                #        "data": json.dumps(
-                                #            [
-                                #                ob.__dict__
-                                #                for ob in self.app.data.gcodeFile.line
-                                #            ]
-                                #        )
-                                #    },
-                                #    namespace="/MaslowCNC",
-                                #)
+                                if self.app.data.compressedGCode is not None:
+                                    socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode}, namespace="/MaslowCNC")
                             if message.find("setAsPause") != -1:
                                 socketio.emit(
                                     "requestedSetting",
@@ -128,7 +139,7 @@ class UIProcessor:
                                 msg = message.split(
                                     "_"
                                 )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                                print("sending home position update")
+                                self.app.data.console_queue.put("sending home position update")
                                 socketio.emit(
                                     "homePositionMessage",
                                     {"data": msg[1]},
@@ -153,7 +164,10 @@ class UIProcessor:
                                 self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
 
                         elif message[0:6] == "ALARM:":
-                            self.activateModal("Notification:", message[7:])
+                            if message.find("The sled is not keeping up") != -1:
+                                #change color of stop button
+                                pass
+                            self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                         elif message == "ok\r\n":
                             pass  # displaying all the 'ok' messages clutters up the display
                         else:
@@ -182,7 +196,7 @@ class UIProcessor:
                     self.sendControllerMessage("Unable to resolve z Kinematics.")
                     self.app.data.zval = 0
         except:
-            print("One Machine Position Report Command Misread")
+            self.app.data.console_queue.put("One Machine Position Report Command Misread")
             return
 
         percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
@@ -195,10 +209,10 @@ class UIProcessor:
         }
         self.sendPositionMessage(position)
 
-    def activateModal(self, title, message, resume="false"):
+    def activateModal(self, title, message, modalType, resume="false", progress="false"):
         socketio.emit(
             "activateModal",
-            {"title": title, "message": message, "resume": resume, "modalSize": "small"},
+            {"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType},
             namespace="/MaslowCNC",
         )
 

@@ -33,8 +33,7 @@ class SerialPort(MakesmithInitFuncs):
         Defines which port the machine is attached to
 
         """
-        print("update ports")
-        print(port)
+        self.data.console_queue.put(port)
         self.data.comport = port
 
     def connect(self, *args):

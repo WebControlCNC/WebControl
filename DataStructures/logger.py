@@ -7,7 +7,12 @@ behavior.
 
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import threading
+import os
+import time
+import datetime
+from pathlib import Path
 from app import app, socketio
+
 
 
 class Logger(MakesmithInitFuncs):
@@ -15,16 +20,43 @@ class Logger(MakesmithInitFuncs):
     errorValues = []
     recordingPositionalErrors = False
     clients = []
+    logStartTime = 0
 
     messageBuffer = ""
     amessageBuffer = ""
+    idler = 0
+    suspendLogging = False
+    lastALogWrite = 0
+    lastLogWrite = 0
+    loggingTimeout = -1
 
-    # clear the old log file
-    with open("log.txt", "a") as logFile:
-        logFile.truncate()
+    def __init__(self):
+        print("Initializing Logger")
+        self.home = str(Path.home())
+        # clear the old log file
+        if not os.path.isdir(self.home + "/.WebControl"):
+            print("creating " + self.home + "/.WebControl directory")
+            os.mkdir(self.home + "/.WebControl")
+        print(self.home+"/.WebControl/"+"log.txt")
+        with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
+            logFile.truncate()
 
-    with open("alog.txt", "a") as logFile:
-        logFile.truncate()
+        with open(self.home+"/.WebControl/"+"alog.txt", "a") as logFile:
+            logFile.truncate()
+        
+        self.logStartTime = time.time()
+        dateTime = datetime.datetime.fromtimestamp(self.logStartTime).strftime('%Y-%m-%d %H:%M:%S')
+        self.amessageBuffer = "+++++\n"+dateTime+"\n+++++\n".format(self.logStartTime)
+        self.messageBuffer = "+++++\n"+dateTime+"\n+++++\n".format(self.logStartTime)
+        self.idler = time.time()
+        self.lastALogWrite = self.idler
+        self.lastLogWrite = self.idler
+
+    def resetIdler(self):
+        self.idler = time.time()
+
+    def setLoggingTimeout(self, timeOut):
+        self.loggingTimeout = timeOut
 
     def writeToLog(self, message):
 
@@ -36,43 +68,65 @@ class Logger(MakesmithInitFuncs):
         way slow
 
         """
+        if self.loggingTimeout == -1: #get setting for suspend time
+            self.loggingTimeout = self.data.config.get("WebControl Settings","loggingTimeout")
+        currentTime = time.time()
+        logTime = "{:0.2f}".format(currentTime-self.logStartTime)
+        dateTime = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
+        if self.loggingTimeout > 0 and self.data.uploadFlag == 0 and currentTime-self.idler > self.loggingTimeout:
+            if not self.suspendLogging:
+                self.messageBuffer += logTime + ": " + "Logging suspended due to user idle time > "+str(self.loggingTimeout)+" seconds\n"
+                self.suspendLogging = True
+        else:
+            if self.suspendLogging:
+                self.messageBuffer += logTime + ": " + "Logging resumed due to user activity\n"
+                self.suspendLogging = False
+
         if message[0] != "<" and message[0] != "[":
             try:
-                self.amessageBuffer = self.amessageBuffer + message
-                self.messageBuffer = self.messageBuffer + message
+                tmessage = message.rstrip('\r\n')
+                self.amessageBuffer += logTime+": " + tmessage+"\n"
+                if not self.suspendLogging:
+                    self.messageBuffer += logTime+": " + tmessage+"\n"
             except:
                 pass
         else:
             try:
-                self.messageBuffer = self.messageBuffer + message
+                if not self.suspendLogging:
+                    tmessage = message.rstrip('\r\n')
+                    self.messageBuffer += logTime+": "+ tmessage+"\n"
             except:
                 pass
 
-        if len(self.messageBuffer) > 500:
-            t = threading.Thread(
-                target=self.writeToFile, args=(self.messageBuffer, True, "write")
-            )
-            t.daemon = True
-            t.start()
-            self.messageBuffer = ""
+        if len(self.messageBuffer) > 500 or currentTime-self.lastLogWrite > 15:
+            if self.messageBuffer != "":  #doing it this way will flush out the buffer when in idle state.
+                t = threading.Thread(
+                    target=self.writeToFile, args=(self.messageBuffer, True, "write")
+                )
+                t.daemon = True
+                t.start()
+                self.messageBuffer = ""
+                self.lastLogWrite = currentTime
 
-        if len(self.amessageBuffer) > 500:
-            t = threading.Thread(
-                target=self.writeToFile, args=(self.amessageBuffer, False, "write")
-            )
-            t.daemon = True
-            t.start()
-            self.amessageBuffer = ""
+        if len(self.amessageBuffer) > 500 or currentTime-self.lastALogWrite > 15:
+            if self.amessageBuffer != "":
+                t = threading.Thread(
+                    target=self.writeToFile, args=(self.amessageBuffer, False, "write")
+                )
+                t.daemon = True
+                t.start()
+                self.amessageBuffer = ""
+                self.lastALogWrite = currentTime
 
     def writeToFile(self, toWrite, log, *args):
         """
         Write to the log file
         """
         if log is True:
-            with open("log.txt", "a") as logFile:
+            with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
                 logFile.write(toWrite)
         else:
-            with open("alog.txt", "a") as logFile:
+            with open(self.home+"/.WebControl/"+"alog.txt", "a") as logFile:
                 logFile.write(toWrite)
 
         return
@@ -109,7 +163,7 @@ class Logger(MakesmithInitFuncs):
         Stops recording error values.
 
         """
-        print("stopping to record")
+        self.data.console_queue.put("stopping to record")
         self.recordingPositionalErrors = False
 
     def reportAvgError(self):

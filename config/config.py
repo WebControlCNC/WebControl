@@ -32,6 +32,13 @@ class Config(MakesmithInitFuncs):
             print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
             copyfile("defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
+        if not os.path.isdir(self.home+"/.WebControl/gcode"):
+            print("creating "+self.home+"/.WebControl/gcode directory")
+            os.mkdir(self.home+"/.WebControl/gcode")
+        if not os.path.isdir(self.home+"/.WebControl/imports"):
+            print("creating "+self.home+"/.WebControl/imports directory")
+            os.mkdir(self.home+"/.WebControl/imports")
+
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it
@@ -48,7 +55,7 @@ class Config(MakesmithInitFuncs):
                                found = True
                                break
                 if found == False:
-                    print(section+"->"+self.defaults[section][x]["key"])
+                    print(section+"->"+self.defaults[section][x]["key"]+" was not found..")
                     t = {}
                     if "default" in self.defaults[section][x]:
                         t["default"]=self.defaults[section][x]["default"]
@@ -67,7 +74,7 @@ class Config(MakesmithInitFuncs):
                     if "value" in self.defaults[section][x]:
                         t["value"]=self.defaults[section][x]["value"]
                     self.settings[section].append(t)
-                    print("adding "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
+                    print("added "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
                     updated = True
 
         if updated:
@@ -77,6 +84,8 @@ class Config(MakesmithInitFuncs):
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )
 
+    def getHome(self):
+        return self.home
 
     def getJSONSettings(self):
         return self.settings
@@ -171,6 +180,7 @@ class Config(MakesmithInitFuncs):
             # must be a turned off checkbox.. what a pain to figure out
             #print(str(self.settings[section][x]["key"])+" not found")
             if self.settings[section][x]["type"] == "bool":
+                self.data.console_queue.put(self.settings[section][x]["key"])
                 storedValue = self.settings[section][x]["value"]
                 self.settings[section][x]["value"] = 0
                 if "firmwareKey" in self.settings[section][x]:
@@ -189,10 +199,23 @@ class Config(MakesmithInitFuncs):
                 )
 
     def updateSettings(self, section, result):
-        print("at updateSettings")
-        for setting in result:
-            self.setValue(section, setting, result[setting], recursionBreaker=False, isImporting = False)
-        print("settings updated")
+        for x in range(len(self.settings[section])):
+            setting = self.settings[section][x]["key"]
+            self.data.console_queue.put(setting)
+            if setting in result:
+                resultValue = result[setting]
+            else:
+                resultValue = 0
+
+            #do a special check for comport because if its open, we need to close existing connection
+            if setting == "COMport":
+                currentSetting = self.data.config.getValue(section, setting)
+                if currentSetting != resultValue:
+                    if self.data.connectionStatus == 1:
+                        self.data.requestSerialClose = True
+                        self.data.console_queue.put("closing serial connection")
+            self.setValue(section, setting, resultValue, recursionBreaker=False, isImporting = False)
+        self.data.console_queue.put("settings updated")
 
     def getJSONSettingSection(self, section):
         """
@@ -282,7 +305,7 @@ class Config(MakesmithInitFuncs):
                         else:
                             value = 0
                     if firmwareKey == 45:
-                        print("firmwareKey = 45")
+                        self.data.console_queue.put("firmwareKey = 45")
                         if storedValue != "":
                             self.sendErrorArray(firmwareKey, storedValue, data)
                         pass
@@ -409,6 +432,11 @@ class Config(MakesmithInitFuncs):
 
     def computeSettings(self, section, key, value, doAll=False):
         # Update Computed settings
+        if key == "loggingTimeout" or doAll is True:
+            loggingTimeout = self.getValue("WebControl Settings", "loggingTimeout")
+            self.data.console_queue.put(str(value))
+            self.data.console_queue.put(str(loggingTimeout))
+            self.data.logger.setLoggingTimeout(loggingTimeout)
         if key == "kinematicsType" or doAll is True:
             if doAll is True:
                 value = self.getValue("Advanced Settings", "kinematicsType")
@@ -420,42 +448,13 @@ class Config(MakesmithInitFuncs):
                 if currentValue != "2":
                     self.setValue("Computed Settings", "kinematicsTypeComputed", "2", True)
 
-        if key == "gearTeeth" or key == "chainPitch" or key == "leftChainTolerance" or key == "rightChainTolerance" or doAll is True:
-            if key == "gearTeeth" or key == "chainPitch" or doAll is True:
-                gearTeeth = float(self.getValue("Advanced Settings", "gearTeeth"))
-                chainPitch = float(self.getValue("Advanced Settings", "chainPitch"))
-                distPerRot = gearTeeth * chainPitch
-                currentdistPerRot = self.getValue("Computed Settings", "distPerRot")
-                if currentdistPerRot != str(distPerRot):
-                    self.setValue("Computed Settings", "distPerRot", str(distPerRot), True)
-
-                leftChainTolerance = float(
-                    self.getValue("Advanced Settings", "leftChainTolerance")
-                )
-            else:
-                distPerRot = self.getValue("Computed Settings", "distPerRot")
-
-            if key != "rightChainTolerance" or doAll is True: #i.e., its gearTeeth, chainPitch, leftChainTolerance or doAll is True
-                currentdistPerRotLeftChainTolerance = self.getValue("Computed Settings", "distPerRotLeftChainTolerance")
-                distPerRotLeftChainTolerance = (1 + leftChainTolerance / 100.0) * distPerRot
-                if currentdistPerRotLeftChainTolerance != str("{0:.5f}".format(distPerRotLeftChainTolerance)):
-                    self.setValue(
-                        "Computed Settings",
-                        "distPerRotLeftChainTolerance",
-                        str("{0:.5f}".format(distPerRotLeftChainTolerance)),
-                        True,
-                    )
-            if key != "leftChainTolerance" or doAll is True:
-                currentdistPerRotRightChainTolerance = self.getValue("Computed Settings", "distPerRotRightChainTolerance")
-                rightChainTolerance = float(self.getValue("Advanced Settings", "rightChainTolerance"))
-                distPerRotRightChainTolerance = (1 + rightChainTolerance / 100.0) * distPerRot
-                if currentdistPerRotRightChainTolerance != str("{0:.5f}".format(distPerRotRightChainTolerance)):
-                    self.setValue(
-                        "Computed Settings",
-                        "distPerRotRightChainTolerance",
-                        str("{0:.5f}".format(distPerRotRightChainTolerance)),
-                        True,
-                    )
+        if key == "gearTeeth" or key == "chainPitch" or doAll is True:
+            gearTeeth = float(self.getValue("Advanced Settings", "gearTeeth"))
+            chainPitch = float(self.getValue("Advanced Settings", "chainPitch"))
+            distPerRot = gearTeeth * chainPitch
+            currentdistPerRot = self.getValue("Computed Settings", "distPerRot")
+            if currentdistPerRot != str(distPerRot):
+                self.setValue("Computed Settings", "distPerRot", str(distPerRot), True)
 
         if key == "enablePosPIDValues" or doAll is True:
             for key in ("KpPos", "KiPos", "KdPos", "propWeight"):

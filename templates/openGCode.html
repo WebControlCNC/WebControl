@@ -1,26 +1,51 @@
 {% block content %}
 <div class="container-fluid">
-  <form id="gcodeForm" method="post" enctype=multipart/form-data>
-    <div class="input-group mb-3">
-      <select class="custom-select" name="selectedGCode" data-group="{{title}}">
+  <form class="form" id="gcodeForm" method="post" enctype=multipart/form-data>
+    <div class="form-group">
+      <label for="directorySelect">Upload Directory</label>
+      <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+        {% for directory in directories %}
+          <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
+            {{directory if directory != '.' else './'}}
+          </option>
+        {% endfor %}
+      </select>
+      <label for="fileSelect">File</label>
+      <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
         {% for file in files %}
-          <option value="{{file}}" {{'selected' if file == lastSelectedFile else ''}}>
-            {{file}}
+          <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file == lastSelectedFile else ''}}>
+            {{file["file"]}}
           </option>
         {% endfor %}
       </select>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary mt-1">Submit</button>
+    <div id="gcCircle">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
+        </div>
+
   </form>
 </div>
 {% endblock %}
 
 {% block javascript %}
 <script>
+$('#gcCircle').hide();
+var unselected = [];
+var selectedDirectory = "{{lastSelectedDirectory}}"
+
 $(document).ready(function () {
+    refreshList();
+    $("#directorySelect").change(refreshList);
+
     $('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
-
+        $('#gcCircle').show();
         var formdata = new FormData(this);
 
         $.ajax({
@@ -33,14 +58,33 @@ $(document).ready(function () {
             processData: false,
             success: function (data) {
               console.log("success");
-                $('#notificationModal').modal('toggle')
+                $('#contentModal').modal('toggle')
                 checkForGCodeUpdate();
+                $('#gcCircle').hide();
             },
             error: function (jXHR, textStatus, errorThrown) {
                 alert(errorThrown);
+                $('#gcCircle').hide();
             }
         });
     });
 });
+
+function refreshList(){
+  unselected.forEach(element => {
+      $("#fileSelect").append(element)
+  });
+  unselected = [];
+  selectedDirectory = $("#directorySelect").val();
+  if (selectedDirectory[selectedDirectory.length-1]=="/")
+      selectedDirectory = selectedDirectory.slice(0,-1)
+  $("#fileSelect > option").each(function() {
+      var splits = $(this).val().split("/");
+      if (splits[0]!=selectedDirectory){
+        unselected.push($(this))
+        $(this).remove();
+      }
+  });
+}
 </script>
 {% endblock %}

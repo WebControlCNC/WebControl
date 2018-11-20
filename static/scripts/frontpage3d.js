@@ -2,15 +2,54 @@
 
 //setInterval(function(){ alert("Hello"); }, 3000);
 
-var scale = 1;
-var startWidth = 0.1
-var draw = SVG('workarea').size('100%','100%').panZoom({zoomMin: 1, zoomMax: 500, zoomFactor:2.5});
-var viewbox = draw.viewbox();
-var originX = viewbox.width/2;
-var originY = viewbox.height/2;
-var currentPosX = 0;
-var currentPosY = 0;
-var gcode = null;
+
+
+var renderer = new THREE.WebGLRenderer();
+var w = $("#workarea").width()-10;
+var h = $("#workarea").height()-10;
+renderer.setSize( w, h );
+console.log(w)
+
+container = document.getElementById('workarea');
+container.appendChild(renderer.domElement);
+
+
+
+var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
+camera.position.set(0, 0, 100);
+camera.lookAt(0,0,0);
+
+var scene = new THREE.Scene();
+scene.background= new THREE.Color(0xeeeeee);
+var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( light );
+var material = new THREE.LineBasicMaterial( {color:0x0000ff });
+var dashedMaterial = new THREE.LineDashedMaterial( {color:0x0000ff, dashSize:.5, gapSize: .5} );
+var outerFrameShape = new THREE.Geometry();
+outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
+outerFrameShape.vertices.push(new THREE.Vector3(48, 24, 0));
+outerFrameShape.vertices.push(new THREE.Vector3(48, -24, 0));
+outerFrameShape.vertices.push(new THREE.Vector3(-48, -24, 0));
+outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
+var outerFrame = new THREE.Line(outerFrameShape, material);
+
+var frameLineSegments = new THREE.Geometry();
+frameLineSegments.vertices.push(new THREE.Vector3(-24, 24, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(-24, -24, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(0, 24, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(0, -24, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(24, 24, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(24, -24, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(-48, 0, 0));
+frameLineSegments.vertices.push(new THREE.Vector3(48, 0, 0));
+var innerFrame = new THREE.LineSegments(frameLineSegments, dashedMaterial)
+innerFrame.computeLineDistances();
+
+scene.add(outerFrame);
+scene.add(innerFrame);
+renderer.render( scene, camera );
+
+/*var gcode = null;
 //var rect = draw.rect(100,100).attr({fill: '#f06'})
 //var sheet = draw.image('/static/images/materials/Plywood_texture.JPG',96,48).center(originX,originY)
 
@@ -89,6 +128,7 @@ function homePositionUpdate(x,y){
   }
   home.center(_x, _y);
 }
+*/
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
@@ -152,19 +192,19 @@ function processPositionMessage(msg){
   var _json = JSON.parse(msg.data);
   $('#positionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2)+' ZPos:'+parseFloat(_json.zval).toFixed(2));
   $('#percentComplete').html(_json.pcom)
-  positionUpdate(_json.xval,_json.yval,_json.zval);
+//  positionUpdate(_json.xval,_json.yval,_json.zval);
 }
 
 function processHomePositionMessage(msg){
   var _json = JSON.parse(msg.data);
   console.log(_json.xval)
   $('#homePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
-  homePositionUpdate(_json.xval,_json.yval);
+//  homePositionUpdate(_json.xval,_json.yval);
 }
 
 function gcodeUpdate(msg){
   console.log("updating gcode");
-  if (gcode!=null) {
+/*  if (gcode!=null) {
     //console.log("removing gcode");
     gcode.remove();
   }
@@ -182,11 +222,12 @@ function gcodeUpdate(msg){
     }
     gcode.move(originX,originY)
   });
+  */
 }
 
 function gcodeUpdateCompressed(msg){
   console.log("updating gcode compressed");
-  if (gcode!=null) {
+  /*if (gcode!=null) {
     //console.log("removing gcode");
     gcode.remove();
   }
@@ -212,6 +253,7 @@ function gcodeUpdateCompressed(msg){
     });
   }
   $("#fpCircle").hide();
+  */
 }
 
 function ab2str(buf) {

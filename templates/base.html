@@ -26,7 +26,7 @@
               socket.emit('my event', {data: 'I\'m connected!'});
               $("#clientStatus").text("Connected");
               $("#clientStatus").removeClass('btn-outline-danger').addClass('btn-success');
-              checkForGCodeUpdate();
+              //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
           });
 
           socket.on('disconnect', function(msg) {
@@ -81,45 +81,95 @@
 
           socket.on('activateModal', function(msg){
             console.log("modal size requested="+msg.modalSize)
-            $('#notificationDialog').removeClass('modal-lg');
-            $('#notificationDialog').removeClass('modal-sm');
-            $('#notificationDialog').removeClass('mw-100 w-75');
+            console.log("modal type ="+msg.modalType);
+            var $modal, $modalTitle, $modalText
+            if (msg.modalType == "content"){
+              $modal = $('#contentModal');
+              $modalDialog = $('#contentDialog');
+              $modalTitle = $('#contentModalTitle');
+              $modalText = $('#contentModalText');
+            }
+            else if (msg.modalType == "alarm") {
+              $modal = $('#alarmModal');
+              $modalDialog = $('#alarmDialog');
+              $modalTitle = $('#alarmModalTitle');
+              $modalText = $('#alarmModalText');
+              if (msg.resume=="clear"){
+                  $('#clearButton').show();
+              } else {
+                  $('#clearButton').hide();
+              }
+            }
+            else{
+              $modal = $('#notificationModal');
+              $modalDialog = $('#notificationDialog');
+              $modalTitle = $('#notificationModalTitle');
+              $modalText = $('#notificationModalText');
+              if (msg.resume=="resume"){
+                $('#resumeButton').show();
+              } else {
+                $('#resumeButton').hide();
+              }
+              if (msg.progress=="true"){
+                $('#progressBarDiv').show();
+              } else {
+                $('#progressBarDiv').hide();
+              }
+              if (msg.progress=="spinner"){
+                $('#notificationCircle').show();
+              } else {
+                $('#notificationCircle').hide();
+              }
+
+            }
+            $modalDialog.removeClass('modal-lg');
+            $modalDialog.removeClass('modal-sm');
+            $modalDialog.removeClass('mw-100 w-75');
             if (msg.modalSize=="large"){
               if (isMobile)
-                $("#notificationDialog").addClass('modal-lg');
+                $modalDialog.addClass('modal-lg');
               else
-                $("#notificationDialog").addClass('mw-100 w-75');
+                $modalDialog.addClass('mw-100 w-75');
             }
             if (msg.modalSize=="medium")
-              $("#notificationDialog").addClass('modal-lg');
+              $modalDialog.addClass('modal-lg');
             if (msg.modalSize=="small")
-              $("#notificationDialog").addClass('modal-sm');
-            $('#notificationModal').data('bs.modal',null);
-            $('#notificationModal').data('name',msg.title);
-            $('#notificationModalTitle').html("<h3>"+msg.title+"</h3");
-            $('#notificationModalText').html("<p>"+msg.message+"</p>");
+              $modalDialog.addClass('modal-sm');
+            $modal.data('bs.modal',null);
+            $modal.data('name',msg.title);
+
+            $modalTitle.html("<h3>"+msg.title+"</h3");
+            $modalText.html("<p>"+msg.message+"</p>");
             console.log(msg.resume)
-            if (msg.resume=="resume"){
-                $('#resumeButton').show();
-            } else {
-                $('#resumeButton').hide();
-            }
+
             if (msg.isStatic==true){
                 console.log("Static Modal")
-                $('#notificationModal').modal({backdrop: 'static', keyboard: false})
+                $modal.modal({backdrop: 'static', keyboard: false})
             } else {
-                $('#notificationModal').modal();
+                $modal.modal();
             }
           });
 
+
+
           socket.on('requestedSetting', function(msg){
             processRequestedSetting(msg);
+          });
+
+          socket.on('updateDirectories', function(msg){
+            updateDirectories(msg);
           });
 
           socket.on('gcodeUpdate', function(msg){
             console.log("gcodeUpdate Message Received")
             gcodeUpdate(msg);
           });
+
+          socket.on('showFPSpinner', function(msg){
+            console.log("showFPSpinner")
+            showFPSpinner(msg);
+          });
+
 
           socket.on('gcodeUpdateCompressed', function(msg){
             console.log("gcodeUpdate Compressed Message Received")
@@ -135,14 +185,29 @@
           });
 
           socket.on('closeModals', function(msg){
-            //console.log("received notice to close: "+msg.data.title);
-            //console.log("active modal has name: "+$("#notificationModal").data('name'));
+            console.log("received notice to close: "+msg.data.title);
+            console.log("active modal has name: "+$("#notificationModal").data('name'));
             if ($('#notificationModal').data('name') == msg.data.title)
             {
-              //console.log("closeModal")
+              console.log("closeModal")
               $('#notificationModal').modal('hide');
              }
           });
+
+          socket.on('closeActionModals', function(msg){
+            if ($('#actionModal').data('name') == msg.data.title)
+            {
+              $('#actionModal').modal('hide');
+             }
+          });
+
+          socket.on('closeContentModals', function(msg){
+            if ($('#contentModal').data('name') == msg.data.title)
+            {
+              $('#contentModal').modal('hide');
+             }
+          });
+
 
           $("#notificationModal").on('hidden.bs.modal', function(e){
               var name = $('#notificationModal').data('name');
@@ -150,6 +215,17 @@
               socket.emit('modalClosed', {data:name});
           });
 
+          $("#actionModal").on('hidden.bs.modal', function(e){
+              var name = $('#actionModal').data('name');
+              //console.log("action modal "+name+" is closing");
+              socket.emit('actionModalClosed', {data:name});
+          });
+
+          $("#contentModal").on('hidden.bs.modal', function(e){
+              var name = $('#contentModal').data('name');
+              console.log("content modal "+name+" is closing");
+              socket.emit('contentModalClosed', {data:name});
+          });
       }
 
       function action(command, arg, arg1){
@@ -258,6 +334,19 @@
         <div id="notificationModalText" class="modal-body">
           <p>Modal body text goes here.</p>
         </div>
+        <div class="progress" id="progressBarDiv" >
+          <div id="progressBar" class="progress-bar w-75" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div id="notificationCircle">
+          <div class="loader">
+            <div class="loader">
+              <div class="loader">
+                <div class="loader">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="modal-footer">
           <button id="resumeButton" type="button" class="btn btn-info" onclick="pauseRun()" data-dismiss="modal">Resume</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -266,6 +355,44 @@
     </div>
   </div>
 
+  <div class="modal" id="contentModal" tabindex="-1" role="dialog">
+    <div id="contentDialog" class="modal-dialog {{modalStyle}}" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="contentModalTitle" class="modal-title">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="contentModalText" class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="alarmModal" tabindex="-1" role="dialog">
+    <div id="alarmDialog" class="modal-dialog {{modalStyle}}" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="alarmModalTitle" class="modal-title">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="alarmModalText" class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alarm</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 {% block javascript %}{% endblock %}
