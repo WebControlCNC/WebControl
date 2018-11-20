@@ -10,7 +10,7 @@ import serial.tools.list_ports
 import glob
 import json
 import time
-
+import datetime
 
 class Actions(MakesmithInitFuncs):
     def processAction(self, msg):
@@ -155,6 +155,9 @@ class Actions(MakesmithInitFuncs):
                 #self.data.ui_queue.put(
                 #    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
                 #)
+        elif msg["data"]["command"] == "saveCalibrationToCSV":
+            if not self.data.opticalCalibration.saveCalibrationToCSV():
+                self.data.ui_queue.put("Message: Error with saving calibration to CSV.")
         elif msg["data"]["command"] == "clearCalibration":
             if not self.data.opticalCalibration.clearCalibration():
                 self.data.ui_queue.put("Message: Error with clearing calibration.")

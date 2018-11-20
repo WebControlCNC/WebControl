@@ -409,12 +409,18 @@
           </div>
       </div>
       <div class="row">
-          <div class="col">
+          <div class="col-6">
               <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('returnToCenter');">Return to Center</button>
           </div>
+      </div>
+      <div class="row">
           <div class="col">
-              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('saveAndSendOpticalCalibration');">Save and Send</button>
+              <button type="button" class="btn btn-lg btn-block btn-secondary m-1" onclick="action('saveCalibrationToCSV');">Save to CSV</button>
           </div>
+          <div class="col">
+              <button type="button" class="btn btn-lg btn-block btn-primary m-1" onclick="action('saveAndSendOpticalCalibration');">Save and Send</button>
+          </div>
+
       </div>
     </div>
   </div>
