@@ -74,12 +74,12 @@ def index(template):
     enable3D = app.data.config.getValue("WebControl Settings", "enable3D")
     if enable3D:
         if template == "mobile/":
-            return render_template("frontpage_mobile.html", modalStyle="modal-lg")
+            return render_template("frontpage3d_mobile.html", modalStyle="modal-lg")
         else:
             return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
     else:
         if template == "mobile/":
-            return render_template("frontpage_mobile.html", modalStyle="modal-lg")
+            return render_template("frontpage3d_mobile.html", modalStyle="modal-lg")
         else:
             return render_template("frontpage.html", modalStyle="mw-100 w-75")
 
