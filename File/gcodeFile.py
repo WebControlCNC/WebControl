@@ -285,6 +285,9 @@ class GCodeFile(MakesmithInitFuncs):
             j = re.search("J(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if j:
                 jTarget = float(j.groups()[0]) * self.canvasScaleFactor
+            z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+            if z:
+                zTarget = float(z.groups()[0]) * self.canvasScaleFactor
 
             radius = math.sqrt(iTarget ** 2 + jTarget ** 2)
             centerX = self.xPosition + iTarget
@@ -324,18 +327,18 @@ class GCodeFile(MakesmithInitFuncs):
                 self.line[-1].dashed = False
 
                 self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
-                self.addPoint3D(self.xPosition, self.yPosition, zTarget)
+                self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                 self.line3D[-1].type = "line"
                 self.line3D[-1].dashed = False
 
-
+            zStep = (zTarget - self.zPosition)/arcLen
             i = 0
             while abs(i) < arcLen:
                 xPosOnLine = centerX + radius * math.cos(angle1 + i)
                 yPosOnLine = centerY + radius * math.sin(angle1 + i)
-                zPosOnline = zTarget
+                zPosOnLine = self.zPosition + zStep*i
                 self.addPoint(xPosOnLine, yPosOnLine)
-                self.addPoint3D(xPosOnLine, yPosOnLine, zTarget)
+                self.addPoint3D(xPosOnLine, yPosOnLine, zPosOnLine)
                 i = i + 0.1 * direction  # this is going to need to be a direction
 
             self.addPoint(xTarget, yTarget)
