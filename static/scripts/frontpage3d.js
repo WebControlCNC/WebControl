@@ -13,6 +13,7 @@ console.log(w)
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
 
+
 var gcode = new THREE.Group();
 
 var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
@@ -131,14 +132,14 @@ function homePositionUpdate(x,y){
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
-    $("#units").text("INCHES");
+    //$("#units").text("INCHES");
     distToMove = Math.round($("#distToMove").val()/25.4,3)
-    $("#distToMove").val(distToMove);
+    //$("#distToMove").val(distToMove);
     updateSetting('toInches',distToMove);
   } else {
-    $("#units").text("MM");
+    //$("#units").text("MM");
     distToMove = Math.round($("#distToMove").val()*25.4,3)
-    $("#distToMove").val(distToMove);
+    //$("#distToMove").val(distToMove);
     updateSetting('toMM',distToMove);
   }
 }
@@ -152,6 +153,12 @@ $(document).ready(function(){
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
     //var $controllerMessage = $("#controllerMessage");
     //$controllerMessage.scrollTop($controllerMessage[0].scrollHeight);
+
+    /*$( "#workarea" ).contextmenu(function() {
+        pos = cursorPosition();
+        requestPage("screenAction",pos)
+        //alert( "Handler for "+pos+" called." );
+    });*/
 });
 
 function pauseRun(){
@@ -307,4 +314,25 @@ function toggle3DView()
 
 function resetView(){
     controls.reset();
+}
+
+function cursorPosition(){
+    var rect = renderer.domElement.getBoundingClientRect();
+    var vec = new THREE.Vector3(); // create once and reuse
+    var pos = new THREE.Vector3(); // create once and reuse
+    vec.set(
+        ( ( event.clientX - rect.left ) / ( rect.width - rect.left ) ) * 2 - 1,
+        - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
+        0.5 );
+
+
+    vec.unproject( camera );
+
+    vec.sub( camera.position ).normalize();
+
+    var distance = - camera.position.z / vec.z;
+
+    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    console.log(pos);
+    return(pos);
 }

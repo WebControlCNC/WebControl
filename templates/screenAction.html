@@ -1,0 +1,31 @@
+
+{% block content %}
+<div class="container-fluid">
+  <h3>Left Motor</h3>
+  <div class="row">
+    <div class="col-6">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('moveTo',{{posX}},{{posY}});$('#contentModal').modal('hide');">
+        Move To
+      </button>
+    </div>
+    <div class="col-6">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('defineHome',{{posX}},{{posY}});$('#contentModal').modal('hide');">
+        Define Home
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('returnToCenter');$('#contentModal').modal('hide');">
+        Return to Center
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+   <script>feather.replace() </script>
+{% endblock %}

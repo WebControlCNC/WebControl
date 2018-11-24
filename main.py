@@ -293,7 +293,7 @@ def actionModalClosed(msg):
 def requestPage(msg):
     app.data.logger.resetIdler()
     try:
-        page, title, isStatic, modalSize, modalType = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"])
+        page, title, isStatic, modalSize, modalType = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"], msg["data"]["args"])
         socketio.emit(
             "activateModal",
             {"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType},

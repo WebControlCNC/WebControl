@@ -32,7 +32,9 @@ class Actions(MakesmithInitFuncs):
             if not self.home():
                 self.data.ui_queue.put("Message: Error with returning to home.")
         elif msg["data"]["command"] == "defineHome":
-            if self.defineHome():
+            posX= msg["data"]["arg"]
+            posY= msg["data"]["arg1"]
+            if self.defineHome(posX, posY):
                 ## the gcode file might change the active units so we need to inform the UI of the change.
                 self.data.ui_queue.put("Action: unitsUpdate gcodeUpdate")
             else:
@@ -180,19 +182,25 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put("Message: Firmware update complete.")
 
 
-    def defineHome(self):
+    def defineHome(self, posX, posY):
         try:
             if self.data.units == "MM":
                 scaleFactor = 25.4
             else:
                 scaleFactor = 1.0
+            if posX!="" and posY!="":
+                homeX=posX*scaleFactor
+                homeY=posY*scaleFactor
+            else:
+                homeX=round(self.data.xval,4)
+                homeY=round(self.data.yval,4)
             self.data.gcodeShift = [
-                round(self.data.xval, 4),
-                round(self.data.yval, 4),
+                homeX,
+                homeY
             ]
-            self.data.config.setValue("Advanced Settings", "homeX", str(round(self.data.xval,4)))
-            self.data.config.setValue("Advanced Settings", "homeY", str(round(self.data.yval,4)))
-            position = {"xval": self.data.xval, "yval": self.data.yval}
+            self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
+            self.data.config.setValue("Advanced Settings", "homeY", str(homeY))
+            position = {"xval": homeX, "yval": homeY}
             self.data.ui_queue.put(
                 "Action: homePositionMessage:_" + json.dumps(position)
             )  # the "_" facilitates the parse

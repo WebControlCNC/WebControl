@@ -15,7 +15,7 @@ class WebPageProcessor:
     def __init__(self, data):
         self.data = data
 
-    def createWebPage(self, pageID, isMobile):
+    def createWebPage(self, pageID, isMobile, args):
         # returns a page and a bool specifying whether the user has to click close to exit modal
         if pageID == "maslowSettings":
             setValues = self.data.config.getJSONSettingSection("Maslow Settings")
@@ -194,5 +194,8 @@ class WebPageProcessor:
                 chainOverSprocket=chainOverSprocket,
             )
             return page, "Quick Configure", False, "medium", "content"
-
+        elif pageID == "screenAction":
+            print(args["x"])
+            page = render_template("screenAction.html", posX=args["x"], posY=args["y"])
+            return page, "Screen Action", False, "medium", "content"
 

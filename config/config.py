@@ -330,7 +330,11 @@ class Config(MakesmithInitFuncs):
         figure specified by rel_tol.  Useful for comparing float values on
         arduino adapted from https://stackoverflow.com/a/33024979
         """
-        return abs(a - b) <= rel_tol * max(abs(a), abs(b))
+        c = abs(a - b) <= rel_tol * max(abs(a), abs(b))
+        #the *max doesn't work well with really small numbers, like the optical calibration curve values
+        #if not c:
+        #    print("a="+str(a)+", b="+str(b)+", a-b="+str(abs(a-b))+", tol="+str(rel_tol)+", c="+str(c))
+        return c
 
     def parseErrorArray(self, value, asFloat):
 
@@ -434,8 +438,8 @@ class Config(MakesmithInitFuncs):
         # Update Computed settings
         if key == "loggingTimeout" or doAll is True:
             loggingTimeout = self.getValue("WebControl Settings", "loggingTimeout")
-            self.data.console_queue.put(str(value))
-            self.data.console_queue.put(str(loggingTimeout))
+            #self.data.console_queue.put(str(value))
+            #self.data.console_queue.put(str(loggingTimeout))
             self.data.logger.setLoggingTimeout(loggingTimeout)
         if key == "kinematicsType" or doAll is True:
             if doAll is True:
