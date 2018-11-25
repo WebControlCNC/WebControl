@@ -229,6 +229,10 @@
       }
 
       function action(command, arg, arg1){
+        if (arg==null)
+          arg = "";
+        if (arg1==null)
+          arg1 = "";
         console.log("action="+command);
         socket.emit('action',{data:{command:command,arg:arg, arg1:arg1}});
 
@@ -249,9 +253,9 @@
           socket.emit('settingRequest',{data:{section:section,setting:setting}});
       }
 
-      function requestPage(page){
+      function requestPage(page, args=""){
           console.log("requesting page..")
-          socket.emit('requestPage',{data:{page:page, isMobile:isMobile}});
+          socket.emit('requestPage',{data:{page:page, isMobile:isMobile, args:args}});
       }
 
       function updateSetting(setting, value){

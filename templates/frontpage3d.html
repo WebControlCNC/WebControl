@@ -9,6 +9,7 @@
   <script src="{{ url_for('static',filename='scripts/pako.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
@@ -17,6 +18,8 @@
 <div class="container-fluid h-100">
   <div class="row justify-content-start h-100">
     <div id="workarea" class="col">
+      <button class="btn btn-primary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+      <button class="btn btn-primary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
     </div>
     <div id="fpCircle" style="display: none;">
       <div class="loader">
@@ -134,8 +137,14 @@
           <div class="col-3 mb-1">
             <h5>Complete:</h5>
           </div>
-          <div class="col-9 mb-1">
+          <div class="col-3 mb-1">
             <div id='percentComplete'></div>
+          </div>
+          <div class="col-3 mb-1">
+            <h5>State:</h5>
+          </div>
+          <div class="col-3 mb-1">
+            <div id='machineState'></div>
           </div>
         </div>
         <div class="row">

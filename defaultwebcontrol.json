@@ -908,6 +908,15 @@
             "title": "Valid File Extensions",
             "type": "string",
             "value": ".nc, .ngc, .text, .gcode"
+        },
+        {
+            "default": "0",
+            "desc": "Use 3D render with orbital controls in lieu of standard 2D rendering with pan/zoom\ndefault setting: False",
+            "key": "enable3D",
+            "section": "WebControl Settings",
+            "title": "Enable 3D Display",
+            "type": "bool",
+            "value": "0"
         }
     ]
 }

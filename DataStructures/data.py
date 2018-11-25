@@ -23,6 +23,8 @@ class Data:
     clients = []
     gcode = []
     compressedGCode = None
+    compressedGCode3D = None
+
     version = "1.25"
     # all of the available COM ports
     comPorts = []

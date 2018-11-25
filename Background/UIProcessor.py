@@ -113,7 +113,13 @@ class UIProcessor:
                                 )
                             if message.find("gcodeUpdate") != -1:
                                 if self.app.data.compressedGCode is not None:
-                                    socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode}, namespace="/MaslowCNC")
+                                    enable3D = self.app.data.config.getValue("WebControl Settings", "enable3D")
+                                    if enable3D:
+                                        self.app.data.console_queue.put("sending compressed")
+                                        socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode3D}, namespace="/MaslowCNC")
+                                    else:
+                                        self.app.data.console_queue.put("sending compressed3D")
+                                        socketio.emit("gcodeUpdateCompressed", {"data": self.app.data.compressedGCode}, namespace="/MaslowCNC")
                             if message.find("setAsPause") != -1:
                                 socketio.emit(
                                     "requestedSetting",
@@ -181,6 +187,13 @@ class UIProcessor:
                 endpt = message.find("WPos:")
                 numz = message[startpt:endpt]
                 valz = numz.split(",")
+                state = ""
+                if message.find("Stop")!=-1:
+                    state = "Stopped"
+                elif message.find("Pause")!=-1:
+                    state = "Paused"
+                elif message.find("Idle")!=-1:
+                    state = "Idle"
 
                 self.app.data.xval = float(valz[0])
                 self.app.data.yval = float(valz[1])
@@ -206,7 +219,11 @@ class UIProcessor:
             "yval": self.app.data.yval,
             "zval": self.app.data.zval,
             "pcom": percentComplete,
+            "state": state
         }
+        
+        #print("upload="+str(self.app.data.uploadFlag)+", gInd="+str(self.app.data.gcodeIndex)+", gco_qu"+str(self.app.data.gcode_queue.qsize()))
+        
         self.sendPositionMessage(position)
 
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
