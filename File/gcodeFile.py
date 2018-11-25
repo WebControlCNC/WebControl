@@ -330,16 +330,20 @@ class GCodeFile(MakesmithInitFuncs):
                 self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                 self.line3D[-1].type = "line"
                 self.line3D[-1].dashed = False
-
-            zStep = (zTarget - self.zPosition)/arcLen
+            print("arclen="+str(arcLen))
+            print(".1*direction ="+str(math.fabs(.1*direction)))
+            zStep = (zTarget - self.zPosition)/math.fabs(arcLen/(.1*direction))
+            print("zSte[] ="+str(zStep))
             i = 0
+            counter = 0
             while abs(i) < arcLen:
                 xPosOnLine = centerX + radius * math.cos(angle1 + i)
                 yPosOnLine = centerY + radius * math.sin(angle1 + i)
-                zPosOnLine = self.zPosition + zStep*i
+                zPosOnLine = self.zPosition + zStep*counter
                 self.addPoint(xPosOnLine, yPosOnLine)
                 self.addPoint3D(xPosOnLine, yPosOnLine, zPosOnLine)
                 i = i + 0.1 * direction  # this is going to need to be a direction
+                counter+=1
 
             self.addPoint(xTarget, yTarget)
             self.addPoint3D(xTarget, yTarget, zTarget)
