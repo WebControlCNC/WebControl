@@ -31,18 +31,21 @@ var scene = new THREE.Scene();
 scene.background= new THREE.Color(0xdddddd);
 var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );
-var material = new THREE.LineBasicMaterial( {color:0x0000ff });
+var blueLineMaterial = new THREE.LineBasicMaterial( {color:0x0000ff });
 var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00ff00 });
 var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
+var blackLineMaterial = new THREE.LineBasicMaterial( {color:0x000000 });
+
 var greenLineDashedMaterial = new THREE.LineDashedMaterial( {color:0x00ff00, dashSize:.1, gapSize: .1} );
-var dashedMaterial = new THREE.LineDashedMaterial( {color:0x0000ff, dashSize:.5, gapSize: .5} );
+var blackDashedMaterial = new THREE.LineDashedMaterial( {color:0x000000, dashSize:.5, gapSize: .5} );
+
 var outerFrameShape = new THREE.Geometry();
 outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
 outerFrameShape.vertices.push(new THREE.Vector3(48, 24, 0));
 outerFrameShape.vertices.push(new THREE.Vector3(48, -24, 0));
 outerFrameShape.vertices.push(new THREE.Vector3(-48, -24, 0));
 outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
-var outerFrame = new THREE.Line(outerFrameShape, material);
+var outerFrame = new THREE.Line(outerFrameShape, blackLineMaterial);
 
 var frameLineSegments = new THREE.Geometry();
 frameLineSegments.vertices.push(new THREE.Vector3(-24, 24, 0));
@@ -53,7 +56,7 @@ frameLineSegments.vertices.push(new THREE.Vector3(24, 24, 0));
 frameLineSegments.vertices.push(new THREE.Vector3(24, -24, 0));
 frameLineSegments.vertices.push(new THREE.Vector3(-48, 0, 0));
 frameLineSegments.vertices.push(new THREE.Vector3(48, 0, 0));
-var innerFrame = new THREE.LineSegments(frameLineSegments, dashedMaterial)
+var innerFrame = new THREE.LineSegments(frameLineSegments, blackDashedMaterial)
 innerFrame.computeLineDistances();
 
 scene.add(outerFrame);
@@ -102,8 +105,31 @@ home.add(homeCircle);
 home.position.set(0,0,0);
 
 
+var gcodePosHorizontalLineSegments = new THREE.Geometry();
+gcodePosHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.0, 0, 0));
+gcodePosHorizontalLineSegments.vertices.push(new THREE.Vector3(1.0, 0, 0));
+var gcodePosHorizontalLine = new THREE.LineSegments(gcodePosHorizontalLineSegments, blackLineMaterial);
+
+var gcodePosVerticalLineSegments = new THREE.Geometry();
+gcodePosVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.0, 0));
+gcodePosVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.0, 0));
+var gcodePosVerticalLine = new THREE.LineSegments(gcodePosVerticalLineSegments, blackLineMaterial);
+
+var gcodePosCircleGeometry = new THREE.CircleGeometry(.5,32);
+var gcodePosCircleEdges = new THREE.EdgesGeometry(gcodePosCircleGeometry)
+var gcodePosCircle = new THREE.LineSegments(gcodePosCircleEdges,blackLineMaterial);
+
+var gcodePos = new THREE.Group();
+gcodePos.add(gcodePosHorizontalLine);
+gcodePos.add(gcodePosVerticalLine);
+gcodePos.add(gcodePosCircle);
+gcodePos.position.set(0,0,0);
+
+
+
 scene.add(sled);
 scene.add(home);
+scene.add(gcodePos);
 
 animate();
 
@@ -129,6 +155,16 @@ function homePositionUpdate(x,y){
     }
     home.position.set(x,y,0);
 }
+
+function gcodePositionUpdate(x,y){
+    if ($("#units").text()=="MM"){
+        x /= 25.4
+        y /= 25.4
+    }
+    gcodePos.position.set(x,y,0);
+    console.log("x="+x+", y="+y)
+}
+
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
@@ -203,9 +239,16 @@ function processPositionMessage(msg){
 
 function processHomePositionMessage(msg){
   var _json = JSON.parse(msg.data);
-  console.log(_json.xval)
+  //console.log(_json.xval)
   $('#homePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
   homePositionUpdate(_json.xval,_json.yval);
+}
+
+function processGCodePositionMessage(msg){
+  var _json = JSON.parse(msg.data);
+  //console.log(_json.xval)
+  $('#gcodePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
+  gcodePositionUpdate(_json.xval,_json.yval);
 }
 
 function gcodeUpdate(msg){
@@ -250,7 +293,7 @@ function gcodeUpdateCompressed(msg){
     var pX, pY, pZ = -99999.9
     data.forEach(function(line) {
       if (line.type=='line'){
-        console.log("Line length="+line.points.length+", dashed="+line.dashed);
+        //console.log("Line length="+line.points.length+", dashed="+line.dashed);
         if (line.dashed==true) {
           line.points.forEach(function(point) {
             gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
@@ -265,7 +308,7 @@ function gcodeUpdateCompressed(msg){
     //gcode.move(originX,originY)
     var gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
     gcodeDashed.computeLineDistances();
-    var gcodeUndashed = new THREE.Line(gcodeLineSegments, material)
+    var gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
     gcode.add(gcodeDashed);
     gcode.add(gcodeUndashed);
     scene.add(gcode);

@@ -118,6 +118,7 @@ class GCodeFile(MakesmithInitFuncs):
                             self.data.zMoves.append(index - 1)
                     else:
                         self.data.zMoves.append(index)
+            #print("zmoves = "+str(self.data.zMoves))
         except:
             self.data.console_queue.put("Gcode File Error")
             self.data.ui_queue.put("Message: Cannot open gcode file.")

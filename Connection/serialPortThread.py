@@ -93,6 +93,8 @@ class SerialPortThread(MakesmithInitFuncs):
             if self.data.uploadFlag:
                 self._write(self.data.gcode[self.data.gcodeIndex])
 
+                self.data.actions.sendGCodePositionUpdate(self.data.gcode[self.data.gcodeIndex])
+
                 # increment gcode index
                 if self.data.gcodeIndex + 1 < len(self.data.gcode):
                     self.data.gcodeIndex = self.data.gcodeIndex + 1

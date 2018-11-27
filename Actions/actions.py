@@ -84,10 +84,7 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "moveGcodeZ":
             if not self.moveGcodeZ(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to Z move")
-        elif (
-            msg["data"]["command"] == "moveGcodeIndex"
-            or msg["data"]["command"] == "moveGcodeZ"
-        ):
+        elif msg["data"]["command"] == "moveGcodeIndex":
             if not self.moveGcodeIndex(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to index")
         elif msg["data"]["command"] == "setSprockets":
@@ -431,31 +428,13 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcodeIndex = targetIndex
             gCodeLine = self.data.gcode[self.data.gcodeIndex]
             # print self.data.gcode
-            # print "gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+gCodeLine
+            # print("gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+str(gCodeLine))
+
             xTarget = 0
             yTarget = 0
-
             try:
-                x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-                if x:
-                    xTarget = float(x.groups()[0])
-                    self.data.previousPosX = xTarget
-                else:
-                    xTarget = self.data.previousPosX
-
-                y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-
-                if y:
-                    yTarget = float(y.groups()[0])
-                    self.data.previousPosY = yTarget
-                else:
-                    yTarget = self.data.previousPosY
-                # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
-                # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
-                position = {"xval": xTarget, "yval": yTarget, "zval": self.data.zval}
-                self.data.ui_queue.put(
-                    "Action: positionMessage:_" + json.dumps(position)
-                )  # the "_" facilitates the parse
+                retval = self.sendGCodePositionUpdate(gCodeLine)
+                return retval
             except Exception as e:
                 self.data.console_queue.put(str(e))
                 self.data.console_queue.put("Unable to update position for new gcode line")
@@ -553,12 +532,14 @@ class Actions(MakesmithInitFuncs):
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
                     scaleFactor = 1.0/25.4
                     self.data.tolerance = 0.020
+                    self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
                     self.data.gcode_queue.put("G20 ")
                 else:
                     self.data.units = "MM"
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
                     scaleFactor = 25.4
                     self.data.tolerance = 0.5
+                    self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
                     self.data.gcode_queue.put("G21 ")
                 self.data.gcodeShift = [
                   self.data.gcodeShift[0] * scaleFactor,
@@ -831,4 +812,27 @@ class Actions(MakesmithInitFuncs):
             )
         except Exception as e:
             print(e)
+        return True
+
+    def sendGCodePositionUpdate(self, gCodeLine):
+        x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+        if x:
+            xTarget = float(x.groups()[0])
+            self.data.previousPosX = xTarget
+        else:
+            xTarget = self.data.previousPosX
+
+        y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+
+        if y:
+            yTarget = float(y.groups()[0])
+            self.data.previousPosY = yTarget
+        else:
+            yTarget = self.data.previousPosY
+        # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
+        # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
+        position = {"xval": xTarget, "yval": yTarget, "zval": self.data.zval}
+        self.data.ui_queue.put(
+           "Action: gcodePositionUpdate:_" + json.dumps(position)
+        )  # the "_" facilitates the parse
         return True

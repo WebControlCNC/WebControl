@@ -27,6 +27,10 @@ app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
 app.data.config.computeSettings(None, None, None, True)
 app.data.units = app.data.config.getValue("Computed Settings", "units")
+app.data.tolerance = app.data.config.getValue("Computed Settings", "tolerance")
+app.data.distToMove = app.data.config.getValue("Computed Settings", "distToMove")
+app.data.distToMoveZ = app.data.config.getValue("Computed Settings", "distToMoveZ")
+app.data.unitsZ = app.data.config.getValue("Computed Settings", "unitsZ")
 app.data.comport = app.data.config.getValue("Maslow Settings", "COMport")
 app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")),
