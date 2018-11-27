@@ -197,6 +197,7 @@ class SerialPortThread(MakesmithInitFuncs):
                     self._write(command, True)
 
                 # send regular instructions to the machine if there are any
+                #print("bSpace="+str(self.bufferSpace)+", bSize="+str(self.bufferSize)+", ready="+str(self.machineIsReadyForData))
                 if self.bufferSpace == self.bufferSize and self.machineIsReadyForData:
                     if self.data.gcode_queue.empty() != True:
                         command = self.data.gcode_queue.get_nowait() + " "

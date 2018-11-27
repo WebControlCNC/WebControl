@@ -103,7 +103,7 @@
       <button type="button" id="pauseButton" class="btn btn-lg btn-block btn-warning" onclick="pauseRun()">Pause</button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun')">Stop</button>
+      <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
     </div>
   </div>
   <div class="row">
@@ -143,8 +143,14 @@
     <div class="col-3 mb-1">
       <h5>Complete:</h5>
     </div>
-    <div class="col-9 mb-1">
+    <div class="col-3 mb-1">
       <div id='percentComplete'></div>
+    </div>
+    <div class="col-3 mb-1">
+      <h5>State:</h5>
+    </div>
+    <div class="col-3 mb-1">
+      <div id='machineState'></div>
     </div>
   </div>
   <div class="row">

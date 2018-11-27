@@ -35,12 +35,26 @@ ADD requirements.txt /requirements.txt
 RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/numpy.*/d' /requirements.txt
 # TODO: Maybe we can cache wheel files outside this container, for more granular reuse when requiremnts.txt changes
 RUN pip install -r /requirements.txt
+
+# Download and compile the Arduino firmware
+# Generates the firmware as /firmware/.pioenvs/megaatmega2560/firmware.hex
+# PlatformIO doesn't support python3 yet, so also install python2 :/
+# See also: https://github.com/platformio/platformio-core/issues/895
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python2.7 python-pip python-setuptools python-wheel git \
+    && pip2 install -U platformio \
+    && pio platform install --with-package framework-arduinoavr atmelavr
+ARG firmware_repo=https://github.com/madgrizzle/Firmware.git
+#ARG firmware_sha=8286f4124109f08e5b8f0a533ae812c017740ff7
+ARG firmware_sha=562ff005e3ddee11aef3e83746d46328c48610b0
+RUN git clone $firmware_repo firmware && cd firmware && git checkout $firmware_sha && pio run -e megaatmega2560
+
 ADD . /WebControl
 # Clean up the /WebControl dir a bit to slim it down
 # TODO: Is there a more automatic way to do this?
 RUN rm -rf /WebControl/.venv && rm -rf /WebControl/.git
 # Pre-compile the pyc files (for faster Docker image startup)
-RUN python -m compileall /WebControl
+RUN python --version && python -m compileall /WebControl
 
 
 FROM arm32v7/python:3.5.6-slim-stretch
@@ -60,6 +74,16 @@ COPY --from=builder /usr/lib/arm-linux-gnueabihf/libgfortran.so.3 /usr/lib/arm-l
 COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
 
 RUN pip install numpy && pip install -r /requirements.txt && rm -rf /root/.cache
+
+# Install avrdude
+# TODO: to speed up incremental docker builds, we can probably do this in the builder image if we can figure out
+# which files we need to copy over
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    avrdude \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y autoremove
+# Copy in the pre-compiled firmware
+COPY --from=builder /firmware/.pioenvs/megaatmega2560/firmware.hex /firmware/firmware.hex
 
 # Copy the pre-compiled source from the builder
 COPY --from=builder /WebControl /WebControl

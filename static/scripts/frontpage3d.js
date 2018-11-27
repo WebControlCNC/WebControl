@@ -234,6 +234,21 @@ function processPositionMessage(msg){
   var _json = JSON.parse(msg.data);
   $('#positionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2)+' ZPos:'+parseFloat(_json.zval).toFixed(2));
   $('#percentComplete').html(_json.pcom)
+  $('#machineState').html(_json.state)
+  /*if (_json.state=="Stopped")
+      if ($("#stopButton").hasClass("btn-danger"))
+          $("#stopButton").removeClass('btn-danger').addClass('btn-info');
+  else
+      if ($("#stopButton").hasClass("btn-info"))
+          $("#stopButton").removeClass('btn-info').addClass('btn-danger');
+
+  if (_json.state=="Paused")
+      if ($("#pauseButton").hasClass("btn-warning"))
+          $("#pauseButton").removeClass('btn-warning').addClass('btn-info');
+  else
+      if ($("#pauseButton").hasClass("btn-info"))
+          $("#pauseButton").removeClass('btn-info').addClass('btn-warning');
+  */
   positionUpdate(_json.xval,_json.yval,_json.zval);
 }
 
