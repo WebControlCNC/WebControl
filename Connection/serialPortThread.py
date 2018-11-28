@@ -93,6 +93,12 @@ class SerialPortThread(MakesmithInitFuncs):
             if self.data.uploadFlag:
                 self._write(self.data.gcode[self.data.gcodeIndex])
 
+                if self.data.gcode[self.data.gcodeIndex].find("G20") != -1:
+                    if self.data.units != "INCHES":
+                        self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+                if self.data.gcode[self.data.gcodeIndex].find("G21") != -1:
+                    if self.data.units != "MM":
+                        self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
                 self.data.actions.sendGCodePositionUpdate(self.data.gcode[self.data.gcodeIndex])
 
                 # increment gcode index

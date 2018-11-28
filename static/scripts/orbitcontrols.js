@@ -679,25 +679,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			case scope.mouseButtons.LEFT:
 
-				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+				if ( scope.enableRotate === false ) return;
 
-					if ( scope.enablePan === false ) return;
+				handleMouseDownRotate( event );
 
-					handleMouseDownPan( event );
-
-					state = STATE.PAN;
-
-				} else {
-
-					if ( scope.enableRotate === false ) return;
-
-					handleMouseDownRotate( event );
-
-					state = STATE.ROTATE;
-
-				}
+				state = STATE.ROTATE;
 
 				break;
+
 
 			case scope.mouseButtons.MIDDLE:
 
@@ -711,11 +700,24 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			case scope.mouseButtons.RIGHT:
 
-				if ( scope.enablePan === false ) return;
 
-				handleMouseDownPan( event );
+				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-				state = STATE.PAN;
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
+
+				} else {
+
+					if ( scope.enablePan === false ) return;
+
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				}
 
 				break;
 

@@ -143,8 +143,10 @@ function positionUpdate(x,y,z){
     if ($("#units").text()=="MM"){
         x /= 25.4
         y /= 25.4
+        z /= 25.4
     }
     sled.position.set(x,y,z);
+    console.log("x="+x+", y="+y+", z="+z)
 }
 
 
@@ -190,11 +192,11 @@ $(document).ready(function(){
     //var $controllerMessage = $("#controllerMessage");
     //$controllerMessage.scrollTop($controllerMessage[0].scrollHeight);
 
-    /*$( "#workarea" ).contextmenu(function() {
+    $( "#workarea" ).contextmenu(function() {
+        if (!view3D)
         pos = cursorPosition();
         requestPage("screenAction",pos)
-        //alert( "Handler for "+pos+" called." );
-    });*/
+    });
 });
 
 function pauseRun(){
@@ -263,6 +265,7 @@ function processGCodePositionMessage(msg){
   var _json = JSON.parse(msg.data);
   //console.log(_json.xval)
   $('#gcodePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
+  $('#gcodeLine').html(_json.gcodeLine);
   gcodePositionUpdate(_json.xval,_json.yval);
 }
 

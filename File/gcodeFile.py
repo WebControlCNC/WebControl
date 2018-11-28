@@ -532,12 +532,14 @@ class GCodeFile(MakesmithInitFuncs):
 
         if gString == "G20":
             if self.data.units != "INCHES":
-                self.data.actions.updateSetting("toInches", 0) # value = doesn't matter
+                self.data.actions.updateSetting("toInches", 0, True) # value = doesn't matter
             self.canvasScaleFactor = self.INCHES
+            self.data.gcodeFileUnits = "INCHES"
 
         if gString == "G21":
             if self.data.units != "MM":
-                self.data.actions.updateSetting("toMM", 0) #value = doesn't matter
+                self.data.actions.updateSetting("toMM", 0, True) #value = doesn't matter
+            self.data.gcodeFileUnits = "MM"
             self.canvasScaleFactor = self.MILLIMETERS
 
         if gString == "G90":

@@ -108,13 +108,29 @@
             <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeIndex',-1);">&lt;1</button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-block btn-secondary">Goto</button>
-          </div>
-          <div class="col mb-1">
             <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeIndex',1);">1&gt;</button>
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeZ',1);">Z&gt;</button>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-3 mb-1">
+            <h5>Line #:</h5>
+          </div>
+          <div class="col-4 mb-1">
+            <input class="form-control" id="gcodeLineNumber" value="0">
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-block btn-secondary">Goto</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Line:</h5>
+          </div>
+          <div class="col-9 mb-1">
+            <div id='gcodeLine'></div>
           </div>
         </div>
         <div class="row">

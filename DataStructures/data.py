@@ -22,6 +22,7 @@ class Data:
     # Gcodes contains all of the lines of gcode in the opened file
     clients = []
     gcode = []
+    gcodeFileUnits = "INCHES"
     compressedGCode = None
     compressedGCode3D = None
 
