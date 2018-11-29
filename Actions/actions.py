@@ -854,7 +854,7 @@ class Actions(MakesmithInitFuncs):
                 xTarget = float(x.groups()[0])
                 self.data.previousPosX = xTarget
             else:
-                xTarget = self.data.previousPosX
+                xTarget = None
 
             y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
 
@@ -862,7 +862,10 @@ class Actions(MakesmithInitFuncs):
                 yTarget = float(y.groups()[0])
                 self.data.previousPosY = yTarget
             else:
-                yTarget = self.data.previousPosY
+                yTarget = None
+
+            if xTarget is None or yTarget is None:
+                xTarget, yTarget, zTarget = self.findPositionAt(self.data.gcodeIndex)
             # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
             # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
             scaleFactor = 1.0
@@ -872,6 +875,7 @@ class Actions(MakesmithInitFuncs):
                 scaleFactor = 25.4
 
             position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine, "gcodeLineIndex":gCodeLineIndex}
+            #print(position)
             self.data.ui_queue.put(
                "Action: gcodePositionUpdate:_" + json.dumps(position)
             )  # the "_" facilitates the parse
@@ -903,6 +907,13 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def processGCode(self):
+        '''
+        This function processes the gcode up to the current gcode index to develop a set of
+        gcodes to send to the controller upon the user starting a run.  This function is intended
+        to ensure that the sled is in the correct location and the controller is in the correct
+        state prior to starting the current gcode move.  Currently processed are relative/absolute
+        positioning (G90/G91), imperial/metric units (G20/G21) and x, y and z positions
+        '''
         zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings","zAxisSafeHeight"))
         positioning = "G90 "
         units = "G20 "
@@ -910,48 +921,132 @@ class Actions(MakesmithInitFuncs):
         xpos = 0
         ypos = 0
         zpos = 0
+        tool = None
+        spindle = None
+        laser = None
+        dwell = None
+        #print("start")
         for x in range(self.data.gcodeIndex):
-            line = self.data.gcode[x]
-            if line[0]=='G':
-                print(line)
-                if line.find("G90")!=-1:
-                    positioning = "G90 "
-                if line.find("G91")!=-1:
-                    positioning = "G91 "
-                if line.find("G20")!=-1:
-                    units = "G20 "
-                if line.find("G21")!=-1:
-                    units = "G21 "
-                if line.find("X")!=-1:
-                    _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+            if self.data.gcode[x][0] != "(":
+                lines = self.data.gcode[x].split(" ")
+                if lines:
+                    finalLines = []
+                    for line in lines:
+                        if len(line)>0:
+                            #print(line+":"+str(len(line)))
+                            if line[0] == "M" or line[0] == "G" or line[0] == "T":
+                                finalLines.append(line)
+                            else:
+                                finalLines[-1] = finalLines[-1] + " " + line
+                    for line in finalLines:
+                        #print(line)
+                        if line[0]=='G':
+                            if line.find("G90")!=-1:
+                                positioning = "G90 "
+                            if line.find("G91")!=-1:
+                                positioning = "G91 "
+                            if line.find("G20")!=-1:
+                                units = "G20 "
+                            if line.find("G21")!=-1:
+                                units = "G21 "
+                            if line.find("X")!=-1:
+                                _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                if positioning == "G91 ":
+                                    xpos = xpos+float(_xpos.groups()[0])
+                                else:
+                                    xpos = float(_xpos.groups()[0])
+                            if line.find("Y")!=-1:
+                                _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                if positioning == "G91 ":
+                                    ypos = ypos+float(_ypos.groups()[0])
+                                else:
+                                    ypos = float(_ypos.groups()[0])
+                            if line.find("Z")!=-1:
+                                _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                if positioning == "G91 ":
+                                    zpos = zpos+float(_zpos.groups()[0])
+                                else:
+                                    zpos = float(_zpos.groups()[0])
+                            if line.find("G4")!=-1:
+                                dwell = line[3:]
+                            if line.find("G04") != -1:
+                                dwell = line[4:]
 
-                    if positioning == "G91 ":
-                        xpos = xpos+float(_xpos.groups()[0])
-                    else:
-                        xpos = float(_xpos.groups()[0])
-                if line.find("Y")!=-1:
-                    _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
-                    if positioning == "G91 ":
-                        ypos = ypos+float(_ypos.groups()[0])
-                    else:
-                        ypos = float(_ypos.groups()[0])
-                if line.find("Z")!=-1:
-                    _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
-                    if positioning == "G91 ":
-                        zpos = zpos+float(_zpos.groups()[0])
-                    else:
-                        zpos = float(_zpos.groups()[0])
 
+                        if line[0]=='M':
+                            if line.find("M3") != -1 or line.find("M03") != -1:
+                                spindle = "M3 "
+                            if line.find("M4") != -1 or line.find("M05") != -1:
+                                spindle = "M4 "
+                            if line.find("M5") != -1 or line.find("M05") != -1:
+                                spindle = "M5 "
+                            if line.find("M106") != -1:
+                                laser = "M106 "
+                            if line.find("M107") != -1:
+                                laser = "M107 "
+                            if line.find("M16") != -1:
+                                laser = "M107 "
+                        if line[0]=='T':
+                            tool = line[1:] #slice off the T
+
+        #print("end")
         self.data.gcode_queue.put(positioning)
         if units == "G20 ":
             self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
             zAxisSafeHeight = zAxisSafeHeight/25.4
         else:
             self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
-        print(zAxisSafeHeight)
-        print(xpos)
-        print(ypos)
-        #self.sendGCodePositionUpdate()
+        #print(zAxisSafeHeight)
+        #print(xpos)
+        #print(ypos)
         self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight,4))+" ")
         self.data.gcode_queue.put("G0 X"+str(round(xpos,4))+" Y"+str(round(ypos,4))+" ")
+        if tool is not None:
+            self.data.gcode_queue.put("T"+tool+" M6 ")
+        if spindle is not None:
+            self.data.gcode_queue.put(spindle)
+        if laser is not None:
+            self.data.gcode_queue.put(laser)
+        if dwell is not None:
+            self.data.gcode_queue.put("G4 "+dwell)
         self.data.gcode_queue.put("G0 Z" + str(round(zpos, 4)) + " ")
+
+
+    def findPositionAt(self, index):
+        #This function is necessary to update the gcode position indicators on z-index moves
+        xpos = 0
+        ypos = 0
+        zpos = 0
+        for x in range(index):
+            if self.data.gcode[x][0] != "(":
+                listOfLines = filter(None, re.split("(G)", self.data.gcode[x]))  # self.data.gcode[x].split("G")
+                # it is necessary to split the lines along G and M commands so that commands concatenated on one line
+                # are processed correctly
+                for line in listOfLines:
+                    line = 'G'+line
+                    #print(line)
+                    if line[0] == 'G':
+                        if line.find("G90") != -1:
+                            positioning = "G90 "
+                        if line.find("G91") != -1:
+                            positioning = "G91 "
+                        if line.find("X") != -1:
+                            _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            if positioning == "G91 ":
+                                xpos = xpos + float(_xpos.groups()[0])
+                            else:
+                                xpos = float(_xpos.groups()[0])
+                        if line.find("Y") != -1:
+                            _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            if positioning == "G91 ":
+                                ypos = ypos + float(_ypos.groups()[0])
+                            else:
+                                ypos = float(_ypos.groups()[0])
+                        if line.find("Z") != -1:
+                            _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            if positioning == "G91 ":
+                                zpos = zpos + float(_zpos.groups()[0])
+                            else:
+                                zpos = float(_zpos.groups()[0])
+        #print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpos="+str(zpos))
+        return xpos, ypos, zpos

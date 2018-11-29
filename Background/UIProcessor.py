@@ -152,7 +152,7 @@ class UIProcessor:
                                     namespace="/MaslowCNC",
                                 )
                             if message.find("gcodePositionUpdate") != -1:
-                                print("gcode Update")
+                                #print("gcode Update")
                                 msg = message.split(
                                     "_"
                                 )  # everything to the right of the "_" should be the position data already json.dumps'ed
