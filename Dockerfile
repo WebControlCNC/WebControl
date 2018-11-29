@@ -44,9 +44,22 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends python2.7 python-pip python-setuptools python-wheel git \
     && pip2 install -U platformio \
     && pio platform install --with-package framework-arduinoavr atmelavr
-ARG firmware_repo=https://github.com/madgrizzle/Firmware.git
-ARG firmware_sha=8286f4124109f08e5b8f0a533ae812c017740ff7
-RUN git clone $firmware_repo firmware && cd firmware && git checkout $firmware_sha && pio run -e megaatmega2560
+ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
+ARG madgrizzle_firmware_sha=8286f4124109f08e5b8f0a533ae812c017740ff7
+RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
+    && cd firmware/madgrizzle \
+    && git checkout $madgrizzle_firmware_sha \
+    && pio run -e megaatmega2560 \
+    && mkdir build \
+    && mv .pioenvs/megaatmega2560/firmware.hex build/$madgrizzle_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+ARG maslowcnc_firmware_repo=https://github.com/MaslowCNC/Firmware.git
+ARG maslowcnc_firmware_sha=d0943e2a2f29faef4c07585a00638d0f822e5daf
+RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
+    && cd firmware/maslowcnc \
+    && git checkout $maslowcnc_firmware_sha \
+    && pio run -e megaatmega2560 \
+    && mkdir build \
+    && mv .pioenvs/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 
 ADD . /WebControl
 # Clean up the /WebControl dir a bit to slim it down
@@ -82,7 +95,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -y autoremove
 # Copy in the pre-compiled firmware
-COPY --from=builder /firmware/.pioenvs/megaatmega2560/firmware.hex /firmware/firmware.hex
+COPY --from=builder /firmware/madgrizzle/build/* /firmware/madgrizzle/
+COPY --from=builder /firmware/maslowcnc/build/* /firmware/maslowcnc/
 
 # Copy the pre-compiled source from the builder
 COPY --from=builder /WebControl /WebControl
