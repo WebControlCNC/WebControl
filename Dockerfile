@@ -46,7 +46,7 @@ RUN apt-get update \
     && pio platform install --with-package framework-arduinoavr atmelavr
 
 ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
-ARG madgrizzle_firmware_sha=8286f4124109f08e5b8f0a533ae812c017740ff7
+ARG madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
 RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
     && cd firmware/madgrizzle \
     && git checkout $madgrizzle_firmware_sha \
