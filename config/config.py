@@ -11,6 +11,7 @@ import os
 from shutil import copyfile
 from pathlib import Path
 import time
+import glob
 
 from __main__ import app
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
@@ -286,41 +287,43 @@ class Config(MakesmithInitFuncs):
         for section in self.settings:
             for option in self.settings[section]:
                 if "firmwareKey" in option and option["firmwareKey"] == firmwareKey:
-                    storedValue = option["value"]
-                    if option["key"] == "spindleAutomate":
-                        if storedValue == "Servo":
-                            storedValue = 1
-                        elif storedValue == "Relay_High":
-                            storedValue = 2
-                        elif storedValue == "Relay_Low":
-                            storedValue = 3
-                        else:
-                            storedValue = 0
-                        if value == "Servo":
-                            value = 1
-                        elif value == "Relay_High":
-                            value = 2
-                        elif value == "Relay_Low":
-                            value = 3
-                        else:
-                            value = 0
-                    if firmwareKey == 45:
-                        self.data.console_queue.put("firmwareKey = 45")
-                        if storedValue != "":
-                            self.sendErrorArray(firmwareKey, storedValue, data)
-                        pass
-                    elif useStored is True:
-                        app.data.gcode_queue.put(
-                            "$" + str(firmwareKey) + "=" + str(storedValue)
-                        )
-                    elif not self.isClose(float(storedValue), float(value)):
-                        # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
-                        if not isImporting:
+                    if self.data.controllerFirmwareVersion > 100 or ("custom" not in option or option["custom"] != 1):
+                        storedValue = option["value"]
+                        if option["key"] == "spindleAutomate":
+                            if storedValue == "Servo":
+                                storedValue = 1
+                            elif storedValue == "Relay_High":
+                                storedValue = 2
+                            elif storedValue == "Relay_Low":
+                                storedValue = 3
+                            else:
+                                storedValue = 0
+                            if value == "Servo":
+                                value = 1
+                            elif value == "Relay_High":
+                                value = 2
+                            elif value == "Relay_Low":
+                                value = 3
+                            else:
+                                value = 0
+
+                        if firmwareKey == 45:
+                            self.data.console_queue.put("firmwareKey = 45")
+                            if storedValue != "":
+                                self.sendErrorArray(firmwareKey, storedValue, data)
+                            pass
+                        elif useStored is True:
                             app.data.gcode_queue.put(
                                 "$" + str(firmwareKey) + "=" + str(storedValue)
                             )
-                    else:
-                        break
+                        elif not self.isClose(float(storedValue), float(value)):
+                            # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
+                            if not isImporting:
+                                app.data.gcode_queue.put(
+                                    "$" + str(firmwareKey) + "=" + str(storedValue)
+                                )
+                        else:
+                            break
         return
 
     def isClose(self, a, b, rel_tol=1e-06):
@@ -523,113 +526,15 @@ class Config(MakesmithInitFuncs):
                 if currentValue != 3:
                     self.setValue("Computed Settings", "fPWMComputed", 3, True)
 
+    def parseFirmwareVersions(self):
+        path = "firmware/madgrizzle/*.hex"
+        for filename in glob.glob(path):
+            version = filename.split("-")
+            version = version[1].split(".hex")
+            self.data.customFirmwareVersion = version[0]
+        path = "firmware/maslowcnc/*.hex"
+        for filename in glob.glob(path):
+            version = filename.split("-")
+            version = version[1].split(".hex")
+            self.data.stockFirmwareVersion = version[0]
 
-'''
-    def updateSettingsOld(self, section, result):
-
-        print("at update Settings")
-        updated = False
-        for x in range(len(self.settings[section])):
-            # print(self.settings[section][x]["key"])
-            # print(self.settings[section][x]["type"])
-            found = False
-            for setting in result:
-                if self.settings[section][x]["key"] == setting:
-
-                    if self.settings[section][x]["type"] == "float":
-                        try:
-                            storedValue = self.settings[section][x]["value"]
-                            self.settings[section][x]["value"] = float(result[setting])
-                            updated = True
-                            if "firmwareKey" in self.settings[section][x]:
-                                self.syncFirmwareKey(
-                                    self.settings[section][x]["firmwareKey"],
-                                    storedValue,
-                                )
-                        except:
-                            pass
-                    elif self.settings[section][x]["type"] == "int":
-                        try:
-                            storedValue = self.settings[section][x]["value"]
-                            self.settings[section][x]["value"] = int(result[setting])
-                            updated = True
-                            if "firmwareKey" in self.settings[section][x]:
-                                self.syncFirmwareKey(
-                                    self.settings[section][x]["firmwareKey"],
-                                    storedValue,
-                                )
-                        except:
-                            pass
-                    elif self.settings[section][x]["type"] == "bool":
-                        # print result[setting]
-                        try:
-                            if result[setting] == "on":
-                                storedValue = self.settings[section][x]["value"]
-                                self.settings[section][x]["value"] = 1
-                                updated = True
-                                if "firmwareKey" in self.settings[section][x]:
-                                    # print "syncing1 true bool at:"+str(self.settings[section][x]['firmwareKey'])
-                                    self.syncFirmwareKey(
-                                        self.settings[section][x]["firmwareKey"],
-                                        storedValue,
-                                    )
-                            else:
-                                storedValue = self.settings[section][x]["value"]
-                                self.settings[section][x]["value"] = 0
-                                updated = True
-                                if "firmwareKey" in self.settings[section][x]:
-                                    # print "syncing2 true bool at:"+str(self.settings[section][x]['firmwareKey'])
-                                    self.syncFirmwareKey(
-                                        self.settings[section][x]["firmwareKey"],
-                                        storedValue,
-                                    )
-                        except:
-                            pass
-
-                    elif self.settings[section][x]["type"] == "options":
-                        try:
-                            # print(str(result[setting]))
-                            storedValue = self.settings[section][x]["value"]
-                            self.settings[section][x]["value"] = str(result[setting])
-                            # print(self.settings[section][x]["value"])
-                            updated = True
-                            if "firmwareKey" in self.settings[section][x]:
-                                self.syncFirmwareKey(
-                                    self.settings[section][x]["firmwareKey"],
-                                    storedValue,
-                                )
-                        except:
-                            pass
-
-                    else:
-                        storedValue = self.settings[section][x]["value"]
-                        self.settings[section][x]["value"] = result[setting]
-                        updated = True
-                        # print str(storedValue)+", "+str(result[settig])
-                        if "firmwareKey" in self.settings[section][x]:
-                            # print "firmwareKey:"+str(self.settings[section][x]["firmwareKey"])
-                            self.syncFirmwareKey(
-                                self.settings[section][x]["firmwareKey"], storedValue
-                            )
-
-                    # print setting+":"+str(result[setting])+"->"+str(settings[section][x]["value"])
-                    found = True
-                    break
-            if not found:
-                # must be a turned off checkbox.. what a pain to figure out
-                if self.settings[section][x]["type"] == "bool":
-                    storedValue = self.settings[section][x]["value"]
-                    self.settings[section][x]["value"] = 0
-                    if "firmwareKey" in self.settings[section][x]:
-                        # print "syncing3 false bool at:"+str(self.settings[section][x]['firmwareKey'])
-                        self.syncFirmwareKey(
-                            self.settings[section][x]["firmwareKey"], storedValue
-                        )
-                    updated = True
-        if updated:
-            self.computeSettings(None, None, None, True)
-            with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
-                json.dump(
-                    self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
-                )
-'''

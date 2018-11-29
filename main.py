@@ -26,6 +26,7 @@ app.data = Data()
 app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
 app.data.config.computeSettings(None, None, None, True)
+app.data.config.parseFirmwareVersions()
 app.data.units = app.data.config.getValue("Computed Settings", "units")
 app.data.tolerance = app.data.config.getValue("Computed Settings", "tolerance")
 app.data.distToMove = app.data.config.getValue("Computed Settings", "distToMove")
@@ -36,6 +37,7 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")),
     float(app.data.config.getValue("Advanced Settings", "homeY")),
 ]
+
 app.data.firstRun = False
 # app.previousPosX = 0.0
 # app.previousPosY = 0.0

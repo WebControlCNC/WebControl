@@ -26,7 +26,10 @@ class Data:
     compressedGCode = None
     compressedGCode3D = None
 
-    version = "1.25"
+    version = "101.25"
+    stockFirmwareVersion = ""
+    customFirmwareVersion = ""
+    controllerFirmwareVersion = 0
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used
