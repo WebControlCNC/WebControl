@@ -66,9 +66,10 @@ class GCodeFile(MakesmithInitFuncs):
         try:
             filterfile = open(filename, "r")
             rawfilters = filterfile.read()
-            filtersparsed = re.sub(
-                r"\(([^)]*)\)", "\n", rawfilters
-            )  # replace mach3 style gcode comments with newline
+            #filtersparsed = re.sub(
+            #    r"\(([^)]*)\)", "\n", rawfilters
+            #)  # replace mach3 style gcode comments with newline
+            filtersparsed = rawfilters #get rid of this if above is uncommented)
             filtersparsed = re.sub(
                 r";([^\n]*)\n", "\n", filtersparsed
             )  # replace standard ; initiated gcode comments with newline

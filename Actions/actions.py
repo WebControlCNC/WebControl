@@ -945,7 +945,7 @@ class Actions(MakesmithInitFuncs):
         self.data.gcode_queue.put(positioning)
         if units == "G20 ":
             self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
-            zAxisSafeHeight = zAxisSafeHeight*25.4
+            zAxisSafeHeight = zAxisSafeHeight/25.4
         else:
             self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
         print(zAxisSafeHeight)

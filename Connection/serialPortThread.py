@@ -41,37 +41,40 @@ class SerialPortThread(MakesmithInitFuncs):
         message = message + "\n"
         # message = message.encode()
         #print("Sending: " + str(message).rstrip('\n'))
-        self.data.console_queue.put("Sending: " + str(message).rstrip('\n'))
+        if message[0]!='(':
+            self.data.console_queue.put("Sending: " + str(message).rstrip('\n'))
         
-        self.bufferSpace = self.bufferSpace - len(
-            message
-        )  # shrink the available buffer space by the length of the line
+            self.bufferSpace = self.bufferSpace - len(
+                message
+            )  # shrink the available buffer space by the length of the line
 
-        self.machineIsReadyForData = False
+            self.machineIsReadyForData = False
 
-        # if this is a quick message sent as soon as the button is pressed (like stop) then put it on the right side of the queue
-        # because it is the first message sent, otherwise put it at the end (left) because it is the last message sent
-        if isQuickCommand:
-            if message[0] == "!":
-                # if we've just sent a stop command, the buffer is now empty on the arduino side
-                self.lengthOfLastLineStack.clear()
-                self.bufferSpace = self.bufferSize - len(message)
-                self.lengthOfLastLineStack.append(len(message))
+            # if this is a quick message sent as soon as the button is pressed (like stop) then put it on the right side of the queue
+            # because it is the first message sent, otherwise put it at the end (left) because it is the last message sent
+            if isQuickCommand:
+                if message[0] == "!":
+                    # if we've just sent a stop command, the buffer is now empty on the arduino side
+                    self.lengthOfLastLineStack.clear()
+                    self.bufferSpace = self.bufferSize - len(message)
+                    self.lengthOfLastLineStack.append(len(message))
+                else:
+                    self.lengthOfLastLineStack.append(len(message))
             else:
-                self.lengthOfLastLineStack.append(len(message))
+                self.lengthOfLastLineStack.appendleft(len(message))
+
+            message = message.encode()
+            try:
+                self.serialInstance.write(message)
+                self.data.logger.writeToLog("Sent: " + str(message.decode()))
+            except:
+                #print("write issue")
+                self.data.console_queue.put("write issue")
+                self.data.logger.writeToLog("Send FAILED: " + str(message.decode()))
+
+            self.lastWriteTime = time.time()
         else:
-            self.lengthOfLastLineStack.appendleft(len(message))
-
-        message = message.encode()
-        try:
-            self.serialInstance.write(message)
-            self.data.logger.writeToLog("Sent: " + str(message.decode()))
-        except:
-            #print("write issue")
-            self.data.console_queue.put("write issue")
-            self.data.logger.writeToLog("Send FAILED: " + str(message.decode()))
-
-        self.lastWriteTime = time.time()
+            self.data.console_queue.put("Skipping: " + str(message).rstrip('\n'))
 
     def _getFirmwareVersion(self):
         self.data.gcode_queue.put("B05 ")
@@ -91,15 +94,15 @@ class SerialPortThread(MakesmithInitFuncs):
         """
         if self.data.gcodeIndex < len(self.data.gcode):
             if self.data.uploadFlag:
+                line = self.data.gcode[self.data.gcodeIndex]
                 self._write(self.data.gcode[self.data.gcodeIndex])
-
-                if self.data.gcode[self.data.gcodeIndex].find("G20") != -1:
+                if line.find("G20") != -1:
                     if self.data.units != "INCHES":
                         self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
-                if self.data.gcode[self.data.gcodeIndex].find("G21") != -1:
+                if line.find("G21") != -1:
                     if self.data.units != "MM":
                         self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
-                self.data.actions.sendGCodePositionUpdate(self.data.gcode[self.data.gcodeIndex])
+                self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
 
                 # increment gcode index
                 if self.data.gcodeIndex + 1 < len(self.data.gcode):
