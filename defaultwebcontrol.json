@@ -522,6 +522,12 @@
             "value": "INCHES"
         },
         {
+            "default": 0.02,
+            "key": "tolerance",
+            "type": "float",
+            "value": 0.02
+        },
+        {
             "default": "INCHES",
             "key": "unitsZ",
             "type": "string",

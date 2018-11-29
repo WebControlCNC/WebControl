@@ -60,3 +60,4 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
+

@@ -66,9 +66,10 @@ class GCodeFile(MakesmithInitFuncs):
         try:
             filterfile = open(filename, "r")
             rawfilters = filterfile.read()
-            filtersparsed = re.sub(
-                r"\(([^)]*)\)", "\n", rawfilters
-            )  # replace mach3 style gcode comments with newline
+            #filtersparsed = re.sub(
+            #    r"\(([^)]*)\)", "\n", rawfilters
+            #)  # replace mach3 style gcode comments with newline
+            filtersparsed = rawfilters #get rid of this if above is uncommented)
             filtersparsed = re.sub(
                 r";([^\n]*)\n", "\n", filtersparsed
             )  # replace standard ; initiated gcode comments with newline
@@ -115,9 +116,10 @@ class GCodeFile(MakesmithInitFuncs):
                         if not self.isClose(
                             float(zList[-1].groups()[0]), float(zList[-2].groups()[0])
                         ):
-                            self.data.zMoves.append(index - 1)
+                            self.data.zMoves.append(index)  # - 1)
                     else:
                         self.data.zMoves.append(index)
+            #print("zmoves = "+str(self.data.zMoves))
         except:
             self.data.console_queue.put("Gcode File Error")
             self.data.ui_queue.put("Message: Cannot open gcode file.")
@@ -330,10 +332,10 @@ class GCodeFile(MakesmithInitFuncs):
                 self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                 self.line3D[-1].type = "line"
                 self.line3D[-1].dashed = False
-            print("arclen="+str(arcLen))
-            print(".1*direction ="+str(math.fabs(.1*direction)))
+            #print("arclen="+str(arcLen))
+            #print(".1*direction ="+str(math.fabs(.1*direction)))
             zStep = (zTarget - self.zPosition)/math.fabs(arcLen/(.1*direction))
-            print("zSte[] ="+str(zStep))
+            #print("zSte[] ="+str(zStep))
             i = 0
             counter = 0
             while abs(i) < arcLen:
@@ -531,12 +533,14 @@ class GCodeFile(MakesmithInitFuncs):
 
         if gString == "G20":
             if self.data.units != "INCHES":
-                self.data.actions.updateSetting("toInches", 0) # value = doesn't matter
+                self.data.actions.updateSetting("toInches", 0, True) # value = doesn't matter
             self.canvasScaleFactor = self.INCHES
+            self.data.gcodeFileUnits = "INCHES"
 
         if gString == "G21":
             if self.data.units != "MM":
-                self.data.actions.updateSetting("toMM", 0) #value = doesn't matter
+                self.data.actions.updateSetting("toMM", 0, True) #value = doesn't matter
+            self.data.gcodeFileUnits = "MM"
             self.canvasScaleFactor = self.MILLIMETERS
 
         if gString == "G90":

@@ -79,6 +79,12 @@
               processHomePositionMessage(msg)
           });
 
+          socket.on('gcodePositionMessage', function(msg){
+              //console.log(msg);
+              processGCodePositionMessage(msg)
+          });
+
+
           socket.on('activateModal', function(msg){
             console.log("modal size requested="+msg.modalSize)
             console.log("modal type ="+msg.modalType);

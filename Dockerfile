@@ -44,6 +44,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends python2.7 python-pip python-setuptools python-wheel git \
     && pip2 install -U platformio \
     && pio platform install --with-package framework-arduinoavr atmelavr
+
 ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
 ARG madgrizzle_firmware_sha=8286f4124109f08e5b8f0a533ae812c017740ff7
 RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \

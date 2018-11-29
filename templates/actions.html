@@ -21,7 +21,7 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('quickConfigure');$('#contentModal').modal('hide');">Quick Configure</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets Vertical</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');">Triangular Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');">Optical Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
 			</div>
 		</div>
 	</div>
@@ -29,7 +29,8 @@
 		<div class="card">
 			<div class="card-body">
 				<h4 class="card-title">Controller</h4>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeFirmware');$('#contentModal').modal('hide');">Upgrade Firmware</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeCustomFirmware');$('#contentModal').modal('hide');">Upgrade Custom Firmware:{{customFirmwareVersion}}</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeStockFirmware');$('#contentModal').modal('hide');">Upgrade Stock Firmware:{{stockFirmwareVersion}}</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('reportSettings');$('#contentModal').modal('hide');">Sync Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Settings');$('#contentModal').modal('hide');">Wipe Controller Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Maslow');$('#contentModal').modal('hide');">Wipe Controller Positional Data</button>

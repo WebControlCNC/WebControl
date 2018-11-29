@@ -22,6 +22,10 @@ class WebPageProcessor:
             # because this page allows you to select the comport from a list that is not stored in webcontrol.json, we need to package and send the list of comports
             # Todo:? change it to store the list?
             ports = self.data.comPorts
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
             if isMobile:
                 page = render_template(
                     "settings_mobile.html",
@@ -29,6 +33,7 @@ class WebPageProcessor:
                     settings=setValues,
                     ports=ports,
                     pageID="maslowSettings",
+                    enableCustom=enableCustom,
                 )
             else:
                 page = render_template(
@@ -37,16 +42,22 @@ class WebPageProcessor:
                     settings=setValues,
                     ports=ports,
                     pageID="maslowSettings",
+                    enableCustom=enableCustom,
                 )
             return page, "Maslow Settings", False, "medium", "content"
         elif pageID == "advancedSettings":
             setValues = self.data.config.getJSONSettingSection("Advanced Settings")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
             if isMobile:
                 page = render_template(
                     "settings_mobile.html",
                     title="Advanced Settings",
                     settings=setValues,
                     pageID="advancedSettings",
+                    enableCustom=enableCustom,
                 )
             else:
                 page = render_template(
@@ -54,16 +65,22 @@ class WebPageProcessor:
                     title="Advanced Settings",
                     settings=setValues,
                     pageID="advancedSettings",
+                    enableCustom=enableCustom,
                 )
             return page, "Advanced Settings", False, "medium", "content"
         elif pageID == "webControlSettings":
             setValues = self.data.config.getJSONSettingSection("WebControl Settings")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
             if isMobile:
                 page = render_template(
                     "settings_mobile.html",
                     title="WebControl Settings",
                     settings=setValues,
                     pageID="webControlSettings",
+                    enableCustom=enableCustom,
                 )
             else:
                 page = render_template(
@@ -71,6 +88,7 @@ class WebPageProcessor:
                     title="WebControl Settings",
                     settings=setValues,
                     pageID="webControlSettings",
+                    enableCustom=enableCustom,
                 )
             return page, "WebControl Settings", False, "medium", "content"
         elif pageID == "openGCode":
@@ -123,7 +141,11 @@ class WebPageProcessor:
             page = render_template("importFile.html")
             return page, "Import groundcontrol.ini", False, "medium", "content"
         elif pageID == "actions":
-            page = render_template("actions.html")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
+            page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, enableCustom=enableCustom)
             return page, "Actions", False, "large", "content"
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")

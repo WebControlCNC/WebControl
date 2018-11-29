@@ -23,6 +23,9 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "move":
             if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating move.")
+        elif msg["data"]["command"] == "moveTo":
+            if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                self.data.ui_queue.put("Message: Error with initiating move.")
         elif msg["data"]["command"] == "moveZ":
             if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                 self.data.ui_queue.put("Message: Error with initiating Z-Axis move.")
@@ -84,10 +87,10 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "moveGcodeZ":
             if not self.moveGcodeZ(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to Z move")
-        elif (
-            msg["data"]["command"] == "moveGcodeIndex"
-            or msg["data"]["command"] == "moveGcodeZ"
-        ):
+        elif msg["data"]["command"] == "moveGcodeGoto":
+            if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
+                self.data.ui_queue.put("Message: Error with moving to Z move")
+        elif msg["data"]["command"] == "moveGcodeIndex":
             if not self.moveGcodeIndex(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to index")
         elif msg["data"]["command"] == "setSprockets":
@@ -175,11 +178,16 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "adjustCenter":
             if not self.adjustCenter(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with adjusting center.")
-        elif msg["data"]["command"] == "upgradeFirmware":
-            if not self.upgradeFirmware():
-                self.data.ui_queue.put("Message: Error with upgrading firmware.")
+        elif msg["data"]["command"] == "upgradeCustomFirmware":
+            if not self.upgradeFirmware(0):
+                self.data.ui_queue.put("Message: Error with upgrading custom firmware.")
             else:
-                self.data.ui_queue.put("Message: Firmware update complete.")
+                self.data.ui_queue.put("Message: Custom firmware update complete.")
+        elif msg["data"]["command"] == "upgradeStockFirmware":
+            if not self.upgradeFirmware(1):
+                self.data.ui_queue.put("Message: Error with upgrading stock firmware.")
+            else:
+                self.data.ui_queue.put("Message: Stock firmware update complete.")
 
 
     def defineHome(self, posX, posY):
@@ -272,6 +280,8 @@ class Actions(MakesmithInitFuncs):
     def startRun(self):
         try:
             if len(self.data.gcode)>0:
+                if self.data.gcodeIndex >0:
+                    self.processGCode()
                 self.data.uploadFlag = 1
                 self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
                 self.data.gcodeIndex += 1
@@ -412,10 +422,13 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def moveGcodeIndex(self, dist):
+    def moveGcodeIndex(self, dist, index=False):
         try:
             maxIndex = len(self.data.gcode) - 1
-            targetIndex = self.data.gcodeIndex + dist
+            if index is True:
+                targetIndex = dist
+            else:
+                targetIndex = self.data.gcodeIndex + dist
 
             # print "targetIndex="+str(targetIndex)
             # check to see if we are still within the length of the file
@@ -431,31 +444,13 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcodeIndex = targetIndex
             gCodeLine = self.data.gcode[self.data.gcodeIndex]
             # print self.data.gcode
-            # print "gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+gCodeLine
+            # print("gcodeIndex="+str(self.data.gcodeIndex)+", gCodeLine:"+str(gCodeLine))
+
             xTarget = 0
             yTarget = 0
-
             try:
-                x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-                if x:
-                    xTarget = float(x.groups()[0])
-                    self.data.previousPosX = xTarget
-                else:
-                    xTarget = self.data.previousPosX
-
-                y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-
-                if y:
-                    yTarget = float(y.groups()[0])
-                    self.data.previousPosY = yTarget
-                else:
-                    yTarget = self.data.previousPosY
-                # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
-                # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
-                position = {"xval": xTarget, "yval": yTarget, "zval": self.data.zval}
-                self.data.ui_queue.put(
-                    "Action: positionMessage:_" + json.dumps(position)
-                )  # the "_" facilitates the parse
+                retval = self.sendGCodePositionUpdate()
+                return retval
             except Exception as e:
                 self.data.console_queue.put(str(e))
                 self.data.console_queue.put("Unable to update position for new gcode line")
@@ -466,7 +461,6 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def move(self, direction, distToMove):
-
         if self.data.config.getValue("WebControl Settings","diagonalMove") == 1:
             diagMove = round(math.sqrt(distToMove*distToMove/2.0), 4)
         else:
@@ -512,6 +506,9 @@ class Actions(MakesmithInitFuncs):
                     + str(-1.0 * diagMove)
                     + " G90 "
                 )
+            else:
+                return False
+            self.data.config.setValue("Computed Settings","distToMove",distToMove)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -546,19 +543,37 @@ class Actions(MakesmithInitFuncs):
     def updateSetting(self, setting, value, fromGcode = False):
         try:
             if setting == "toInches" or setting == "toMM":
+                scaleFactor = 0
                 if fromGcode:
-                    value = float(self.data.config.getValue("Computed Settings", "distToMove")) * 25.4
+                    value = float(self.data.config.getValue("Computed Settings", "distToMove"))
+                    if self.data.units == "INCHES":
+                        if setting == "toMM":
+                            value = value * 25.4
+                            scaleFactor = 25.4
+                        else:
+                            scaleFactor = 1.0
+                    if self.data.units == "MM":
+                        if setting == "toInches":
+                            value = value / 25.4
+                            scaleFactor = 1.0 / 25.4
+                        else:
+                            scaleFactor = 1.0
+
                 if setting == "toInches":
                     self.data.units = "INCHES"
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
-                    scaleFactor = 1.0/25.4
+                    if scaleFactor == 0:
+                        scaleFactor = 1.0/25.4
                     self.data.tolerance = 0.020
+                    self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
                     self.data.gcode_queue.put("G20 ")
                 else:
                     self.data.units = "MM"
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
-                    scaleFactor = 25.4
+                    if scaleFactor == 0:
+                        scaleFactor = 25.4
                     self.data.tolerance = 0.5
+                    self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
                     self.data.gcode_queue.put("G21 ")
                 self.data.gcodeShift = [
                   self.data.gcodeShift[0] * scaleFactor,
@@ -575,6 +590,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put(
                     "Action: homePositionMessage:_" + json.dumps(position)
                 )  # the "_" facilitates the parse
+                self.sendGCodePositionUpdate()
             elif setting == "toInchesZ":
                 self.data.units = "INCHES"
                 self.data.config.setValue(
@@ -809,14 +825,22 @@ class Actions(MakesmithInitFuncs):
             pass
         return None, None
 
-    def upgradeFirmware(self):
-        self.data.ui_queue.put("SpinnerMessage: Firmware Update in Progress, Please Wait.")
+    def upgradeFirmware(self, version):
+        if version == 0:
+            self.data.ui_queue.put("SpinnerMessage: Custom Firmware Update in Progress, Please Wait.")
+            path = "firmware/madgrizzle/*.hex"
+        if version == 1:
+            self.data.ui_queue.put("SpinnerMessage: Stock Firmware Update in Progress, Please Wait.")
+            path = "firmware/maslowcnc/*.hex"
         time.sleep(.5)
-        port = self.data.comport
-        cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
-        os.system(cmd)
-        self.data.ui_queue.put("closeModals:_Notification:")
-        return True
+        for filename in glob.glob(path):
+            port = self.data.comport
+            print(filename)
+            cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
+            #cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
+            os.system(cmd)
+            self.data.ui_queue.put("closeModals:_Notification:")
+            return True
 
     def createDirectory(self, _directory):
         try:
@@ -832,3 +856,210 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             print(e)
         return True
+
+    def sendGCodePositionUpdate(self, gCodeLineIndex=None):#gCodeLine=None):
+        if self.data.gcode:
+            if gCodeLineIndex is None:
+                gCodeLineIndex = self.data.gcodeIndex
+            gCodeLine = self.data.gcode[gCodeLineIndex]
+            x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+            if x:
+                xTarget = float(x.groups()[0])
+                self.data.previousPosX = xTarget
+            else:
+                xTarget = None
+
+            y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+
+            if y:
+                yTarget = float(y.groups()[0])
+                self.data.previousPosY = yTarget
+            else:
+                yTarget = None
+
+            if xTarget is None or yTarget is None:
+                xTarget, yTarget, zTarget = self.findPositionAt(self.data.gcodeIndex)
+            # self.gcodecanvas.positionIndicator.setPos(xTarget,yTarget,self.data.units)
+            # print "xTarget:"+str(xTarget)+", yTarget:"+str(yTarget)
+            scaleFactor = 1.0
+            if self.data.gcodeFileUnits == "MM" and self.data.units=="INCHES":
+                scaleFactor = 1/25.4
+            if self.data.gcodeFileUnits == "INCHES" and self.data.units=="MM":
+                scaleFactor = 25.4
+
+            position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine, "gcodeLineIndex":gCodeLineIndex}
+            #print(position)
+            self.data.ui_queue.put(
+               "Action: gcodePositionUpdate:_" + json.dumps(position)
+            )  # the "_" facilitates the parse
+            return True
+
+    def moveTo(self, posX, posY):
+        bedHeight = float(self.data.config.getValue("Maslow Settings","bedHeight"))/25.4
+        bedWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4
+        try:
+            #print("posX=" + str(posX) + ", posY=" + str(posY))
+            if posX<=bedWidth/2 and posX>=bedWidth/-2 and posY<=bedHeight/2 and posY>=bedHeight/-2:
+                if self.data.units == "INCHES":
+                    posX=round(posX,4)
+                    posY=round(posY,4)
+                else:
+                    posX=round(posX*25.4,4)
+                    posY=round(posY*25.4,4)
+                self.data.gcode_queue.put(
+                    "G90 G00 X"
+                    + str(posX)
+                    + " Y"
+                    + str(posY)
+                    + " "
+                )
+                return True
+            return False
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def processGCode(self):
+        '''
+        This function processes the gcode up to the current gcode index to develop a set of
+        gcodes to send to the controller upon the user starting a run.  This function is intended
+        to ensure that the sled is in the correct location and the controller is in the correct
+        state prior to starting the current gcode move.  Currently processed are relative/absolute
+        positioning (G90/G91), imperial/metric units (G20/G21) and x, y and z positions
+        '''
+        zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings","zAxisSafeHeight"))
+        positioning = "G90 "
+        units = "G20 "
+
+        xpos = 0
+        ypos = 0
+        zpos = 0
+        tool = None
+        spindle = None
+        laser = None
+        dwell = None
+        #print("start")
+        for x in range(self.data.gcodeIndex):
+            if self.data.gcode[x][0] != "(":
+                lines = self.data.gcode[x].split(" ")
+                if lines:
+                    finalLines = []
+                    for line in lines:
+                        if len(line)>0:
+                            #print(line+":"+str(len(line)))
+                            if line[0] == "M" or line[0] == "G" or line[0] == "T":
+                                finalLines.append(line)
+                            else:
+                                finalLines[-1] = finalLines[-1] + " " + line
+                    for line in finalLines:
+                        #print(line)
+                        if line[0]=='G':
+                            if line.find("G90")!=-1:
+                                positioning = "G90 "
+                            if line.find("G91")!=-1:
+                                positioning = "G91 "
+                            if line.find("G20")!=-1:
+                                units = "G20 "
+                            if line.find("G21")!=-1:
+                                units = "G21 "
+                            if line.find("X")!=-1:
+                                _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                if positioning == "G91 ":
+                                    xpos = xpos+float(_xpos.groups()[0])
+                                else:
+                                    xpos = float(_xpos.groups()[0])
+                            if line.find("Y")!=-1:
+                                _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                if positioning == "G91 ":
+                                    ypos = ypos+float(_ypos.groups()[0])
+                                else:
+                                    ypos = float(_ypos.groups()[0])
+                            if line.find("Z")!=-1:
+                                _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                if positioning == "G91 ":
+                                    zpos = zpos+float(_zpos.groups()[0])
+                                else:
+                                    zpos = float(_zpos.groups()[0])
+                            if line.find("G4")!=-1:
+                                dwell = line[3:]
+                            if line.find("G04") != -1:
+                                dwell = line[4:]
+
+
+                        if line[0]=='M':
+                            if line.find("M3") != -1 or line.find("M03") != -1:
+                                spindle = "M3 "
+                            if line.find("M4") != -1 or line.find("M05") != -1:
+                                spindle = "M4 "
+                            if line.find("M5") != -1 or line.find("M05") != -1:
+                                spindle = "M5 "
+                            if line.find("M106") != -1:
+                                laser = "M106 "
+                            if line.find("M107") != -1:
+                                laser = "M107 "
+                            if line.find("M16") != -1:
+                                laser = "M107 "
+                        if line[0]=='T':
+                            tool = line[1:] #slice off the T
+
+        #print("end")
+        self.data.gcode_queue.put(positioning)
+        if units == "G20 ":
+            self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+            zAxisSafeHeight = zAxisSafeHeight/25.4
+        else:
+            self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+        #print(zAxisSafeHeight)
+        #print(xpos)
+        #print(ypos)
+        self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight,4))+" ")
+        self.data.gcode_queue.put("G0 X"+str(round(xpos,4))+" Y"+str(round(ypos,4))+" ")
+        if tool is not None:
+            self.data.gcode_queue.put("T"+tool+" M6 ")
+        if spindle is not None:
+            self.data.gcode_queue.put(spindle)
+        if laser is not None:
+            self.data.gcode_queue.put(laser)
+        if dwell is not None:
+            self.data.gcode_queue.put("G4 "+dwell)
+        self.data.gcode_queue.put("G0 Z" + str(round(zpos, 4)) + " ")
+
+
+    def findPositionAt(self, index):
+        #This function is necessary to update the gcode position indicators on z-index moves
+        xpos = 0
+        ypos = 0
+        zpos = 0
+        for x in range(index):
+            if self.data.gcode[x][0] != "(":
+                listOfLines = filter(None, re.split("(G)", self.data.gcode[x]))  # self.data.gcode[x].split("G")
+                # it is necessary to split the lines along G and M commands so that commands concatenated on one line
+                # are processed correctly
+                for line in listOfLines:
+                    line = 'G'+line
+                    #print(line)
+                    if line[0] == 'G':
+                        if line.find("G90") != -1:
+                            positioning = "G90 "
+                        if line.find("G91") != -1:
+                            positioning = "G91 "
+                        if line.find("X") != -1:
+                            _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            if positioning == "G91 ":
+                                xpos = xpos + float(_xpos.groups()[0])
+                            else:
+                                xpos = float(_xpos.groups()[0])
+                        if line.find("Y") != -1:
+                            _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            if positioning == "G91 ":
+                                ypos = ypos + float(_ypos.groups()[0])
+                            else:
+                                ypos = float(_ypos.groups()[0])
+                        if line.find("Z") != -1:
+                            _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            if positioning == "G91 ":
+                                zpos = zpos + float(_zpos.groups()[0])
+                            else:
+                                zpos = float(_zpos.groups()[0])
+        #print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpos="+str(zpos))
+        return xpos, ypos, zpos

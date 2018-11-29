@@ -151,6 +151,16 @@ class UIProcessor:
                                     {"data": msg[1]},
                                     namespace="/MaslowCNC",
                                 )
+                            if message.find("gcodePositionUpdate") != -1:
+                                #print("gcode Update")
+                                msg = message.split(
+                                    "_"
+                                )  # everything to the right of the "_" should be the position data already json.dumps'ed
+                                socketio.emit(
+                                    "gcodePositionMessage",
+                                    {"data": msg[1]},
+                                    namespace="/MaslowCNC",
+                                )
                             if message.find("updatePorts") != -1:
                                 ports = json.dumps(self.app.data.comPorts)
                                 socketio.emit(
@@ -247,4 +257,5 @@ class UIProcessor:
         socketio.emit(
             "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
         )
+
 

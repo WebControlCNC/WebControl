@@ -447,7 +447,9 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/opticalCalibration.js', version='10262018a') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/svg.panzoom.min.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/opticalCalibration.js', version='11272018b') }}" crossorigin="anonymous"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script> feather.replace() </script>
 <script>
@@ -456,6 +458,8 @@ var _yError = [];
 var _xValues = [];
 var xCurve = [];
 var yCurve = [];
+var colorwayLayout = ['#313131','#3D019D','#3810DC','#2D47F9','#2503FF','#2ADEF6','#60FDFA','#AEFDFF','#BBBBBB','#FFFDA9','#FAFD5B','#F7DA29','#FF8E25','#F8432D','#D90D39','#D7023D','#313131']
+ 
 
 
 settingRequest('Optical Calibration Settings','calibrationCurve');
@@ -561,9 +565,9 @@ function redrawCurveCharts(chart){
           _x[j]=j
         }
         {% if isMobile == true %}
-          Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+          Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         {% else %}
-          Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve" } );
+          Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve" , colorway: colorwayLayout } );
         {% endif %}
       }
 
@@ -575,9 +579,9 @@ function redrawCurveCharts(chart){
           _x[j]=j
         }
         {% if isMobile == true %}
-          Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+          Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         {% else %}
-          Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve" } );
+          Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve" , colorway: colorwayLayout} );
         {% endif %}
       }
 
@@ -593,9 +597,9 @@ function redrawErrorCharts(chart){
               Plotly.deleteTraces(xErrorPlot, [0]);
       for(var i = 0; i<15; i++){
         {% if isMobile == true %}
-          Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+          Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         {% else %}
-          Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error" } );
+          Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", colorway: colorwayLayout } );
         {% endif %}
       }
     }
@@ -606,9 +610,9 @@ function redrawErrorCharts(chart){
               Plotly.deleteTraces(yErrorPlot, [0]);
       for(var i = 0; i<15; i++){
         {% if isMobile == true %}
-          Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
+          Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         {% else %}
-          Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error" } );
+          Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", colorway: colorwayLayout } );
         {% endif %}
       }
     }
