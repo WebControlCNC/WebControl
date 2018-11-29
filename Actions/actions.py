@@ -87,6 +87,9 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "moveGcodeZ":
             if not self.moveGcodeZ(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to Z move")
+        elif msg["data"]["command"] == "moveGcodeGoto":
+            if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
+                self.data.ui_queue.put("Message: Error with moving to Z move")
         elif msg["data"]["command"] == "moveGcodeIndex":
             if not self.moveGcodeIndex(int(msg["data"]["arg"])):
                 self.data.ui_queue.put("Message: Error with moving to index")
@@ -414,10 +417,13 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def moveGcodeIndex(self, dist):
+    def moveGcodeIndex(self, dist, index=False):
         try:
             maxIndex = len(self.data.gcode) - 1
-            targetIndex = self.data.gcodeIndex + dist
+            if index is True:
+                targetIndex = dist
+            else:
+                targetIndex = self.data.gcodeIndex + dist
 
             # print "targetIndex="+str(targetIndex)
             # check to see if we are still within the length of the file
@@ -438,7 +444,7 @@ class Actions(MakesmithInitFuncs):
             xTarget = 0
             yTarget = 0
             try:
-                retval = self.sendGCodePositionUpdate(gCodeLine)
+                retval = self.sendGCodePositionUpdate()
                 return retval
             except Exception as e:
                 self.data.console_queue.put(str(e))
@@ -838,10 +844,11 @@ class Actions(MakesmithInitFuncs):
             print(e)
         return True
 
-    def sendGCodePositionUpdate(self, gCodeLine=None):
+    def sendGCodePositionUpdate(self, gCodeLineIndex=None):#gCodeLine=None):
         if self.data.gcode:
-            if gCodeLine is None:
-                gCodeLine = self.data.gcode[self.data.gcodeIndex]
+            if gCodeLineIndex is None:
+                gCodeLineIndex = self.data.gcodeIndex
+            gCodeLine = self.data.gcode[gCodeLineIndex]
             x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if x:
                 xTarget = float(x.groups()[0])
@@ -864,7 +871,7 @@ class Actions(MakesmithInitFuncs):
             if self.data.gcodeFileUnits == "INCHES" and self.data.units=="MM":
                 scaleFactor = 25.4
 
-            position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine}
+            position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine, "gcodeLineIndex":gCodeLineIndex}
             self.data.ui_queue.put(
                "Action: gcodePositionUpdate:_" + json.dumps(position)
             )  # the "_" facilitates the parse

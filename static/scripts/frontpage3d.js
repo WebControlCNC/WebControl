@@ -8,7 +8,7 @@ var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-10;
 var h = $("#workarea").height()-10;
 renderer.setSize( w, h );
-console.log(w)
+//console.log(w)
 
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
@@ -125,8 +125,6 @@ gcodePos.add(gcodePosVerticalLine);
 gcodePos.add(gcodePosCircle);
 gcodePos.position.set(0,0,0);
 
-
-
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
@@ -146,7 +144,7 @@ function positionUpdate(x,y,z){
         z /= 25.4
     }
     sled.position.set(x,y,z);
-    console.log("x="+x+", y="+y+", z="+z)
+    //console.log("x="+x+", y="+y+", z="+z)
 }
 
 
@@ -164,7 +162,7 @@ function gcodePositionUpdate(x,y){
         y /= 25.4
     }
     gcodePos.position.set(x,y,0);
-    console.log("x="+x+", y="+y)
+    //console.log("x="+x+", y="+y)
 }
 
 
@@ -209,7 +207,7 @@ function pauseRun(){
 }
 
 function processRequestedSetting(msg){
-  console.log(msg);
+  //console.log(msg);
   if (msg.setting=="pauseButtonSetting"){
     if(msg.value=="Resume")
         $('#pauseButton').removeClass('btn-warning').addClass('btn-info');
@@ -266,6 +264,7 @@ function processGCodePositionMessage(msg){
   //console.log(_json.xval)
   $('#gcodePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
   $('#gcodeLine').html(_json.gcodeLine);
+  $('#gcodeLineIndex').val(_json.gcodeLineIndex)
   gcodePositionUpdate(_json.xval,_json.yval);
 }
 
@@ -394,6 +393,6 @@ function cursorPosition(){
     var distance = - camera.position.z / vec.z;
 
     pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
-    console.log(pos);
+    //console.log(pos);
     return(pos);
 }
