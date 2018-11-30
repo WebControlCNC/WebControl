@@ -828,10 +828,10 @@ class Actions(MakesmithInitFuncs):
     def upgradeFirmware(self, version):
         if version == 0:
             self.data.ui_queue.put("SpinnerMessage: Custom Firmware Update in Progress, Please Wait.")
-            path = "firmware/madgrizzle/*.hex"
+            path = "/firmware/madgrizzle/*.hex"
         if version == 1:
             self.data.ui_queue.put("SpinnerMessage: Stock Firmware Update in Progress, Please Wait.")
-            path = "firmware/maslowcnc/*.hex"
+            path = "/firmware/maslowcnc/*.hex"
         time.sleep(.5)
         for filename in glob.glob(path):
             port = self.data.comport

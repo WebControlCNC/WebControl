@@ -203,6 +203,8 @@ class OpticalCalibration(MakesmithInitFuncs):
         yBList = np.zeros(shape=(10))
         x = 0
         falseCounter = 0
+        xA=0
+        yA=0
 
         while True:
             (grabbed, image) = self.camera.read()
@@ -311,20 +313,30 @@ class OpticalCalibration(MakesmithInitFuncs):
             avgDi, stdDi = self.removeOutliersAndAverage(diList)
             avgxB, stdxB = self.removeOutliersAndAverage(xBList)
             avgyB, stdyB = self.removeOutliersAndAverage(yBList)
+            print("avgxB="+str(avgxB)+", stdxB="+str(stdxB))
+            print("avgyB="+str(avgyB)+", stdyB="+str(stdyB))
             if findCenter == False:
                 orig = cv2.warpAffine(orig, M, (width, height))
-            return avgDx, avgDy, avgDi, avgxB, avgyB, orig
+            return avgDx, avgDy, avgDi, avgxB, avgyB, xA, yA, orig
         else:
-            return None, None, None, None, None, gray
+            return None, None, None, None, None, None, None, gray
 
     def on_CenterOnSquare(self, _dist, findCenter=False):
 
-        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
+        avgDx, avgDy, avgDi, avgxB, avgyB, xA, yA, image = self.processImage(findCenter)
 
         if avgDx is not None:
             cv2.putText(image, "(" + str(self.HomingPosX) + ", " + str(self.HomingPosY) + ")", (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
             cv2.putText(image, "Dx:{:.3f}, Dy:{:.3f}->Di:{:.3f}mm".format(avgDx, avgDy, avgDi), (15, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
             cv2.putText(image, "({:.3f}, {:.3f})".format(avgxB, avgyB), (15, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
+            cv2.circle(image, (int(avgxB), int(avgyB)), 10, (0,0,255), 1)
+            cv2.line(image, (int(avgxB), int(avgyB) - 15), (int(avgxB), int(avgyB) + 15), (0,0,255), 1)
+            cv2.line(image, (int(avgxB) - 15, int(avgyB)), (int(avgxB) + 15, int(avgyB)), (0,0,255), 1)
+            
+            cv2.circle(image, (int(xA), int(yA)), 10, (255,0,0), 1)
+            cv2.line(image, (int(xA), int(yA) - 15), (int(xA), int(yA) + 15), (255,0,0), 1)
+            cv2.line(image, (int(xA) - 15, int(yA)), (int(xA) + 15, int(yA)), (255,0,0), 1)
+            
             imgencode = cv2.imencode(".png", image)[1]
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationImage = stringData
@@ -458,7 +470,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.console_queue.put("Starting Camera")
             self.camera = cv2.VideoCapture(0)
             self.data.console_queue.put("Camera Started")
-        avgDx, avgDy, avgDi, avgxB, avgyB, image = self.processImage(findCenter)
+        avgDx, avgDy, avgDi, avgxB, avgyB, xA, yA, image = self.processImage(findCenter)
         self.data.console_queue.put("Releasing Camera")
         self.camera.release()
         self.camera = None
@@ -466,6 +478,14 @@ class OpticalCalibration(MakesmithInitFuncs):
             cv2.putText(image, "(" + str(self.HomingPosX) + ", " + str(self.HomingPosY) + ")", (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
             cv2.putText(image, "Dx:{:.3f}, Dy:{:.3f}->Di:{:.3f}mm".format(avgDx, avgDy, avgDi), (15, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
             cv2.putText(image, "({:.3f}, {:.3f})".format(avgxB, avgyB), (15, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
+            cv2.circle(image, (int(avgxB), int(avgyB)), 10, (0,0,255), 1)
+            cv2.line(image, (int(avgxB), int(avgyB) - 15), (int(avgxB), int(avgyB) + 15), (0,0,255), 1)
+            cv2.line(image, (int(avgxB) - 15, int(avgyB)), (int(avgxB) + 15, int(avgyB)), (0,0,255), 1)
+            
+            cv2.circle(image, (int(avgxB), int(avgyB)), 10, (0,0,255), 1)
+            cv2.line(image, (int(avgxB), int(avgyB) - 15), (int(avgxB), int(avgyB) + 15), (0,0,255), 1)
+            cv2.line(image, (int(avgxB) - 15, int(avgyB)), (int(avgxB) + 15, int(avgyB)), (0,0,255), 1)
+
             imgencode = cv2.imencode(".png", image)[1]
             stringData = base64.b64encode(imgencode).decode()
             self.data.opticalCalibrationTestImage = stringData
