@@ -41,7 +41,7 @@ There are two ways to run WebControl.  The first downloading and running the web
 While logged into the RPi, issue the following command:
 ```
 docker pull madgrizzle/webmcp
-docker run -it -v $HOME/.WebControl:/root/.WebControl -v /var/run/docker.sock:/var/run/docker.sock -p 5001:5001 -e HOST_HOME=$HOME --network=“host” --privileged madgrizzle/webmcp
+docker run -it -v $HOME/.WebControl:/root/.WebControl -v /var/run/docker.sock:/var/run/docker.sock -p 5001:5001 -e HOST_HOME=$HOME --network=host --privileged madgrizzle/webmcp
 ```
 
 ### Setting Up WebMCP to Run on Boot
