@@ -192,8 +192,10 @@ $(document).ready(function(){
 
     $( "#workarea" ).contextmenu(function() {
         if (!view3D)
-        pos = cursorPosition();
-        requestPage("screenAction",pos)
+        {
+            pos = cursorPosition();
+            requestPage("screenAction",pos)
+        }
     });
 });
 
@@ -358,6 +360,14 @@ function toggle3DView()
             RIGHT: THREE.MOUSE.LEFT
         }
         view3D=false;
+        if (isMobile)
+        {
+            $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
+        }
+        else
+        {
+            $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
+        }
         console.log("toggled off");
     } else {
         controls.enableRotate = true;
@@ -367,6 +377,15 @@ function toggle3DView()
             RIGHT: THREE.MOUSE.LEFT
         }
         view3D=true;
+        if (isMobile)
+        {
+            $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
+        }
+        else
+        {
+            console.log("notmobile")
+            $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
+        }
         console.log("toggled on");
     }
     controls.update();

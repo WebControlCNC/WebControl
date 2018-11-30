@@ -26,12 +26,17 @@
               socket.emit('my event', {data: 'I\'m connected!'});
               $("#clientStatus").text("Connected");
               $("#clientStatus").removeClass('btn-outline-danger').addClass('btn-success');
+              $("#mobileClientStatus").removeClass('btn-outline-danger').addClass('btn-success');
               //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
           });
 
           socket.on('disconnect', function(msg) {
               $("#clientStatus").text("Not Connected");
               $("#clientStatus").removeClass('btn-success').addClass('btn-outline-danger');
+              $("#mobileClientStatus").removeClass('btn-success').addClass('btn-outline-danger');
+              $("#controllerStatus").removeClass('btn-success').removeClass('btn-outine-danger').addClass('btn-secondary');
+              $("#mobileControllerStatus").removeClass('btn-success').removeClass('btn-outine-danger').addClass('btn-secondary');
+
           });
 
           socket.on('message', function(msg){
@@ -55,12 +60,14 @@
             console.log(msg.status);
             if (msg.status=="disconnected"){
               $("#controllerStatus").text("Not Connected");
-              $("#controllerStatus").removeClass('btn-success').addClass('btn-outline-danger');
+              $("#controllerStatus").removeClass('btn-success').removeClass('btn-secondary').addClass('btn-outline-danger');
+              $("#mobileControllerStatus").removeClass('btn-success').removeClass('btn-secondary').addClass('btn-outline-danger');
             }
             else
             {
               $("#controllerStatus").text(msg.port);
               $("#controllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
+              $("#mobileControllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
             }
           });
 
@@ -154,6 +161,7 @@
             } else {
                 $modal.modal();
             }
+            $modalText.scrollTop(0);
           });
 
 
@@ -288,6 +296,8 @@
 </head>
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" data-name="">
     <a class="navbar-brand" href="#">WebControl</a>
+    <button id="mobileClientStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>
+    <button id="mobileControllerStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -374,8 +384,10 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div id="contentModalText" class="modal-body">
-          <p>Modal body text goes here.</p>
+        <div class="modal-body">
+          <div id="contentModalText">
+            <p>Modal body text goes here.</p>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -3,6 +3,10 @@
       width: 90% !important;
  }
 
+#contentModalText {
+    max-height: 80vh;
+    overflow-y: auto;
+}
 
 #fpCircle {
     position: absolute;

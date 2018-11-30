@@ -8,14 +8,26 @@
         <p>Select your type of kit or provide a custom value for rotational radius.  Note: Quadrilateral kits have no rotational radius, you can leave it zero.
         If you've come back to this page and see your setting is custom, don't worry.  Custom means a triangular kit.  As long as its marked custom and has a
         rotational radius entered, you're good to go (unless of course you are using a quadrilateral kit for some reason)</p>
-        <h5>Ring</h5>
-        <img src="{{ url_for('static',filename='images/quickConfig/ring.png') }}" height="300" width="300">
-        <h5>Linkage</h5>
-        <img src="{{ url_for('static',filename='images/quickConfig/linkage.png') }}" height="300" width="300">
-        <h5>Pantograph</h5>
-        <img src="{{ url_for('static',filename='images/quickConfig/pantograph.png') }}" height="300" width="300">
-        <h5>Quadrilateral</h5>
-        <img src="{{ url_for('static',filename='images/quickConfig/quadrilateral.png') }}" height="300" width="300">
+        <div class="row">
+          <div class="col">
+            <h5>Ring</h5>
+            <img src="{{ url_for('static',filename='images/quickConfig/ring.png') }}" height="300" width="300">
+          </div>
+          <div class="col">
+            <h5>Linkage</h5>
+            <img src="{{ url_for('static',filename='images/quickConfig/linkage.png') }}" height="300" width="300">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h5>Pantograph</h5>
+            <img src="{{ url_for('static',filename='images/quickConfig/pantograph.png') }}" height="300" width="300">
+          </div>
+          <div class="col">
+            <h5>Quadrilateral</h5>
+            <img src="{{ url_for('static',filename='images/quickConfig/quadrilateral.png') }}" height="300" width="300">
+          </div>
+        </div>
         <p></p>
         <select class="custom-select" name="kinematicsType" id="kinematicsType">
           <option value="Ring" {{'selected' if kinematicsType=='Ring' else ''}}>Ring</option>

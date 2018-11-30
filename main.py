@@ -319,6 +319,7 @@ def test_connect():
         app.uithread.start()
 
     if not app.data.connectionStatus:
+        app.data.console_queue.put("Attempting to re-establish connection to controller")
         app.data.serialPort.openConnection()
 
     socketio.emit("my response", {"data": "Connected", "count": 0})

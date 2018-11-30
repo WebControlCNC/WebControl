@@ -146,7 +146,7 @@ class WebPageProcessor:
             else:
                 enableCustom = True
             page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, enableCustom=enableCustom)
-            return page, "Actions", False, "large", "content"
+            return page, "Actions", False, "medium", "content"
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
