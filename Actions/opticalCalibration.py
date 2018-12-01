@@ -2,7 +2,7 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 #from scipy.spatial import distance as dist
 
 # from imutils.video                      import VideoStream
-# from Background.webcamVideoStream       import WebcamVideoStream
+from Background.webcamVideoStream       import WebcamVideoStream
 # from imutils.video			import WebcamVideoStream
 import numpy as np
 #import imutils
@@ -38,6 +38,7 @@ class OpticalCalibration(MakesmithInitFuncs):
     inAutoMode = False
     inMeasureOnlyMode = False
     autoScanDirection = 0
+    y = 0
 
     def __init__(self):
         # can't do much because data hasn't been initialized yet
@@ -205,9 +206,10 @@ class OpticalCalibration(MakesmithInitFuncs):
         falseCounter = 0
         xA=0
         yA=0
-
+        time.sleep(1)
         while True:
-            (grabbed, image) = self.camera.read()
+            #(grabbed, image) = self.camera.read()
+            image = self.camera.read()
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(
                 gray, (self.gaussianBlurValue, self.gaussianBlurValue), 0
@@ -301,6 +303,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 x += 1
                 #print("Processed Image " + str(x))
                 if x == 10:
+                    self.y = self.y + 1
                     break
             else:
                 falseCounter += 1
@@ -362,8 +365,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                     self.on_AutoHome()
                 else:
                     self.data.console_queue.put("avgDx,Dy:" + str(avgDx) + ", " + str(avgDy))
-                    self.data.console_queue.put("Releasing Camera")
-                    self.camera.release()
+                    self.data.console_queue.put("Stopping Camera")
+                    self.camera.stop()
                     self.data.console_queue.put("Done")
         else:
             return False
@@ -406,9 +409,9 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomeIn()
                     else:
                         self.inAutoMode = False
-                        self.data.console_queue.put("Releasing Camera")
-                        self.camera.release()
-                        self.camera=None
+                        self.data.console_queue.put("Stopping Camera")
+                        self.camera.stop()
+                        #self.camera=None
                         self.data.console_queue.put("Calibration Completed")
                         #send ui updated data
                         data = {"errorX": self.calErrorsX.tolist(), "errorY": self.calErrorsY.tolist()}
@@ -435,9 +438,9 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.HomeIn()
                     else:
                         self.inAutoMode = False
-                        self.data.console_queue.put("Releasing Camera")
-                        self.camera.release()
-                        self.camera=None
+                        self.data.console_queue.put("Stopping Camera")
+                        self.camera.stop()
+                        #self.camera=None
                         self.data.console_queue.put("Calibration Completed")
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -458,7 +461,9 @@ class OpticalCalibration(MakesmithInitFuncs):
         )
         if self.camera is None:
             self.data.console_queue.put("Starting Camera")
-            self.camera = cv2.VideoCapture(0)
+            self.camera = self.data.camera
+            #cv2.VideoCapture(0)
+        self.camera.start()
         self.data.console_queue.put("Analyzing Images")
         self.on_AutoHome(False)
         return True
@@ -468,12 +473,13 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.setCalibrationSettings(args)
         if self.camera is None:
             self.data.console_queue.put("Starting Camera")
-            self.camera = cv2.VideoCapture(0)
+            self.camera = self.data.camera #cv2.VideoCapture(0)
             self.data.console_queue.put("Camera Started")
+        self.camera.start()
         avgDx, avgDy, avgDi, avgxB, avgyB, xA, yA, image = self.processImage(findCenter)
-        self.data.console_queue.put("Releasing Camera")
-        self.camera.release()
-        self.camera = None
+        self.data.console_queue.put("Stopping Camera")
+        self.camera.stop()
+        #self.camera.release()
         if avgDx is not None:
             cv2.putText(image, "(" + str(self.HomingPosX) + ", " + str(self.HomingPosY) + ")", (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)
             cv2.putText(image, "Dx:{:.3f}, Dy:{:.3f}->Di:{:.3f}mm".format(avgDx, avgDy, avgDi), (15, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,0,255), 2)

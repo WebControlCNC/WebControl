@@ -1,8 +1,11 @@
-from threading import Thread
+import threading
 import cv2
+import time
 
 
 class WebcamVideoStream:
+    th = None
+    
     def __init__(self, src=0):
         # initialize the video camera stream and read the first frame
         # from the stream
@@ -16,7 +19,10 @@ class WebcamVideoStream:
     def start(self):
         # start the thread to read frames from the video stream
         print("Starting camera thread")
-        Thread(target=self.update, args=()).start()
+        #Thread(target=self.update, args=()).start()
+        self.th = threading.Thread(target=self.update)
+        self.th.daemon = True
+        self.th.start()
         print("Camera thread started")
         return self
 
@@ -26,13 +32,13 @@ class WebcamVideoStream:
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
                 return
-
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.stream.read()
+            time.sleep(0.001)
 
     def read(self):
         # return the frame most recently read
-        print("Reading camera frame")
+        #print("Reading camera frame")
         return self.frame
 
     def stop(self):
