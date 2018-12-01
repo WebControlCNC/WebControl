@@ -392,5 +392,11 @@ def default_error_handler(e):
 if __name__ == "__main__":
     app.debug = False
     app.config["SECRET_KEY"] = "secret!"
+
+    from Actions import Thread
+    server = ThreadedHTTPServer(('127.0.0.1', 8080), CamHandler)
+    threading.Thread(target=server.serve_forever).start()
+    print("mjpeg server started")
+
     socketio.run(app, use_reloader=False, host="0.0.0.0")
     # socketio.run(app, host='0.0.0.0')
