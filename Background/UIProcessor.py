@@ -8,9 +8,10 @@ from flask import render_template
 class UIProcessor:
 
     app = None
-
+    lastCameraTime = 0
+    
     def start(self, _app):
-
+        
         self.app = _app
         self.app.data.console_queue.put("starting UI")
         with self.app.app_context():
@@ -28,6 +29,15 @@ class UIProcessor:
                         self.app.data.opticalCalibrationImage,
                     )
                     self.app.data.opticalCalibrationImageUpdated = False
+                if self.app.data.cameraImageUpdated is True:
+                    if time.time()-self.lastCameraTime > .25:
+                        self.sendCameraMessage(
+                            "cameraImageUpdated",
+                            self.app.data.cameraImage,
+                        )
+                        self.app.data.cameraImageUpdated = False
+                        self.lastCameraTime = time.time()
+
                 if self.app.data.opticalCalibrationTestImageUpdated is True:
                     self.sendCalibrationMessage(
                         "OpticalCalibrationTestImageUpdated",
@@ -257,5 +267,11 @@ class UIProcessor:
         socketio.emit(
             "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
         )
+    
+    def sendCameraMessage(self, message, data):
+        socketio.emit(
+            "cameraMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
+        )
+    
 
 

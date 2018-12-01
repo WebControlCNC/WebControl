@@ -83,6 +83,8 @@ class Data:
     opticalCalibrationImageUpdated = False  # stores whether its been updated or not
     opticalCalibrationTestImage = None  # stores the current image
     opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
+    cameraImage = None
+    cameraImageUpdated = False
 
     """
 

@@ -415,3 +415,8 @@ function cursorPosition(){
     //console.log(pos);
     return(pos);
 }
+
+function processCameraMessage(msg){
+    if(msg.msg=="cameraImageUpdated")
+      $("#cameraDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
+}

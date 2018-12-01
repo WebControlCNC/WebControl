@@ -32,3 +32,12 @@ html, body{
     left: 95%;
 }
 
+#cameraDiv {
+    position: absolute;
+    display: block;
+    z-index: 95;
+    top: 70%;
+    left: 1%;
+    width: 256;
+    height: 192;
+}

@@ -76,6 +76,10 @@
               processCalibrationMessage(msg)
           });
 
+          socket.on('cameraMessage', function(msg){
+              processCameraMessage(msg)
+          });
+          
           socket.on('positionMessage', function(msg){
               processPositionMessage(msg)
               if (typeof processPositionMessageOptical === "function") {
