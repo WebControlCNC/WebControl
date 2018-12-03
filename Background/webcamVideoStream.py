@@ -13,12 +13,38 @@ class WebcamVideoStream(MakesmithInitFuncs):
         # initialize the video camera stream and read the first frame
         # from the stream
         self.stream = cv2.VideoCapture(src)
+
+
         (self.grabbed, self.frame) = self.stream.read()
         # initialize the variable used to indicate if the thread should
         # be stopped
         self.stopped = True
         self.suspended = False
         print("Camera initialized")
+
+    def getSettings(self):
+        self.data.console_queue.put("CAP_PROP_POS_MSEC=" + str(self.stream.get(cv2.CAP_PROP_POS_MSEC)))
+        self.data.console_queue.put("CAP_PROP_POS_FRAMES=" + str(self.stream.get(cv2.CAP_PROP_POS_FRAMES)))
+        self.data.console_queue.put("CAP_PROP_POS_AVI_RATIO=" + str(self.stream.get(cv2.CAP_PROP_POS_AVI_RATIO)))
+        self.data.console_queue.put("CAP_PROP_FRAME_WIDTH=" + str(self.stream.get(cv2.CAP_PROP_FRAME_WIDTH)))
+        self.data.console_queue.put("CAP_PROP_FRAME_HEIGHT=" + str(self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        self.data.console_queue.put("CAP_PROP_FPS=" + str(self.stream.get(cv2.CAP_PROP_FPS)))
+        self.data.console_queue.put("CAP_PROP_FOURCC=" + str(self.stream.get(cv2.CAP_PROP_FOURCC)))
+        self.data.console_queue.put("CAP_PROP_FRAME_COUNT=" + str(self.stream.get(cv2.CAP_PROP_FRAME_COUNT)))
+        self.data.console_queue.put("CAP_PROP_FORMAT=" + str(self.stream.get(cv2.CAP_PROP_FORMAT)))
+        self.data.console_queue.put("CAP_PROP_MODE=" + str(self.stream.get(cv2.CAP_PROP_MODE)))
+        self.data.console_queue.put("CAP_PROP_BRIGHTNESS=" + str(self.stream.get(cv2.CAP_PROP_BRIGHTNESS)))
+        self.data.console_queue.put("CAP_PROP_CONTRAST=" + str(self.stream.get(cv2.CAP_PROP_CONTRAST)))
+        self.data.console_queue.put("CAP_PROP_SATURATION=" + str(self.stream.get(cv2.CAP_PROP_SATURATION)))
+        self.data.console_queue.put("CAP_PROP_HUE=" + str(self.stream.get(cv2.CAP_PROP_HUE)))
+        self.data.console_queue.put("CAP_PROP_GAIN=" + str(self.stream.get(cv2.CAP_PROP_GAIN)))
+        self.data.console_queue.put("CAP_PROP_EXPOSURE=" + str(self.stream.get(cv2.CAP_PROP_EXPOSURE)))
+        self.data.console_queue.put("CAP_PROP_CONVERT_RGB=" + str(self.stream.get(cv2.CAP_PROP_CONVERT_RGB)))
+#        self.data.console_queue.put("CAP_PROP_WHITE_BALANCE_U=" + str(self.stream.get(cv2.CAP_PROP_WHITE_BALANCE_U)))
+#        self.data.console_queue.put("CAP_PROP_WHITE_BALANCE_V=" + str(self.stream.get(cv2.CAP_PROP_WHITE_BALANCE_V)))
+        self.data.console_queue.put("CAP_PROP_RECTIFICATION=" + str(self.stream.get(cv2.CAP_PROP_RECTIFICATION)))
+        self.data.console_queue.put("CAP_PROP_ISO_SPEED=" + str(self.stream.get(cv2.CAP_PROP_ISO_SPEED)))
+        self.data.console_queue.put("CAP_PROP_BUFFERSIZE=" + str(self.stream.get(cv2.CAP_PROP_BUFFERSIZE)))
 
     def start(self):
         # start the thread to read frames from the video stream

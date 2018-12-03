@@ -1,3 +1,4 @@
+
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
@@ -167,7 +168,8 @@ class Actions(MakesmithInitFuncs):
             if not self.data.opticalCalibration.clearCalibration():
                 self.data.ui_queue.put("Message: Error with clearing calibration.")
         elif msg["data"]["command"] == "curveFitOpticalCalibration":
-            curveX, curveY = self.data.opticalCalibration.surfaceFit()
+            #curveX, curveY = self.data.opticalCalibration.surfaceFit()
+            curveX, curveY = self.data.opticalCalibration.polySurfaceFit()
             if curveX is None or curveY is None:
                 self.data.ui_queue.put("Message: Error with curve fitting calibration data.")
             else:
@@ -188,6 +190,9 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put("Message: Error with upgrading stock firmware.")
             else:
                 self.data.ui_queue.put("Message: Stock firmware update complete.")
+        elif msg["data"]["command"] == "adjustChain":
+            if not self.adjustChain(msg["data"]["arg"]):
+                self.data.ui_queue.put("Message: Error with adjusting chain.")
 
 
     def defineHome(self, posX, posY):
@@ -1063,3 +1068,16 @@ class Actions(MakesmithInitFuncs):
                                 zpos = float(_zpos.groups()[0])
         #print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpos="+str(zpos))
         return xpos, ypos, zpos
+
+    def adjustChain(self, chain):
+        try:
+            for x in range(6):
+                self.data.ui_queue.put("Action:updateTimer_"+chain+":"+str(5-x))
+                self.data.console_queue.put("Action:updateTimer_" + chain + ":" + str(5 - x))
+                time.sleep(1)
+            if chain == "left":
+                self.data.gcode_queue.put("B02 L1 R0 ")
+            if chain == "right":
+                self.data.gcode_queue.put("B02 L0 R1 ")
+        except Exception as e:
+            self.data.console_queue.put(str(e))

@@ -64,5 +64,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
         self.camera.setUpData(data)
+        self.camera.getSettings()
         self.camera.start()
 

@@ -366,7 +366,7 @@ function toggle3DView()
         }
         else
         {
-            $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
+            $("#button3D").removeClass('btn-primary').addClass('btn-secondary');
         }
         console.log("toggled off");
     } else {
@@ -383,8 +383,7 @@ function toggle3DView()
         }
         else
         {
-            console.log("notmobile")
-            $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
+            $("#button3D").removeClass('btn-secondary').addClass('btn-primary');
         }
         console.log("toggled on");
     }

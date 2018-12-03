@@ -188,6 +188,9 @@ class UIProcessor:
                             if message.find("updateOpticalCalibrationFindCenter") != -1:
                                 msg = message.split("_")
                                 self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
+                            if message.find("updateTimer") != -1:
+                                msg = message.split("_")
+                                self.sendCalibrationMessage("updateTimer", msg[1])
 
                         elif message[0:6] == "ALARM:":
                             if message.find("The sled is not keeping up") != -1:

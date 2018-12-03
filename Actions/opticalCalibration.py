@@ -7,6 +7,7 @@ from Background.webcamVideoStream       import WebcamVideoStream
 import numpy as np
 #import imutils
 import cv2
+import itertools
 import time
 import re
 import sys
@@ -591,6 +592,44 @@ class OpticalCalibration(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+
+    def polySurfaceFit(self):
+        try:
+            dataX = np.zeros(15 * 31)
+            dataY = np.zeros(15 * 31)
+            dataZX = np.zeros(15 * 31)
+            dataZY = np.zeros(15 * 31)
+            for y in range(7, -8, -1):
+                for x in range(-15, 16, +1):
+                    dataX[(7 - y) * 31 + (x + 15)] = float(x * 3.0 * 25.4)
+                    dataY[(7 - y) * 31 + (x + 15)] = float(x * 3.0 * 25.4)
+                    dataZX[(7 - y) * 31 + (x + 15)] = self.calErrorsX[x + 15][7 - y]
+                    dataZY[(7 - y) * 31 + (x + 15)] = self.calErrorsY[x + 15][7 - y]
+            mx = self.polyFit2D(dataX, dataY, dataZX)
+            print(mx)
+            my = self.polyFit2D(dataX, dataY, dataZY)
+            print(mx)
+            return mx, my
+        except Exception as e:
+            print(e)
+            return None, None
+
+
+    def polyFit2D(self, x, y, z, order = 2):
+        ncols = (order + 1) ** 2
+        G = np.zeros((x.size, ncols))
+        #ij = itertools.product(range(order + 1), range(order + 1))
+        powers = itertools.product(range(order+1), range(order+1))
+        print(powers)
+        ij = [tup for tup in powers if sum(tup) <= order]
+        print(ij)
+        for k, (i, j) in enumerate(ij):
+            G[:, k] = x ** i * y ** j
+        m, _, _, _ = np.linalg.lstsq(G, z, rcond=None)
+        return m
+
+
+
 
     def surfaceFit(self):
         # set data into proper format
