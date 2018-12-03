@@ -7,6 +7,7 @@ import base64
 
 class WebcamVideoStream(MakesmithInitFuncs):
     th = None
+    lastCameraRead = 0
     
     def __init__(self, src=0):
         # initialize the video camera stream and read the first frame
@@ -15,7 +16,8 @@ class WebcamVideoStream(MakesmithInitFuncs):
         (self.grabbed, self.frame) = self.stream.read()
         # initialize the variable used to indicate if the thread should
         # be stopped
-        self.stopped = False
+        self.stopped = True
+        self.suspended = False
         print("Camera initialized")
 
     def start(self):
@@ -36,11 +38,16 @@ class WebcamVideoStream(MakesmithInitFuncs):
         # keep looping infinitely until the thread is stopped
         while True:
             time.sleep(0.001)
+            if not self.data.continuousCamera or time.time()-self.lastCameraRead < 20:
+                (self.grabbed, self.frame) = self.stream.read()
+                self.suspended=False
+            else:
+                self.suspended=True
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
                 return
             # otherwise, read the next frame from the stream
-            (self.grabbed, self.frame) = self.stream.read()
+            
             '''small = cv2.resize(self.frame, (256,192))
             imgencode = cv2.imencode(".png",small )[1]
             stringData = base64.b64encode(imgencode).decode()
@@ -52,6 +59,13 @@ class WebcamVideoStream(MakesmithInitFuncs):
     def read(self):
         # return the frame most recently read
         #print("Reading camera frame")
+        if self.suspended:
+            (self.grabbed, self.frame) = self.stream.read()
+            self.suspended = False
+        self.lastCameraRead = time.time()
+        
+        if self.stopped:
+            self.start()
         return self.frame
 
     def stop(self):

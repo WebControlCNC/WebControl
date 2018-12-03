@@ -885,6 +885,12 @@
             "key": "calibrationExtents",
             "type": "string",
             "value": "Full Area"
+        }        ,
+        {
+            "default": 0.125,
+            "key": "positionTolerance",
+            "type": "float",
+            "value": 0.125
         }
     ],
     "WebControl Settings": [

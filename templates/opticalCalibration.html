@@ -60,6 +60,15 @@
                 </div>
              </div>
             </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="positionTolerance">Position Tolerance</label>
+                  <input class="form-control" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
+                  <small class="form-text text-muted">Enter something like 0.125 (mm)</small>
+                </div>
+              </div>
+            </div>
             <button type="button" class="btn btn-lg btn-primary float-right m-1" onclick="saveConfiguration();">Save</button>
           </div>
         </div>
@@ -189,7 +198,16 @@
                       <input class="form-control" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
                       <small class="form-text text-muted">Enter something like 200</small>
                     </div>
+                   </div>
                  </div>
+                 <div class="row">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label for="positionTolerance">Position Tolerance</label>
+                      <input class="form-control" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
+                      <small class="form-text text-muted">Enter something like 0.125 (mm)</small>
+                    </div>
+                  </div>
                 </div>
               </div>
               </div>
@@ -482,6 +500,7 @@ function process(processName){
   var cannyHighValue = $("#cannyHighValue").val();
   var gaussianBlurValue = $("#gaussianBlurValue option:selected").val()
   var autoScanDirection = $("#autoScanDirection option:selected").val()
+  var positionTolerance = $("#positionTolerance").val();
   var parameters = {markerX:markerX,
                     markerY:markerY,
                     opticalCenterX:opticalCenterX,
@@ -496,7 +515,8 @@ function process(processName){
                     cannyLowValue:cannyLowValue,
                     cannyHighValue:cannyHighValue,
                     gaussianBlurValue:gaussianBlurValue,
-                    autoScanDirection:autoScanDirection
+                    autoScanDirection:autoScanDirection,
+                    positionTolerance:positionTolerance
                     };
   if (processName=="testImage")
     action('testOpticalCalibration', parameters)
@@ -560,7 +580,7 @@ function redrawCurveCharts(chart){
       for(var i = 0; i<15; i++){
         _y[i]=[]
         for(var j =0; j<31; j++){
-          var temp=calSurface(xCurve, i, j);
+          var temp=calSurface(xCurve, j-15, i-7);
           _y[i][j]=temp
           _x[j]=j
         }
@@ -574,7 +594,7 @@ function redrawCurveCharts(chart){
       for(var i = 0; i<15; i++){
         _y[i]=[]
         for(var j =0; j<31; j++){
-          var temp=calSurface(yCurve, i, j);
+          var temp=calSurface(yCurve, j-15, i-7);
           _y[i][j]=temp
           _x[j]=j
         }
@@ -740,6 +760,7 @@ function saveConfiguration(){
   var cannyHighValue = $("#cannyHighValue").val();
   var gaussianBlurValue = $("#gaussianBlurValue option:selected").val();
   var autoScanDirection = $("#autoScanDirection option:selected").val();
+  var positionTolerance = $("#positionTolerance").val();
   var parameters = {markerX:markerX,
                     markerY:markerY,
                     opticalCenterX:opticalCenterX,
@@ -754,7 +775,8 @@ function saveConfiguration(){
                     cannyLowValue:cannyLowValue,
                     cannyHighValue:cannyHighValue,
                     gaussianBlurValue:gaussianBlurValue,
-                    autoScanDirection:autoScanDirection
+                    autoScanDirection:autoScanDirection,
+                    positionTolerance:positionTolerance
                     };
   action('saveOpticalCalibrationConfiguration',parameters);
 }

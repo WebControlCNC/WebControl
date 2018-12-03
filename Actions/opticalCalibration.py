@@ -38,6 +38,7 @@ class OpticalCalibration(MakesmithInitFuncs):
     inAutoMode = False
     inMeasureOnlyMode = False
     autoScanDirection = 0
+    positionTolerance = 0.125
     y = 0
 
     def __init__(self):
@@ -139,6 +140,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.gaussianBlurValue = int(args["gaussianBlurValue"])
         self.cannyLowValue = float(args["cannyLowValue"])
         self.cannyHighValue = float(args["cannyHighValue"])
+        self.positionTolerance = float(args["positionTolerance"])
 
     def saveOpticalCalibrationConfiguration(self, args):
         self.data.console_queue.put("Saving Configuration")
@@ -160,6 +162,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.config.setValue("Optical Calibration Settings", "brX", int(args["brX"]))
             self.data.config.setValue("Optical Calibration Settings", "brY", int(args["brY"]))
             self.data.config.setValue("Optical Calibration Settings", "calibrationExtents", args["calibrationExtents"])
+            self.data.config.setValue("Optical Calibration Settings", "positionTolerance", args["positionTolerance"])
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
@@ -346,7 +349,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             self.data.opticalCalibrationImageUpdated = True
             self.HomingX += avgDx
             self.HomingY += avgDy
-            if ((abs(avgDx) >= 0.125) or (abs(avgDy) >= 0.125)) and ( not findCenter ):
+            if ((abs(avgDx) >= self.positionTolerance) or (abs(avgDy) >= self.positionTolerance)) and ( not findCenter ):
                 self.data.console_queue.put("Adjusting Location")
                 self.HomeIn()
             else:
@@ -472,10 +475,10 @@ class OpticalCalibration(MakesmithInitFuncs):
         self.data.console_queue.put("at Test Image")
         self.setCalibrationSettings(args)
         if self.camera is None:
-            self.data.console_queue.put("Starting Camera")
             self.camera = self.data.camera #cv2.VideoCapture(0)
-            self.data.console_queue.put("Camera Started")
+        self.data.console_queue.put("Starting Camera")
         self.camera.start()
+        self.data.console_queue.put("Camera Started")
         avgDx, avgDy, avgDi, avgxB, avgyB, xA, yA, image = self.processImage(findCenter)
         self.data.console_queue.put("Stopping Camera")
         self.camera.stop()
@@ -604,7 +607,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                     dataX[(7 - y) * 31 + (x + 15)][2] = self.calErrorsX[x + 15][7 - y]
                     dataY[(7 - y) * 31 + (x + 15)][2] = self.calErrorsY[x + 15][7 - y]
             # surface fit X Errors
-            xA = np.c_[np.ones(dataX.shape[0]), dataX[:, :2], np.prod(dataX[:, :2], axis=1), dataX[:, :2] ** 2]
+            xA = np.c_[np.ones(dataX.shape[0]), dataX[:, :], np.prod(dataX[:, :2], axis=1), dataX[:, :2] ** 2]
+            self.data.console_queue.put(str(xA))
             self.xCurve, _, _, _ = np.linalg.lstsq(xA, dataX[:, 2], rcond=None)
             xB = dataX[:, 2]
             xSStot = ((xB - xB.mean()) ** 2).sum()
