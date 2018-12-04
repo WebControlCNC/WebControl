@@ -196,6 +196,10 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "toggleCamera":
             if not self.toggleCamera():
                 self.data.ui_queue.put("Message: Error with toggling camera.")
+        elif msg["data"]["command"] == "statusRequest":
+            if msg["data"]["arg"] == "cameraStatus":
+                if not self.cameraStatus():
+                    self.data.ui_queue.put("Message: Error with toggling camera.")
 
 
     def defineHome(self, posX, posY):
@@ -1082,18 +1086,40 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("B02 L1 R0 ")
             if chain == "right":
                 self.data.gcode_queue.put("B02 L0 R1 ")
+            return True
         except Exception as e:
             self.data.console_queue.put(str(e))
-            
+            return False
+
     def toggleCamera(self):
-        status = self.data.camera.status()
-        if status == "stopped":
-            self.data.camera.start()
-            self.data.ui_queue.put("Action:updateCamera_on")
-        if status == "suspended":
-            self.data.camera.read()
-            self.data.ui_queue.put("Action:updateCamera_on")
-        if status == "running":
-            self.data.camera.stop()
-            self.data.ui_queue.put("Action:updateCamera_off")
-            
+        try:
+            status = self.data.camera.status()
+            if status == "stopped":
+                self.data.camera.start()
+                #self.data.ui_queue.put("Action:updateCamera_on")
+            if status == "suspended":
+                self.data.camera.read()
+                #self.data.ui_queue.put("Action:updateCamera_on")
+            if status == "running":
+                self.data.camera.stop()
+                #self.data.ui_queue.put("Action:updateCamera_off")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def cameraStatus(self):
+        try:
+            status = self.data.camera.status()
+            print("##")
+            print(status)
+            if status == "stopped":
+                self.data.ui_queue.put("Action:updateCamera_off")
+            if status == "suspended":
+                self.data.ui_queue.put("Action:updateCamera_off")
+            if status == "running":
+                self.data.ui_queue.put("Action:updateCamera_on")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False

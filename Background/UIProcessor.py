@@ -191,6 +191,9 @@ class UIProcessor:
                             if message.find("updateTimer") != -1:
                                 msg = message.split("_")
                                 self.sendCalibrationMessage("updateTimer", msg[1])
+                            if message.find("updateCamera") != -1:
+                                msg = message.split("_")
+                                self.sendCameraMessage("updateCamera", msg[1])
 
                         elif message[0:6] == "ALARM:":
                             if message.find("The sled is not keeping up") != -1:
@@ -271,7 +274,7 @@ class UIProcessor:
             "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
         )
     
-    def sendCameraMessage(self, message, data):
+    def sendCameraMessage(self, message, data=""):
         socketio.emit(
             "cameraMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
         )

@@ -930,5 +930,29 @@
             "type": "bool",
             "value": "0"
         }
+    ],
+    "Camera Settings": [
+        {
+            "default": "640x480",
+            "desc": "Size of video image.  Affects FPS and computational needs\ndefault setting: 640x480",
+            "key": "videoSize",
+            "options": [
+                "640x480",
+                "1024x768"
+            ],
+            "section": "Camera Settings",
+            "title": "Video Image Size",
+            "type": "options",
+            "value": "640x480"
+       },
+        {
+            "default": 5,
+            "desc": "Number of frames per second the camera captures\ndefault setting: 5",
+            "key": "fps",
+            "section": "Camera Settings",
+            "title": "fps",
+            "type": "float",
+            "value": 5
+        }
     ]
 }

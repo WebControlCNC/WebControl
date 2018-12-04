@@ -91,6 +91,29 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "WebControl Settings", False, "medium", "content"
+        elif pageID == "cameraSettings":
+            setValues = self.data.config.getJSONSettingSection("Camera Settings")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
+            if isMobile:
+                page = render_template(
+                    "settings_mobile.html",
+                    title="Camera Settings",
+                    settings=setValues,
+                    pageID="cameraSettings",
+                    enableCustom=enableCustom,
+                )
+            else:
+                page = render_template(
+                    "settings.html",
+                    title="Camera Settings",
+                    settings=setValues,
+                    pageID="cameraSettings",
+                    enableCustom=enableCustom,
+                )
+            return page, "Camera Settings", False, "medium", "content"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")

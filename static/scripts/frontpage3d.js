@@ -184,6 +184,7 @@ $(document).ready(function(){
     settingRequest("Computed Settings","units");
     settingRequest("Computed Settings","distToMove");
     settingRequest("Computed Settings","homePosition");
+    action("statusRequest","cameraStatus");
     checkForGCodeUpdate();
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
@@ -416,6 +417,23 @@ function cursorPosition(){
 }
 
 function processCameraMessage(msg){
+    console.log(msg)
     if(msg.msg=="cameraImageUpdated")
       $("#cameraDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
+    if(msg.msg=="updateCamera")
+    {
+        if (msg.data=="on"){
+            //$("#videoStatus").html("<i data-feather='video-on'></i>");
+            $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
+            feather.replace();
+            console.log("video on");
+        }
+
+        if (msg.data=="off"){
+            //$("#videoStatus").html("<i data-feather='video-off'></i>");
+            $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
+            feather.replace();
+            console.log("video off")
+        }
+    }
 }

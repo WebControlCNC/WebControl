@@ -273,6 +273,11 @@
           socket.emit('settingRequest',{data:{section:section,setting:setting}});
       }
 
+      function statusRequest(status){
+          console.log("requesting status..")
+          socket.emit('statusRequest',{data:{status:status}});
+      }
+
       function requestPage(page, args=""){
           console.log("requesting page..")
           socket.emit('requestPage',{data:{page:page, isMobile:isMobile, args:args}});
@@ -340,6 +345,7 @@
             <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Setttings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl Settings</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('cameraSettings');">Camera Settings</a>
           </div>
         </li>
       </ul>
