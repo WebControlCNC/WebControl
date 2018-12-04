@@ -193,6 +193,9 @@ class Actions(MakesmithInitFuncs):
         elif msg["data"]["command"] == "adjustChain":
             if not self.adjustChain(msg["data"]["arg"]):
                 self.data.ui_queue.put("Message: Error with adjusting chain.")
+        elif msg["data"]["command"] == "toggleCamera":
+            if not self.toggleCamera():
+                self.data.ui_queue.put("Message: Error with toggling camera.")
 
 
     def defineHome(self, posX, posY):
@@ -1081,3 +1084,16 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("B02 L0 R1 ")
         except Exception as e:
             self.data.console_queue.put(str(e))
+            
+    def toggleCamera(self):
+        status = self.data.camera.status()
+        if status == "stopped"
+            self.data.camera.start()
+            self.data.ui_queue.put("Action:updateCamera_on")
+        if status == "suspended"
+            self.data.camera.read()
+            self.data.ui_queue.put("Action:updateCamera_on")
+        if status == "running"
+            self.data.camera.stop()
+            self.data.ui_queue.put("Action:updateCamera_off")
+            

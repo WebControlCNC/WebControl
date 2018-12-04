@@ -63,7 +63,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
     def update(self):
         # keep looping infinitely until the thread is stopped
         while True:
-            time.sleep(0.001)
+            time.sleep(0.01)
             if not self.data.continuousCamera or time.time()-self.lastCameraRead < 20:
                 (self.grabbed, self.frame) = self.stream.read()
                 self.suspended=False
@@ -98,3 +98,10 @@ class WebcamVideoStream(MakesmithInitFuncs):
         # indicate that the thread should be stopped
         print("Stopping camera")
         self.stopped = True
+
+    def status(self):
+        if self.stopped:
+            return("stopped")
+        if self.suspended:
+            return("suspended")
+        return("running")
