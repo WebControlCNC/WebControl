@@ -1087,13 +1087,13 @@ class Actions(MakesmithInitFuncs):
             
     def toggleCamera(self):
         status = self.data.camera.status()
-        if status == "stopped"
+        if status == "stopped":
             self.data.camera.start()
             self.data.ui_queue.put("Action:updateCamera_on")
-        if status == "suspended"
+        if status == "suspended":
             self.data.camera.read()
             self.data.ui_queue.put("Action:updateCamera_on")
-        if status == "running"
+        if status == "running":
             self.data.camera.stop()
             self.data.ui_queue.put("Action:updateCamera_off")
             

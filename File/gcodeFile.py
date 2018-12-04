@@ -109,18 +109,20 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.zMoves = [0]
             zList = []
             for index, line in enumerate(self.data.gcode):
-                z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
-                if z:
-                    zList.append(z)
-                    if len(zList) > 1:
-                        if not self.isClose(
-                            float(zList[-1].groups()[0]), float(zList[-2].groups()[0])
-                        ):
-                            self.data.zMoves.append(index)  # - 1)
-                    else:
-                        self.data.zMoves.append(index)
+                if line.find("(") == -1:
+                    z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
+                    if z:
+                        zList.append(z)
+                        if len(zList) > 1:
+                            if not self.isClose(
+                                float(zList[-1].groups()[0]), float(zList[-2].groups()[0])
+                            ):
+                                self.data.zMoves.append(index)  # - 1)
+                        else:
+                            self.data.zMoves.append(index)
             #print("zmoves = "+str(self.data.zMoves))
-        except:
+        except Exception as e:
+            self.data.console_queue.put(str(e))
             self.data.console_queue.put("Gcode File Error")
             self.data.ui_queue.put("Message: Cannot open gcode file.")
             self.data.gcodeFile.filename = ""
