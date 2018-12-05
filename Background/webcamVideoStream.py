@@ -67,14 +67,15 @@ class WebcamVideoStream(MakesmithInitFuncs):
         if self.stream is None:
             self.stream = cv2.VideoCapture(src)
             (self.grabbed, self.frame) = self.stream.read()
-            self.setVideoSize()
-            self.setFPS()
-        #Thread(target=self.update, args=()).start()
+
+            #self.setVideoSize()
+            #self.setFPS()
+
         if self.stopped == True:
+            self.stopped = False
             self.th = threading.Thread(target=self.update)
             self.th.daemon = True
             self.th.start()
-            self.stopped = False
             print("Camera thread started")
             self.data.ui_queue.put("Action:updateCamera_on")
         else:
@@ -99,14 +100,12 @@ class WebcamVideoStream(MakesmithInitFuncs):
                 self.data.ui_queue.put("Action:updateCamera_off")
                 return
             # otherwise, read the next frame from the stream
-            
-            small = cv2.resize(self.frame, (256,192))
-            imgencode = cv2.imencode(".png",small )[1]
-            stringData = base64.b64encode(imgencode).decode()
-            self.data.cameraImage = stringData
-            self.data.cameraImageUpdated = True
-            
-
+            if self.frame is not None:
+                small = cv2.resize(self.frame, (256,192))
+                imgencode = cv2.imencode(".png",small )[1]
+                stringData = base64.b64encode(imgencode).decode()
+                self.data.cameraImage = stringData
+                self.data.cameraImageUpdated = True
 
     def read(self):
         # return the frame most recently read
