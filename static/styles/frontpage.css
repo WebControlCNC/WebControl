@@ -32,11 +32,21 @@ html, body{
     left: 95%;
 }
 
-#cameraDiv {
+#cameraDiv1 {
     position: absolute;
     display: block;
     z-index: 95;
-    top: 70%;
+    top: 77%;
+    left: 1%;
+    width: 256;
+    height: 192;
+}
+
+#cameraDiv2 {
+    position: absolute;
+    display: block;
+    z-index: 94;
+    top: 77%;
     left: 1%;
     width: 256;
     height: 192;

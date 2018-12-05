@@ -9,7 +9,7 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash
+from flask import Flask, jsonify, render_template, current_app, request, flash, Response
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
@@ -125,6 +125,18 @@ def webControlSettings():
         return resp
 
 
+@app.route("/cameraSettings", methods=["POST"])
+def cameraSettings():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        result = request.form
+        app.data.config.updateSettings("Camera Settings", result)
+        message = {"status": 200}
+        resp = jsonify(message)
+        resp.status_code = 200
+        return resp
+
+        
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
     app.data.logger.resetIdler()
@@ -249,6 +261,8 @@ def quickConfigure():
         resp = jsonify(message)
         resp.status_code = 200
         return resp
+        
+        
 
 #Watchdog socketio.. not working yet.
 @socketio.on("checkInRequested", namespace="/WebMCP")

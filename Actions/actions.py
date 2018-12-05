@@ -200,6 +200,9 @@ class Actions(MakesmithInitFuncs):
             if msg["data"]["arg"] == "cameraStatus":
                 if not self.cameraStatus():
                     self.data.ui_queue.put("Message: Error with toggling camera.")
+        elif msg["data"]["command"] == "queryCamera":
+            if not self.queryCamera():
+                self.data.ui_queue.put("Message: Error with toggling camera.")
 
 
     def defineHome(self, posX, posY):
@@ -1119,6 +1122,14 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue.put("Action:updateCamera_off")
             if status == "running":
                 self.data.ui_queue.put("Action:updateCamera_on")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def queryCamera(self):
+        try:
+            self.data.camera.getSettings()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))

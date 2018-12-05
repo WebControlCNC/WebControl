@@ -37,7 +37,6 @@ class UIProcessor:
                         )
                         self.app.data.cameraImageUpdated = False
                         self.lastCameraTime = time.time()
-
                 if self.app.data.opticalCalibrationTestImageUpdated is True:
                     self.sendCalibrationMessage(
                         "OpticalCalibrationTestImageUpdated",

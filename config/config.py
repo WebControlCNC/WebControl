@@ -81,6 +81,9 @@ class Config(MakesmithInitFuncs):
                         t["type"]=self.defaults[section][x]["type"]
                     if "value" in self.defaults[section][x]:
                         t["value"]=self.defaults[section][x]["value"]
+                    if "options" in self.defaults[section][x]:
+                        t["options"]=self.defaults[section][x]["options"]
+
                     self.settings[section].append(t)
                     print("added "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
                     updated = True
@@ -556,5 +559,5 @@ class Config(MakesmithInitFuncs):
 
     def processChange(self, key, value):
         ### TODO: This does not currently fire on bools ##
-        if key == "fps" or key == "videoSize":
+        if key == "fps" or key == "videoSize" or key=="cameraSleep":
             self.data.camera.changeSetting(key, value)

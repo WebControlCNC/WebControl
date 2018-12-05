@@ -953,6 +953,15 @@
             "title": "fps",
             "type": "float",
             "value": 5
+        },
+        {
+            "default": 0.001,
+            "desc": "Sleep time (seconds) during camera thread.  This is here to help us tweak the camera process\ndefault setting: 0.001",
+            "key": "cameraSleep",
+            "section": "Camera Settings",
+            "title": "Camera Thread Sleep Interval",
+            "type": "float",
+            "value": 0.001
         }
     ]
 }

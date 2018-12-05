@@ -15,6 +15,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
     width = 480
     fps = 5
     videoSize = "640x480"
+    cameraSleep = 0.01
     
     def __init__(self, src=0):
         # initialize the video camera stream and read the first frame
@@ -65,6 +66,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
         print("Starting camera thread")
         if self.stream is None:
             self.stream = cv2.VideoCapture(src)
+            (self.grabbed, self.frame) = self.stream.read()
             self.setVideoSize()
             self.setFPS()
         #Thread(target=self.update, args=()).start()
@@ -82,7 +84,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
     def update(self):
         # keep looping infinitely until the thread is stopped
         while True:
-            time.sleep(0.01)
+            time.sleep(self.cameraSleep)
             if not self.data.continuousCamera or time.time()-self.lastCameraRead < 20:
                 (self.grabbed, self.frame) = self.stream.read()
                 self.suspended = False
@@ -98,12 +100,12 @@ class WebcamVideoStream(MakesmithInitFuncs):
                 return
             # otherwise, read the next frame from the stream
             
-            '''small = cv2.resize(self.frame, (256,192))
+            small = cv2.resize(self.frame, (256,192))
             imgencode = cv2.imencode(".png",small )[1]
             stringData = base64.b64encode(imgencode).decode()
             self.data.cameraImage = stringData
             self.data.cameraImageUpdated = True
-            '''
+            
 
 
     def read(self):
@@ -140,6 +142,14 @@ class WebcamVideoStream(MakesmithInitFuncs):
             self.videoSize = value
             if self.stream is not None:
                 self.setVideoSize()
+        if key == 'cameraSleep' and value != self.cameraSleep:
+            if value<1:
+                print("changing sleep interval")
+                self.cameraSleep = value
+                if self.stream is not None:
+                    self.stopped = True
+                    self.stream.join()
+                    self.start()
 
     def setFPS(self):
         self.stream.set(cv2.CAP_PROP_FPS, self.fps)

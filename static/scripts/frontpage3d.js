@@ -12,7 +12,7 @@ renderer.setSize( w, h );
 
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
-
+var imageShowing = 1
 
 var gcode = new THREE.Group();
 
@@ -417,9 +417,32 @@ function cursorPosition(){
 }
 
 function processCameraMessage(msg){
-    console.log(msg)
-    if(msg.msg=="cameraImageUpdated")
-      $("#cameraDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
+    //console.log(msg)
+    if(msg.msg=="cameraImageUpdated"){
+        var newImg = new Image();
+        if (imageShowing==1)
+        {
+            newImg.onload = function() {
+                //console.log(this.src)
+                document.getElementById("cameraImage2").setAttribute('src',this.src);
+                document.getElementById("cameraDiv2").style.zIndex = "95";
+                document.getElementById("cameraDiv1").style.zIndex = "94";
+                imageShowing = 2
+            }
+        }
+        else
+        {
+            newImg.onload = function() {
+                //console.log(this.src)
+                document.getElementById("cameraImage1").setAttribute('src',this.src);
+                document.getElementById("cameraDiv1").style.zIndex = "95";
+                document.getElementById("cameraDiv2").style.zIndex = "94";
+                imageShowing = 1
+            }
+        }
+        newImg.setAttribute('src', 'data:image/png;base64,'+msg.data)
+      //$("#cameraDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
+    }
     if(msg.msg=="updateCamera")
     {
         if (msg.data=="on"){
@@ -427,6 +450,8 @@ function processCameraMessage(msg){
             $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
             feather.replace();
             console.log("video on");
+            document.getElementById("cameraImage1").style.display = "block"
+            document.getElementById("cameraImage2").style.display = "block"
         }
 
         if (msg.data=="off"){
@@ -434,6 +459,9 @@ function processCameraMessage(msg){
             $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
             feather.replace();
             console.log("video off")
+            document.getElementById("cameraImage1").style.display = "none";
+            document.getElementById("cameraImage2").style.display = "none"
+
         }
     }
 }
