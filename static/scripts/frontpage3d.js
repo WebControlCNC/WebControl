@@ -425,8 +425,13 @@ function processCameraMessage(msg){
             newImg.onload = function() {
                 //console.log(this.src)
                 document.getElementById("cameraImage2").setAttribute('src',this.src);
-                document.getElementById("cameraDiv2").style.zIndex = "95";
-                document.getElementById("cameraDiv1").style.zIndex = "94";
+                if (isMobile){
+                    document.getElementById("mobileCameraDiv2").style.zIndex = "95";
+                    document.getElementById("mobileCameraDiv1").style.zIndex = "94";
+                } else {
+                    document.getElementById("cameraDiv2").style.zIndex = "95";
+                    document.getElementById("cameraDiv1").style.zIndex = "94";
+                }
                 imageShowing = 2
             }
         }
@@ -435,8 +440,13 @@ function processCameraMessage(msg){
             newImg.onload = function() {
                 //console.log(this.src)
                 document.getElementById("cameraImage1").setAttribute('src',this.src);
-                document.getElementById("cameraDiv1").style.zIndex = "95";
-                document.getElementById("cameraDiv2").style.zIndex = "94";
+                if (isMobile){
+                    document.getElementById("mobileCameraDiv1").style.zIndex = "95";
+                    document.getElementById("mobileCameraDiv2").style.zIndex = "94";
+                } else {
+                    document.getElementById("cameraDiv1").style.zIndex = "95";
+                    document.getElementById("cameraDiv2").style.zIndex = "94";
+                }
                 imageShowing = 1
             }
         }
@@ -452,6 +462,8 @@ function processCameraMessage(msg){
             console.log("video on");
             document.getElementById("cameraImage1").style.display = "block"
             document.getElementById("cameraImage2").style.display = "block"
+            if (isMobile)
+                document.getElementById("mobileCameraArea").style.display = "block"
         }
 
         if (msg.data=="off"){
@@ -461,7 +473,8 @@ function processCameraMessage(msg){
             console.log("video off")
             document.getElementById("cameraImage1").style.display = "none";
             document.getElementById("cameraImage2").style.display = "none"
-
+            if (isMobile)
+                document.getElementById("mobileCameraArea").style.display = "none"
         }
     }
 }
