@@ -548,3 +548,15 @@ function processCameraMessage(msg){
         }
     }
 }
+
+function processControllerMessage(msg){
+    if (controllerMessages.length >100)
+        controllerMessages.shift();
+      controllerMessages.push(msg.data);
+      $('#controllerMessage').html('');
+      controllerMessages.forEach(function(message){
+        $('#controllerMessage').append(message+"<br>");
+      });
+      $('#controllerMessage').scrollBottom();
+    });
+}
