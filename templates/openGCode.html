@@ -13,7 +13,7 @@
       <label for="fileSelect">File</label>
       <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
         {% for file in files %}
-          <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file == lastSelectedFile else ''}}>
+          <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
             {{file["file"]}}
           </option>
         {% endfor %}

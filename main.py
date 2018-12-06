@@ -172,6 +172,7 @@ def openGCode():
         app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
         home = app.data.config.getHome()
         app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
+        app.data.config.setValue("Maslow Settings", "openFile", tDir[1])
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
             message = {"status": 200}

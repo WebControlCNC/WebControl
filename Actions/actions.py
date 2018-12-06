@@ -735,7 +735,7 @@ class Actions(MakesmithInitFuncs):
             motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
                 result
             )
-            if motorYoffsetEst == False:
+            if not motorYoffsetEst:
                 return False
             return (
                 motorYoffsetEst,

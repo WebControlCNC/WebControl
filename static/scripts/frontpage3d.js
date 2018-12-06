@@ -5,8 +5,8 @@
 
 
 var renderer = new THREE.WebGLRenderer();
-var w = $("#workarea").width()-10;
-var h = $("#workarea").height()-10;
+var w = $("#workarea").width()-20;
+var h = $("#workarea").height()-20;
 renderer.setSize( w, h );
 //console.log(w)
 
@@ -293,7 +293,6 @@ function gcodeUpdate(msg){
   });
   */
 }
-
 function gcodeUpdateCompressed(msg){
   console.log("updating gcode compressed");
   console.log(gcode.length);
@@ -332,10 +331,81 @@ function gcodeUpdateCompressed(msg){
     gcode.add(gcodeDashed);
     gcode.add(gcodeUndashed);
     scene.add(gcode);
+    console.log(gcodeUndashed);
   }
   $("#fpCircle").hide();
 
 }
+/*
+function gcodeUpdateCompressed(msg){
+
+  //This routine was an attempt at seeing if individual line segments could be stored such
+  //that we could change their color as the cut progresses.  It worked on small gcode but
+  //crashed on a large file.  will need to find another way.
+  console.log("updating gcode compressed");
+  console.log(gcode.length);
+  if (gcode.children.length!=0) {
+    for (var i = gcode.children.length -1; i>=0; i--){
+        gcode.remove(gcode.children[i]);
+    }
+  }
+
+
+  var gcodeLineSegments = new THREE.Geometry();
+  var gcodeDashedLineSegments = new THREE.Geometry();
+
+  var gcodeDashed = []
+  var gcodeUndashed = []
+
+  index1 = 0
+  index2 = 0
+  if (msg.data!=null){
+    var uncompressed = pako.inflate(msg.data);
+    var _str = ab2str(uncompressed);
+    var data = JSON.parse(_str)
+    var pX, pY, pZ = -99999.9
+    data.forEach(function(line) {
+      if (line.type=='line'){
+        //console.log("Line length="+line.points.length+", dashed="+line.dashed);
+        if (line.dashed==true) {
+          line.points.forEach(function(point) {
+            gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+            if (index1 != 0) {
+                gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+                gcodeDashed[index1]=new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
+                gcodeDashed[index1].computeLineDistances();
+                gcodeDashedLineSegments = new THREE.Geometry();
+            }
+            index1=index1+1
+          })
+        } else {
+          line.points.forEach(function(point) {
+            gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+            if (index2 != 0) {
+                gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+                gcodeUndashed[index2]=new THREE.Line(gcodeLineSegments, blueLineMaterial)
+                gcodeUndashedLineSegments = new THREE.Geometry();
+            }
+            index2=index2+1
+          })
+        }
+      }
+    });
+    //gcode.move(originX,originY)
+    gcodeDashed.forEach(function(line){
+        gcode.add(line);
+    })
+    gcodeUndashed.forEach(function(line){
+        gcode.add(line);
+    })
+
+
+    scene.add(gcode);
+  }
+  $("#fpCircle").hide();
+
+}
+*/
 
 function ab2str(buf) {
     var bufView = new Uint16Array(buf);

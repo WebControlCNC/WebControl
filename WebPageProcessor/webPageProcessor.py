@@ -116,6 +116,7 @@ class WebPageProcessor:
             return page, "Camera Settings", False, "medium", "content"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"

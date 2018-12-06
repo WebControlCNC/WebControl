@@ -82,8 +82,10 @@ class SerialPortThread(MakesmithInitFuncs):
     def _setupMachineUnits(self):
         if self.data.units == "INCHES":
             self.data.gcode_queue.put("G20 ")
+            self.data.console_queue.put("Sent G20")
         else:
             self.data.gcode_queue.put("G21 ")
+            self.data.console_queue.put("Sent G21")
 
     def _requestSettingsUpdate(self):
         self.data.gcode_queue.put("$$")
