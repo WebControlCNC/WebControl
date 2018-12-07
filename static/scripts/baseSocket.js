@@ -28,14 +28,42 @@
 
       });
 
+      $("#notificationModal").on('hidden.bs.modal', function(e){
+          var name = $('#notificationModal').data('name');
+          socket.emit('modalClosed', {data:name});
+      });
+
+      $("#actionModal").on('hidden.bs.modal', function(e){
+          var name = $('#actionModal').data('name');
+          socket.emit('actionModalClosed', {data:name});
+      });
+
+      $("#contentModal").on('hidden.bs.modal', function(e){
+          var name = $('#contentModal').data('name');
+          socket.emit('contentModalClosed', {data:name});
+      });
+
+      //TODO: convert to message
+      socket.on('calibrationMessage', function(msg){
+          processCalibrationMessage(msg)
+      });
+
+      //TODO: convert to message
+      socket.on('cameraMessage', function(msg){
+          processCameraMessage(msg)
+      });
+
+
       socket.on('message', function(msg){
           //console.log(msg);
           switch(msg.command) {
             case 'controllerMessage':
-                processControllerMessage(msg.message);
+                //completed
+                processControllerMessage(msg.data);
                 break;
             case 'controllerStatus':
-                processControllerStatus(msg.message);
+                //completed
+                processControllerStatus(msg.data);
                 break;
             case 'calibrationMessage':
                 processCalibrationMessage(msg.message);
@@ -44,48 +72,78 @@
                 processCameraMessage(msg.message);
                 break;
             case 'positionMessage':
-                processPositionMessage(msg.message)
+                //completed
+                data = JSON.parse(msg.data);
+                processPositionMessage(data)
                 if (typeof processPositionMessageOptical === "function") {
-                     processPositionMessageOptical(msg.message)
+                     processPositionMessageOptical(data)
                 }
                 break;
             case 'homePositionMessage':
-                processHomePositionMessage(msg.message);
+                //completed
+                data = JSON.parse(msg.data);
+                processHomePositionMessage(data);
                 break;
             case 'gcodePositionMessage':
-                processGCodePositionMessage(msg.message);
+                //completed
+                data = JSON.parse(msg.data);
+                processGCodePositionMessage(data);
                 break;
             case 'activateModal':
-                processActivateModal(msg.message);
+                //completed
+                data = JSON.parse(msg.data);
+                processActivateModal(data);
                 break;
             case 'requestedSetting':
-                processRequestedSetting(msg.message);
+                //completed
+                data = JSON.parse(msg.data);
+                processRequestedSetting(data);
                 break;
             case 'updateDirectories':
-                updateDirectories(msg.message);
+                //completed
+                data = JSON.parse(msg.data);
+                updateDirectories(data);
                 break;
             case 'gcodeUpdate':
                 gcodeUpdate(msg.message);
                 break;
             case 'showFPSpinner':
+                //completed
                 showFPSpinner(msg.message);
                 break;
             case 'gcodeUpdateCompressed':
-                gcodeUpdateCompressed(msg.message);
+
+                gcodeUpdateCompressed(msg.data);
                 break;
             case 'updatePorts':
-                updatePorts(msg.message);
+                //completed
+                if (typeof updatePorts === "function") {
+                    data = JSON.parse(msg.data)
+                    updatePorts(data);
+                }
                 break;
             case 'closeModals':
-                closeModals(msg.message);
+                //completed
+                data=JSON.parse(msg.data)
+                closeModals(data);
                 break;
             case 'closeActionModals':
-                closeActionModals(msg.message);
+                //completed
+                data=JSON.parse(msg.data)
+                closeActionModals(data);
                 break;
             case 'closeContentModals':
-                closeActionModals(msg.message);
+                //completed
+                data=JSON.parse(msg.data)
+                closeActionModals(data);
                 break;
           }
+      });
+        /*
+
+      socket.on('gcodeUpdate', function(msg){
+        console.log("gcodeUpdate Message Received")
+        gcodeUpdate(msg);
       });
 
       socket.on('controllerMessage', function(msg){
@@ -101,6 +159,7 @@
 
 
       socket.on('controllerStatus', function(msg){
+        console.log("oldControllerStatus")
         msg = JSON.parse(msg);
         console.log(msg.status);
         if (msg.status=="disconnected"){
@@ -115,16 +174,9 @@
           $("#mobileControllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
         }
       });
+        */
 
-      socket.on('calibrationMessage', function(msg){
-          processCalibrationMessage(msg)
-      });
-
-      socket.on('cameraMessage', function(msg){
-          processCameraMessage(msg)
-      });
-
-      socket.on('positionMessage', function(msg){
+      /*socket.on('positionMessage', function(msg){
           processPositionMessage(msg)
           if (typeof processPositionMessageOptical === "function") {
                processPositionMessageOptical(msg)
@@ -216,26 +268,26 @@
 
 
       socket.on('requestedSetting', function(msg){
+        console.log("oldRequestedSetting"+msg.toString());
+
         processRequestedSetting(msg);
       });
 
+
       socket.on('updateDirectories', function(msg){
+        console.log("oldUpdateDirectories")
         updateDirectories(msg);
       });
-
-      socket.on('gcodeUpdate', function(msg){
-        console.log("gcodeUpdate Message Received")
-        gcodeUpdate(msg);
-      });
-
+        */
+    /*
       socket.on('showFPSpinner', function(msg){
-        console.log("showFPSpinner")
+        console.log("oldshowFPSpinner")
         showFPSpinner(msg);
       });
 
 
       socket.on('gcodeUpdateCompressed', function(msg){
-        console.log("gcodeUpdate Compressed Message Received")
+        console.log("old gcodeUpdate Compressed Message Received")
         gcodeUpdateCompressed(msg);
       });
 
@@ -248,6 +300,7 @@
       });
 
       socket.on('closeModals', function(msg){
+        console.log("oldcloseModals")
         console.log("received notice to close: "+msg.data.title);
         console.log("active modal has name: "+$("#notificationModal").data('name'));
         if ($('#notificationModal').data('name') == msg.data.title)
@@ -258,6 +311,7 @@
       });
 
       socket.on('closeActionModals', function(msg){
+        console.log("oldcloseActionModals")
         if ($('#actionModal').data('name') == msg.data.title)
         {
           $('#actionModal').modal('hide');
@@ -265,28 +319,12 @@
       });
 
       socket.on('closeContentModals', function(msg){
+        console.log("oldcloseContentModals")
         if ($('#contentModal').data('name') == msg.data.title)
         {
           $('#contentModal').modal('hide');
          }
       });
+    */
 
-
-      $("#notificationModal").on('hidden.bs.modal', function(e){
-          var name = $('#notificationModal').data('name');
-          //console.log("modal "+name+" is closing");
-          socket.emit('modalClosed', {data:name});
-      });
-
-      $("#actionModal").on('hidden.bs.modal', function(e){
-          var name = $('#actionModal').data('name');
-          //console.log("action modal "+name+" is closing");
-          socket.emit('actionModalClosed', {data:name});
-      });
-
-      $("#contentModal").on('hidden.bs.modal', function(e){
-          var name = $('#contentModal').data('name');
-          console.log("content modal "+name+" is closing");
-          socket.emit('contentModalClosed', {data:name});
-      });
   }

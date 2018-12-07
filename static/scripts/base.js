@@ -9,37 +9,34 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 }
 
 
-function processControllerStatus(msg){
-    msg = JSON.parse(msg);
-    console.log(msg.status);
-    if (msg.status=="disconnected"){
+function processControllerStatus(data){
+    if (data.status=="disconnected"){
       $("#controllerStatus").text("Not Connected");
       $("#controllerStatus").removeClass('btn-success').removeClass('btn-secondary').addClass('btn-outline-danger');
       $("#mobileControllerStatus").removeClass('btn-success').removeClass('btn-secondary').addClass('btn-outline-danger');
     }
     else
     {
-      $("#controllerStatus").text(msg.port);
+      $("#controllerStatus").text(data.port);
       $("#controllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
       $("#mobileControllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
     }
 }
 
-function processActivateModal(msg){
-
+function processActivateModal(data){
     var $modal, $modalTitle, $modalText
-    if (msg.modalType == "content"){
+    if (data.modalType == "content"){
       $modal = $('#contentModal');
       $modalDialog = $('#contentDialog');
       $modalTitle = $('#contentModalTitle');
       $modalText = $('#contentModalText');
     }
-    else if (msg.modalType == "alarm") {
+    else if (data.modalType == "alarm") {
       $modal = $('#alarmModal');
       $modalDialog = $('#alarmDialog');
       $modalTitle = $('#alarmModalTitle');
       $modalText = $('#alarmModalText');
-      if (msg.resume=="clear"){
+      if (data.resume=="clear"){
           $('#clearButton').show();
       } else {
           $('#clearButton').hide();
@@ -50,17 +47,17 @@ function processActivateModal(msg){
       $modalDialog = $('#notificationDialog');
       $modalTitle = $('#notificationModalTitle');
       $modalText = $('#notificationModalText');
-      if (msg.resume=="resume"){
+      if (data.resume=="resume"){
         $('#resumeButton').show();
       } else {
         $('#resumeButton').hide();
       }
-      if (msg.progress=="true"){
+      if (data.progress=="true"){
         $('#progressBarDiv').show();
       } else {
         $('#progressBarDiv').hide();
       }
-      if (msg.progress=="spinner"){
+      if (data.progress=="spinner"){
         $('#notificationCircle').show();
       } else {
         $('#notificationCircle').hide();
@@ -69,23 +66,23 @@ function processActivateModal(msg){
     $modalDialog.removeClass('modal-lg');
     $modalDialog.removeClass('modal-sm');
     $modalDialog.removeClass('mw-100 w-75');
-    if (msg.modalSize=="large"){
+    if (data.modalSize=="large"){
       if (isMobile)
         $modalDialog.addClass('modal-lg');
       else
         $modalDialog.addClass('mw-100 w-75');
     }
-    if (msg.modalSize=="medium")
+    if (data.modalSize=="medium")
       $modalDialog.addClass('modal-lg');
-    if (msg.modalSize=="small")
+    if (data.modalSize=="small")
       $modalDialog.addClass('modal-sm');
     $modal.data('bs.modal',null);
-    $modal.data('name',msg.title);
+    $modal.data('name',data.title);
 
-    $modalTitle.html("<h3>"+msg.title+"</h3");
-    $modalText.html("<p>"+msg.message+"</p>");
+    $modalTitle.html("<h3>"+data.title+"</h3");
+    $modalText.html("<p>"+data.message+"</p>");
 
-    if (msg.isStatic==true){
+    if (data.isStatic==true){
         console.log("Static Modal")
         $modal.modal({backdrop: 'static', keyboard: false})
     } else {
@@ -94,22 +91,22 @@ function processActivateModal(msg){
     $modalText.scrollTop(0);
 }
 
-function closeModals(msg){
-    if ($('#notificationModal').data('name') == msg.data.title)
+function closeModals(data){
+    if ($('#notificationModal').data('name') == data.title)
     {
       $('#notificationModal').modal('hide');
     }
 }
 
-function closeActionModals(msg){
-    if ($('#actionModal').data('name') == msg.data.title)
+function closeActionModals(data){
+    if ($('#actionModal').data('name') == data.title)
     {
       $('#actionModal').modal('hide');
     }
 }
 
-function closeContentModals(msg){
-    if ($('#contentModal').data('name') == msg.data.title)
+function closeContentModals(data){
+    if ($('#contentModal').data('name') == data.title)
     {
       $('#contentModal').modal('hide');
     }

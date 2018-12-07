@@ -25,48 +25,5 @@
 {% endblock %}
 
 {% block javascript %}
-<script>
-
-function updateDirectories(msg){
-   var json = JSON.parse(msg.data);
-   var directory = json.directory;
-   console.log(directory);
-   $("#directorySelect").append($("<option></option>").attr("value",directory).text(directory));
-   $("#directorySelect option[value="+directory+"]").prop('selected', 'selected');
-   $("#newDirectory").val("");
-}
-
-$(document).ready(function () {
-
-    $('#newDirectoryButton').on('click',function(){ //bind click handler
-        event.preventDefault();
-        directory=$("#newDirectory").val();
-        action("createDirectory",directory);
-     });
-
-    $('#gcodeForm').on('submit', function(e) {
-        e.preventDefault();
-
-        var formdata = new FormData(this);
-
-        $.ajax({
-            url : '/uploadGCode',
-            type: "POST",
-            data: formdata,
-            mimeTypes:"multipart/form-data",
-            contentType: false,
-            cache: false,
-            processData: false,
-            success: function (data) {
-              console.log("success");
-                $('#contentModal').modal('toggle')
-                checkForGCodeUpdate();
-            },
-            error: function (jXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            }
-        });
-    });
-});
-</script>
+<script src="{{ url_for('static',filename='scripts/uploadGCode.js', version='11102020a') }}" crossorigin="anonymous"></script>
 {% endblock %}

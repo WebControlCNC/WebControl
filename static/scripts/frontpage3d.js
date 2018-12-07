@@ -209,66 +209,47 @@ function pauseRun(){
   }
 }
 
-function processRequestedSetting(msg){
+function processRequestedSetting(data){
   //console.log(msg);
-  if (msg.setting=="pauseButtonSetting"){
-    if(msg.value=="Resume")
+  if (data.setting=="pauseButtonSetting"){
+    if(data.value=="Resume")
         $('#pauseButton').removeClass('btn-warning').addClass('btn-info');
     else
         $('#pauseButton').removeClass('btn-info').addClass('btn-warning');
-    $("#pauseButton").text(msg.value);
+    $("#pauseButton").text(data.value);
   }
-  if (msg.setting=="units"){
-    console.log("requestedSetting:"+msg.value);
-    $("#units").text(msg.value)
+  if (data.setting=="units"){
+    console.log("requestedSetting:"+data.value);
+    $("#units").text(data.value)
   }
-  if (msg.setting=="distToMove"){
-    console.log("requestedSetting for distToMove:"+msg.value);
-    $("#distToMove").val(msg.value)
+  if (data.setting=="distToMove"){
+    console.log("requestedSetting for distToMove:"+data.value);
+    $("#distToMove").val(data.value)
   }
-  if ((msg.setting=="unitsZ") || (msg.setting=="distToMoveZ")){
+  if ((data.setting=="unitsZ") || (data.setting=="distToMoveZ")){
     if (typeof processZAxisRequestedSetting === "function") {
-       processZAxisRequestedSetting(msg)
+       processZAxisRequestedSetting(data)
     }
   }
 }
 
-function processPositionMessage(msg){
-  var _json = JSON.parse(msg.data);
-  $('#positionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2)+' ZPos:'+parseFloat(_json.zval).toFixed(2));
-  $('#percentComplete').html(_json.pcom)
-  $('#machineState').html(_json.state)
-  /*if (_json.state=="Stopped")
-      if ($("#stopButton").hasClass("btn-danger"))
-          $("#stopButton").removeClass('btn-danger').addClass('btn-info');
-  else
-      if ($("#stopButton").hasClass("btn-info"))
-          $("#stopButton").removeClass('btn-info').addClass('btn-danger');
-
-  if (_json.state=="Paused")
-      if ($("#pauseButton").hasClass("btn-warning"))
-          $("#pauseButton").removeClass('btn-warning').addClass('btn-info');
-  else
-      if ($("#pauseButton").hasClass("btn-info"))
-          $("#pauseButton").removeClass('btn-info').addClass('btn-warning');
-  */
-  positionUpdate(_json.xval,_json.yval,_json.zval);
+function processPositionMessage(data){
+  $('#positionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' ZPos:'+parseFloat(data.zval).toFixed(2));
+  $('#percentComplete').html(data.pcom)
+  $('#machineState').html(data.state)
+  positionUpdate(data.xval,data.yval,data.zval);
 }
 
-function processHomePositionMessage(msg){
-  var _json = JSON.parse(msg.data);
-  //console.log(_json.xval)
-  $('#homePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
-  homePositionUpdate(_json.xval,_json.yval);
+function processHomePositionMessage(data){
+  $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  homePositionUpdate(data.xval,data.yval);
 }
 
-function processGCodePositionMessage(msg){
-  var _json = JSON.parse(msg.data);
-  //console.log(_json.xval)
-  $('#gcodePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
-  $('#gcodeLine').html(_json.gcodeLine);
-  $('#gcodeLineIndex').val(_json.gcodeLineIndex)
-  gcodePositionUpdate(_json.xval,_json.yval);
+function processGCodePositionMessage(data){
+  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  $('#gcodeLine').html(data.gcodeLine);
+  $('#gcodeLineIndex').val(data.gcodeLineIndex)
+  gcodePositionUpdate(data.xval,data.yval);
 }
 
 function gcodeUpdate(msg){
@@ -293,7 +274,7 @@ function gcodeUpdate(msg){
   });
   */
 }
-function gcodeUpdateCompressed(msg){
+function gcodeUpdateCompressed(data){
   console.log("updating gcode compressed");
   console.log(gcode.length);
   if (gcode.children.length!=0) {
@@ -305,8 +286,8 @@ function gcodeUpdateCompressed(msg){
   var gcodeLineSegments = new THREE.Geometry();
   var gcodeDashedLineSegments = new THREE.Geometry();
 
-  if (msg.data!=null){
-    var uncompressed = pako.inflate(msg.data);
+  if (data!=null){
+    var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
     var pX, pY, pZ = -99999.9
@@ -549,14 +530,13 @@ function processCameraMessage(msg){
     }
 }
 
-function processControllerMessage(msg){
+function processControllerMessage(data){
     if (controllerMessages.length >100)
         controllerMessages.shift();
-      controllerMessages.push(msg.data);
-      $('#controllerMessage').html('');
-      controllerMessages.forEach(function(message){
+    controllerMessages.push(data);
+    $('#controllerMessage').html('');
+    controllerMessages.forEach(function(message){
         $('#controllerMessage').append(message+"<br>");
-      });
-      $('#controllerMessage').scrollBottom();
     });
+    $('#controllerMessage').scrollBottom();
 }

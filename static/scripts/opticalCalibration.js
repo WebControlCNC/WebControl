@@ -55,9 +55,6 @@ function positionUpdateOptical(x,y,z){
 
 }
 
-function processPositionMessageOptical(msg){
-
-  var json = JSON.parse(msg.data);
-  //$('#positionMessageOptical').html('<p>XPos:'+json.xval+' Ypos:'+json.yval+' ZPos:'+json.zval+'</p>');
-  positionUpdateOptical(json.xval,json.yval,json.zval);
+function processPositionMessageOptical(data){
+  positionUpdateOptical(data.xval,data.yval,data.zval);
 }

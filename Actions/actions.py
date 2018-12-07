@@ -859,14 +859,17 @@ class Actions(MakesmithInitFuncs):
 
     def createDirectory(self, _directory):
         try:
+
             home = self.data.config.getHome()
             directory = home + "/.WebControl/gcode/" + _directory
             if not os.path.isdir(directory):
                 print("creating "+directory)
                 os.mkdir(directory)
-            data = {"directory": _directory}
+            print(_directory)
+            data = json.dumps({"directory": _directory});
+            print(data)
             self.data.ui_queue.put(
-                "Action: updateDirectories:_" + json.dumps(data)
+                "Action: updateDirectories:_" + data
             )
         except Exception as e:
             print(e)
