@@ -32,7 +32,7 @@ function processCalibrationMessage(msg)
         if (data[1]!="0"){
             $("#leftChainDefault").text(data[1]+"...");
         } else {
-            $("#leftChainDefault").text(data[1]+"Left Chain To Default");
+            $("#leftChainDefault").text("Left Chain To Default");
         }
     }
     if(data[0]=="right")
@@ -40,7 +40,7 @@ function processCalibrationMessage(msg)
         if (data[1]!="0"){
             $("#rightChainDefault").text(data[1]+"...");
         } else {
-            $("#rightChainDefault").text(data[1]+"Right Chain To Default");
+            $("#rightChainDefault").text("Right Chain To Default");
         }
     }
 

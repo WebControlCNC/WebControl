@@ -3,14 +3,18 @@ import math
 
 
 class TriangularCalibration(MakesmithInitFuncs):
+
     def cutTestPaternTriangular(self):
 
         workspaceHeight = float(
             self.data.config.getValue("Maslow Settings", "bedHeight")
         )
         workspaceWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))
-
-        self.data.units = "MM"
+        oldUnits = self.data.units
+        #self.data.units = "MM"
+        if oldUnits!="MM":
+            self.data.actions.updateSetting("toMM", 0, True):
+        
         self.data.gcode_queue.put("G21 ")
         self.data.gcode_queue.put("G90 ")  # Switch to absolute mode
         self.data.gcode_queue.put("G40 ")
@@ -61,6 +65,11 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         self.data.gcode_queue.put("G90 ")  # Switch back to absolute mode
         self.data.gcode_queue.put("G0 X0 Y0 ")  # Move to home location
+        
+        if oldUnits == "INCHES":
+            #self.data.units = "INCHES"
+            self.data.actions.updateSetting("toInches", 0, True):
+
 
     def calculate(self, result):
         """
@@ -581,7 +590,7 @@ class TriangularCalibration(MakesmithInitFuncs):
                 self.data.console_queue.put("Estimated values out of range, trying again with smaller steps")
 
         if n == numberOfIterations:
-            self.data.message_queue.put(
+            self.data.ui_queue.put(
                 "Message: The machine was not able to be calibrated. Please ensure the work area dimensions are correct and try again."
             )
             self.data.console_queue.put("Machine parameters could not be determined")
