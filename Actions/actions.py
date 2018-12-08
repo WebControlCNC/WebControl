@@ -15,6 +15,9 @@ import datetime
 
 class Actions(MakesmithInitFuncs):
     def processAction(self, msg):
+        if msg["data"]["command"] == "cutTriangularCalibrationPattern":
+            if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
+                self.data.ui_queue.put("Message: Error with cutting triangular calibration pattern.")
         if msg["data"]["command"] == "resetChainLengths":
             if not self.resetChainLengths():
                 self.data.ui_queue.put("Message: Error with resetting chain lengths.")

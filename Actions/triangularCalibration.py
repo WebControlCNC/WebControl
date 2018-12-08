@@ -4,7 +4,7 @@ import math
 
 class TriangularCalibration(MakesmithInitFuncs):
 
-    def cutTestPaternTriangular(self):
+    def cutTriangularCalibrationPattern(self):
 
         workspaceHeight = float(
             self.data.config.getValue("Maslow Settings", "bedHeight")
@@ -13,7 +13,7 @@ class TriangularCalibration(MakesmithInitFuncs):
         oldUnits = self.data.units
         #self.data.units = "MM"
         if oldUnits!="MM":
-            self.data.actions.updateSetting("toMM", 0, True):
+            self.data.actions.updateSetting("toMM", 0, True)
         
         self.data.gcode_queue.put("G21 ")
         self.data.gcode_queue.put("G90 ")  # Switch to absolute mode
@@ -68,7 +68,7 @@ class TriangularCalibration(MakesmithInitFuncs):
         
         if oldUnits == "INCHES":
             #self.data.units = "INCHES"
-            self.data.actions.updateSetting("toInches", 0, True):
+            self.data.actions.updateSetting("toInches", 0, True)
 
 
     def calculate(self, result):
