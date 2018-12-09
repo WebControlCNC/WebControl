@@ -33,6 +33,11 @@
     height: 80px;
 }
 
+#notificationModal {
+    z-index: 1051;
+}
+
+
 
 .loader {
     width: calc(100% - 0px);

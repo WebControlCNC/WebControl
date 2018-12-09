@@ -15,198 +15,204 @@ import datetime
 
 class Actions(MakesmithInitFuncs):
     def processAction(self, msg):
-        if msg["data"]["command"] == "cutTriangularCalibrationPattern":
-            if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
-                self.data.ui_queue.put("Message: Error with cutting triangular calibration pattern.")
-        if msg["data"]["command"] == "resetChainLengths":
-            if not self.resetChainLengths():
-                self.data.ui_queue.put("Message: Error with resetting chain lengths.")
-        elif msg["data"]["command"] == "createDirectory":
-            if not self.createDirectory(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with creating directory.")
-        elif msg["data"]["command"] == "move":
-            if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                self.data.ui_queue.put("Message: Error with initiating move.")
-        elif msg["data"]["command"] == "moveTo":
-            if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                self.data.ui_queue.put("Message: Error with initiating move.")
-        elif msg["data"]["command"] == "moveZ":
-            if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                self.data.ui_queue.put("Message: Error with initiating Z-Axis move.")
-        elif msg["data"]["command"] == "reportSettings":
-            self.data.gcode_queue.put("$$")
-        elif msg["data"]["command"] == "home":
-            if not self.home():
-                self.data.ui_queue.put("Message: Error with returning to home.")
-        elif msg["data"]["command"] == "defineHome":
-            posX= msg["data"]["arg"]
-            posY= msg["data"]["arg1"]
-            if self.defineHome(posX, posY):
-                ## the gcode file might change the active units so we need to inform the UI of the change.
-                self.data.ui_queue.put("Action: unitsUpdate gcodeUpdate")
-            else:
-                self.data.ui_queue.put("Message: Error with defining home.")
-        elif msg["data"]["command"] == "defineZ0":
-            if not self.data.actions.defineZ0():
-                self.data.ui_queue.put("Message: Error with defining Z-Axis zero.")
-        elif msg["data"]["command"] == "stopZ":
-            if not self.stopZ():
-                self.data.ui_queue.put("Message: Error with stopping Z-Axis movement")
-        elif msg["data"]["command"] == "startRun":
-            if not self.startRun():
-                if len(self.data.gcode) > 0:
-                    self.data.ui_queue.put("Message: Error with starting run.")
+        try:
+            if msg["data"]["command"] == "cutTriangularCalibrationPattern":
+                if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
+                    self.data.ui_queue.put("Message: Error with cutting triangular calibration pattern.")
+            elif msg["data"]["command"] == "acceptTriangularCalibrationResults":
+                if not self.data.triangularCalibration.acceptTriangularCalibrationResults():
+                    self.data.ui_queue.put("Message: Error with accepting triangular calibration results.")
+            elif msg["data"]["command"] == "resetChainLengths":
+                if not self.resetChainLengths():
+                    self.data.ui_queue.put("Message: Error with resetting chain lengths.")
+            elif msg["data"]["command"] == "createDirectory":
+                if not self.createDirectory(msg["data"]["arg"]):
+                    self.data.ui_queue.put("Message: Error with creating directory.")
+            elif msg["data"]["command"] == "move":
+                if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue.put("Message: Error with initiating move.")
+            elif msg["data"]["command"] == "moveTo":
+                if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue.put("Message: Error with initiating move.")
+            elif msg["data"]["command"] == "moveZ":
+                if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue.put("Message: Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "reportSettings":
+                self.data.gcode_queue.put("$$")
+            elif msg["data"]["command"] == "home":
+                if not self.home():
+                    self.data.ui_queue.put("Message: Error with returning to home.")
+            elif msg["data"]["command"] == "defineHome":
+                posX= msg["data"]["arg"]
+                posY= msg["data"]["arg1"]
+                if self.defineHome(posX, posY):
+                    ## the gcode file might change the active units so we need to inform the UI of the change.
+                    self.data.ui_queue.put("Action: unitsUpdate gcodeUpdate")
                 else:
-                    self.data.ui_queue.put("Message: No GCode file loaded.")
-        elif msg["data"]["command"] == "stopRun":
-            if not self.stopRun():
-                self.data.ui_queue.put("Message: Error with stopping run")
-        elif msg["data"]["command"] == "moveToDefault":
-            if not self.moveToDefault():
-                self.data.ui_queue.put(
-                    "Message: Error with moving to default chain lengths"
-                )
-        elif msg["data"]["command"] == "testMotors":
-            if not self.testMotors():
-                self.data.ui_queue.put("Message: Error with testing motors")
-        elif msg["data"]["command"] == "wipeEEPROM":
-            if not self.wipeEEPROM(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with wiping EEPROM")
-        elif msg["data"]["command"] == "pauseRun":
-            if not self.pauseRun():
-                self.data.ui_queue.put("Message: Error with pausing run")
-        elif msg["data"]["command"] == "resumeRun":
-            if not self.resumeRun():
-                self.data.ui_queue.put("Message: Error with resuming run")
-        elif msg["data"]["command"] == "returnToCenter":
-            if not self.returnToCenter():
-                self.data.ui_queue.put("Message: Error with returning to center")
-        elif msg["data"]["command"] == "clearGCode":
-            if self.clearGCode():
-                # send blank gcode to UI
-                self.data.ui_queue.put("Action: gcodeUpdate")
-                # socketio.emit("gcodeUpdate", {"data": ""}, namespace="/MaslowCNC")
-            else:
-                self.data.ui_queue.put("Message: Error with clearing gcode")
-        elif msg["data"]["command"] == "moveGcodeZ":
-            if not self.moveGcodeZ(int(msg["data"]["arg"])):
-                self.data.ui_queue.put("Message: Error with moving to Z move")
-        elif msg["data"]["command"] == "moveGcodeGoto":
-            if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
-                self.data.ui_queue.put("Message: Error with moving to Z move")
-        elif msg["data"]["command"] == "moveGcodeIndex":
-            if not self.moveGcodeIndex(int(msg["data"]["arg"])):
-                self.data.ui_queue.put("Message: Error with moving to index")
-        elif msg["data"]["command"] == "setSprockets":
-            if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
-                self.data.ui_queue.put("Message: Error with setting sprocket")
-        elif msg["data"]["command"] == "setSprocketsAutomatic":
-            if not self.setSprocketsAutomatic():
-                self.data.ui_queue.put(
-                    "Message: Error with setting sprockets automatically"
-                )
-        elif msg["data"]["command"] == "setSprocketsZero":
-            if not self.setSprocketsZero():
-                self.data.ui_queue.put(
-                    "Message: Error with setting sprockets zero value"
-                )
-        elif msg["data"]["command"] == "setSprocketsDefault":
-            if not self.setSprocketsDefault():
-                self.data.ui_queue.put(
-                    "Message: Error with setting sprockets as default"
-                )
-        elif msg["data"]["command"] == "updatePorts":
-            if not self.updatePorts():
-                self.data.ui_queue.put("Message: Error with updating list of ports")
-        elif msg["data"]["command"] == "macro1":
-            if not self.macro(1):
-                self.data.ui_queue.put("Message: Error with performing macro")
-        elif msg["data"]["command"] == "macro2":
-            if not self.macro(2):
-                self.data.ui_queue.put("Message: Error with performing macro")
-        elif msg["data"]["command"] == "optical_onStart":
-            if not self.data.opticalCalibration.on_Start():
-                self.data.ui_queue.put(
-                    "Message: Error with starting optical calibration"
-                )
-        elif msg["data"]["command"] == "optical_Calibrate":
-            if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-                self.data.ui_queue.put(
-                    "Message: Error with starting optical calibration"
-                )
-        elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
-            if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
-                self.data.ui_queue.put(
-                    "Message: Error with saving optical calibration configuration"
-                )
-        elif msg["data"]["command"] == "stopOpticalCalibration":
-            if not self.data.opticalCalibration.stopOpticalCalibration():
-                self.data.ui_queue.put("Message: Error with stopping optical calibration.")
-        elif msg["data"]["command"] == "testOpticalCalibration":
-            if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with test image.")
-        elif msg["data"]["command"] == "findCenterOpticalCalibration":
-            if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with find Center.")
-        elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
-            if not self.data.opticalCalibration.saveAndSend():
-                self.data.ui_queue.put("Message: Error with saving and sending calibration matrix.")
-        elif msg["data"]["command"] == "reloadCalibration":
-            errorX, errorY, curveX, curveY = self.data.opticalCalibration.reloadCalibration()
-            if errorX is None or errorY is None or curveX is None or curveY is None:
-                self.data.ui_queue.put("Message: Error with (re)loading calibration.")
-            else:
-                data = {"errorX": errorX, "errorY": errorY}
-                self.data.ui_queue.put(
-                    "Action: updateOpticalCalibrationError:_" + json.dumps(data)
-                )
-                #data = {"curveX": curveX, "curveY": curveY}
-                #self.data.ui_queue.put(
-                #    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
-                #)
-        elif msg["data"]["command"] == "saveCalibrationToCSV":
-            if not self.data.opticalCalibration.saveCalibrationToCSV():
-                self.data.ui_queue.put("Message: Error with saving calibration to CSV.")
-        elif msg["data"]["command"] == "clearCalibration":
-            if not self.data.opticalCalibration.clearCalibration():
-                self.data.ui_queue.put("Message: Error with clearing calibration.")
-        elif msg["data"]["command"] == "curveFitOpticalCalibration":
-            #curveX, curveY = self.data.opticalCalibration.surfaceFit()
-            curveX, curveY = self.data.opticalCalibration.polySurfaceFit()
-            if curveX is None or curveY is None:
-                self.data.ui_queue.put("Message: Error with curve fitting calibration data.")
-            else:
-                data = {"curveX":curveX, "curveY":curveY}
-                self.data.ui_queue.put(
-                    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
-                )
-        elif msg["data"]["command"] == "adjustCenter":
-            if not self.adjustCenter(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with adjusting center.")
-        elif msg["data"]["command"] == "upgradeCustomFirmware":
-            if not self.upgradeFirmware(0):
-                self.data.ui_queue.put("Message: Error with upgrading custom firmware.")
-            else:
-                self.data.ui_queue.put("Message: Custom firmware update complete.")
-        elif msg["data"]["command"] == "upgradeStockFirmware":
-            if not self.upgradeFirmware(1):
-                self.data.ui_queue.put("Message: Error with upgrading stock firmware.")
-            else:
-                self.data.ui_queue.put("Message: Stock firmware update complete.")
-        elif msg["data"]["command"] == "adjustChain":
-            if not self.adjustChain(msg["data"]["arg"]):
-                self.data.ui_queue.put("Message: Error with adjusting chain.")
-        elif msg["data"]["command"] == "toggleCamera":
-            if not self.toggleCamera():
-                self.data.ui_queue.put("Message: Error with toggling camera.")
-        elif msg["data"]["command"] == "statusRequest":
-            if msg["data"]["arg"] == "cameraStatus":
-                if not self.cameraStatus():
+                    self.data.ui_queue.put("Message: Error with defining home.")
+            elif msg["data"]["command"] == "defineZ0":
+                if not self.data.actions.defineZ0():
+                    self.data.ui_queue.put("Message: Error with defining Z-Axis zero.")
+            elif msg["data"]["command"] == "stopZ":
+                if not self.stopZ():
+                    self.data.ui_queue.put("Message: Error with stopping Z-Axis movement")
+            elif msg["data"]["command"] == "startRun":
+                if not self.startRun():
+                    if len(self.data.gcode) > 0:
+                        self.data.ui_queue.put("Message: Error with starting run.")
+                    else:
+                        self.data.ui_queue.put("Message: No GCode file loaded.")
+            elif msg["data"]["command"] == "stopRun":
+                if not self.stopRun():
+                    self.data.ui_queue.put("Message: Error with stopping run")
+            elif msg["data"]["command"] == "moveToDefault":
+                if not self.moveToDefault():
+                    self.data.ui_queue.put(
+                        "Message: Error with moving to default chain lengths"
+                    )
+            elif msg["data"]["command"] == "testMotors":
+                if not self.testMotors():
+                    self.data.ui_queue.put("Message: Error with testing motors")
+            elif msg["data"]["command"] == "wipeEEPROM":
+                if not self.wipeEEPROM(msg["data"]["arg"]):
+                    self.data.ui_queue.put("Message: Error with wiping EEPROM")
+            elif msg["data"]["command"] == "pauseRun":
+                if not self.pauseRun():
+                    self.data.ui_queue.put("Message: Error with pausing run")
+            elif msg["data"]["command"] == "resumeRun":
+                if not self.resumeRun():
+                    self.data.ui_queue.put("Message: Error with resuming run")
+            elif msg["data"]["command"] == "returnToCenter":
+                if not self.returnToCenter():
+                    self.data.ui_queue.put("Message: Error with returning to center")
+            elif msg["data"]["command"] == "clearGCode":
+                if self.clearGCode():
+                    # send blank gcode to UI
+                    self.data.ui_queue.put("Action: gcodeUpdate")
+                    # socketio.emit("gcodeUpdate", {"data": ""}, namespace="/MaslowCNC")
+                else:
+                    self.data.ui_queue.put("Message: Error with clearing gcode")
+            elif msg["data"]["command"] == "moveGcodeZ":
+                if not self.moveGcodeZ(int(msg["data"]["arg"])):
+                    self.data.ui_queue.put("Message: Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeGoto":
+                if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
+                    self.data.ui_queue.put("Message: Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeIndex":
+                if not self.moveGcodeIndex(int(msg["data"]["arg"])):
+                    self.data.ui_queue.put("Message: Error with moving to index")
+            elif msg["data"]["command"] == "setSprockets":
+                if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
+                    self.data.ui_queue.put("Message: Error with setting sprocket")
+            elif msg["data"]["command"] == "setSprocketsAutomatic":
+                if not self.setSprocketsAutomatic():
+                    self.data.ui_queue.put(
+                        "Message: Error with setting sprockets automatically"
+                    )
+            elif msg["data"]["command"] == "setSprocketsZero":
+                if not self.setSprocketsZero():
+                    self.data.ui_queue.put(
+                        "Message: Error with setting sprockets zero value"
+                    )
+            elif msg["data"]["command"] == "setSprocketsDefault":
+                if not self.setSprocketsDefault():
+                    self.data.ui_queue.put(
+                        "Message: Error with setting sprockets as default"
+                    )
+            elif msg["data"]["command"] == "updatePorts":
+                if not self.updatePorts():
+                    self.data.ui_queue.put("Message: Error with updating list of ports")
+            elif msg["data"]["command"] == "macro1":
+                if not self.macro(1):
+                    self.data.ui_queue.put("Message: Error with performing macro")
+            elif msg["data"]["command"] == "macro2":
+                if not self.macro(2):
+                    self.data.ui_queue.put("Message: Error with performing macro")
+            elif msg["data"]["command"] == "optical_onStart":
+                if not self.data.opticalCalibration.on_Start():
+                    self.data.ui_queue.put(
+                        "Message: Error with starting optical calibration"
+                    )
+            elif msg["data"]["command"] == "optical_Calibrate":
+                if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
+                    self.data.ui_queue.put(
+                        "Message: Error with starting optical calibration"
+                    )
+            elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
+                if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
+                    self.data.ui_queue.put(
+                        "Message: Error with saving optical calibration configuration"
+                    )
+            elif msg["data"]["command"] == "stopOpticalCalibration":
+                if not self.data.opticalCalibration.stopOpticalCalibration():
+                    self.data.ui_queue.put("Message: Error with stopping optical calibration.")
+            elif msg["data"]["command"] == "testOpticalCalibration":
+                if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
+                    self.data.ui_queue.put("Message: Error with test image.")
+            elif msg["data"]["command"] == "findCenterOpticalCalibration":
+                if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
+                    self.data.ui_queue.put("Message: Error with find Center.")
+            elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
+                if not self.data.opticalCalibration.saveAndSend():
+                    self.data.ui_queue.put("Message: Error with saving and sending calibration matrix.")
+            elif msg["data"]["command"] == "reloadCalibration":
+                errorX, errorY, curveX, curveY = self.data.opticalCalibration.reloadCalibration()
+                if errorX is None or errorY is None or curveX is None or curveY is None:
+                    self.data.ui_queue.put("Message: Error with (re)loading calibration.")
+                else:
+                    data = {"errorX": errorX, "errorY": errorY}
+                    self.data.ui_queue.put(
+                        "Action: updateOpticalCalibrationError:_" + json.dumps(data)
+                    )
+                    #data = {"curveX": curveX, "curveY": curveY}
+                    #self.data.ui_queue.put(
+                    #    "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
+                    #)
+            elif msg["data"]["command"] == "saveCalibrationToCSV":
+                if not self.data.opticalCalibration.saveCalibrationToCSV():
+                    self.data.ui_queue.put("Message: Error with saving calibration to CSV.")
+            elif msg["data"]["command"] == "clearCalibration":
+                if not self.data.opticalCalibration.clearCalibration():
+                    self.data.ui_queue.put("Message: Error with clearing calibration.")
+            elif msg["data"]["command"] == "curveFitOpticalCalibration":
+                #curveX, curveY = self.data.opticalCalibration.surfaceFit()
+                curveX, curveY = self.data.opticalCalibration.polySurfaceFit()
+                if curveX is None or curveY is None:
+                    self.data.ui_queue.put("Message: Error with curve fitting calibration data.")
+                else:
+                    data = {"curveX":curveX, "curveY":curveY}
+                    self.data.ui_queue.put(
+                        "Action: updateOpticalCalibrationCurve:_" + json.dumps(data)
+                    )
+            elif msg["data"]["command"] == "adjustCenter":
+                if not self.adjustCenter(msg["data"]["arg"]):
+                    self.data.ui_queue.put("Message: Error with adjusting center.")
+            elif msg["data"]["command"] == "upgradeCustomFirmware":
+                if not self.upgradeFirmware(0):
+                    self.data.ui_queue.put("Message: Error with upgrading custom firmware.")
+                else:
+                    self.data.ui_queue.put("Message: Custom firmware update complete.")
+            elif msg["data"]["command"] == "upgradeStockFirmware":
+                if not self.upgradeFirmware(1):
+                    self.data.ui_queue.put("Message: Error with upgrading stock firmware.")
+                else:
+                    self.data.ui_queue.put("Message: Stock firmware update complete.")
+            elif msg["data"]["command"] == "adjustChain":
+                if not self.adjustChain(msg["data"]["arg"]):
+                    self.data.ui_queue.put("Message: Error with adjusting chain.")
+            elif msg["data"]["command"] == "toggleCamera":
+                if not self.toggleCamera():
                     self.data.ui_queue.put("Message: Error with toggling camera.")
-        elif msg["data"]["command"] == "queryCamera":
-            if not self.queryCamera():
-                self.data.ui_queue.put("Message: Error with toggling camera.")
-
+            elif msg["data"]["command"] == "statusRequest":
+                if msg["data"]["arg"] == "cameraStatus":
+                    if not self.cameraStatus():
+                        self.data.ui_queue.put("Message: Error with toggling camera.")
+            elif msg["data"]["command"] == "queryCamera":
+                if not self.queryCamera():
+                    self.data.ui_queue.put("Message: Error with toggling camera.")
+        except Exception as e:
+            print (str(e))
+            
 
     def defineHome(self, posX, posY):
         try:
@@ -734,6 +740,15 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def acceptTriangularKinematicsResults():
+        try:
+            self.data.triangularCalibration.acceptTriangularKinematicsResults()
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+            
     def calibrate(self, result):
         try:
             motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
@@ -747,19 +762,6 @@ class Actions(MakesmithInitFuncs):
                 chainSagCorrectionEst,
                 cut34YoffsetEst,
             )
-            """
-            self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorYoffsetEst))
-            self.data.config.setValue('Advanced Settings', 'rotationRadius', str(rotationRadiusEst))
-            self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(chainSagCorrectionEst))
-
-            # With new calibration parameters return sled to workspace center
-
-            self.data.gcode_queue.put("G21 ")
-            self.data.gcode_queue.put("G90 ")
-            self.data.gcode_queue.put("G40 ")
-            self.data.gcode_queue.put("G0 X0 Y0 ")
-            """
-            return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False

@@ -4,6 +4,10 @@ import math
 
 class TriangularCalibration(MakesmithInitFuncs):
 
+    motorYoffsetEst = 0
+    chainSagCorrectionEst = 0
+    rotationRadiusEst = 0
+    
     def cutTriangularCalibrationPattern(self):
 
         workspaceHeight = float(
@@ -66,7 +70,7 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         self.data.gcode_queue.put("G90 ")  # Switch back to absolute mode
         self.data.gcode_queue.put("G0 X0 Y0 ")  # Move to home location
-
+        return True
 
 
     def calculate(self, result):
@@ -621,6 +625,9 @@ class TriangularCalibration(MakesmithInitFuncs):
             + str(chainSagCorrectionEst)
         )
 
+        self.motorYoffsetEst = motorYoffsetEst
+        self.rotationRadiusEst = rotationRadiusEst
+        self.chainSagCorrectionEst = chainSagCorrectionEst
         # Update machine parameters
         """
         self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorYoffsetEst))
@@ -641,7 +648,17 @@ class TriangularCalibration(MakesmithInitFuncs):
             cut34YoffsetEst,
         )
 
-
+    def acceptTriangularCalibrationResults(self):
+        self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(self.motorYoffsetEst))
+        self.data.config.setValue('Advanced Settings', 'rotationRadius', str(self.rotationRadiusEst))
+        self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(self.chainSagCorrectionEst))
+        
+        self.data.gcode_queue.put("G21 ")
+        self.data.gcode_queue.put("G90 ")
+        self.data.gcode_queue.put("G40 ")
+        self.data.gcode_queue.put("G0 X0 Y0 ")
+        return True
+        
 """
     def switchUnitsT(self):
         if self.unitsBtnT.text == 'Units: mm':
