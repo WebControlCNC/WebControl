@@ -347,8 +347,6 @@ class UIProcessor:
         )
     
     def processMessage(self, _message):
-
-
         msg = json.loads(_message)
         if msg["command"] == "Action":
             socketio.emit("message", {"command": msg["message"], "data": msg["data"]}, namespace="/MaslowCNC")
