@@ -325,9 +325,9 @@ def actionModalClosed(msg):
 def requestPage(msg):
     app.data.logger.resetIdler()
     try:
-        page, title, isStatic, modalSize, modalType = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"], msg["data"]["args"])
+        page, title, isStatic, modalSize, modalType, resume = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"], msg["data"]["args"])
 
-        data = json.dumps({"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType})
+        data = json.dumps({"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType, "resume":resume})
         socketio.emit("message", {"command": "activateModal", "data": data},
             namespace="/MaslowCNC",
         )
@@ -391,20 +391,20 @@ def checkForGCodeUpdate(msg):
     data = json.dumps({"setting": "units", "value": units})
     socketio.emit("message", {"command": "requestedSetting", "data": data}, namespace="/MaslowCNC", )
 
-    enable3D = app.data.config.getValue("WebControl Settings", "enable3D")
+    enable3D = True #app.data.config.getValue("WebControl Settings", "enable3D")
     ## send updated gcode to UI
-    if (enable3D):
-        if app.data.compressedGCode is not None:
-            app.data.console_queue.put("Sending Gcode3D compressed")
-            #socketio.emit("showFPSpinner", {"data": len(app.data.compressedGCode3D)}, namespace="/MaslowCNC")
-            socketio.emit("message", {"command": "showFPSpinner", "data": len(app.data.compressedGCode3D)}, namespace="/MaslowCNC", )
+    #if (enable3D):
+    if app.data.compressedGCode3D is not None:
+        app.data.console_queue.put("Sending Gcode3D compressed")
+        #socketio.emit("showFPSpinner", {"data": len(app.data.compressedGCode3D)}, namespace="/MaslowCNC")
+        socketio.emit("message", {"command": "showFPSpinner", "data": len(app.data.compressedGCode3D)}, namespace="/MaslowCNC", )
 
-            time.sleep(0.25)
-            socketio.emit("message", {"command": "gcodeUpdateCompressed", "data": app.data.compressedGCode3D},
-                          namespace="/MaslowCNC", )
-            #socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode3D}, namespace="/MaslowCNC")
-            app.data.console_queue.put("Sent Gcode3D compressed")
-    else:
+        time.sleep(0.25)
+        socketio.emit("message", {"command": "gcodeUpdateCompressed", "data": app.data.compressedGCode3D},
+                      namespace="/MaslowCNC", )
+        #socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode3D}, namespace="/MaslowCNC")
+        app.data.console_queue.put("Sent Gcode3D compressed")
+    '''else:
         if app.data.compressedGCode is not None:
             app.data.console_queue.put("Sending Gcode compressed")
             #socketio.emit("showFPSpinner", {"data": len(app.data.compressedGCode)}, namespace="/MaslowCNC")
@@ -415,7 +415,7 @@ def checkForGCodeUpdate(msg):
                           namespace="/MaslowCNC", )
             #socketio.emit("gcodeUpdateCompressed", {"data":app.data.compressedGCode}, namespace="/MaslowCNC")
             app.data.console_queue.put("Sent Gcode compressed")
-
+    '''
 
 @socketio.on_error_default
 def default_error_handler(e):

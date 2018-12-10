@@ -1,6 +1,7 @@
 from time import time
 from DataStructures.logger import Logger
 from DataStructures.loggingQueue import LoggingQueue
+from DataStructures.uiQueue import UIQueue
 from config.config import Config
 import queue
 
@@ -111,6 +112,7 @@ class Data:
     """
     message_queue = LoggingQueue(logger)
     ui_queue = queue.Queue()
+    ui_queue1 = UIQueue()
     console_queue = queue.Queue() # used for printing to terminal
     mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
     webMCPActive = False  # start false until WebMCP connects

@@ -44,15 +44,10 @@
       });
 
       //TODO: convert to message
-      socket.on('calibrationMessage', function(msg){
+     /* socket.on('calibrationMessage', function(msg){
           processCalibrationMessage(msg)
       });
-
-      //TODO: convert to message
-      socket.on('cameraMessage', function(msg){
-          processCameraMessage(msg)
-      });
-
+    */
 
       socket.on('message', function(msg){
           //console.log(msg);
@@ -63,13 +58,17 @@
                 break;
             case 'controllerStatus':
                 //completed
-                processControllerStatus(msg.data);
+                data = JSON.parse(msg.data);
+                processControllerStatus(data);
                 break;
             case 'calibrationMessage':
-                processCalibrationMessage(msg.message);
+                data = JSON.parse(msg.data);
+                processCalibrationMessage(data);
                 break;
             case 'cameraMessage':
-                processCameraMessage(msg.message);
+                //completed
+                data = JSON.parse(msg.data);
+                processCameraMessage(data);
                 break;
             case 'positionMessage':
                 //completed
@@ -325,6 +324,14 @@
           $('#contentModal').modal('hide');
          }
       });
+
+
+      socket.on('cameraMessage', function(msg){
+          processCameraMessage(msg)
+      });
+
+
+
     */
 
   }

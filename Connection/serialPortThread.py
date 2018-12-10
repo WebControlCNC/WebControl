@@ -120,8 +120,8 @@ class SerialPortThread(MakesmithInitFuncs):
 
         # check for serial version being > 3
         if float(serial.VERSION[0]) < 3:
-            self.data.ui_queue.put(
-                "Pyserial version 3.x is needed, version "
+            self.data.ui_queue.put("Alert", "Incompability Detected",
+                "Pyserial version 3.x is needed, but version "
                 + serial.VERSION
                 + " is installed"
             )
@@ -145,12 +145,14 @@ class SerialPortThread(MakesmithInitFuncs):
         else:
             #print("\r\nConnected on port " + self.data.comport + "\r\n")
             self.data.console_queue.put("\r\nConnected on port " + self.data.comport + "\r\n")
-            self.data.ui_queue.put(
-                "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
-            )  # the "_" facilitates the parse
-            self.data.ui_queue.put(
-                "\r\nConnected on port " + self.data.comport + "\r\n"
-            )
+            self.data.ui_queue1.put("Action", "connectionStatus", {'status': 'connected', 'port': self.data.comport})
+            #self.data.ui_queue.put(
+            #    "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
+            #)  # the "_" facilitates the parse
+            #self.data.ui_queue.put(
+            #    "\r\nConnected on port " + self.data.comport + "\r\n"
+            #)
+            self.data.ui_queue1.put("TextMessage", "", "Connected on port " + self.data.comport)
             gcode = ""
             msg = ""
             subReadyFlag = True
@@ -238,15 +240,19 @@ class SerialPortThread(MakesmithInitFuncs):
                 if time.time() - self.lastMessageTime > 5:
                     self.data.console_queue.put("Connection Timed Out")
                     #print("Connection Timed Out")
-                    self.data.ui_queue.put("Connection Timed Out\n")
+                    #self.data.ui_queue.put("Connection Timed Out\n")
+                    self.data.ui_queue1.put("TextMessage", "", "Connection Timed Out")
                     if self.data.uploadFlag:
-                        self.data.ui_queue.put(
-                            "Message: USB connection lost. This has likely caused the machine to loose it's calibration, which can cause erratic behavior. It is recommended to stop the program, remove the sled, and perform the chain calibration process. Press Continue to override and proceed with the cut."
-                        )
+                        self.data.ui_queue1.put("Alert", "Connection Lost",
+                                                "Message: USB connection lost. This has likely caused the machine to loose it's calibration, which can cause erratic behavior. It is recommended to stop the program, remove the sled, and perform the chain calibration process. Press Continue to override and proceed with the cut.")
+                        #self.data.ui_queue.put(
+                        #    "Message: USB connection lost. This has likely caused the machine to loose it's calibration, which can cause erratic behavior. It is recommended to stop the program, remove the sled, and perform the chain calibration process. Press Continue to override and proceed with the cut."
+                        #)
                     else:
-                        self.data.ui_queue.put(
-                            "It is possible that the serial port selected is not the one used by the Maslow's Arduino,\nor that the firmware is not loaded on the Arduino."
-                        )
+                        self.data.ui_queue1.put("Alert", "Connection Lost", "It is possible that the serial port selected is not the one used by the Maslow's Arduino, or that the firmware is not loaded on the Arduino.")
+                        #self.data.ui_queue.put(
+                        #    "It is possible that the serial port selected is not the one used by the Maslow's Arduino,\nor that the firmware is not loaded on the Arduino."
+                        #)
                     self.data.connectionStatus = 0
                     self.serialInstance.close()
                     return

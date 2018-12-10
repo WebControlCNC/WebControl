@@ -30,6 +30,11 @@ function processActivateModal(data){
       $modalDialog = $('#contentDialog');
       $modalTitle = $('#contentModalTitle');
       $modalText = $('#contentModalText');
+      if (data.resume=='footerSubmit'){
+        $('#footerSubmit').show();
+      } else {
+        $('#footerSubmit').hide();
+      }
     }
     else if (data.modalType == "alarm") {
       $modal = $('#alarmModal');

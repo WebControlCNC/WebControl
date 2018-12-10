@@ -419,9 +419,10 @@ class OpticalCalibration(MakesmithInitFuncs):
                         self.data.console_queue.put("Calibration Completed")
                         #send ui updated data
                         data = {"errorX": self.calErrorsX.tolist(), "errorY": self.calErrorsY.tolist()}
-                        self.data.ui_queue.put(
-                             "Action: updateOpticalCalibrationError:_" + json.dumps(data)
-                        )
+                        #self.data.ui_queue.put(
+                        #     "Action: updateOpticalCalibrationError:_" + json.dumps(data)
+                        #)
+                        self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
                         self.data.console_queue.put("sent")
                         # self.printCalibrationErrorValue()
                 else:  # vertical
@@ -521,9 +522,10 @@ class OpticalCalibration(MakesmithInitFuncs):
         if avgxB is not None and avgyB is not None:
             # return optical center values, but don't use them until returned by user
             data = {"opticalCenterX": avgxB, "opticalCenterY": avgyB}
-            self.data.ui_queue.put(
-                "Action: updateOpticalCalibrationFindCenter:_" + json.dumps(data)
-            )
+            #self.data.ui_queue.put(
+            #    "Action: updateOpticalCalibrationFindCenter:_" + json.dumps(data)
+            #)
+            self.data.ui_queue1.put("Action", "updateOpticalCalibrationFindCenter", data)
             return True
         return False
 

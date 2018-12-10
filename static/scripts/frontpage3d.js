@@ -467,14 +467,12 @@ function cursorPosition(){
     return(pos);
 }
 
-function processCameraMessage(msg){
-    //console.log(msg)
-    if(msg.msg=="cameraImageUpdated"){
+function processCameraMessage(data){
+    if(data.command=="cameraImageUpdated"){
         var newImg = new Image();
         if (imageShowing==1)
         {
             newImg.onload = function() {
-                //console.log(this.src)
                 document.getElementById("cameraImage2").setAttribute('src',this.src);
                 if (isMobile){
                     document.getElementById("mobileCameraDiv2").style.zIndex = "95";
@@ -489,7 +487,6 @@ function processCameraMessage(msg){
         else
         {
             newImg.onload = function() {
-                //console.log(this.src)
                 document.getElementById("cameraImage1").setAttribute('src',this.src);
                 if (isMobile){
                     document.getElementById("mobileCameraDiv1").style.zIndex = "95";
@@ -501,13 +498,12 @@ function processCameraMessage(msg){
                 imageShowing = 1
             }
         }
-        newImg.setAttribute('src', 'data:image/png;base64,'+msg.data)
-      //$("#cameraDiv").html("<img width='100%' src='data:image/png;base64,"+msg.data+"'></html>");
+        newImg.setAttribute('src', 'data:image/png;base64,'+data.data)
+
     }
-    if(msg.msg=="updateCamera")
+    if(data.command=="updateCamera")
     {
-        if (msg.data=="on"){
-            //$("#videoStatus").html("<i data-feather='video-on'></i>");
+        if (data.data=="on"){
             $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
             feather.replace();
             console.log("video on");
@@ -517,8 +513,7 @@ function processCameraMessage(msg){
                 document.getElementById("mobileCameraArea").style.display = "block"
         }
 
-        if (msg.data=="off"){
-            //$("#videoStatus").html("<i data-feather='video-off'></i>");
+        if (data.data=="off"){
             $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
             feather.replace();
             console.log("video off")
