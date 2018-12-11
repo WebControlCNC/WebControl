@@ -174,7 +174,7 @@ class Logger(MakesmithInitFuncs):
         """
 
         avg = sum(self.errorValues) / len(self.errorValues)
-        self.data.ui_queue.put(
+        self.data.ui_controller_queue.put(
             "Message: The average feedback system error was: " + "%.2f" % avg + "mm"
         )
 

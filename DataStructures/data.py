@@ -107,11 +107,12 @@ class Data:
     zPopupUnits = None
     zStepSizeVal = 0.1
 
+
     """
     Queues
     """
     message_queue = LoggingQueue(logger)
-    ui_queue = queue.Queue()
+    ui_controller_queue = queue.Queue()
     ui_queue1 = UIQueue()
     console_queue = queue.Queue() # used for printing to terminal
     mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
@@ -125,6 +126,7 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    pausedzval = 0.0
 
     previousPosX = 0.0
     previousPosY = 0.0

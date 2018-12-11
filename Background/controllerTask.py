@@ -1,3 +1,4 @@
+'''
 import time
 import math
 import json
@@ -183,3 +184,4 @@ def sendCalibrationMessage(message, data):
     socketio.emit(
         "calibrationMessage", {"msg": message, "data": data}, namespace="/MaslowCNC"
     )
+'''

@@ -592,7 +592,7 @@ class TriangularCalibration(MakesmithInitFuncs):
                 self.data.console_queue.put("Estimated values out of range, trying again with smaller steps")
 
         if n == numberOfIterations:
-            self.data.ui_queue.put(
+            self.data.ui_queue1.put("Alert", "Alert",
                 "Message: The machine was not able to be calibrated. Please ensure the work area dimensions are correct and try again."
             )
             self.data.console_queue.put("Machine parameters could not be determined")

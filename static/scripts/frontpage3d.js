@@ -276,7 +276,6 @@ function gcodeUpdate(msg){
 }
 function gcodeUpdateCompressed(data){
   console.log("updating gcode compressed");
-  console.log(gcode.length);
   if (gcode.children.length!=0) {
     for (var i = gcode.children.length -1; i>=0; i--){
         gcode.remove(gcode.children[i]);
@@ -312,7 +311,7 @@ function gcodeUpdateCompressed(data){
     gcode.add(gcodeDashed);
     gcode.add(gcodeUndashed);
     scene.add(gcode);
-    console.log(gcodeUndashed);
+    //console.log(gcodeUndashed);
   }
   $("#fpCircle").hide();
 

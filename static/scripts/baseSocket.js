@@ -43,36 +43,30 @@
           socket.emit('contentModalClosed', {data:name});
       });
 
-      //TODO: convert to message
-     /* socket.on('calibrationMessage', function(msg){
-          processCalibrationMessage(msg)
-      });
-    */
-
       socket.on('message', function(msg){
-          //console.log(msg);
+          //#console.log(msg.dataFormat);
+          if (msg.dataFormat=='json')
+            data = JSON.parse(msg.data);
+          else
+            data = msg.data;
           switch(msg.command) {
             case 'controllerMessage':
                 //completed
-                processControllerMessage(msg.data);
+                processControllerMessage(data);
                 break;
-            case 'controllerStatus':
+            case 'connectionStatus':
                 //completed
-                data = JSON.parse(msg.data);
                 processControllerStatus(data);
                 break;
             case 'calibrationMessage':
-                data = JSON.parse(msg.data);
                 processCalibrationMessage(data);
                 break;
             case 'cameraMessage':
                 //completed
-                data = JSON.parse(msg.data);
                 processCameraMessage(data);
                 break;
             case 'positionMessage':
                 //completed
-                data = JSON.parse(msg.data);
                 processPositionMessage(data)
                 if (typeof processPositionMessageOptical === "function") {
                      processPositionMessageOptical(data)
@@ -80,27 +74,22 @@
                 break;
             case 'homePositionMessage':
                 //completed
-                data = JSON.parse(msg.data);
                 processHomePositionMessage(data);
                 break;
             case 'gcodePositionMessage':
                 //completed
-                data = JSON.parse(msg.data);
                 processGCodePositionMessage(data);
                 break;
             case 'activateModal':
                 //completed
-                data = JSON.parse(msg.data);
                 processActivateModal(data);
                 break;
             case 'requestedSetting':
                 //completed
-                data = JSON.parse(msg.data);
                 processRequestedSetting(data);
                 break;
             case 'updateDirectories':
                 //completed
-                data = JSON.parse(msg.data);
                 updateDirectories(data);
                 break;
             case 'gcodeUpdate':
@@ -111,35 +100,51 @@
                 showFPSpinner(msg.message);
                 break;
             case 'gcodeUpdateCompressed':
-
-                gcodeUpdateCompressed(msg.data);
+                gcodeUpdateCompressed(data);
                 break;
             case 'updatePorts':
                 //completed
                 if (typeof updatePorts === "function") {
-                    data = JSON.parse(msg.data)
                     updatePorts(data);
                 }
                 break;
             case 'closeModals':
                 //completed
-                data=JSON.parse(msg.data)
                 closeModals(data);
                 break;
             case 'closeActionModals':
                 //completed
-                data=JSON.parse(msg.data)
                 closeActionModals(data);
                 break;
             case 'closeContentModals':
                 //completed
-                data=JSON.parse(msg.data)
                 closeActionModals(data);
                 break;
+            case 'updateOpticalCalibrationCurve':
+                //completed
+                updateOpticalCalibrationCurve(data);
+                break;
+            case 'updateOpticalCalibrationError':
+                //completed
+                updateOpticalCalibrationError(data);
+                break;
+            case 'updateOpticalCalibrationFindCenter':
+                //completed
+                updateOpticalCalibrationFindCenter(data);
+                break;
+            case 'updateCalibrationImage':
+                //completed
+                updateCalibrationImage(data);
+                break;
+
+            default:
+                console.log("!!!!!!");
+                console.log("uncaught action:"+msg.command);
+                console.log("!!!!!!");
           }
       });
-        /*
 
+        /*
       socket.on('gcodeUpdate', function(msg){
         console.log("gcodeUpdate Message Received")
         gcodeUpdate(msg);
@@ -328,6 +333,10 @@
 
       socket.on('cameraMessage', function(msg){
           processCameraMessage(msg)
+      });
+
+     socket.on('calibrationMessage', function(msg){
+          processCalibrationMessage(msg)
       });
 
 

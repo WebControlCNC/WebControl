@@ -608,10 +608,14 @@ class OpticalCalibration(MakesmithInitFuncs):
                     dataZX[(7 - y) * 31 + (x + 15)] = self.calErrorsX[x + 15][7 - y]
                     dataZY[(7 - y) * 31 + (x + 15)] = self.calErrorsY[x + 15][7 - y]
             mx = self.polyFit2D(dataX, dataY, dataZX)
+            print("mx=")
             print(mx)
+            _mx = mx.tolist()
             my = self.polyFit2D(dataX, dataY, dataZY)
-            print(mx)
-            return mx, my
+            print("my=")
+            print(my)
+            _my = my.tolist()
+            return _mx, _my
         except Exception as e:
             print(e)
             return None, None
@@ -648,8 +652,8 @@ class OpticalCalibration(MakesmithInitFuncs):
                     dataX[(7 - y) * 31 + (x + 15)][2] = self.calErrorsX[x + 15][7 - y]
                     dataY[(7 - y) * 31 + (x + 15)][2] = self.calErrorsY[x + 15][7 - y]
             # surface fit X Errors
-            xA = np.c_[np.ones(dataX.shape[0]), dataX[:, :], np.prod(dataX[:, :2], axis=1), dataX[:, :2] ** 2]
-            self.data.console_queue.put(str(xA))
+            xA = np.c_[np.ones(dataX.shape[0]), dataX[:, :2], np.prod(dataX[:, :2], axis=1), dataX[:, :2] ** 2]
+            #self.data.console_queue.put(str(xA))
             self.xCurve, _, _, _ = np.linalg.lstsq(xA, dataX[:, 2], rcond=None)
             xB = dataX[:, 2]
             xSStot = ((xB - xB.mean()) ** 2).sum()
@@ -669,11 +673,12 @@ class OpticalCalibration(MakesmithInitFuncs):
                 yR2 = 1.0 - ySSres / ySStot
             else:
                 yR2 = 0.0
-
+            print("xcurve")
             print(self.xCurve)
-            print(xR2)
+            #print(xR2)
+            print("ycurve")
             print(self.yCurve)
-            print(yR2)
+            #print(yR2)
             return self.xCurve.tolist(), self.yCurve.tolist()
         except Exception as e:
             self.data.console_queue.put(str(e))

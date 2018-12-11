@@ -24,7 +24,7 @@ class UIProcessor:
                     self.activateModal("Notification:",
                                        "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.","notification")
                 if self.app.data.opticalCalibrationImageUpdated is True:
-                    self.sendCalibrationMessage(
+                    self.sendCalibrationImage(
                         "OpticalCalibrationImageUpdated",
                         self.app.data.opticalCalibrationImage,
                     )
@@ -38,14 +38,14 @@ class UIProcessor:
                         self.app.data.cameraImageUpdated = False
                         self.lastCameraTime = time.time()
                 if self.app.data.opticalCalibrationTestImageUpdated is True:
-                    self.sendCalibrationMessage(
+                    self.sendCalibrationImage(
                         "OpticalCalibrationTestImageUpdated",
                         self.app.data.opticalCalibrationTestImage,
                     )
                     self.app.data.opticalCalibrationTestImageUpdated = False
-                while ( not self.app.data.ui_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
-                    if not self.app.data.ui_queue.empty():
-                        message = self.app.data.ui_queue.get()
+                while ( not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
+                    if not self.app.data.ui_controller_queue.empty():
+                        message = self.app.data.ui_controller_queue.get()
                         # send message to web for display in appropriate column
                         zAxisMessage = False
                         if message != "":
@@ -59,200 +59,47 @@ class UIProcessor:
                                     # app.setErrorOnScreen(message)
                             elif message[0:13] == "Maslow Paused":
                                 self.app.data.console_queue.put("caught maslow paused")
-                                #socketio.emit(
-                                #    "requestedSetting",
-                                #    {"setting": "pauseButtonSetting", "value": "Resume"},
-                                #    namespace="/MaslowCNC",
-                                #)
+                                self.app.data.uploadFlag = 0
+                                self.app.data.quick_queue.put("~")
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
-                                socketio.emit("message", {"command": "requestedSetting", "data": data},
+                                socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                                               namespace="/MaslowCNC", )
 
                             elif message[0:12] == "Tool Change:":
+                                self.app.data.manualZAxisAdjust = True
+                                self.app.data.previousUploadStatus = self.app.data.uploadFlag
+                                self.app.data.pausedzval = self.app.data.zval
                                 self.app.data.console_queue.put("found tool change in message")
-                                self.activateModal("Notification:", message[13:],"notification", resume="resume")
+                                self.activateModal("Notification:", message[13:], "notification", resume="resume")
                             elif message[0:13] == "showFPSpinner":
-                                socketio.emit("message", {"command": "showFPSpinner", "data": ""},
+                                socketio.emit("message", {"command": "showFPSpinner", "data": "", "dataFormat": "json"},
                                               namespace="/MaslowCNC", )
-                                #socketio.emit("showFPSpinner", {"data": ""}, namespace="/MaslowCNC")
-                            elif message[0:12] == "closeModals:":
-                                msg = message.split("_")
-                                #socketio.emit(
-                                #    "closeModals",
-                                #    {"data": {"title": msg[1]}},
-                                #    namespace="/MaslowCNC",
-                                #)
-                                data = json.dumps({"title":msg[1]})
-                                socketio.emit("message", {"command": "closeModals", "data": data},
-                                              namespace="/MaslowCNC", )
+                            #elif message[0:12] == "closeModals:":
+                            #    msg = message.split("_")
+                            #    data = json.dumps({"title":msg[1]})
+                            #    socketio.emit("message", {"command": "closeModals", "data": data, "dataFormat": "json"},
+                            #                  namespace="/MaslowCNC", )
 
                             elif message[0:8] == "Message:":
                                 if message.find("adjust Z-Axis") != -1:
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
-                                    #socketio.emit(
-                                    #    "requestedSetting",
-                                    #    {"setting": "pauseButtonSetting", "value": "Resume"},
-                                    #    namespace="/MaslowCNC",
-                                    #)
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 else:
                                     self.activateModal("Notification:", message[9:], "notification")
-                            elif message[0:16] == "ProgressMessage:":
-                                    self.activateModal("Notification:", message[17:], "notification", progress="enable")
-                            elif message[0:15] == "SpinnerMessage:":
-                                    self.activateModal("Notification:", message[15:], "notification", progress="spinner")
-                            elif message[0:7] == "Action:":
-                                if message.find("updateDirectories") != -1:
-                                    msg = message.split(
-                                        "_"
-                                    )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                                    #socketio.emit(
-                                    #    "updateDirectories",
-                                    #    {"data": msg[1]},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                    print(msg[1])
-                                    socketio.emit("message", {"command": "updateDirectories", "data": msg[1]},
-                                                  namespace="/MaslowCNC", )
-                                if message.find("unitsUpdate") != -1:
-                                    units = self.app.data.config.getValue(
-                                        "Computed Settings", "units"
-                                    )
-                                    #socketio.emit(
-                                    #    "requestedSetting",
-                                    #    {"setting": "units", "value": units},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                    data = json.dumps({"setting": "units", "value": units})
-                                    socketio.emit("message", {"command": "requestedSetting", "data": data},
-                                                  namespace="/MaslowCNC", )
-                                if message.find("distToMoveUpdate") != -1:
-                                    units = self.app.data.config.getValue(
-                                        "Computed Settings", "distToMove"
-                                    )
-                                    #socketio.emit(
-                                    #    "requestedSetting",
-                                    #    {"setting": "distToMove", "value": units},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                    data = json.dumps({"setting": "distToMove", "value": units})
-                                    socketio.emit("message", {"command": "requestedSetting", "data": data},
-                                                  namespace="/MaslowCNC", )
-                                if message.find("gcodeUpdate") != -1:
-                                    if self.app.data.compressedGCode is not None:
-                                        enable3D = self.app.data.config.getValue("WebControl Settings", "enable3D")
-                                        if enable3D:
-                                            #self.app.data.console_queue.put("sending compressed")
-                                            #socketio.emit("gcodeUpdateCompressed", {"data":self.app.data.compressedGCode3D}, namespace="/MaslowCNC")
-                                            self.app.data.console_queue.put("Sending Gcode compressed")
-                                            socketio.emit("message", {"command": "showFPSpinner",
-                                                                      "data": len(self.app.data.compressedGCode3D)},
-                                                          namespace="/MaslowCNC", )
-                                            time.sleep(0.25)
-                                            socketio.emit("message", {"command": "gcodeUpdateCompressed",
-                                                                      "data": self.app.data.compressedGCode3D},
-                                                          namespace="/MaslowCNC", )
-                                            self.app.data.console_queue.put("Sent Gcode compressed")
-                                        else:
-                                            #self.app.data.console_queue.put("sending compressed3D")
-                                            #socketio.emit("gcodeUpdateCompressed", {"data": self.app.data.compressedGCode}, namespace="/MaslowCNC")
-                                            self.app.data.console_queue.put("Sending Gcode compressed")
-                                            socketio.emit("message", {"command": "showFPSpinner",
-                                                                      "data": len(self.app.data.compressedGCode)},
-                                                          namespace="/MaslowCNC", )
-                                            time.sleep(0.25)
-                                            socketio.emit("message", {"command": "gcodeUpdateCompressed",
-                                                                      "data": self.app.data.compressedGCode},
-                                                          namespace="/MaslowCNC", )
-                                            self.app.data.console_queue.put("Sent Gcode compressed")
-
-
-                                if message.find("setAsPause") != -1:
-                                    #socketio.emit(
-                                    #    "requestedSetting",
-                                    #    {"setting": "pauseButtonSetting", "value": "Pause"},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                    data = json.dumps({"setting": "pauseButtonSetting", "value": "Pause"})
-                                    socketio.emit("message", {"command": "requestedSetting", "data": data},
-                                                  namespace="/MaslowCNC", )
-                                if message.find("setAsResume") != -1:
-                                    #socketio.emit(
-                                    #    "requestedSetting",
-                                    #    {"setting": "pauseButtonSetting", "value": "Resume"},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                    data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
-                                    socketio.emit("message", {"command": "requestedSetting", "data": data},
-                                                  namespace="/MaslowCNC", )
-                                if message.find("positionUpdate") != -1:
-                                    msg = message.split(
-                                        "_"
-                                    )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                                    socketio.emit("message", {"command": "positionMessage", "data": msg[1]},
-                                                  namespace="/MaslowCNC")
-                                    #socketio.emit(
-                                    #    "positionMessage",
-                                    #    {"data": msg[1]},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                if message.find("homePositionMessage") != -1:
-                                    msg = message.split(
-                                        "_"
-                                    )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                                    self.app.data.console_queue.put("sending home position update")
-                                    socketio.emit(
-                                        "message",
-                                        {"command":"homePositionMessage","data": msg[1]},
-                                        namespace="/MaslowCNC",
-                                    )
-
-                                if message.find("gcodePositionUpdate") != -1:
-                                    msg = message.split(
-                                        "_"
-                                    )  # everything to the right of the "_" should be the position data already json.dumps'ed
-                                    socketio.emit(
-                                        "message",
-                                        {"command":"gcodePositionMessage","data": msg[1]},
-                                        namespace="/MaslowCNC",
-                                    )
-
-                                    #socketio.emit(
-                                    #    "gcodePositionMessage",
-                                    #    {"data": msg[1]},
-                                    #    namespace="/MaslowCNC",
-                                    #)
-                                if message.find("updatePorts") != -1:
-                                    data = json.dumps(self.app.data.comPorts)
-                                    #socketio.emit(
-                                    #    "updatePorts", {"data": ports}, namespace="/MaslowCNC"
-                                    #)
-                                    socketio.emit(
-                                        "message",
-                                        {"command":"updatePorts","data": data},
-                                        namespace="/MaslowCNC",
-                                    )
-
-                                #if message.find("connectionStatus") != -1:
+                            #elif message[0:16] == "ProgressMessage:":
+                            #        self.activateModal("Notification:", message[17:], "notification", progress="enable")
+                            #elif message[0:15] == "SpinnerMessage:":
+                            #        self.activateModal("Notification:", message[15:], "notification", progress="spinner")
+                            #elif message[0:7] == "Action:":
+                                #if message.find("updateOpticalCalibrationCurve") != -1:
                                 #    msg = message.split("_")
-                                #    socketio.emit("message",{"command":"controllerStatus", "data":msg[1]}, namespace="/MaslowCNC")
-
-                                if message.find("updateOpticalCalibrationCurve") != -1:
-                                    msg = message.split("_")
-                                    self.sendCalibrationMessage("updateOpticalCalibrationCurve", msg[1])
+                                #    self.sendCalibrationMessage("updateOpticalCalibrationCurve", msg[1])
                                 #if message.find("updateOpticalCalibrationError") != -1:
                                 #    msg = message.split("_")
                                 #    self.sendCalibrationMessage("updateOpticalCalibrationError", msg[1])
-                                if message.find("updateOpticalCalibrationFindCenter") != -1:
-                                    msg = message.split("_")
-                                    self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
-                                if message.find("updateTimer") != -1:
-                                    msg = message.split("_")
-                                    self.sendCalibrationMessage("updateTimer", msg[1])
-                                if message.find("updateCamera") != -1:
-                                    msg = message.split("_")
-                                    self.sendCameraMessage("updateCamera", msg[1])
-
+                                #if message.find("updateOpticalCalibrationFindCenter") != -1:
+                                #    msg = message.split("_")
+                                #    self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
                                     #change color of stop button
@@ -315,43 +162,85 @@ class UIProcessor:
 
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
         data = json.dumps({"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType})
-        socketio.emit("message",{"command":"activateModal","data":data},
+        socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
             namespace="/MaslowCNC",
         )
 
     def sendControllerMessage(self, message):
-        socketio.emit("message", {"command": "controllerMessage", "data": message},
+        socketio.emit("message", {"command": "controllerMessage", "data": json.dumps(message), "dataFormat": "json"},
                       namespace="/MaslowCNC")
         #socketio.emit(
         #    "controllerMessage", {"data": message}, namespace="/MaslowCNC"
         #)
 
     def sendPositionMessage(self, position):
-        socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position)},
+        socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
-    def sendCalibrationMessage(self, message, _data):
 
-        data = json.dumps({"command": message, "data": _data})
-
-        socketio.emit(
-            "message", {"command": "calibrationMessage", "data": data}, namespace="/MaslowCNC"
-        )
-    
     def sendCameraMessage(self, message, _data=""):
 
         data = json.dumps({"command": message, "data": _data})
 
         socketio.emit(
-            "message", {"command":"cameraMessage", "data": data}, namespace="/MaslowCNC"
+            "message", {"command":"cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
         )
-    
+
+    def sendGcodeUpdate(self):
+        if self.app.data.compressedGCode3D is not None:
+            self.app.data.console_queue.put("Sending Gcode compressed")
+            socketio.emit("message", {"command": "showFPSpinner",
+                                      "data": len(self.app.data.compressedGCode3D), "dataFormat": "int"},
+                          namespace="/MaslowCNC", )
+            time.sleep(0.25)
+            socketio.emit("message", {"command": "gcodeUpdateCompressed",
+                                      "data": self.app.data.compressedGCode3D, "dataFormat": "base64"},
+                          namespace="/MaslowCNC", )
+            self.app.data.console_queue.put("Sent Gcode compressed")
+
+    def unitsUpdate(self):
+        units = self.app.data.config.getValue(
+            "Computed Settings", "units"
+        )
+        data = json.dumps({"setting": "units", "value": units})
+        socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
+                      namespace="/MaslowCNC", )
+    def distToMoveUpdate(self):
+        distToMove = self.app.data.config.getValue(
+            "Computed Settings", "distToMove"
+        )
+        data = json.dumps({"setting": "distToMove", "value": distToMove})
+        socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
+                      namespace="/MaslowCNC", )
+
     def processMessage(self, _message):
         msg = json.loads(_message)
         if msg["command"] == "Action":
-            socketio.emit("message", {"command": msg["message"], "data": msg["data"]}, namespace="/MaslowCNC")
+            if msg["message"] == "gcodeUpdate":
+                self.sendGcodeUpdate()
+            elif msg["message"] == "unitsUpdate":
+                self.unitsUpdate()
+            elif msg["message"] == "distToMoveUpdate":
+                self.distToMoveUpdate()
+            elif msg["message"] == "updateTimer":
+                #Todo: clean this up
+                self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
+            elif msg["message"] == "updateCamera":
+                self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
+            else:
+                if msg["message"] == "setAsPause":
+                    msg["message"] = "requestedSetting"
+                    msg["data"] = json.dumps({"setting": "pauseButtonSetting", "value": "Pause"})
+                elif msg["message"] == "setAsResume":
+                    msg["message"] = "requestedSetting"
+                    msg["data"] = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
+                elif msg["message"] == "updatePorts":
+                    msg["data"] = json.dumps(self.app.data.comPorts)
+                elif msg["message"] == "closeModals":
+                    msg["data"] = json.dumps({"title": msg["data"]})
+                socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"}, namespace="/MaslowCNC")
         elif msg["command"] == "TextMessage":
-            socketio.emit("message", {"command": "controllerMessage", "data": msg["data"]},
+            socketio.emit("message", {"command": "controllerMessage", "data": msg["data"], "dataFormat": "json"},
                           namespace="/MaslowCNC")
         elif msg["command"] == "Alert":
             #if message.find("adjust Z-Axis") != -1:
@@ -359,5 +248,13 @@ class UIProcessor:
             #    self.activateModal("Notification:", message[9:], "notification", resume="resume")
             #else:
             self.activateModal(msg["message"], msg["data"], "notification")
+        elif msg["command"] == "SpinnerMessage":
+            self.activateModal("Notification:", msg["data"], "notification", progress="spinner")
 
+    def sendCalibrationImage(self, message, _data):
 
+        data = json.dumps({"command": message, "data": _data})
+
+        socketio.emit(
+            "message", {"command": "updateCalibrationImage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+        )

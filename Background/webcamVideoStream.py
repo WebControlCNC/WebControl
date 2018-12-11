@@ -77,7 +77,8 @@ class WebcamVideoStream(MakesmithInitFuncs):
             self.th.daemon = True
             self.th.start()
             print("Camera thread started")
-            self.data.ui_queue.put("Action:updateCamera_on")
+            #self.data.ui_queue.put("Action:updateCamera_on")
+            self.data.ui_queue1.put("Action", "updateCamera", "on")
         else:
             print("Camera already started")
         return self
@@ -91,13 +92,15 @@ class WebcamVideoStream(MakesmithInitFuncs):
                 self.suspended = False
             else:
                 if self.suspended == False:
-                    self.data.ui_queue.put("Action:updateCamera_off")
+                    #self.data.ui_queue.put("Action:updateCamera_off")
+                    self.data.ui_queue1.put("Action", "updateCamera", "off")
                 self.suspended=True
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
                 self.stream.release()
                 self.stream = None
-                self.data.ui_queue.put("Action:updateCamera_off")
+                #self.data.ui_queue.put("Action:updateCamera_off")
+                self.data.ui_queue1.put("Action", "updateCamera", "off")
                 return
             # otherwise, read the next frame from the stream
             if self.frame is not None:
@@ -113,7 +116,8 @@ class WebcamVideoStream(MakesmithInitFuncs):
         if self.suspended:
             (self.grabbed, self.frame) = self.stream.read()
             self.suspended = False
-            self.data.ui_queue.put("Action:updateCamera_on")
+            #self.data.ui_queue.put("Action:updateCamera_on")
+            self.data.ui_queue1.put("Action", "updateCamera", "on")
         self.lastCameraRead = time.time()
         
         if self.stopped:

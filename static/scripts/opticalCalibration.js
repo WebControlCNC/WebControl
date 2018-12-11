@@ -101,41 +101,53 @@ function process(processName){
 
 
 function processCalibrationMessage(data){
-    if(data.command=="updateOpticalCalibrationFindCenter"){
-      data = JSON.parse(data.data)
-      console.log(data)
-      $("#opticalCenterX").val(data.opticalCenterX.toFixed(2))
-      $("#opticalCenterY").val(data.opticalCenterY.toFixed(2))
-    }
-    if(data.command=="OpticalCalibrationImageUpdated")
-      $("#imageDiv").html("<img width='100%' src='data:image/png;base64,"+data.data+"'></html>");
-    if(data.command=="OpticalCalibrationTestImageUpdated")
-      $("#testImageDiv").html("<img width='100%' src='data:image/png;base64,"+data.data+"'></html>");
-    if(data.command=="updateOpticalCalibrationCurve"){
-      data = JSON.parse(data.data);
-      xCurve = data.curveX;
-      yCurve = data.curveY;
-      $('#curveChartButton').removeClass('btn-secondary').addClass('btn-primary');
-      $('#curveFitButton').removeClass('btn-primary').addClass('btn-secondary');
-    }
-    if(data.command=="updateOpticalCalibrationError"){
-      data = JSON.parse(data.data);
-      var x = data.errorX;
-      var y = data.errorY;
-      xErrorPlot = document.getElementById('xErrorPlot');
-      yErrorPlot = document.getElementById('yErrorPlot');
-      for(var i = 0; i<15; i++){
+    console.log("!!!!!!")
+    console.log("Uncaught processCalibrationMessage");
+    console.log("!!!!!!")
+}
+
+function updateOpticalCalibrationFindCenter(data){
+    //data = JSON.parse(data.data)
+    console.log(data)
+    $("#opticalCenterX").val(data.opticalCenterX.toFixed(2))
+    $("#opticalCenterY").val(data.opticalCenterY.toFixed(2))
+}
+
+function updateCalibrationImage(data){
+    //console.log(data)
+    //data = JSON.parse(data)
+    if (data.command=="OpticalCalibrationImageUpdated")
+        $("#imageDiv").html("<img width='100%' src='data:image/png;base64,"+data.data+"'></html>");
+    if (data.command=="OpticalCalibrationTestImageUpdated")
+        $("#testImageDiv").html("<img width='100%' src='data:image/png;base64,"+data.data+"'></html>");
+}
+
+function updateOpticalCalibrationCurve(data) {
+    console.log(data)
+    xCurve = data.curveX;
+    yCurve = data.curveY;
+    $('#curveChartButton').removeClass('btn-secondary').addClass('btn-primary');
+    $('#curveFitButton').removeClass('btn-primary').addClass('btn-secondary');
+}
+
+function updateOpticalCalibrationError(data) {
+    //data = JSON.parse(data);
+    console.log(data);
+    var x = data.errorX;
+    var y = data.errorY;
+    xErrorPlot = document.getElementById('xErrorPlot');
+    yErrorPlot = document.getElementById('yErrorPlot');
+    for(var i = 0; i<15; i++){
         _xError[i]=[];
         _yError[i]=[];
         for(var j =0; j<31; j++){
-          _xError[i][j]=x[j][i];
-          _yError[i][j]=y[j][i];
-          _xValues[j]=j;
+            _xError[i][j]=x[j][i];
+            _yError[i][j]=y[j][i];
+            _xValues[j]=j;
         }
-      }
-      $('#errorChartButton').removeClass('btn-secondary').addClass('btn-primary');
-      $('#curveFitButton').removeClass('btn-secondary').addClass('btn-primary');
     }
+    $('#errorChartButton').removeClass('btn-secondary').addClass('btn-primary');
+    $('#curveFitButton').removeClass('btn-secondary').addClass('btn-primary');
 }
 
 function redrawCurveCharts(chart){
@@ -164,6 +176,7 @@ function redrawCurveCharts(chart){
 
       }
 
+      console.log(yCurve)
       for(var i = 0; i<15; i++){
         _y[i]=[]
         for(var j =0; j<31; j++){

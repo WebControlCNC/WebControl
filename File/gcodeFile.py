@@ -124,7 +124,7 @@ class GCodeFile(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             self.data.console_queue.put("Gcode File Error")
-            self.data.ui_queue.put("Message: Cannot open gcode file.")
+            self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
             self.data.gcodeFile.filename = ""
             return False
         self.updateGcode()
@@ -602,15 +602,18 @@ class GCodeFile(MakesmithInitFuncs):
             errorText = (
                 "The current file contains "
                 + str(len(self.data.gcode))
-                + " lines of gcode.\nrendering all "
+                + " lines of gcode.  Rendering all "
                 + str(len(self.data.gcode))
-                + " lines simultaneously may crash the\n program, only the first "
+                + " lines simultaneously may crash the program, therefore, only the first "
                 + str(self.maxNumberOfLinesToRead)
-                + "lines are shown here.\nThe complete program will cut if you choose to do so unless the home position is moved from (0,0)."
+                + "lines are shown here.  The complete program will cut if you choose to do so unless the home position is moved from (0,0)."
             )
             self.data.console_queue.put(errorText)
-            self.data.ui_queue.put("closeModals:_Notification:")
-            self.data.ui_queue.put("Message: " + errorText)
+            #self.data.ui_queue.put("closeModals:_Notification:")
+            #self.data.ui_queue.put("Message: " + errorText)
+            #self.data.ui_queue1.put("Action", "closeModals", "Notification")
+            self.data.ui_queue1.put("Alert", "Alert", errorText)
+
 
         th = threading.Thread(target=self.callBackMechanism)
         th.start()

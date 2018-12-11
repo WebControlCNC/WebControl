@@ -120,7 +120,7 @@ class SerialPortThread(MakesmithInitFuncs):
 
         # check for serial version being > 3
         if float(serial.VERSION[0]) < 3:
-            self.data.ui_queue.put("Alert", "Incompability Detected",
+            self.data.ui_queue1.put("Alert", "Incompability Detected",
                 "Pyserial version 3.x is needed, but version "
                 + serial.VERSION
                 + " is installed"
