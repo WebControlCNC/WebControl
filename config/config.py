@@ -356,6 +356,8 @@ class Config(MakesmithInitFuncs):
         #the *max doesn't work well with really small numbers, like the optical calibration curve values
         #if not c:
         #    print("a="+str(a)+", b="+str(b)+", a-b="+str(abs(a-b))+", tol="+str(rel_tol)+", c="+str(c))
+        if not c:
+            print("a="+str(a)+", b="+str(b))
         return c
 
     def parseErrorArray(self, value, asFloat):

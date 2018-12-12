@@ -40,6 +40,7 @@
 
       $("#contentModal").on('hidden.bs.modal', function(e){
           var name = $('#contentModal').data('name');
+          console.log("closing modal:"+name);
           socket.emit('contentModalClosed', {data:name});
       });
 
@@ -118,7 +119,7 @@
                 break;
             case 'closeContentModals':
                 //completed
-                closeActionModals(data);
+                closeContentModals(data);
                 break;
             case 'updateOpticalCalibrationCurve':
                 //completed

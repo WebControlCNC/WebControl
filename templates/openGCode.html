@@ -2,7 +2,7 @@
 <div class="container-fluid">
   <form class="form" id="gcodeForm" method="post" enctype=multipart/form-data>
     <div class="form-group">
-      <label for="directorySelect">Upload Directory</label>
+      <label for="directorySelect">Selected Directory</label>
       <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
         {% for directory in directories %}
           <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>

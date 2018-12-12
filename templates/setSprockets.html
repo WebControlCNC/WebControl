@@ -119,21 +119,21 @@
   </div>
   <div class="row">
     <div class="col mb-1">
-      <button disabled type="button" id="leftChainDefault" class="btn btn-lg btn-secondary btn-block" onclick="action('adjustChain','left')">Left Chain To Default</button>
+      <button disabled type="button" id="leftChainDefault" class="btn btn-lg btn-secondary btn-block" onclick="action('adjustChain','left')">Extend Left To {{chainExtendLength}} mm</button>
     </div>
     <div class="col mb-1">
-      <button disabled type="button" id="rightChainDefault" class="btn btn-lg btn-secondary btn-block" onclick="action('adjustChain', 'right')">Right Chain To Default</button>
+      <button disabled type="button" id="rightChainDefault" class="btn btn-lg btn-secondary btn-block" onclick="action('adjustChain', 'right')">Extend Right To {{chainExtendLength}} mm</button>
     </div>
   </div>
   <div class="row">
     <div class="col mb-1">
-      <button type="button" class="btn btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
+      <button type="button" class="btn bn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
     </div>
   </div>
 
   <div class="row">
     <div class="col mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault')">Set At Default</button>
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault')">Manually Set Chains At {{chainExtendLength}} mm</button>
     </div>
   </div>
 </div>

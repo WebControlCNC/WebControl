@@ -71,14 +71,14 @@
             "value": "Bottom"
         },
         {
-            "default": 1650,
+            "default": 1651,
             "desc": "The length in mm that will be extended during chain calibration\ndefault setting: 1650",
             "firmwareKey": 11,
             "key": "chainExtendLength",
             "section": "Advanced Settings",
             "title": "Extend Chain Distance",
             "type": "string",
-            "value": "1650"
+            "value": "1651"
         },
         {
             "default": 3360,

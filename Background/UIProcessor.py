@@ -46,11 +46,8 @@ class UIProcessor:
                 while ( not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
                     if not self.app.data.ui_controller_queue.empty():
                         message = self.app.data.ui_controller_queue.get()
-                        # send message to web for display in appropriate column
-                        zAxisMessage = False
                         if message != "":
                             if message[0] == "<":
-                                # print message
                                 self.setPosOnScreen(message)
                             elif message[0] == "[":
                                 if message[1:4] == "PE:":
@@ -64,51 +61,25 @@ class UIProcessor:
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                                               namespace="/MaslowCNC", )
-
                             elif message[0:12] == "Tool Change:":
                                 self.app.data.manualZAxisAdjust = True
                                 self.app.data.previousUploadStatus = self.app.data.uploadFlag
                                 self.app.data.pausedzval = self.app.data.zval
                                 self.app.data.console_queue.put("found tool change in message")
                                 self.activateModal("Notification:", message[13:], "notification", resume="resume")
-                            elif message[0:13] == "showFPSpinner":
-                                socketio.emit("message", {"command": "showFPSpinner", "data": "", "dataFormat": "json"},
-                                              namespace="/MaslowCNC", )
-                            #elif message[0:12] == "closeModals:":
-                            #    msg = message.split("_")
-                            #    data = json.dumps({"title":msg[1]})
-                            #    socketio.emit("message", {"command": "closeModals", "data": data, "dataFormat": "json"},
-                            #                  namespace="/MaslowCNC", )
-
                             elif message[0:8] == "Message:":
                                 if message.find("adjust Z-Axis") != -1:
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 else:
                                     self.activateModal("Notification:", message[9:], "notification")
-                            #elif message[0:16] == "ProgressMessage:":
-                            #        self.activateModal("Notification:", message[17:], "notification", progress="enable")
-                            #elif message[0:15] == "SpinnerMessage:":
-                            #        self.activateModal("Notification:", message[15:], "notification", progress="spinner")
-                            #elif message[0:7] == "Action:":
-                                #if message.find("updateOpticalCalibrationCurve") != -1:
-                                #    msg = message.split("_")
-                                #    self.sendCalibrationMessage("updateOpticalCalibrationCurve", msg[1])
-                                #if message.find("updateOpticalCalibrationError") != -1:
-                                #    msg = message.split("_")
-                                #    self.sendCalibrationMessage("updateOpticalCalibrationError", msg[1])
-                                #if message.find("updateOpticalCalibrationFindCenter") != -1:
-                                #    msg = message.split("_")
-                                #    self.sendCalibrationMessage("updateOpticalCalibrationFindCenter", msg[1])
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
-                                    #change color of stop button
                                     pass
                                 self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
                                 pass  # displaying all the 'ok' messages clutters up the display
                             else:
-                                #print("UIProcessor:"+message)
                                 self.sendControllerMessage(message)
                     if not self.app.data.ui_queue1.empty():
                         message = self.app.data.ui_queue1.get()
@@ -155,9 +126,7 @@ class UIProcessor:
             "pcom": percentComplete,
             "state": state
         }
-        
-        #print("upload="+str(self.app.data.uploadFlag)+", gInd="+str(self.app.data.gcodeIndex)+", gco_qu"+str(self.app.data.gcode_queue.qsize()))
-        
+
         self.sendPositionMessage(position)
 
     def activateModal(self, title, message, modalType, resume="false", progress="false"):

@@ -178,8 +178,9 @@ class WebPageProcessor:
             page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
             return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
+            chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            page = render_template("setSprockets.html")
+            page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
             return page, "Set Sprockets", False, "medium", "content", False
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
@@ -195,7 +196,7 @@ class WebPageProcessor:
                 rotationRadius=rotationRadius,
                 chainSagCorrection=chainSagCorrection,
             )
-            return page, "Triangular Calibration", True, "large", "content", False
+            return page, "Triangular Calibration", True, "medium", "content", False
         elif pageID == "opticalCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")

@@ -604,7 +604,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             for y in range(7, -8, -1):
                 for x in range(-15, 16, +1):
                     dataX[(7 - y) * 31 + (x + 15)] = float(x * 3.0 * 25.4)
-                    dataY[(7 - y) * 31 + (x + 15)] = float(x * 3.0 * 25.4)
+                    dataY[(7 - y) * 31 + (x + 15)] = float(y * 3.0 * 25.4)
                     dataZX[(7 - y) * 31 + (x + 15)] = self.calErrorsX[x + 15][7 - y]
                     dataZY[(7 - y) * 31 + (x + 15)] = self.calErrorsY[x + 15][7 - y]
             mx = self.polyFit2D(dataX, dataY, dataZX)
@@ -621,7 +621,7 @@ class OpticalCalibration(MakesmithInitFuncs):
             return None, None
 
 
-    def polyFit2D(self, x, y, z, order = 2):
+    def polyFit2D(self, x, y, z, order = 4):
         ncols = (order + 1) ** 2
         G = np.zeros((x.size, ncols))
         #ij = itertools.product(range(order + 1), range(order + 1))
