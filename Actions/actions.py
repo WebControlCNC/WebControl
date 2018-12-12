@@ -840,24 +840,28 @@ class Actions(MakesmithInitFuncs):
         return None, None
 
     def upgradeFirmware(self, version):
-        if version == 0:
-            #self.data.ui_queue.put("SpinnerMessage: Custom Firmware Update in Progress, Please Wait.")
-            self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
-            path = "/firmware/madgrizzle/*.hex"
-        if version == 1:
-            #self.data.ui_queue.put("SpinnerMessage: Stock Firmware Update in Progress, Please Wait.")
-            self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
-            path = "/firmware/maslowcnc/*.hex"
-        time.sleep(.5)
-        for filename in glob.glob(path):
-            port = self.data.comport
-            print(filename)
-            cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
-            #cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
-            os.system(cmd)
-            #self.data.ui_queue.put("closeModals:_Notification:")
-            self.data.ui_queue1.put("Action", "closeModals", "Notification")
-            return True
+        try:
+            if version == 0:
+                #self.data.ui_queue.put("SpinnerMessage: Custom Firmware Update in Progress, Please Wait.")
+                self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
+                path = "/firmware/madgrizzle/*.hex"
+            if version == 1:
+                #self.data.ui_queue.put("SpinnerMessage: Stock Firmware Update in Progress, Please Wait.")
+                self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
+                path = "/firmware/maslowcnc/*.hex"
+            time.sleep(.5)
+            for filename in glob.glob(path):
+                port = self.data.comport
+                print(filename)
+                cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
+                #cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:avr/cnc_ctrl_v1.ino.hex:i"
+                os.system(cmd)
+                #self.data.ui_queue.put("closeModals:_Notification:")
+                self.data.ui_queue1.put("Action", "closeModals", "Notification")
+                return True
+        except Exception as e:
+            self.data.console_log.put(str(e))
+            return False
 
     def createDirectory(self, _directory):
         try:
