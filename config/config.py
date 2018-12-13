@@ -335,15 +335,31 @@ class Config(MakesmithInitFuncs):
                             app.data.gcode_queue.put(
                                 "$" + str(firmwareKey) + "=" + str(storedValue)
                             )
-                        elif not self.isClose(float(storedValue), float(value)):
-                            # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
-                            if not isImporting:
+                        elif firmwareKey >= 47 and firmwareKey <= 58:
+                            if not self.isPercentClose(float(storedValue), float(value)):
+                                if not isImporting:
+                                    app.data.gcode_queue.put(
+                                        "$" + str(firmwareKey) + "=" + str(storedValue)
+                                    )
+                            else:
+                                break
+                        elif not self.isClose(float(storedValue), float(value)) and not isImporting:
                                 app.data.gcode_queue.put(
                                     "$" + str(firmwareKey) + "=" + str(storedValue)
                                 )
                         else:
                             break
         return
+
+    def isPercentClose(self, a, b, rel_tol = 0.0001):
+        if b != 0:
+            c = abs( abs(a/b) - 1.0)
+            if c < rel_tol:
+                return True
+            else:
+                return False
+        else:
+            return self.isClose(a, b)
 
     def isClose(self, a, b, rel_tol=1e-06):
         """
@@ -353,11 +369,6 @@ class Config(MakesmithInitFuncs):
         arduino adapted from https://stackoverflow.com/a/33024979
         """
         c = abs(a - b) <= rel_tol * max(abs(a), abs(b))
-        #the *max doesn't work well with really small numbers, like the optical calibration curve values
-        #if not c:
-        #    print("a="+str(a)+", b="+str(b)+", a-b="+str(abs(a-b))+", tol="+str(rel_tol)+", c="+str(c))
-        if not c:
-            print("a="+str(a)+", b="+str(b))
         return c
 
     def parseErrorArray(self, value, asFloat):
