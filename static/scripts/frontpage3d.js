@@ -289,27 +289,38 @@ function gcodeUpdateCompressed(data){
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
+    console.log(data)
     var pX, pY, pZ = -99999.9
+    var gcodeDashed;
+    var gcodeUndashed;
     data.forEach(function(line) {
       if (line.type=='line'){
         //console.log("Line length="+line.points.length+", dashed="+line.dashed);
         if (line.dashed==true) {
+          var gcodeDashedLineSegments = new THREE.Geometry();
           line.points.forEach(function(point) {
             gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
           })
+          gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
+          gcodeDashed.computeLineDistances();
+          gcode.add(gcodeDashed);
         } else {
+          var gcodeLineSegments = new THREE.Geometry();
           line.points.forEach(function(point) {
             gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
           })
+          gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
+          gcode.add(gcodeUndashed);
+
         }
       }
     });
     //gcode.move(originX,originY)
-    var gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
-    gcodeDashed.computeLineDistances();
-    var gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
-    gcode.add(gcodeDashed);
-    gcode.add(gcodeUndashed);
+    //var gcodeDashed = new THREE.LineSegments(gcodeDashedLineSegments, greenLineDashedMaterial)
+    //gcodeDashed.computeLineDistances();
+    //var gcodeUndashed = new THREE.LineSegments(gcodeLineSegments, blueLineMaterial)
+    //gcode.add(gcodeDashed);
+    //gcode.add(gcodeUndashed);
     scene.add(gcode);
     //console.log(gcodeUndashed);
   }
