@@ -37,13 +37,8 @@ class GCodeFile(MakesmithInitFuncs):
     maxNumberOfLinesToRead = 300000
 
     filename = ""
-    #line = []
     line3D = []
 
-
-    #def serializeGCode(self):
-    #    sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
-    #    return sendStr
 
     def serializeGCode3D(self):
         sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line3D])
@@ -56,8 +51,6 @@ class GCodeFile(MakesmithInitFuncs):
             self.canvasScaleFactor = self.INCHES
 
         filename = self.data.gcodeFile.filename
-        # print(filename)
-        #del self.line[:]
         del self.line3D[:]
         if filename is "":  # Blank the g-code if we're loading "nothing"
             self.data.gcode = ""
@@ -66,9 +59,6 @@ class GCodeFile(MakesmithInitFuncs):
         try:
             filterfile = open(filename, "r")
             rawfilters = filterfile.read()
-            #filtersparsed = re.sub(
-            #    r"\(([^)]*)\)", "\n", rawfilters
-            #)  # replace mach3 style gcode comments with newline
             filtersparsed = rawfilters #get rid of this if above is uncommented)
             filtersparsed = re.sub(
                 r";([^\n]*)\n", "\n", filtersparsed
@@ -120,7 +110,6 @@ class GCodeFile(MakesmithInitFuncs):
                                 self.data.zMoves.append(index)  # - 1)
                         else:
                             self.data.zMoves.append(index)
-            #print("zmoves = "+str(self.data.zMoves))
         except Exception as e:
             self.data.console_queue.put(str(e))
             self.data.console_queue.put("Gcode File Error")
@@ -189,23 +178,12 @@ class GCodeFile(MakesmithInitFuncs):
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
 
-            # Draw lines for G1 and G0
-            # with self.scatterObject.canvas:
-            # print "Command:"+command
-            # print "#"+gCodeLine+"#"
-            # print "#"+str(self.xPosition/25.4)+", "+str(self.yPosition/25.4)+" - "+str(xTarget/25.4)+", "+str(yTarget/25.4)
             if self.isNotReallyClose(self.xPosition, xTarget) or self.isNotReallyClose(
                 self.yPosition, yTarget
             ):
-                # Color(self.data.drawingColor[0], self.data.drawingColor[1], self.data.drawingColor[2])
 
                 if command == "G00":
                     # draw a dashed line
-                    #self.line.append(Line())  # points = (), width = 1, group = 'gcode')
-                    #self.line[-1].type = "line"
-                    #self.line[-1].dashed = True
-                    #self.addPoint(self.xPosition, self.yPosition)
-                    #self.addPoint(xTarget, yTarget)
 
                     self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line3D[-1].type = "line"
@@ -214,29 +192,23 @@ class GCodeFile(MakesmithInitFuncs):
                     self.addPoint3D(xTarget, yTarget, zTarget)
 
                 else:
-                    # print "here"
                     if (
                         len(self.line3D) == 0
                         or self.line3D[-1].dashed
                         or self.line3D[-1].type != "line"
                     ):
-                        #self.line.append( Line() )
-                        #self.line[-1].type = "line"
-                        #self.addPoint(self.xPosition, self.yPosition)
-                        #self.line[-1].dashed = False
 
                         self.line3D.append( Line() )
                         self.line3D[-1].type = "line"
                         self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                         self.line3D[-1].dashed = False
 
-                    #self.addPoint(xTarget, yTarget)
+
                     self.addPoint3D(xTarget, yTarget, zTarget)
 
             # If the zposition has changed, add indicators
             tol = 0.05  # Acceptable error in mm
             if abs(zTarget - self.zPosition) >= tol:
-                # with self.scatterObject.canvas:
                 if True:
                     if zTarget - self.zPosition > 0:
                         # Color(0, 1, 0)
@@ -244,11 +216,6 @@ class GCodeFile(MakesmithInitFuncs):
                     else:
                         # Color(1, 0, 0)
                         radius = 2
-                    #self.line.append(Line())  # points = (), width = 1, group = 'gcode')
-                    #self.line[-1].type = "circle"
-                    #self.addPoint(self.xPosition, self.yPosition)
-                    #self.addPoint(radius, 0)
-                    #self.line[-1].dashed = False
 
                     self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line3D[-1].type = "circle"
@@ -259,8 +226,6 @@ class GCodeFile(MakesmithInitFuncs):
             self.xPosition = xTarget
             self.yPosition = yTarget
             self.zPosition = zTarget
-        # except:
-        #    print "Unable to draw line on screen: " + gCodeLine
 
     def drawArc(self, gCodeLine, command):
         """
@@ -326,38 +291,26 @@ class GCodeFile(MakesmithInitFuncs):
                 or self.line3D[-1].dashed
                 or self.line3D[-1].type != "line"
             ):
-                #self.line.append(Line())  # points = (), width = 1, group = 'gcode')
-                #self.addPoint(self.xPosition, self.yPosition)
-                #self.line[-1].type = "line"
-                #self.line[-1].dashed = False
-
                 self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                 self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                 self.line3D[-1].type = "line"
                 self.line3D[-1].dashed = False
-            #print("arclen="+str(arcLen))
-            #print(".1*direction ="+str(math.fabs(.1*direction)))
             zStep = (zTarget - self.zPosition)/math.fabs(arcLen/(.1*direction))
-            #print("zSte[] ="+str(zStep))
             i = 0
             counter = 0
             while abs(i) < arcLen:
                 xPosOnLine = centerX + radius * math.cos(angle1 + i)
                 yPosOnLine = centerY + radius * math.sin(angle1 + i)
                 zPosOnLine = self.zPosition + zStep*counter
-                #self.addPoint(xPosOnLine, yPosOnLine)
                 self.addPoint3D(xPosOnLine, yPosOnLine, zPosOnLine)
                 i = i + 0.1 * direction  # this is going to need to be a direction
                 counter+=1
 
-            #self.addPoint(xTarget, yTarget)
             self.addPoint3D(xTarget, yTarget, zTarget)
 
             self.xPosition = xTarget
             self.yPosition = yTarget
             self.zPosition = zTarget
-        # except:
-        #    print "Unable to draw arc on screen: " + gCodeLine
 
     def clearGcode(self):
         """
@@ -365,7 +318,7 @@ class GCodeFile(MakesmithInitFuncs):
         clearGcode deletes the lines and arcs corresponding to gcode commands from the canvas.
 
         """
-        #del self.line[:]
+
         del self.line3D[:]
 
 
@@ -383,18 +336,7 @@ class GCodeFile(MakesmithInitFuncs):
                 else:
                     q = str(q)
 
-                #                 xTarget = '%f' % (float(x.groups()[0]) + self.data.gcodeShift[0]) # not used any more...
-                #eNtnX = re.sub(
-                #    "\-?\d\.|\d*e-",
-                #    "",
-                #    str(abs(float(x.groups()[0]) + self.data.gcodeShift[0])),
-                #)  # strip off everything but the decimal part or e-notation exponent
-
                 eNtnX = re.sub("\-?\d\.|\d*e-","",q,)  # strip off everything but the decimal part or e-notation exponent
-
-                #e = re.search(
-                #    ".*e-", str(abs(float(x.groups()[0]) + self.data.gcodeShift[0]))
-                #)
 
                 e = re.search(".*e-", q)
 
@@ -414,23 +356,14 @@ class GCodeFile(MakesmithInitFuncs):
 
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
-                #                 yTarget = '%f' % (float(y.groups()[0]) + self.data.gcodeShift[1]) # not used any more...
                 q = abs(float(y.groups()[0])+self.data.gcodeShift[1])
                 if self.truncate >= 0:
                     q = str(round(q, self.truncate))
                 else:
                     q = str(q)
 
-                #eNtnY = re.sub(
-                #    "\-?\d\.|\d*e-",
-                #    "",
-                #    str(abs(float(y.groups()[0]) + self.data.gcodeShift[1])),
-                #)
                 eNtnY = re.sub("\-?\d\.|\d*e-", "", q, )
 
-                #e = re.search(
-                #    ".*e-", str(abs(float(y.groups()[0]) + self.data.gcodeShift[1]))
-                #)
                 e = re.search(".*e-", q )
 
                 if e:
@@ -442,7 +375,6 @@ class GCodeFile(MakesmithInitFuncs):
                     + (fmtY % (float(y.groups()[0]) + self.data.gcodeShift[1]))
                     + gCodeLine[y.end() :]
                 )
-            #print(gCodeLine)
             return gCodeLine
         except ValueError:
             self.data.console_queue.put("line could not be moved:")
@@ -461,7 +393,6 @@ class GCodeFile(MakesmithInitFuncs):
                 self.data.gcode[self.lineNumber]
             )  # move the line if the gcode has been moved
             fullString = self.data.gcode[self.lineNumber]
-            #print(fullString)
         except:
             return  # we have reached the end of the file
 
@@ -470,10 +401,8 @@ class GCodeFile(MakesmithInitFuncs):
         if len(listOfLines) > 1:  # if the line contains at least one 'G'
             for line in listOfLines:
                 if len(line) > 0:  # If the line is not blank
-                    # print "line:"+str(self.lineNumber)+"#G"+str(line)+"#"
                     self.updateOneLine("G" + line)  # Draw it
         else:
-            # print "line:"+str(self.lineNumber)+"<"+fullString+">"
             self.updateOneLine(fullString)
 
         self.lineNumber = self.lineNumber + 1
@@ -560,12 +489,6 @@ class GCodeFile(MakesmithInitFuncs):
         for _ in range(min(len(self.data.gcode), self.maxNumberOfLinesToRead)):
             self.loadNextLine()
 
-        #tstr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line])
-        #out = io.BytesIO()
-        #with gzip.GzipFile(fileobj=out, mode="w") as f:
-        #    f.write(tstr.encode())
-        #self.data.compressedGCode = out.getvalue()
-
         tstr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line3D])
         out = io.BytesIO()
         with gzip.GzipFile(fileobj=out, mode="w") as f:
@@ -573,7 +496,6 @@ class GCodeFile(MakesmithInitFuncs):
         self.data.compressedGCode3D = out.getvalue()
 
         self.data.console_queue.put("uncompressed:"+str(len(tstr)))
-        #self.data.console_queue.put("compressed:"+str(len(self.data.compressedGCode)))
         self.data.console_queue.put("compressed3D:"+str(len(self.data.compressedGCode3D)))
 
 
@@ -609,9 +531,6 @@ class GCodeFile(MakesmithInitFuncs):
                 + "lines are shown here.  The complete program will cut if you choose to do so unless the home position is moved from (0,0)."
             )
             self.data.console_queue.put(errorText)
-            #self.data.ui_queue.put("closeModals:_Notification:")
-            #self.data.ui_queue.put("Message: " + errorText)
-            #self.data.ui_queue1.put("Action", "closeModals", "Notification")
             self.data.ui_queue1.put("Alert", "Alert", errorText)
 
 
