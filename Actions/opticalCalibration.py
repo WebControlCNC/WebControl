@@ -41,6 +41,7 @@ class OpticalCalibration(MakesmithInitFuncs):
     autoScanDirection = 0
     positionTolerance = 0.125
     y = 0
+    oldUnits = None
 
     def __init__(self):
         # can't do much because data hasn't been initialized yet
@@ -189,7 +190,9 @@ class OpticalCalibration(MakesmithInitFuncs):
             )
         self.data.console_queue.put("message")
 
-        self.data.units = "INCHES"
+        if self.oldUnits != "INCHES":
+            self.data.actions.updateSetting("toInches", 0, True)
+        #self.data.units = "INCHES"
         self.data.gcode_queue.put("G20 ")
         self.data.gcode_queue.put("G90  ")
         self.data.gcode_queue.put("G0 X" + str(_posX) + " Y" + str(_posY) + "  ")
@@ -392,6 +395,7 @@ class OpticalCalibration(MakesmithInitFuncs):
                 self.HomingScanDirection = 1
                 self.inAutoMode = True
                 self.HomeIn()
+                self.oldUnits = self.data.units
             else:
                 # note, the self.HomingX and self.HomingY are not reinitialzed here
                 # The rationale is that the offset for the previous registration point is
