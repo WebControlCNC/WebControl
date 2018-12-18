@@ -76,18 +76,19 @@ app.mcpthread = None
 @mobile_template("{mobile/}")
 def index(template):
     app.data.logger.resetIdler()
-    #current_app._get_current_object()
-    #enable3D = app.data.config.getValue("WebControl Settings", "enable3D")
-    #if enable3D:
     if template == "mobile/":
         return render_template("frontpage3d_mobile.html", modalStyle="modal-lg")
     else:
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
-    #else:
-    #    if template == "mobile/":
-    #        return render_template("frontpage3d_mobile.html", modalStyle="modal-lg")
-    #    else:
-    #        return render_template("frontpage.html", modalStyle="mw-100 w-75")
+
+@app.route("/controls")
+@mobile_template("/controls/{mobile/}")
+def controls(template):
+    app.data.logger.resetIdler()
+    if template == "/controls/mobile/":
+        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True)
+    else:
+        return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
 
 @app.route("/maslowSettings", methods=["POST"])
 def maslowSettings():
