@@ -71,28 +71,29 @@ class MessageProcessor(MakesmithInitFuncs):
                         print(self.data.controllerFirmwareVersion)
                         if self.data.controllerFirmwareVersion < 100:
                             self.data.ui_queue1.put("Alert", "Alert",
-                                "<p>Warning, you are using stock firmware with WebControl.  Custom features will be disabled.\n\n"
-                                + "Ground Control Version "
+                                "<p>Warning, you are using stock firmware with WebControl.  Custom features will be disabled.</p>"
+                                + "<p>Ground Control Version "
                                 + str(self.data.version)
-                                + "\r\n"
+                                + "</p><p>"
                                 + message
+                                + "</p>"
                             )
                         else:
                             if self.data.controllerFirmwareVersion < float(self.data.version):
                                 self.data.ui_queue1.put("Alert", "Alert",
-                                    "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl\n"
-                                    + "WebControl Version "
+                                    "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl.</p>"
+                                    + "<p>WebControl Version "
                                     + str(self.data.version)
-                                    + "\n"
+                                    + "</p><p>"
                                     + message
                                     + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest WebControl-compatible code.</p>"
                                 )
                             if self.data.controllerFirmwareVersion > float(self.data.version):
                                 self.data.ui_queue1.put("Alert", "Alert",
-                                    "<p>Warning, your version of WebControl is out of date and may not work with this firmware version\n\n"
-                                    + "WebControl Version "
+                                    "<p>Warning, your version of WebControl is out of date and may not work with this firmware version</p>"
+                                    + "<p>WebControl Version "
                                     + str(self.data.version)
-                                    + "\r\n"
+                                    + "</p><p>"
                                     + message
                                     + "</p><p>Please, update WebControl via WebMCP.</p>"
                                 )
