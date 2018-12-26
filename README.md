@@ -6,7 +6,17 @@ WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https:
 
 ## Getting Started
 
-These instructions are based upon using a Raspberry Pi (RPi) for running WebControl.  WebControl should be able to be run on any computer capable of running Python 3.  The instructions also assume a headless operation of the RPi and that it configured with an IP address and SSH capability.
+These instructions are based upon using a Raspberry Pi (RPi) for running WebControl.  WebControl should be able to be run on any computer capable of running Python 3.  
+
+The simplest way to get started is to use the pre-built RPi image that @johnboiles has put together:
+
+https://drive.google.com/file/d/132811KALMXDlxUa9jGZdCv1eB2lz09Ws/view?usp=sharing 2
+
+Download the file and burn it to your SD card.  Add the appropriate ssh & wpa_supplicant.conf files for your network and then boot it.  It will automatically download the latest WebMCP and start it (takes 3-5 minutes to complete the initial boot process).  WebMCP is a watchdog/control program that allows you to start, stop, and update webcontrol.  It also displays webcontrol messages that would normally print out in the terminal (like groundcontrol would do).  WebMCP is bound to port 5001, so to reach it, open your browser and bring up http://xxx.xxx.xxx.xxx:5001 (where xxx... is your RPI's IP address).
+
+When WebMC comes up, click “Start WebControl” it will download the latest docker image and run it (takes another 3-5 minutes to docwnload).  It may look like nothing is going on for a while, but just let it run.  WebControl is bound to port 5000, so to reach it, browse to http://xxx.xxx.xxx.xxx:5000.
+
+Alternatively, you can install it onto an existing RPI OS by following these instructions.  Note, the instructions assume your RPI has been configured with an IP address and SSH capability.
 
 ### Prerequisites
 
