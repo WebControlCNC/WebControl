@@ -32,3 +32,42 @@ html, body{
     left: 95%;
 }
 
+#cameraDiv1 {
+    position: absolute;
+    display: block;
+    z-index: 95;
+    top: 77%;
+    left: 1%;
+    width: 256;
+    height: 192;
+}
+
+#cameraDiv2 {
+    position: absolute;
+    display: block;
+    z-index: 94;
+    top: 77%;
+    left: 1%;
+    width: 256;
+    height: 192;
+}
+
+#mobileCameraDiv1 {
+    position: absolute;
+    display: block;
+    z-index: 95;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 200;
+}
+
+#mobileCameraDiv2 {
+    position: absolute;
+    display: block;
+    z-index: 94;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 200;
+}

@@ -3,14 +3,23 @@ import math
 
 
 class TriangularCalibration(MakesmithInitFuncs):
-    def cutTestPaternTriangular(self):
+
+    motorYoffsetEst = 0
+    chainSagCorrectionEst = 0
+    rotationRadiusEst = 0
+    
+    def cutTriangularCalibrationPattern(self):
 
         workspaceHeight = float(
             self.data.config.getValue("Maslow Settings", "bedHeight")
         )
         workspaceWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))
+        oldUnits = self.data.units
 
-        self.data.units = "MM"
+        #self.data.units = "MM"
+        if oldUnits != "MM":
+            self.data.actions.updateSetting("toMM", 0, True)
+
         self.data.gcode_queue.put("G21 ")
         self.data.gcode_queue.put("G90 ")  # Switch to absolute mode
         self.data.gcode_queue.put("G40 ")
@@ -61,6 +70,8 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         self.data.gcode_queue.put("G90 ")  # Switch back to absolute mode
         self.data.gcode_queue.put("G0 X0 Y0 ")  # Move to home location
+        return True
+
 
     def calculate(self, result):
         """
@@ -581,7 +592,7 @@ class TriangularCalibration(MakesmithInitFuncs):
                 self.data.console_queue.put("Estimated values out of range, trying again with smaller steps")
 
         if n == numberOfIterations:
-            self.data.message_queue.put(
+            self.data.ui_queue1.put("Alert", "Alert",
                 "Message: The machine was not able to be calibrated. Please ensure the work area dimensions are correct and try again."
             )
             self.data.console_queue.put("Machine parameters could not be determined")
@@ -614,6 +625,9 @@ class TriangularCalibration(MakesmithInitFuncs):
             + str(chainSagCorrectionEst)
         )
 
+        self.motorYoffsetEst = motorYoffsetEst
+        self.rotationRadiusEst = rotationRadiusEst
+        self.chainSagCorrectionEst = chainSagCorrectionEst
         # Update machine parameters
         """
         self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorYoffsetEst))
@@ -634,7 +648,17 @@ class TriangularCalibration(MakesmithInitFuncs):
             cut34YoffsetEst,
         )
 
-
+    def acceptTriangularCalibrationResults(self):
+        self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(self.motorYoffsetEst))
+        self.data.config.setValue('Advanced Settings', 'rotationRadius', str(self.rotationRadiusEst))
+        self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(self.chainSagCorrectionEst))
+        
+        self.data.gcode_queue.put("G21 ")
+        self.data.gcode_queue.put("G90 ")
+        self.data.gcode_queue.put("G40 ")
+        self.data.gcode_queue.put("G0 X0 Y0 ")
+        return True
+        
 """
     def switchUnitsT(self):
         if self.unitsBtnT.text == 'Units: mm':

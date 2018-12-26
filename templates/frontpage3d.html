@@ -18,8 +18,10 @@
 <div class="container-fluid h-100">
   <div class="row justify-content-start h-100">
     <div id="workarea" class="col">
-      <button class="btn btn-primary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
-      <button class="btn btn-primary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+      <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+      <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+      <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
+      <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>
     </div>
     <div id="fpCircle" style="display: none;">
       <div class="loader">
@@ -123,6 +125,9 @@
           </div>
           <div class="col-3 mb-1">
             <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeGoto',$('#gcodeLineIndex').val());")>Goto</button>
+          </div>
+          <div class="col-2 mb-1">
+            <button id="videoStatus" type="button" class="btn btn-block btn-secondary" onclick="action('toggleCamera');")><i data-feather="video-off"></i></button>
           </div>
         </div>
         <div class="row">

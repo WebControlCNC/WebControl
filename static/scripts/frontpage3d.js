@@ -5,14 +5,14 @@
 
 
 var renderer = new THREE.WebGLRenderer();
-var w = $("#workarea").width()-10;
-var h = $("#workarea").height()-10;
+var w = $("#workarea").width()-20;
+var h = $("#workarea").height()-20;
 renderer.setSize( w, h );
 //console.log(w)
 
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
-
+var imageShowing = 1
 
 var gcode = new THREE.Group();
 
@@ -184,6 +184,7 @@ $(document).ready(function(){
     settingRequest("Computed Settings","units");
     settingRequest("Computed Settings","distToMove");
     settingRequest("Computed Settings","homePosition");
+    action("statusRequest","cameraStatus");
     checkForGCodeUpdate();
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
@@ -192,8 +193,10 @@ $(document).ready(function(){
 
     $( "#workarea" ).contextmenu(function() {
         if (!view3D)
-        pos = cursorPosition();
-        requestPage("screenAction",pos)
+        {
+            pos = cursorPosition();
+            requestPage("screenAction",pos)
+        }
     });
 });
 
@@ -206,66 +209,47 @@ function pauseRun(){
   }
 }
 
-function processRequestedSetting(msg){
+function processRequestedSetting(data){
   //console.log(msg);
-  if (msg.setting=="pauseButtonSetting"){
-    if(msg.value=="Resume")
+  if (data.setting=="pauseButtonSetting"){
+    if(data.value=="Resume")
         $('#pauseButton').removeClass('btn-warning').addClass('btn-info');
     else
         $('#pauseButton').removeClass('btn-info').addClass('btn-warning');
-    $("#pauseButton").text(msg.value);
+    $("#pauseButton").text(data.value);
   }
-  if (msg.setting=="units"){
-    console.log("requestedSetting:"+msg.value);
-    $("#units").text(msg.value)
+  if (data.setting=="units"){
+    console.log("requestedSetting:"+data.value);
+    $("#units").text(data.value)
   }
-  if (msg.setting=="distToMove"){
-    console.log("requestedSetting for distToMove:"+msg.value);
-    $("#distToMove").val(msg.value)
+  if (data.setting=="distToMove"){
+    console.log("requestedSetting for distToMove:"+data.value);
+    $("#distToMove").val(data.value)
   }
-  if ((msg.setting=="unitsZ") || (msg.setting=="distToMoveZ")){
+  if ((data.setting=="unitsZ") || (data.setting=="distToMoveZ")){
     if (typeof processZAxisRequestedSetting === "function") {
-       processZAxisRequestedSetting(msg)
+       processZAxisRequestedSetting(data)
     }
   }
 }
 
-function processPositionMessage(msg){
-  var _json = JSON.parse(msg.data);
-  $('#positionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2)+' ZPos:'+parseFloat(_json.zval).toFixed(2));
-  $('#percentComplete').html(_json.pcom)
-  $('#machineState').html(_json.state)
-  /*if (_json.state=="Stopped")
-      if ($("#stopButton").hasClass("btn-danger"))
-          $("#stopButton").removeClass('btn-danger').addClass('btn-info');
-  else
-      if ($("#stopButton").hasClass("btn-info"))
-          $("#stopButton").removeClass('btn-info').addClass('btn-danger');
-
-  if (_json.state=="Paused")
-      if ($("#pauseButton").hasClass("btn-warning"))
-          $("#pauseButton").removeClass('btn-warning').addClass('btn-info');
-  else
-      if ($("#pauseButton").hasClass("btn-info"))
-          $("#pauseButton").removeClass('btn-info').addClass('btn-warning');
-  */
-  positionUpdate(_json.xval,_json.yval,_json.zval);
+function processPositionMessage(data){
+  $('#positionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' ZPos:'+parseFloat(data.zval).toFixed(2));
+  $('#percentComplete').html(data.pcom)
+  $('#machineState').html(data.state)
+  positionUpdate(data.xval,data.yval,data.zval);
 }
 
-function processHomePositionMessage(msg){
-  var _json = JSON.parse(msg.data);
-  //console.log(_json.xval)
-  $('#homePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
-  homePositionUpdate(_json.xval,_json.yval);
+function processHomePositionMessage(data){
+  $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  homePositionUpdate(data.xval,data.yval);
 }
 
-function processGCodePositionMessage(msg){
-  var _json = JSON.parse(msg.data);
-  //console.log(_json.xval)
-  $('#gcodePositionMessage').html('XPos:'+parseFloat(_json.xval).toFixed(2)+' Ypos:'+parseFloat(_json.yval).toFixed(2));
-  $('#gcodeLine').html(_json.gcodeLine);
-  $('#gcodeLineIndex').val(_json.gcodeLineIndex)
-  gcodePositionUpdate(_json.xval,_json.yval);
+function processGCodePositionMessage(data){
+  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  $('#gcodeLine').html(data.gcodeLine);
+  $('#gcodeLineIndex').val(data.gcodeLineIndex)
+  gcodePositionUpdate(data.xval,data.yval);
 }
 
 function gcodeUpdate(msg){
@@ -290,10 +274,8 @@ function gcodeUpdate(msg){
   });
   */
 }
-
-function gcodeUpdateCompressed(msg){
+function gcodeUpdateCompressed(data){
   console.log("updating gcode compressed");
-  console.log(gcode.length);
   if (gcode.children.length!=0) {
     for (var i = gcode.children.length -1; i>=0; i--){
         gcode.remove(gcode.children[i]);
@@ -303,6 +285,71 @@ function gcodeUpdateCompressed(msg){
   var gcodeLineSegments = new THREE.Geometry();
   var gcodeDashedLineSegments = new THREE.Geometry();
 
+  if (data!=null){
+    var uncompressed = pako.inflate(data);
+    var _str = ab2str(uncompressed);
+    var data = JSON.parse(_str)
+    console.log(data)
+    var pX, pY, pZ = -99999.9
+    var gcodeDashed;
+    var gcodeUndashed;
+    data.forEach(function(line) {
+      if (line.type=='line'){
+        //console.log("Line length="+line.points.length+", dashed="+line.dashed);
+        if (line.dashed==true) {
+          var gcodeDashedLineSegments = new THREE.Geometry();
+          line.points.forEach(function(point) {
+            gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+          })
+          gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
+          gcodeDashed.computeLineDistances();
+          gcode.add(gcodeDashed);
+        } else {
+          var gcodeLineSegments = new THREE.Geometry();
+          line.points.forEach(function(point) {
+            gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+          })
+          gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
+          gcode.add(gcodeUndashed);
+
+        }
+      }
+    });
+    //gcode.move(originX,originY)
+    //var gcodeDashed = new THREE.LineSegments(gcodeDashedLineSegments, greenLineDashedMaterial)
+    //gcodeDashed.computeLineDistances();
+    //var gcodeUndashed = new THREE.LineSegments(gcodeLineSegments, blueLineMaterial)
+    //gcode.add(gcodeDashed);
+    //gcode.add(gcodeUndashed);
+    scene.add(gcode);
+    //console.log(gcodeUndashed);
+  }
+  $("#fpCircle").hide();
+
+}
+/*
+function gcodeUpdateCompressed(msg){
+
+  //This routine was an attempt at seeing if individual line segments could be stored such
+  //that we could change their color as the cut progresses.  It worked on small gcode but
+  //crashed on a large file.  will need to find another way.
+  console.log("updating gcode compressed");
+  console.log(gcode.length);
+  if (gcode.children.length!=0) {
+    for (var i = gcode.children.length -1; i>=0; i--){
+        gcode.remove(gcode.children[i]);
+    }
+  }
+
+
+  var gcodeLineSegments = new THREE.Geometry();
+  var gcodeDashedLineSegments = new THREE.Geometry();
+
+  var gcodeDashed = []
+  var gcodeUndashed = []
+
+  index1 = 0
+  index2 = 0
   if (msg.data!=null){
     var uncompressed = pako.inflate(msg.data);
     var _str = ab2str(uncompressed);
@@ -314,25 +361,42 @@ function gcodeUpdateCompressed(msg){
         if (line.dashed==true) {
           line.points.forEach(function(point) {
             gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+            if (index1 != 0) {
+                gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+                gcodeDashed[index1]=new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
+                gcodeDashed[index1].computeLineDistances();
+                gcodeDashedLineSegments = new THREE.Geometry();
+            }
+            index1=index1+1
           })
         } else {
           line.points.forEach(function(point) {
             gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+            if (index2 != 0) {
+                gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+                gcodeUndashed[index2]=new THREE.Line(gcodeLineSegments, blueLineMaterial)
+                gcodeUndashedLineSegments = new THREE.Geometry();
+            }
+            index2=index2+1
           })
         }
       }
     });
     //gcode.move(originX,originY)
-    var gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
-    gcodeDashed.computeLineDistances();
-    var gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
-    gcode.add(gcodeDashed);
-    gcode.add(gcodeUndashed);
+    gcodeDashed.forEach(function(line){
+        gcode.add(line);
+    })
+    gcodeUndashed.forEach(function(line){
+        gcode.add(line);
+    })
+
+
     scene.add(gcode);
   }
   $("#fpCircle").hide();
 
 }
+*/
 
 function ab2str(buf) {
     var bufView = new Uint16Array(buf);
@@ -358,6 +422,14 @@ function toggle3DView()
             RIGHT: THREE.MOUSE.LEFT
         }
         view3D=false;
+        if (isMobile)
+        {
+            $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
+        }
+        else
+        {
+            $("#button3D").removeClass('btn-primary').addClass('btn-secondary');
+        }
         console.log("toggled off");
     } else {
         controls.enableRotate = true;
@@ -367,6 +439,14 @@ function toggle3DView()
             RIGHT: THREE.MOUSE.LEFT
         }
         view3D=true;
+        if (isMobile)
+        {
+            $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
+        }
+        else
+        {
+            $("#button3D").removeClass('btn-secondary').addClass('btn-primary');
+        }
         console.log("toggled on");
     }
     controls.update();
@@ -395,4 +475,73 @@ function cursorPosition(){
     pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
     //console.log(pos);
     return(pos);
+}
+
+function processCameraMessage(data){
+    if(data.command=="cameraImageUpdated"){
+        var newImg = new Image();
+        if (imageShowing==1)
+        {
+            newImg.onload = function() {
+                document.getElementById("cameraImage2").setAttribute('src',this.src);
+                if (isMobile){
+                    document.getElementById("mobileCameraDiv2").style.zIndex = "95";
+                    document.getElementById("mobileCameraDiv1").style.zIndex = "94";
+                } else {
+                    document.getElementById("cameraDiv2").style.zIndex = "95";
+                    document.getElementById("cameraDiv1").style.zIndex = "94";
+                }
+                imageShowing = 2
+            }
+        }
+        else
+        {
+            newImg.onload = function() {
+                document.getElementById("cameraImage1").setAttribute('src',this.src);
+                if (isMobile){
+                    document.getElementById("mobileCameraDiv1").style.zIndex = "95";
+                    document.getElementById("mobileCameraDiv2").style.zIndex = "94";
+                } else {
+                    document.getElementById("cameraDiv1").style.zIndex = "95";
+                    document.getElementById("cameraDiv2").style.zIndex = "94";
+                }
+                imageShowing = 1
+            }
+        }
+        newImg.setAttribute('src', 'data:image/png;base64,'+data.data)
+
+    }
+    if(data.command=="updateCamera")
+    {
+        if (data.data=="on"){
+            $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
+            feather.replace();
+            console.log("video on");
+            document.getElementById("cameraImage1").style.display = "block"
+            document.getElementById("cameraImage2").style.display = "block"
+            if (isMobile)
+                document.getElementById("mobileCameraArea").style.display = "block"
+        }
+
+        if (data.data=="off"){
+            $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
+            feather.replace();
+            console.log("video off")
+            document.getElementById("cameraImage1").style.display = "none";
+            document.getElementById("cameraImage2").style.display = "none"
+            if (isMobile)
+                document.getElementById("mobileCameraArea").style.display = "none"
+        }
+    }
+}
+
+function processControllerMessage(data){
+    if (controllerMessages.length >100)
+        controllerMessages.shift();
+    controllerMessages.push(data);
+    $('#controllerMessage').html('');
+    controllerMessages.forEach(function(message){
+        $('#controllerMessage').append(message+"<br>");
+    });
+    $('#controllerMessage').scrollBottom();
 }

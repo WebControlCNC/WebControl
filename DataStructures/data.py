@@ -1,6 +1,7 @@
 from time import time
 from DataStructures.logger import Logger
 from DataStructures.loggingQueue import LoggingQueue
+from DataStructures.uiQueue import UIQueue
 from config.config import Config
 import queue
 
@@ -83,6 +84,9 @@ class Data:
     opticalCalibrationImageUpdated = False  # stores whether its been updated or not
     opticalCalibrationTestImage = None  # stores the current image
     opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
+    cameraImage = None
+    cameraImageUpdated = False
+    continuousCamera = False
 
     """
 
@@ -103,11 +107,13 @@ class Data:
     zPopupUnits = None
     zStepSizeVal = 0.1
 
+
     """
     Queues
     """
     message_queue = LoggingQueue(logger)
-    ui_queue = queue.Queue()
+    ui_controller_queue = queue.Queue()
+    ui_queue1 = UIQueue()
     console_queue = queue.Queue() # used for printing to terminal
     mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
     webMCPActive = False  # start false until WebMCP connects
@@ -120,6 +126,7 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    pausedzval = 0.0
 
     previousPosX = 0.0
     previousPosY = 0.0

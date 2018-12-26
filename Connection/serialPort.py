@@ -58,17 +58,21 @@ class SerialPort(MakesmithInitFuncs):
         # This function opens the thread which handles the input from the serial port
 
         if not self.data.connectionStatus:
-            self.data.ui_queue.put(
-                "Action: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
-            )  # the "_" facilitates the parse
+            #self.data.ui_queue.put(
+            #    "Action: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
+            #)  # the "_" facilitates the parse
+            self.data.ui_queue1.put("Action", "connectionStatus",
+                                    {'status': 'disconnected', 'port': 'none'})
             x = SerialPortThread()
             x.data = self.data
             self.th = threading.Thread(target=x.getmessage)
             self.th.daemon = True
             self.th.start()
         else:
-            self.data.ui_queue.put(
-                "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
-            )  # the "_" facilitates the parse
+            self.data.ui_queue1.put("Action", "connectionStatus",
+                                    {'status': 'connected', 'port': self.data.comport})
+            #self.data.ui_queue.put(
+            #    "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
+            #)  # the "_" facilitates the parse
 
 

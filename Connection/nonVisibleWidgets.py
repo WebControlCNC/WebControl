@@ -8,6 +8,7 @@ from Actions.opticalCalibration import OpticalCalibration
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
+from Background.webcamVideoStream import WebcamVideoStream
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -26,6 +27,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     messageProcessor = MessageProcessor()
     mcpProcessor = WebMCPProcessor()
     consoleProcessor = ConsoleProcessor()
+    camera = WebcamVideoStream()
 
     def setUpData(self, data):
         """
@@ -50,6 +52,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
+        data.camera = self.camera
 
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
@@ -60,4 +63,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
+        self.camera.setUpData(data)
+        self.camera.getSettings()
+        #self.camera.start()
 

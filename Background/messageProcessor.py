@@ -20,7 +20,7 @@ class MessageProcessor(MakesmithInitFuncs):
                 # send message to web for display in appropriate column
                 if message != "":
                     if message[0] == "<":
-                        self.data.ui_queue.put(message)
+                        self.data.ui_controller_queue.put(message)
                     elif message[0] == "$":
                         self.data.config.receivedSetting(message)
                     elif message[0] == "[":
@@ -37,7 +37,7 @@ class MessageProcessor(MakesmithInitFuncs):
                                 self.data.console_queue.put("No function has requested a measurement")
                     elif message[0:13] == "Maslow Paused":
                         self.data.uploadFlag = 0
-                        self.data.ui_queue.put(message)
+                        self.data.ui_controller_queue.put(message)
                     elif message[0:8] == "Message:":
                         if (
                             self.data.calibrationInProcess
@@ -48,13 +48,13 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.uploadFlag = 0
                         if message.find("adjust Z-Axis") != -1:
                             self.data.manualZAxisAdjust = True
-                            self.data.ui_queue.put(message)
+                            self.data.ui_controller_queue.put(message)
                         if message[0:15] == "Message: Unable":
-                            self.data.ui_queue.put(message)
+                            self.data.ui_controller_queue.put(message)
                     elif message[0:6] == "ALARM:":
                         self.data.previousUploadStatus = self.data.uploadFlag
                         self.data.uploadFlag = 0
-                        self.data.ui_queue.put(message)
+                        self.data.ui_controller_queue.put(message)
                     elif message[0:8] == "Firmware":
                         self.data.logger.writeToLog(
                             "Ground Control Version " + str(self.data.version) + "\n"
@@ -70,33 +70,35 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.controllerFirmwareVersion = float(message[16-len(message):])
                         print(self.data.controllerFirmwareVersion)
                         if self.data.controllerFirmwareVersion < 100:
-                            self.data.ui_queue.put(
-                                "Message: <p>Warning, you are using stock firmware with WebControl.  Custom features will be disabled.\n\n"
-                                + "Ground Control Version "
+                            self.data.ui_queue1.put("Alert", "Alert",
+                                "<p>Warning, you are using stock firmware with WebControl.  Custom features will be disabled.</p>"
+                                + "<p>Ground Control Version "
                                 + str(self.data.version)
-                                + "\r\n"
+                                + "</p><p>"
                                 + message
+                                + "</p>"
                             )
                         else:
                             if self.data.controllerFirmwareVersion < float(self.data.version):
-                                self.data.ui_queue.put(
-                                    "Message: <p>Warning, your firmware is out of date and may not work correctly with this version of WebControl\n\n"
-                                    + "WebControl Version "
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                    "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl.</p>"
+                                    + "<p>WebControl Version "
                                     + str(self.data.version)
-                                    + "\r\n"
+                                    + "</p><p>"
                                     + message
                                     + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest WebControl-compatible code.</p>"
                                 )
                             if self.data.controllerFirmwareVersion > float(self.data.version):
-                                self.data.ui_queue.put(
-                                    "Message: <p>Warning, your version of WebControl is out of date and may not work with this firmware version\n\n"
-                                    + "WebControl Version "
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                    "<p>Warning, your version of WebControl is out of date and may not work with this firmware version</p>"
+                                    + "<p>WebControl Version "
                                     + str(self.data.version)
-                                    + "\r\n"
+                                    + "</p><p>"
                                     + message
                                     + "</p><p>Please, update WebControl via WebMCP.</p>"
                                 )
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
                     else:
-                        self.data.ui_queue.put(message)
+                        self.data.ui_controller_queue.put(message)
+

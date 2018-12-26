@@ -44,7 +44,7 @@ class WebPageProcessor:
                     pageID="maslowSettings",
                     enableCustom=enableCustom,
                 )
-            return page, "Maslow Settings", False, "medium", "content"
+            return page, "Maslow Settings", False, "medium", "content", "footerSubmit"
         elif pageID == "advancedSettings":
             setValues = self.data.config.getJSONSettingSection("Advanced Settings")
             if self.data.controllerFirmwareVersion < 100:
@@ -67,7 +67,7 @@ class WebPageProcessor:
                     pageID="advancedSettings",
                     enableCustom=enableCustom,
                 )
-            return page, "Advanced Settings", False, "medium", "content"
+            return page, "Advanced Settings", False, "medium", "content", "footerSubmit"
         elif pageID == "webControlSettings":
             setValues = self.data.config.getJSONSettingSection("WebControl Settings")
             if self.data.controllerFirmwareVersion < 100:
@@ -90,9 +90,33 @@ class WebPageProcessor:
                     pageID="webControlSettings",
                     enableCustom=enableCustom,
                 )
-            return page, "WebControl Settings", False, "medium", "content"
+            return page, "WebControl Settings", False, "medium", "content", "footerSubmit"
+        elif pageID == "cameraSettings":
+            setValues = self.data.config.getJSONSettingSection("Camera Settings")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
+            if isMobile:
+                page = render_template(
+                    "settings_mobile.html",
+                    title="Camera Settings",
+                    settings=setValues,
+                    pageID="cameraSettings",
+                    enableCustom=enableCustom,
+                )
+            else:
+                page = render_template(
+                    "settings.html",
+                    title="Camera Settings",
+                    settings=setValues,
+                    pageID="cameraSettings",
+                    enableCustom=enableCustom,
+                )
+            return page, "Camera Settings", False, "medium", "content", "footerSubmit"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"
@@ -117,7 +141,7 @@ class WebPageProcessor:
             page = render_template(
                 "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory
             )
-            return page, "Open GCode", False, "medium", "content"
+            return page, "Open GCode", False, "medium", "content", False
         elif pageID == "uploadGCode":
             validExtensions = self.data.config.getValue(
                 "WebControl Settings", "validExtensions"
@@ -136,27 +160,28 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
             page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
-            return page, "Upload GCode", False, "medium", "content"
+            return page, "Upload GCode", False, "medium", "content", False
         elif pageID == "importGCini":
             page = render_template("importFile.html")
-            return page, "Import groundcontrol.ini", False, "medium", "content"
+            return page, "Import groundcontrol.ini", False, "medium", "content", False
         elif pageID == "actions":
             if self.data.controllerFirmwareVersion < 100:
                 enableCustom = False
             else:
                 enableCustom = True
             page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, enableCustom=enableCustom)
-            return page, "Actions", False, "large", "content"
+            return page, "Actions", False, "medium", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
-            return page, "Z-Axis", False, "medium", "content"
+            return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
+            chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            page = render_template("setSprockets.html")
-            return page, "Set Sprockets", False, "medium", "content"
+            page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
+            return page, "Set Sprockets", False, "medium", "content", False
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -171,7 +196,7 @@ class WebPageProcessor:
                 rotationRadius=rotationRadius,
                 chainSagCorrection=chainSagCorrection,
             )
-            return page, "Triangular Calibration", True, "large", "content"
+            return page, "Triangular Calibration", True, "medium", "content", False
         elif pageID == "opticalCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
@@ -189,8 +214,9 @@ class WebPageProcessor:
             brX = self.data.config.getValue("Optical Calibration Settings", "brX")
             brY = self.data.config.getValue("Optical Calibration Settings", "brY")
             calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
-            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile)
-            return page, "Optical Calibration", True, "large", "content"
+            positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
+            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
+            return page, "Optical Calibration", True, "large", "content", False
         elif pageID == "quickConfigure":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorOffsetY = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -215,9 +241,9 @@ class WebPageProcessor:
                 motorSpacingX=motorSpacingX,
                 chainOverSprocket=chainOverSprocket,
             )
-            return page, "Quick Configure", False, "medium", "content"
+            return page, "Quick Configure", False, "medium", "content", False
         elif pageID == "screenAction":
             print(args["x"])
             page = render_template("screenAction.html", posX=args["x"], posY=args["y"])
-            return page, "Screen Action", False, "medium", "content"
+            return page, "Screen Action", False, "medium", "content", False
 

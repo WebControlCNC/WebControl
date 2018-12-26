@@ -71,14 +71,14 @@
             "value": "Bottom"
         },
         {
-            "default": 1650,
+            "default": 1651,
             "desc": "The length in mm that will be extended during chain calibration\ndefault setting: 1650",
             "firmwareKey": 11,
             "key": "chainExtendLength",
             "section": "Advanced Settings",
             "title": "Extend Chain Distance",
             "type": "string",
-            "value": "1650"
+            "value": "1651"
         },
         {
             "default": 3360,
@@ -885,6 +885,12 @@
             "key": "calibrationExtents",
             "type": "string",
             "value": "Full Area"
+        }        ,
+        {
+            "default": 0.125,
+            "key": "positionTolerance",
+            "type": "float",
+            "value": 0.125
         }
     ],
     "WebControl Settings": [
@@ -923,6 +929,39 @@
             "title": "Enable 3D Display",
             "type": "bool",
             "value": "0"
+        }
+    ],
+    "Camera Settings": [
+        {
+            "default": "640x480",
+            "desc": "Size of video image.  Affects FPS and computational needs\ndefault setting: 640x480",
+            "key": "videoSize",
+            "options": [
+                "640x480",
+                "1024x768"
+            ],
+            "section": "Camera Settings",
+            "title": "Video Image Size",
+            "type": "options",
+            "value": "640x480"
+       },
+        {
+            "default": 5,
+            "desc": "Number of frames per second the camera captures\ndefault setting: 5",
+            "key": "fps",
+            "section": "Camera Settings",
+            "title": "fps",
+            "type": "float",
+            "value": 5
+        },
+        {
+            "default": 0.001,
+            "desc": "Sleep time (seconds) during camera thread.  This is here to help us tweak the camera process\ndefault setting: 0.001",
+            "key": "cameraSleep",
+            "section": "Camera Settings",
+            "title": "Camera Thread Sleep Interval",
+            "type": "float",
+            "value": 0.001
         }
     ]
 }

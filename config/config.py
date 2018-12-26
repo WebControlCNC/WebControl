@@ -47,15 +47,22 @@ class Config(MakesmithInitFuncs):
             self.defaults = json.load(infile)
         updated = False
         for section in self.defaults:
+            sectionFound = False
             for x in range(len(self.defaults[section])):
                 found = False
                 for _section in self.settings:
                     if _section == section:
+                        sectionFound = True
                         for y in range(len(self.settings[_section])):
                            if self.defaults[section][x]["key"] == self.settings[_section][y]["key"]:
                                found = True
                                break
                 if found == False:
+                    if sectionFound:
+                        print("section found")
+                    else:
+                        print("section not found")
+                        self.settings[section]=[]
                     print(section+"->"+self.defaults[section][x]["key"]+" was not found..")
                     t = {}
                     if "default" in self.defaults[section][x]:
@@ -74,6 +81,9 @@ class Config(MakesmithInitFuncs):
                         t["type"]=self.defaults[section][x]["type"]
                     if "value" in self.defaults[section][x]:
                         t["value"]=self.defaults[section][x]["value"]
+                    if "options" in self.defaults[section][x]:
+                        t["options"]=self.defaults[section][x]["options"]
+
                     self.settings[section].append(t)
                     print("added "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
                     updated = True
@@ -108,6 +118,8 @@ class Config(MakesmithInitFuncs):
         updated = False
         found = False
         t0=time.time()
+        changedValue = None
+        changedKey = None
         for x in range(len(self.settings[section])):
             if self.settings[section][x]["key"].lower() == key.lower():
                 found = True
@@ -116,6 +128,8 @@ class Config(MakesmithInitFuncs):
                         storedValue = self.settings[section][x]["value"]
                         self.settings[section][x]["value"] = float(value)
                         updated = True
+                        if storedValue != float(value):
+                            self.processChange(self.settings[section][x]["key"],float(value))
                         if "firmwareKey" in self.settings[section][x]:
                             self.syncFirmwareKey(
                                 self.settings[section][x]["firmwareKey"], storedValue, isImporting,
@@ -127,6 +141,8 @@ class Config(MakesmithInitFuncs):
                     try:
                         storedValue = self.settings[section][x]["value"]
                         self.settings[section][x]["value"] = int(value)
+                        if storedValue != int(value):
+                            self.processChange(self.settings[section][x]["key"], int(value))
                         updated = True
                         if "firmwareKey" in self.settings[section][x]:
                             if self.settings[section][x]["firmwareKey"] != 45:
@@ -171,6 +187,8 @@ class Config(MakesmithInitFuncs):
                 else:
                     storedValue = self.settings[section][x]["value"]
                     self.settings[section][x]["value"] = value
+                    if storedValue != value:
+                        self.processChange(self.settings[section][x]["key"], value)
                     updated = True
                     if "firmwareKey" in self.settings[section][x]:
                         self.syncFirmwareKey(
@@ -184,6 +202,7 @@ class Config(MakesmithInitFuncs):
                 self.data.console_queue.put(self.settings[section][x]["key"])
                 storedValue = self.settings[section][x]["value"]
                 self.settings[section][x]["value"] = 0
+
                 if "firmwareKey" in self.settings[section][x]:
                     # print "syncing3 false bool at:"+str(self.settings[section][x]['firmwareKey'])
                     self.syncFirmwareKey(
@@ -316,15 +335,31 @@ class Config(MakesmithInitFuncs):
                             app.data.gcode_queue.put(
                                 "$" + str(firmwareKey) + "=" + str(storedValue)
                             )
-                        elif not self.isClose(float(storedValue), float(value)):
-                            # print("firmwareKey(send) = "+ str(firmwareKey)+ ":"+ str(storedValue))
-                            if not isImporting:
+                        elif firmwareKey >= 47 and firmwareKey <= 58:
+                            if not self.isPercentClose(float(storedValue), float(value)):
+                                if not isImporting:
+                                    app.data.gcode_queue.put(
+                                        "$" + str(firmwareKey) + "=" + str(storedValue)
+                                    )
+                            else:
+                                break
+                        elif not self.isClose(float(storedValue), float(value)) and not isImporting:
                                 app.data.gcode_queue.put(
                                     "$" + str(firmwareKey) + "=" + str(storedValue)
                                 )
                         else:
                             break
         return
+
+    def isPercentClose(self, a, b, rel_tol = 0.0001):
+        if b != 0:
+            c = abs( abs(a/b) - 1.0)
+            if c < rel_tol:
+                return True
+            else:
+                return False
+        else:
+            return self.isClose(a, b)
 
     def isClose(self, a, b, rel_tol=1e-06):
         """
@@ -334,9 +369,6 @@ class Config(MakesmithInitFuncs):
         arduino adapted from https://stackoverflow.com/a/33024979
         """
         c = abs(a - b) <= rel_tol * max(abs(a), abs(b))
-        #the *max doesn't work well with really small numbers, like the optical calibration curve values
-        #if not c:
-        #    print("a="+str(a)+", b="+str(b)+", a-b="+str(abs(a-b))+", tol="+str(rel_tol)+", c="+str(c))
         return c
 
     def parseErrorArray(self, value, asFloat):
@@ -538,3 +570,7 @@ class Config(MakesmithInitFuncs):
             version = version[1].split(".hex")
             self.data.stockFirmwareVersion = version[0]
 
+    def processChange(self, key, value):
+        ### TODO: This does not currently fire on bools ##
+        if key == "fps" or key == "videoSize" or key=="cameraSleep":
+            self.data.camera.changeSetting(key, value)

@@ -3,6 +3,10 @@
       width: 90% !important;
  }
 
+#contentModalText {
+    max-height: 80vh;
+    overflow-y: auto;
+}
 
 #fpCircle {
     position: absolute;
@@ -28,6 +32,11 @@
 	width: 80px;
     height: 80px;
 }
+
+#notificationModal {
+    z-index: 1051;
+}
+
 
 
 .loader {
