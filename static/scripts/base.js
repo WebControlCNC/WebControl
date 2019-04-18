@@ -10,14 +10,14 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 function processControllerStatus(data){
     if (data.status=="disconnected"){
       $("#controllerStatus").text("Not Connected");
-      $("#controllerStatus").removeClass('btn-success').removeClass('btn-secondary').addClass('btn-outline-danger');
-      $("#mobileControllerStatus").removeClass('btn-success').removeClass('btn-secondary').addClass('btn-outline-danger');
+      $("#controllerStatus").removeClass('alert-success').removeClass('alert-secondary').addClass('alert-danger');
+      $("#mobileControllerStatus").removeClass('alert-success').removeClass('alert-secondary').addClass('alert-danger');
     }
     else
     {
       $("#controllerStatus").text(data.port);
-      $("#controllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
-      $("#mobileControllerStatus").removeClass('btn-outline-danger').addClass('btn-success');
+      $("#controllerStatus").removeClass('alert-danger').addClass('alert-success');
+      $("#mobileControllerStatus").removeClass('alert-danger').addClass('alert-success');
     }
 }
 

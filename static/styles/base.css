@@ -2,7 +2,14 @@
        max-width: 90% !important;
       width: 90% !important;
  }
-
+ 
+.alert {
+  margin-bottom: 1px;
+  height: 30px;
+  line-height:30px;
+  padding:0px 15px;
+}
+ 
 #contentModalText {
     max-height: 70vh;
     overflow-y: auto;
