@@ -6,15 +6,13 @@
       {% for setting in settings %}
       <li class="list-group-item">
         <div class="row align-items-center">
-          <div class="col">
-            <h4>{{setting.title}}</h4>
-            <p>{{setting.desc}}</p>
+          <div class="col-8">
+            <h4 {{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.title}}</h4>
+            <p {{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.desc}}</p>
           </div>
-        </div>
-        <div class="row align-items-center">
-          <div class="col">
+          <div class="col-4">
             {% if setting.key =="COMport" %}
-             <div class="input-group mb-3">
+              <div class="input-group mb-3">
                 <select class="custom-select" name="{{setting.key}}" id="comPorts" data-group="{{title}}">
                   {% if ports|length == 0 %}
                     <option value="{{setting.value}}" 'selected'>
@@ -35,7 +33,7 @@
                 </div>
               </div>
             {% elif setting.type=="options" %}
-              <select name="{{setting.key}}" data-group="{{title}}">
+              <select name="{{setting.key}}" data-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                 {% for option in setting.options %}
                   <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
                     {{option}}
@@ -44,66 +42,23 @@
               </select>
             {% elif setting.type=="bool" %}
               <span class="switch switch-lg">
-                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
+                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %} {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                 <label for="switch-{{setting.key}}"></label>
               </span>
             {% else %}
-              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}">
+              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
             {% endif %}
           </div>
         </div>
-      </il>
+      </li>
       {% endfor %}
     </ul>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <!--<button type="submit" class="btn btn-primary">Submit</button>-->
   </form>
 </div>
 {% endblock %}
 
 {% block javascript %}
-<script>
-$(document).ready(function () {
-    $('#settingsForm').on('submit', function(e) {
-        e.preventDefault();
-        var url = $("#pageID").val()
-        $.ajax({
-            url : '/'+url,
-            type: "POST",
-            data: $(this).serialize(),
-            success: function (data) {
-              console.log("success");
-                $('#contentModal').modal('toggle')
-            },
-            error: function (jXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            }
-        });
-    });
-
-    $('#updateListofPorts').on('click',function(){ //bind click handler
-        event.preventDefault();
-        action('updatePorts');
-    });
-});
-
-function updatePorts(msg){
-  ports = JSON.parse(msg.data);
-  var selectedPort = $("#comPorts").find(":selected").text();
-  if ($("#comPorts").length){
-    $("#comPorts").empty()
-    ports.forEach(function(port){
-       var option = "";
-       if (port==selectedPort){
-          option = "<option value='"+port+"' 'selected'>"+port+"</option>";
-       }
-       else {
-          option = "<option value='"+port+"' >"+port+"</option>";
-       }
-       $("#comPorts").append(option);
-    });
-  }
-
-}
-</script>
+<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>
 <script> feather.replace() </script>
 {% endblock %}

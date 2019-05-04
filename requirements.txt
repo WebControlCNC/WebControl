@@ -7,7 +7,7 @@ greenlet==0.4.15
 itsdangerous==0.24
 Jinja2>=2.10.1
 MarkupSafe==1.0
-numpy==1.15.2
+numpy==1.16.2
 opencv-python==3.4.3.18
 pyserial==3.4
 python-engineio==2.3.2
