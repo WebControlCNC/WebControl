@@ -142,6 +142,11 @@ class UIProcessor:
         #    "controllerMessage", {"data": message}, namespace="/MaslowCNC"
         #)
 
+    def sendWebMCPMessage(self, message):
+        #print(message)
+        #socketio.emit("message", {"command": json.dumps(message), "dataFormat": "json"},namespace="/WebMCP")
+        socketio.emit("shutdown",namespace="/WebMCP")
+
     def sendPositionMessage(self, position):
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
@@ -184,6 +189,8 @@ class UIProcessor:
 
     def processMessage(self, _message):
         msg = json.loads(_message)
+        if msg["command"] == "WebMCP":
+            self.sendWebMCPMessage(msg["message"])
         if msg["command"] == "Action":
             if msg["message"] == "gcodeUpdate":
                 self.sendGcodeUpdate()

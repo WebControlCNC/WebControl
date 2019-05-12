@@ -246,4 +246,10 @@ class WebPageProcessor:
             print(args["x"])
             page = render_template("screenAction.html", posX=args["x"], posY=args["y"])
             return page, "Screen Action", False, "medium", "content", False
+        elif pageID == "viewGcode":
+            page = render_template("viewGcode.html", gcode=self.data.gcode)
+            return page, "View GCode", False, "medium", "content", False
+        elif pageID == "sendGcode":
+            page = render_template("sendGcode.html")
+            return page, "Send GCode", False, "medium", "content", False
 

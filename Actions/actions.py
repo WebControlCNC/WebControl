@@ -188,9 +188,20 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "queryCamera":
                 if not self.queryCamera():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            elif msg["data"]["command"] == "shutdown":
+                if not self.shutdown():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
         except Exception as e:
             print (str(e))
             
+
+    def shutdown(self):
+        try:
+            self.data.ui_queue1.put("WebMCP","shutdown","")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
 
     def defineHome(self, posX, posY):
         try:
@@ -734,6 +745,14 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def sendGcode(self, gcode):
+        try:
+            self.data.gcode_queue.put(gcode)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+    
     def macro(self, number):
         try:
             if number == 1:

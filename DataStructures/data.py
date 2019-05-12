@@ -132,6 +132,8 @@ class Data:
     previousPosY = 0.0
     previousPosZ = 0.0
 
+    shutdown = False
+    
     def __init__(self):
         """
 
