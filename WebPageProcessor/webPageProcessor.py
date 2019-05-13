@@ -252,4 +252,7 @@ class WebPageProcessor:
         elif pageID == "sendGcode":
             page = render_template("sendGcode.html")
             return page, "Send GCode", False, "medium", "content", False
+        elif pageID == "pidTuning":
+            page = render_template("pidTuning.html")
+            return page, "PID Tuning", False, "large", "content", False
 
