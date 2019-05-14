@@ -17,23 +17,39 @@ function updateVErrorCurve(data) {
 }
 
 function updatePIDData(msg){
-      data = JSON.parse(msg.data)
-      if data.result == "velocity":
+      data = JSON.parse(msg.data);
+      if (data.result == "velocity"){
           vErrorPlot = document.getElementById('vErrorPlot');
-          data = JSON.parse(msg.data)
           console.log(data);
           if ($("#vErrorPlot").html()!="")
               while (vErrorPlot.data.length>0)
                   Plotly.deleteTraces(vErrorPlot, [0]);
-          Plotly.plot(vErrorPlot, [{y: data.data }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
-      if data.result == "position":
+          if (data.version == "2")
+          {
+            var _setpoint = [];
+            var _input = [];
+            var _output = [];
+            for (var x = 0; x<data.data.length; x++){
+                var ss = data.data[x].split(",");
+                _setpoint.push(parseFloat(ss[0]));
+                _input.push(parseFloat(ss[1]));
+                _output.push(parseFloat(ss[2]));
+            }
+            Plotly.plot(vErrorPlot, [{y: _setpoint }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
+            Plotly.plot(vErrorPlot, [{y: _input }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
+            Plotly.plot(vErrorPlot, [{y: _output }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
+          }
+          else
+            Plotly.plot(vErrorPlot, [{y: data.data }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
+      }
+      if (data.result == "position") {
           pErrorPlot = document.getElementById('pErrorPlot');
-          data = JSON.parse(msg.data)
           console.log(data);
           if ($("#pErrorPlot").html()!="")
               while (pErrorPlot.data.length>0)
                   Plotly.deleteTraces(pErrorPlot, [0]);
           Plotly.plot(pErrorPlot, [{y: data.data }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+      }
 }
 
 

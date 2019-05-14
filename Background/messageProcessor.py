@@ -102,26 +102,18 @@ class MessageProcessor(MakesmithInitFuncs):
 
                     ### Velocity PID Testing Processing###
                     elif message[0:26] == "--PID Velocity Test Stop--":
-                        self.data.inPIDVelocityTest = False
-                        print("PID velocity test stopped")
-                        print(self.data.PIDVelocityTestData)
-                        data = json.dumps({"result": "velocity", "data": self.data.PIDVelocityTestData})
-                        self.data.ui_queue1.put("Action","updatePIDData",data)
-                        #send data
+                        self.data.actions.velocityPIDTestRun("stop", "")
                     elif self.data.inPIDVelocityTest:
-                        if message.find("Kp=") == -1:
-                            self.data.PIDVelocityTestData.append(float(message))
+                        self.data.actions.velocityPIDTestRun("running", message)
                     elif message[0:27] == "--PID Velocity Test Start--":
-                        self.data.inPIDVelocityTest = True
-                        self.data.PIDVelocityTestData = []
-                        print("PID velocity test started")
+                        self.data.actions.velocityPIDTestRun("start", "")
                     ### END ###
                     ### Position PID Testing Processing###
                     elif message[0:26] == "--PID Position Test Stop--":
                         self.data.inPIDPositionTest = False
                         print("PID position test stopped")
                         print(self.data.PIDPositionTestData)
-                        data = json.dumps({"result": "position", "data": self.data.PIDPositionTestData})
+                        data = json.dumps({"result": "position", "version": self.data.PIDPositionTestVersion, "data": self.data.PIDPositionTestData})
                         self.data.ui_queue1.put("Action", "updatePIDData", data)
                         #send data
                     elif self.data.inPIDPositionTest:

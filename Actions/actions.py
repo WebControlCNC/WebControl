@@ -199,7 +199,7 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
 
         except Exception as e:
-            print (str(e))
+            print(str(e))
             
 
     def shutdown(self):
@@ -1116,6 +1116,7 @@ class Actions(MakesmithInitFuncs):
             print(parameters["KpV"])
             gcodeString = "B13 "+parameters["vMotor"]+" S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
             print(gcodeString)
+            self.data.PIDVelocityTestVersion = parameters["vVersion"]
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
@@ -1128,8 +1129,30 @@ class Actions(MakesmithInitFuncs):
             print(parameters["KpP"])
             gcodeString = "B14 "+parameters["pMotor"]+" S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" V"+parameters["pVersion"]
             print(gcodeString)
+            self.data.PIDPositionTestVersion = parameters["pVersion"]
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+
+    def velocityPIDTestRun(self, command, msg):
+        try:
+            if command == 'stop':
+                self.data.inPIDVelocityTest = False
+                print("PID velocity test stopped")
+                print(self.data.PIDVelocityTestData)
+                data = json.dumps({"result": "velocity", "version": self.data.PIDVelocityTestVersion, "data": self.data.PIDVelocityTestData})
+                self.data.ui_queue1.put("Action", "updatePIDData", data)
+            if command == 'running':
+                if msg.find("Kp=") == -1:
+                    self.data.PIDVelocityTestData.append(float(msg))
+            if command == 'start':
+                self.data.inPIDVelocityTest = True
+                self.data.PIDVelocityTestData = []
+                print("PID velocity test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+

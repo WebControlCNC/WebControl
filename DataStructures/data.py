@@ -74,6 +74,8 @@ class Data:
     calibrationInProcess = False
     inPIDVelocityTest = False
     inPIDPositionTest = False
+    PIDVelocityTestVersion = 0
+    PIDPositionTestVersion = 0
 
     """
     Pointers to Objects
