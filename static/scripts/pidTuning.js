@@ -17,13 +17,23 @@ function updateVErrorCurve(data) {
 }
 
 function updatePIDData(msg){
-      vErrorPlot = document.getElementById('vErrorPlot');
       data = JSON.parse(msg.data)
-      console.log(data);
-      if ($("#vErrorPlot").html()!="")
-          while (vErrorPlot.data.length>0)
-              Plotly.deleteTraces(vErrorPlot, [0]);
-      Plotly.plot(vErrorPlot, [{y: data.data }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
+      if data.result == "velocity":
+          vErrorPlot = document.getElementById('vErrorPlot');
+          data = JSON.parse(msg.data)
+          console.log(data);
+          if ($("#vErrorPlot").html()!="")
+              while (vErrorPlot.data.length>0)
+                  Plotly.deleteTraces(vErrorPlot, [0]);
+          Plotly.plot(vErrorPlot, [{y: data.data }], {title: "Velocity Error", showlegend: false, colorway: colorwayLayout } );
+      if data.result == "position":
+          pErrorPlot = document.getElementById('pErrorPlot');
+          data = JSON.parse(msg.data)
+          console.log(data);
+          if ($("#pErrorPlot").html()!="")
+              while (pErrorPlot.data.length>0)
+                  Plotly.deleteTraces(pErrorPlot, [0]);
+          Plotly.plot(pErrorPlot, [{y: data.data }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
 }
 
 
@@ -53,6 +63,28 @@ function vExecute(){
                     KdV: KdV
                     };
   console.log(parameters);
-  action('vExecute',parameters);
+  action('executeVelocityPIDTest',parameters);
+}
+
+function pExecute(){
+  var pMotor = $('#pMotor input:radio:checked').val();
+  var pStart= $("#pStart").val();
+  var pStop= $("#pStop").val();
+  var pSteps= $("#pSteps").val();
+  var pVersion= $("#pVersion").val();
+  var KpP = $('#KpP').val();
+  var KiP = $('#KiP').val();
+  var KdP = $('#KdP').val();
+  var parameters = {pMotor: pMotor,
+                    pStart: pStart,
+                    pStop: pStop,
+                    pSteps: pSteps,
+                    pVersion: pVersion,
+                    KpP: KpP,
+                    KiP: KiP,
+                    KdP: KdP
+                    };
+  console.log(parameters);
+  action('executePositionPIDTest',parameters);
 }
 

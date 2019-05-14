@@ -191,9 +191,13 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
-            elif msg["data"]["command"] == "vExecute":
+            elif msg["data"]["command"] == "executeVelocityPIDTest":
                 if not self.velocityPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+            elif msg["data"]["command"] == "executePositionPIDTest":
+                if not self.positionPIDTest(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+
         except Exception as e:
             print (str(e))
             
@@ -1118,3 +1122,14 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def positionPIDTest(self, parameters):
+        try:
+            print(parameters)
+            print(parameters["KpP"])
+            gcodeString = "B14 "+parameters["pMotor"]+" S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" V"+parameters["pVersion"]
+            print(gcodeString)
+            self.data.gcode_queue.put(gcodeString)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
