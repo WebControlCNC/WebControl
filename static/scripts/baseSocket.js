@@ -137,7 +137,10 @@
                 //completed
                 updateCalibrationImage(data);
                 break;
-
+            case 'updatePIDData':
+                //completed
+                updatePIDData(data);
+                break;
             default:
                 console.log("!!!!!!");
                 console.log("uncaught action:"+msg.command);

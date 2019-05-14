@@ -72,6 +72,8 @@ class Data:
     connectionStatus = 0
     # is the calibration process currently underway 0 -> false
     calibrationInProcess = False
+    inPIDVelocityTest = False
+    inPIDPositionTest = False
 
     """
     Pointers to Objects

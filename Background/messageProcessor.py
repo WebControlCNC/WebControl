@@ -99,6 +99,20 @@ class MessageProcessor(MakesmithInitFuncs):
                                 )
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
+                    elif message[0:26] == "--PID Velocity Test Stop--":
+                        self.data.inPIDVelocityTest = False
+                        print("test stopped")
+                        print(self.data.PIDVelocityTestData)
+                        data = json.dumps({"result": "velocity", "data": self.data.PIDVelocityTestData})
+                        self.data.ui_queue1.put("Action","updatePIDData",data)
+                        #send data
+                    elif self.data.inPIDVelocityTest:
+                        if message.find("Kp=") == -1:
+                            self.data.PIDVelocityTestData.append(float(message))
+                    elif message[0:27] == "--PID Velocity Test Start--":
+                        self.data.inPIDVelocityTest = True
+                        self.data.PIDVelocityTestData = []
+                        print("test started")
                     else:
                         self.data.ui_controller_queue.put(message)
 

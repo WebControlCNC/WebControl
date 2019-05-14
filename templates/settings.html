@@ -7,12 +7,33 @@
       <li class="list-group-item">
         <div class="row align-items-center">
           <div class="col-8">
-            <h4>{{setting.title}}</h4>
-            <p>{{setting.desc}}</p>
+            <h4 {{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.title}}</h4>
+            <p {{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.desc}}</p>
           </div>
           <div class="col-4">
-            {% if setting.type=="options" %}
-              <select name="{{setting.key}}" data-group="{{title}}"}>
+            {% if setting.key =="COMport" %}
+              <div class="input-group mb-3">
+                <select class="custom-select" name="{{setting.key}}" id="comPorts" data-group="{{title}}">
+                  {% if ports|length == 0 %}
+                    <option value="{{setting.value}}" 'selected'>
+                      {{setting.value}}
+                    </option>
+                  {% else %}
+                    {% for port in ports %}
+                      <option value="{{port}}" {{'selected' if port == setting.value else ''}}>
+                        {{port}}
+                      </option>
+                    {% endfor %}
+                  {% endif %}
+                </select>
+                <div class="input-group-append">
+                  <button class="btn" type="button" id="updateListofPorts">
+                    <i data-feather="refresh-cw"></i>
+                  </button>
+                </div>
+              </div>
+            {% elif setting.type=="options" %}
+              <select name="{{setting.key}}" data-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                 {% for option in setting.options %}
                   <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
                     {{option}}
@@ -21,11 +42,11 @@
               </select>
             {% elif setting.type=="bool" %}
               <span class="switch switch-lg">
-                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %}>
+                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %} {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                 <label for="switch-{{setting.key}}"></label>
               </span>
             {% else %}
-              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}">
+              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
             {% endif %}
           </div>
         </div>

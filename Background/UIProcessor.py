@@ -160,6 +160,15 @@ class UIProcessor:
             "message", {"command":"cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
         )
 
+    def updatePIDData(self, message, _data=""):
+
+        data = json.dumps({"command": message, "data": _data})
+        print(data)
+        socketio.emit(
+            "message", {"command":"updatePIDData", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+        )
+
+
     def sendGcodeUpdate(self):
         if self.app.data.compressedGCode3D is not None:
             self.app.data.console_queue.put("Sending Gcode compressed")
@@ -203,6 +212,8 @@ class UIProcessor:
                 self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
             elif msg["message"] == "updateCamera":
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
+            elif msg["message"] == "updatePIDData":
+                self.updatePIDData("updatePIDData", json.loads(msg["data"]))
             else:
                 if msg["message"] == "setAsPause":
                     msg["message"] = "requestedSetting"
