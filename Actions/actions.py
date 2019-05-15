@@ -102,6 +102,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "setSprockets":
                 if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")
+            elif msg["data"]["command"] == "rotateSprocket":
+                if not self.rotateSprocket(msg["data"]["arg"], msg["data"]["arg1"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")                    
             elif msg["data"]["command"] == "setSprocketsAutomatic":
                 if not self.setSprocketsAutomatic():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprockets automatically")
@@ -619,6 +622,18 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def rotateSprocket(self, sprocket, time):
+        try:
+            if  time > 0:
+                self.data.gcode_queue.put("B11 "+sprocket+" S100 T"+str(time))
+            else:
+                self.data.gcode_queue.put("B11 "+sprocket+" S-100 T"+str(abs(time)))
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+            
     def setSprockets(self, sprocket, degrees):
         try:
             degValue = round(
