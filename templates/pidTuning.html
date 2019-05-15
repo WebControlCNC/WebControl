@@ -267,7 +267,7 @@
                    <label for="vMotor">Motor</label>
                    <div id="vMotor" class="btn-group btn-group-toggle" data-toggle="buttons">
                    <label class="btn btn-secondary active">
-                     <input type="radio" name="options" id="vMotorTL" autocomplete="off" value="L" checked > Top Left
+                     <input type="radio" name="options" id="vMotorTL" autocomplete="off" value="L"> Top Left
                    </label>
                    <label class="btn btn-secondary">
                      <input type="radio" name="options" id="vMotorTR" autocomplete="off" value="R"> Top Right
@@ -368,7 +368,7 @@
                    <label for="pMotor">Motor</label>
                    <div id="pMotor" class="btn-group btn-group-toggle" data-toggle="buttons">
                    <label class="btn btn-secondary active">
-                     <input type="radio" name="options" id="pMotorTL" autocomplete="off" value="L" checked > Top Left
+                     <input type="radio" name="options" id="pMotorTL" autocomplete="off" value="L" > Top Left
                    </label>
                    <label class="btn btn-secondary">
                      <input type="radio" name="options" id="pMotorTR" autocomplete="off" value="R"> Top Right
@@ -456,7 +456,7 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018i') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018j') }}" crossorigin="anonymous"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script> feather.replace() </script>
 {% endblock %}

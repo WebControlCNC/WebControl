@@ -61,7 +61,7 @@ $(document).ready(function () {
 
 
 function vExecute(){
-  var vMotor = $('#vMotor input:radio:checked').val();
+  var vMotor = $('#vMotor label.active input').val();
   var vStart= $("#vStart").val();
   var vStop= $("#vStop").val();
   var vSteps= $("#vSteps").val();
@@ -83,7 +83,7 @@ function vExecute(){
 }
 
 function pExecute(){
-  var pMotor = $('#pMotor input:radio:checked').val();
+  var pMotor = $('#pMotor label:active input').val();
   var pStart= $("#pStart").val();
   var pStop= $("#pStop").val();
   var pSteps= $("#pSteps").val();

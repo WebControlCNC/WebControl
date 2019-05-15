@@ -108,22 +108,16 @@ class MessageProcessor(MakesmithInitFuncs):
                     elif message[0:27] == "--PID Velocity Test Start--":
                         self.data.actions.velocityPIDTestRun("start", "")
                     ### END ###
+
                     ### Position PID Testing Processing###
                     elif message[0:26] == "--PID Position Test Stop--":
-                        self.data.inPIDPositionTest = False
-                        print("PID position test stopped")
-                        print(self.data.PIDPositionTestData)
-                        data = json.dumps({"result": "position", "version": self.data.PIDPositionTestVersion, "data": self.data.PIDPositionTestData})
-                        self.data.ui_queue1.put("Action", "updatePIDData", data)
-                        #send data
+                        self.data.actions.positionPIDTestRun("stop", "")
                     elif self.data.inPIDPositionTest:
-                        if message.find("Kp=") == -1:
-                            self.data.PIDPositionTestData.append(float(message))
+                        self.data.actions.positionPIDTestRun("running", message)
                     elif message[0:27] == "--PID Position Test Start--":
-                        self.data.inPIDPositionTest = True
-                        self.data.PIDPositionTestData = []
-                        print("PID position test started")
+                        self.data.actions.positionPIDTestRun("start", "")
                     ### END ###
+
                     else:
                         self.data.ui_controller_queue.put(message)
 

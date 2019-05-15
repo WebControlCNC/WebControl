@@ -1129,6 +1129,9 @@ class Actions(MakesmithInitFuncs):
         try:
             print(parameters)
             print(parameters["KpV"])
+            self.data.config.setValue("Advanced Settings", "KpV", float(parameters["KpV"]))
+            self.data.config.setValue("Advanced Settings", "KiV", float(parameters["KiV"]))
+            self.data.config.setValue("Advanced Settings", "KdV", float(parameters["KdV"]))
             gcodeString = "B13 "+parameters["vMotor"]+" S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
             print(gcodeString)
             self.data.PIDVelocityTestVersion = parameters["vVersion"]
@@ -1142,6 +1145,10 @@ class Actions(MakesmithInitFuncs):
         try:
             print(parameters)
             print(parameters["KpP"])
+            self.data.config.setValue("Advanced Settings", "KpPos", float(parameters["KpP"]))
+            self.data.config.setValue("Advanced Settings", "KiPos", float(parameters["KiP"]))
+            self.data.config.setValue("Advanced Settings", "KdPos", float(parameters["KdP"]))
+
             gcodeString = "B14 "+parameters["pMotor"]+" S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" V"+parameters["pVersion"]
             print(gcodeString)
             self.data.PIDPositionTestVersion = parameters["pVersion"]
@@ -1161,7 +1168,10 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "updatePIDData", data)
             if command == 'running':
                 if msg.find("Kp=") == -1:
-                    self.data.PIDVelocityTestData.append(float(msg))
+                    if self.data.PIDVelocityTestVersion == "2":
+                        self.data.PIDVelocityTestData.append(msg)
+                    else:
+                        self.data.PIDVelocityTestData.append(float(msg))
             if command == 'start':
                 self.data.inPIDVelocityTest = True
                 self.data.PIDVelocityTestData = []
@@ -1170,4 +1180,25 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def positionPIDTestRun(self, command, msg):
+        try:
+            if command == 'stop':
+                self.data.inPIDPositionTest = False
+                print("PID position test stopped")
+                print(self.data.PIDPositionTestData)
+                data = json.dumps({"result": "position", "version": self.data.PIDPositionTestVersion, "data": self.data.PIDPositionTestData})
+                self.data.ui_queue1.put("Action", "updatePIDData", data)
+            if command == 'running':
+                if msg.find("Kp=") == -1:
+                    if self.data.PIDPositionTestVersion == "2":
+                        self.data.PIDPositionTestData.append(msg)
+                    else:
+                        self.data.PIDPositionTestData.append(float(msg))
+            if command == 'start':
+                self.data.inPIDPositionTest = True
+                self.data.PIDPositionTestData = []
+                print("PID position test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
 
