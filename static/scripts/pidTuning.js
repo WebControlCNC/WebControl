@@ -83,10 +83,11 @@ function vExecute(){
 }
 
 function pExecute(){
-  var pMotor = $('#pMotor label:active input').val();
+  var pMotor = $('#pMotor label.active input').val();
   var pStart= $("#pStart").val();
   var pStop= $("#pStop").val();
   var pSteps= $("#pSteps").val();
+  var pTime= $("#pTime").val();
   var pVersion= $("#pVersion").val();
   var KpP = $('#KpP').val();
   var KiP = $('#KiP').val();
@@ -95,6 +96,7 @@ function pExecute(){
                     pStart: pStart,
                     pStop: pStop,
                     pSteps: pSteps,
+                    pTime: pTime,
                     pVersion: pVersion,
                     KpP: KpP,
                     KiP: KiP,

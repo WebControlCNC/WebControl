@@ -416,6 +416,15 @@
              </div>
            </div>
            <div class="row">
+             <div class="col-6">
+               <div class="form-group">
+                 <label for="pTime">Time</label>
+                 <input class="form-control" name="pTime" id="pTime" value="{{pTime}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
              <div class="col">
                <div class="form-group">
                  <label for="KpP">KpP</label>
@@ -456,7 +465,7 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018j') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018k') }}" crossorigin="anonymous"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script> feather.replace() </script>
 {% endblock %}
