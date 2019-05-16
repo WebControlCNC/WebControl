@@ -48,7 +48,29 @@ function updatePIDData(msg){
           if ($("#pErrorPlot").html()!="")
               while (pErrorPlot.data.length>0)
                   Plotly.deleteTraces(pErrorPlot, [0]);
-          Plotly.plot(pErrorPlot, [{y: data.data }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+          if (data.version == "2")
+          {
+            var _setpoint = [];
+            var _input = [];
+            var _output = [];
+            var _rpminput = [];
+            var _voltage = [];
+            for (var x = 0; x<data.data.length; x++){
+                var ss = data.data[x].split(",");
+                _setpoint.push(parseFloat(ss[0]));
+                _input.push(parseFloat(ss[1]));
+                _output.push(parseFloat(ss[2]));
+                _rpminput.push(parseFloat(ss[3]));
+                _voltage.push(parseFloat(ss[4]));
+            }
+            Plotly.plot(pErrorPlot, [{y: _setpoint }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+            Plotly.plot(pErrorPlot, [{y: _input }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+            Plotly.plot(pErrorPlot, [{y: _output }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+            Plotly.plot(pErrorPlot, [{y: _rpminput }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+            Plotly.plot(pErrorPlot, [{y: _voltage }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
+          }
+          else
+              Plotly.plot(pErrorPlot, [{y: data.data }], {title: "Position Error", showlegend: false, colorway: colorwayLayout } );
       }
 }
 

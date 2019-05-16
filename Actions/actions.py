@@ -317,6 +317,8 @@ class Actions(MakesmithInitFuncs):
     def stopRun(self):
         try:
             self.data.console_queue.put("stopping run")
+            self.data.inPIDPositionTest = False
+            self.data.inPIDVelocityTest = False
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             self.data.quick_queue.put("!")
@@ -1170,7 +1172,8 @@ class Actions(MakesmithInitFuncs):
             if command == 'running':
                 if msg.find("Kp=") == -1:
                     if self.data.PIDVelocityTestVersion == "2":
-                        self.data.PIDVelocityTestData.append(msg)
+                        if msg.find("setpoint") == -1:
+                            self.data.PIDVelocityTestData.append(msg)
                     else:
                         self.data.PIDVelocityTestData.append(float(msg))
             if command == 'start':
@@ -1193,7 +1196,8 @@ class Actions(MakesmithInitFuncs):
             if command == 'running':
                 if msg.find("Kp=") == -1:
                     if self.data.PIDPositionTestVersion == "2":
-                        self.data.PIDPositionTestData.append(msg)
+                        if msg.find("setpoint") == -1:
+                            self.data.PIDPositionTestData.append(msg)
                     else:
                         self.data.PIDPositionTestData.append(float(msg))
             if command == 'start':
