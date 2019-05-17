@@ -83,7 +83,7 @@ function processActivateModal(data){
     $modal.data('name',data.title);
 
     $modalTitle.html("<h3>"+data.title+"</h3");
-    $modalText.html("<p>"+data.message+"</p>");
+    $modalText.html(JSON.parse(data.message));
 
     if (data.isStatic==true){
         console.log("Static Modal")

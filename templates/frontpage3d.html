@@ -10,7 +10,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018a') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018d') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -33,7 +33,6 @@
         </div>
       </div>
     </div>
-
     <div class="col my-sidebar">
       <div class="h-100 d-flex flex-column">
         <h3>Controls</h3>
@@ -93,13 +92,18 @@
         </div>
         <div class="row">
           <div class="col mb-1">
+            <div id="alerts" class="alert alert-success alert-dismissible col-md-12">No alerts</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-1">
             <button type="button" class="btn btn-block btn-success" onclick="action('startRun')">Play</button>
           </div>
           <div class="col mb-1">
             <button type="button" id="pauseButton" class="btn btn-block btn-warning" onclick="pauseRun()">Pause</button>
           </div>
           <div class="col mb-1">
-            <button type="button" class="btn btn-block btn-danger" onclick="action('stopRun')">Stop</button>
+            <button type="button" id="stopButton" class="btn btn-block btn-danger" onclick="$(this).removeClass('stopbutton'); action('stopRun')">Stop</button>
           </div>
         </div>
         <div class="row">

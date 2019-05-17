@@ -141,6 +141,12 @@
                 //completed
                 updatePIDData(data);
                 break;
+            case 'alert':
+                processAlert(data);
+                break;
+            case 'clearAlert':
+                clearAlert(data);
+                break;
             default:
                 console.log("!!!!!!");
                 console.log("uncaught action:"+msg.command);

@@ -76,7 +76,8 @@ class UIProcessor:
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
                                     pass
-                                self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
+                                self.sendAlert("Alarm: Sled Not Keeping Up")
+                                #self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
                                 pass  # displaying all the 'ok' messages clutters up the display
                             else:
@@ -132,6 +133,12 @@ class UIProcessor:
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
         data = json.dumps({"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType})
         socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
+            namespace="/MaslowCNC",
+        )
+
+    def sendAlert(self, message):
+        data = json.dumps({"message":message})
+        socketio.emit("message", {"command": "alert", "data": data, "dataFormat": "json"},
             namespace="/MaslowCNC",
         )
 
@@ -214,6 +221,10 @@ class UIProcessor:
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
             elif msg["message"] == "updatePIDData":
                 self.updatePIDData("updatePIDData", json.loads(msg["data"]))
+            elif msg["message"] == "clearAlert":
+                msg["data"] = json.dumps({"data":""})
+                socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
+                              namespace="/MaslowCNC")
             else:
                 if msg["message"] == "setAsPause":
                     msg["message"] = "requestedSetting"
