@@ -23,6 +23,7 @@ function processControllerStatus(data){
 
 function processActivateModal(data){
     var $modal, $modalTitle, $modalText
+    var message
     if (data.modalType == "content"){
       $modal = $('#contentModal');
       $modalDialog = $('#contentDialog');
@@ -33,6 +34,7 @@ function processActivateModal(data){
       } else {
         $('#footerSubmit').hide();
       }
+      message = data.message;
     }
     else if (data.modalType == "alarm") {
       $modal = $('#alarmModal');
@@ -44,6 +46,7 @@ function processActivateModal(data){
       } else {
           $('#clearButton').hide();
       }
+      message = JSON.parse(data.message);
     }
     else{
       $modal = $('#notificationModal');
@@ -65,6 +68,7 @@ function processActivateModal(data){
       } else {
         $('#notificationCircle').hide();
       }
+      message = JSON.parse(data.message);
     }
     $modalDialog.removeClass('modal-lg');
     $modalDialog.removeClass('modal-sm');
@@ -83,7 +87,7 @@ function processActivateModal(data){
     $modal.data('name',data.title);
 
     $modalTitle.html("<h3>"+data.title+"</h3");
-    $modalText.html(JSON.parse(data.message));
+    $modalText.html(message);
 
     if (data.isStatic==true){
         console.log("Static Modal")

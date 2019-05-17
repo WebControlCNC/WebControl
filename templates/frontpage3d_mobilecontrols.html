@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='10262019a') }}" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='10262019b') }}" crossorigin="anonymous">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endblock %}
 
 {% block javascript %}
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018a') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018d') }}" crossorigin="anonymous"></script>
 <script> feather.replace() </script>
 {% endblock %}
 
@@ -93,6 +93,12 @@
     </div>
   </div>
   <div class="row">
+    <div class="col mb-1">
+      <div id="alerts" class="alert alert-success alert-dismissible col-md-12">No alerts</div>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-4  mb-1">
       <button type="button" class="btn btn-lg btn-block btn-success" onclick="action('startRun')">Play</button>
     </div>
@@ -100,7 +106,7 @@
       <button type="button" id="pauseButton" class="btn btn-lg btn-block btn-warning" onclick="pauseRun()">Pause</button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
+      <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="$(this).removeClass('stopbutton'); action('stopRun')">Stop</button>
     </div>
   </div>
   <div class="row">
