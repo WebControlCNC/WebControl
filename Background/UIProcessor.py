@@ -71,12 +71,22 @@ class UIProcessor:
                                 if message.find("adjust Z-Axis") != -1:
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
+                                elif message.find("Unable to find valid") != -1:
+                                    self.sendAlert(message);
                                 else:
                                     self.activateModal("Notification:", message[9:], "notification")
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
+                                    self.sendAlert("Alarm: Sled Not Keeping Up")
+                                elif message.find("Position Lost") != -1:
+                                    self.sendAlert("Alarm: Position Lost.  Reset Chains.")
+                                else:
+                                    self.sendAlert(message);
+                            elif message[0:6] == "Unable to":
+                                if message.find("The sled is not keeping up") != -1:
                                     pass
                                 self.sendAlert("Alarm: Sled Not Keeping Up")
+
                                 #self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
                                 pass  # displaying all the 'ok' messages clutters up the display

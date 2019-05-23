@@ -549,7 +549,7 @@ function processControllerMessage(data){
 
 function processAlert(data){
     console.log("alert received");
-    $("#alerts").text(data.message);
+    $("#alerts").html("<marquee behavior='scroll' direction='left'>"+data.message+"</marquee>");
     $("#alerts").removeClass('alert-success').addClass('alert-danger');
     $("#stopButton").addClass('stopbutton');
 }
