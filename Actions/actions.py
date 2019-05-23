@@ -1135,7 +1135,7 @@ class Actions(MakesmithInitFuncs):
             self.data.config.setValue("Advanced Settings", "KpV", parameters["KpV"])
             self.data.config.setValue("Advanced Settings", "KiV", parameters["KiV"])
             self.data.config.setValue("Advanced Settings", "KdV", parameters["KdV"])
-            gcodeString = "B13 "+parameters["vMotor"]+" S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
+            gcodeString = "B13 "+parameters["vMotor"]+"1 S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
             print(gcodeString)
             self.data.PIDVelocityTestVersion = parameters["vVersion"]
             self.data.gcode_queue.put(gcodeString)
@@ -1152,7 +1152,7 @@ class Actions(MakesmithInitFuncs):
             self.data.config.setValue("Advanced Settings", "KiPos", parameters["KiP"])
             self.data.config.setValue("Advanced Settings", "KdPos", parameters["KdP"])
 
-            gcodeString = "B14 "+parameters["pMotor"]+" S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
+            gcodeString = "B14 "+parameters["pMotor"]+"1 S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
             print(gcodeString)
             self.data.PIDPositionTestVersion = parameters["pVersion"]
             self.data.gcode_queue.put(gcodeString)
