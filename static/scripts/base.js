@@ -46,7 +46,7 @@ function processActivateModal(data){
       } else {
           $('#clearButton').hide();
       }
-      message = JSON.parse(data.message);
+      message = data.mesage; //JSON.parse(data.message);
     }
     else{
       $modal = $('#notificationModal');
@@ -68,7 +68,7 @@ function processActivateModal(data){
       } else {
         $('#notificationCircle').hide();
       }
-      message = JSON.parse(data.message);
+      message = data.message; //JSON.parse(data.message);
     }
     $modalDialog.removeClass('modal-lg');
     $modalDialog.removeClass('modal-sm');
