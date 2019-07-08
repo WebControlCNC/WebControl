@@ -14,17 +14,17 @@
       socket.on('connect', function(msg) {
           socket.emit('my event', {data: 'I\'m connected!'});
           $("#clientStatus").text("Connected");
-          $("#clientStatus").removeClass('btn-outline-danger').addClass('btn-success');
-          $("#mobileClientStatus").removeClass('btn-outline-danger').addClass('btn-success');
+          $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
+          $("#mobileClientStatus").removeClass('alert-danger').addClass('alert-success');
           //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
       });
 
       socket.on('disconnect', function(msg) {
           $("#clientStatus").text("Not Connected");
-          $("#clientStatus").removeClass('btn-success').addClass('btn-outline-danger');
-          $("#mobileClientStatus").removeClass('btn-success').addClass('btn-outline-danger');
-          $("#controllerStatus").removeClass('btn-success').removeClass('btn-outine-danger').addClass('btn-secondary');
-          $("#mobileControllerStatus").removeClass('btn-success').removeClass('btn-outine-danger').addClass('btn-secondary');
+          $("#clientStatus").removeClass('alert-success').addClass('alert-outline-danger');
+          $("#mobileClientStatus").removeClass('alert-success').addClass('alert-danger');
+          $("#controllerStatus").removeClass('alert-success').removeClass('alert-danger').addClass('alert-secondary');
+          $("#mobileControllerStatus").removeClass('alert-success').removeClass('alert-danger').addClass('alert-secondary');
 
       });
 
@@ -137,7 +137,16 @@
                 //completed
                 updateCalibrationImage(data);
                 break;
-
+            case 'updatePIDData':
+                //completed
+                updatePIDData(data);
+                break;
+            case 'alert':
+                processAlert(data);
+                break;
+            case 'clearAlert':
+                clearAlert(data);
+                break;
             default:
                 console.log("!!!!!!");
                 console.log("uncaught action:"+msg.command);

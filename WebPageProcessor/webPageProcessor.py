@@ -246,4 +246,29 @@ class WebPageProcessor:
             print(args["x"])
             page = render_template("screenAction.html", posX=args["x"], posY=args["y"])
             return page, "Screen Action", False, "medium", "content", False
+        elif pageID == "viewGcode":
+            page = render_template("viewGcode.html", gcode=self.data.gcode)
+            return page, "View GCode", False, "medium", "content", False
+        elif pageID == "sendGcode":
+            page = render_template("sendGcode.html")
+            return page, "Send GCode", False, "medium", "content", False
+        elif pageID == "pidTuning":
+            KpP = self.data.config.getValue("Advanced Settings", "KpPos")
+            KiP = self.data.config.getValue("Advanced Settings", "KiPos")
+            KdP = self.data.config.getValue("Advanced Settings", "KdPos")
+            KpV = self.data.config.getValue("Advanced Settings", "KpV")
+            KiV = self.data.config.getValue("Advanced Settings", "KiV")
+            KdV = self.data.config.getValue("Advanced Settings", "KdV")
+            vVersion = "1"
+            pVersion = "1"
+            page = render_template("pidTuning.html",
+                                   KpP=KpP,
+                                   KiP=KiP,
+                                   KdP=KdP,
+                                   KpV=KpV,
+                                   KiV=KiV,
+                                   KdV=KdV,
+                                   vVersion=vVersion,
+                                   pVersion=pVersion)
+            return page, "PID Tuning", False, "large", "content", False
 

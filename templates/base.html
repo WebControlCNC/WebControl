@@ -8,8 +8,8 @@
   <script src="{{ url_for('static',filename='scripts/socket.io-2.1.1.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/jquery-3.3.1.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/bootstrap.bundle.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018a') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018b') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018h') }}" crossorigin="anonymous"></script>
 
   <script type="text/javascript" charset="utf-8">
   </script>
@@ -32,6 +32,8 @@
             <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a>
             <a class="dropdown-item" href="#" onclick="requestPage('uploadGCode');">Upload</a>
             <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('viewGcode');">View</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('sendGcode');">Send</a>
           </div>
         </li>
         <li class="nav-item">
@@ -49,8 +51,8 @@
           </div>
         </li>
       </ul>
-      <button id="clientStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button">Not Connect</button>
-      <button id="controllerStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button">Not Connect</button>
+      <div id="clientStatus" class="alert alert-danger">Not Connect</div>
+      <div id="controllerStatus" class="alert alert-danger">Not Connect</div>
     </div>
 </nav>
 <body>
@@ -74,7 +76,6 @@
           </button>
         </div>
         <div id="notificationModalText" class="modal-body">
-          <p>Modal body text goes here.</p>
         </div>
         <div class="progress" id="progressBarDiv" >
           <div id="progressBar" class="progress-bar w-75" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -108,7 +109,6 @@
         </div>
         <div class="modal-body">
           <div id="contentModalText">
-            <p>Modal body text goes here.</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -129,7 +129,6 @@
           </button>
         </div>
         <div id="alarmModalText" class="modal-body">
-          <p>Modal body text goes here.</p>
         </div>
         <div class="modal-footer">
           <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alarm</button>

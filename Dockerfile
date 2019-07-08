@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get -y autoremove
 
 # OpenCV dependency
-RUN pip install numpy
+RUN pip install numpy==1.16.2
 
 # Build OpenCV
 ADD tools/download_build_install_opencv.sh /download_build_install_opencv.sh
@@ -43,10 +43,12 @@ RUN pip install -r /requirements.txt
 RUN apt-get update \
     && apt-get install -y --no-install-recommends python2.7 python-pip python-setuptools python-wheel git \
     && pip2 install -U platformio \
-    && pio platform install --with-package framework-arduinoavr atmelavr
+    && pio platform install --with-package framework-arduinoavr atmelavr \
+    && pio lib -g install "Servo"
 
 ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
 ARG madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
+#ARG madgrizzle_firmware_sha=95f7d4b5c431dec162d2e2eec7c6e42530298c4b
 RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
     && cd firmware/madgrizzle \
     && git checkout $madgrizzle_firmware_sha \
@@ -86,7 +88,8 @@ COPY --from=builder /usr/lib/libblas.so.3 /usr/lib/libblas.so.3
 COPY --from=builder /usr/lib/arm-linux-gnueabihf/libgfortran.so.3 /usr/lib/arm-linux-gnueabihf/libgfortran.so.3
 COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
 
-RUN pip install numpy && pip install -r /requirements.txt && rm -rf /root/.cache
+RUN pip install numpy==1.16.2 && pip install -r /requirements.txt && rm -rf /root/.cache
+
 
 # Install avrdude
 # TODO: to speed up incremental docker builds, we can probably do this in the builder image if we can figure out

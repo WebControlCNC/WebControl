@@ -207,6 +207,23 @@ def importFile():
             resp.status_code = 500
             return resp
 
+@app.route("/sendGcode", methods=["POST"])
+def sendGcode():
+    app.data.logger.resetIdler()
+    #print(request.form)#["gcodeInput"])
+    if request.method == "POST":
+        returnVal = app.data.actions.sendGcode(request.form["gcodeInput"])
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
 
 @app.route("/triangularCalibration", methods=["POST"])
 def triangularCalibration():

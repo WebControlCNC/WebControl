@@ -102,6 +102,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "setSprockets":
                 if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")
+            elif msg["data"]["command"] == "rotateSprocket":
+                if not self.rotateSprocket(msg["data"]["arg"], msg["data"]["arg1"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")                    
             elif msg["data"]["command"] == "setSprocketsAutomatic":
                 if not self.setSprocketsAutomatic():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprockets automatically")
@@ -188,9 +191,27 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "queryCamera":
                 if not self.queryCamera():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            elif msg["data"]["command"] == "shutdown":
+                if not self.shutdown():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
+            elif msg["data"]["command"] == "executeVelocityPIDTest":
+                if not self.velocityPIDTest(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+            elif msg["data"]["command"] == "executePositionPIDTest":
+                if not self.positionPIDTest(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+
         except Exception as e:
-            print (str(e))
+            print(str(e))
             
+
+    def shutdown(self):
+        try:
+            self.data.ui_queue1.put("WebMCP","shutdown","")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
 
     def defineHome(self, posX, posY):
         try:
@@ -296,6 +317,8 @@ class Actions(MakesmithInitFuncs):
     def stopRun(self):
         try:
             self.data.console_queue.put("stopping run")
+            self.data.inPIDPositionTest = False
+            self.data.inPIDVelocityTest = False
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             self.data.quick_queue.put("!")
@@ -303,6 +326,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             # TODO: app.onUploadFlagChange(self.stopRun, 0)
             self.data.console_queue.put("Gcode stopped")
+            self.data.ui_queue1.put("Action", "clearAlert", "")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -601,6 +625,18 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def rotateSprocket(self, sprocket, time):
+        try:
+            if  time > 0:
+                self.data.gcode_queue.put("B11 "+sprocket+" S100 T"+str(time))
+            else:
+                self.data.gcode_queue.put("B11 "+sprocket+" S-100 T"+str(abs(time)))
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+            
     def setSprockets(self, sprocket, degrees):
         try:
             degValue = round(
@@ -734,6 +770,14 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def sendGcode(self, gcode):
+        try:
+            self.data.gcode_queue.put(gcode)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+    
     def macro(self, number):
         try:
             if number == 1:
@@ -1083,3 +1127,85 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+
+    def velocityPIDTest(self, parameters):
+        try:
+            print(parameters)
+            print(parameters["KpV"])
+            self.data.config.setValue("Advanced Settings", "KpV", parameters["KpV"])
+            self.data.config.setValue("Advanced Settings", "KiV", parameters["KiV"])
+            self.data.config.setValue("Advanced Settings", "KdV", parameters["KdV"])
+            gcodeString = "B13 "+parameters["vMotor"]+"1 S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
+            print(gcodeString)
+            self.data.PIDVelocityTestVersion = parameters["vVersion"]
+            self.data.gcode_queue.put(gcodeString)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def positionPIDTest(self, parameters):
+        try:
+            print(parameters)
+            print(parameters["KpP"])
+            self.data.config.setValue("Advanced Settings", "KpPos", parameters["KpP"])
+            self.data.config.setValue("Advanced Settings", "KiPos", parameters["KiP"])
+            self.data.config.setValue("Advanced Settings", "KdPos", parameters["KdP"])
+
+            gcodeString = "B14 "+parameters["pMotor"]+"1 S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
+            print(gcodeString)
+            self.data.PIDPositionTestVersion = parameters["pVersion"]
+            self.data.gcode_queue.put(gcodeString)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def velocityPIDTestRun(self, command, msg):
+        try:
+            if command == 'stop':
+                self.data.inPIDVelocityTest = False
+                print("PID velocity test stopped")
+                print(self.data.PIDVelocityTestData)
+                data = json.dumps({"result": "velocity", "version": self.data.PIDVelocityTestVersion, "data": self.data.PIDVelocityTestData})
+                self.data.ui_queue1.put("Action", "updatePIDData", data)
+                self.stopRun()
+            if command == 'running':
+                if msg.find("Kp=") == -1:
+                    if self.data.PIDVelocityTestVersion == "2":
+                        if msg.find("setpoint") == -1:
+                            self.data.PIDVelocityTestData.append(msg)
+                    else:
+                        self.data.PIDVelocityTestData.append(float(msg))
+            if command == 'start':
+                self.data.inPIDVelocityTest = True
+                self.data.PIDVelocityTestData = []
+                print("PID velocity test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def positionPIDTestRun(self, command, msg):
+        try:
+            if command == 'stop':
+                self.data.inPIDPositionTest = False
+                print("PID position test stopped")
+                print(self.data.PIDPositionTestData)
+                data = json.dumps({"result": "position", "version": self.data.PIDPositionTestVersion, "data": self.data.PIDPositionTestData})
+                self.data.ui_queue1.put("Action", "updatePIDData", data)
+                self.stopRun()
+            if command == 'running':
+                if msg.find("Kp=") == -1:
+                    if self.data.PIDPositionTestVersion == "2":
+                        if msg.find("setpoint") == -1:
+                            self.data.PIDPositionTestData.append(msg)
+                    else:
+                        self.data.PIDPositionTestData.append(float(msg))
+            if command == 'start':
+                self.data.inPIDPositionTest = True
+                self.data.PIDPositionTestData = []
+                print("PID position test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+

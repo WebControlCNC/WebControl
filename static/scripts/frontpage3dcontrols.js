@@ -105,3 +105,16 @@ function processControllerMessage(data){
     });
     $('#controllerMessage').scrollBottom();
 }
+
+function processAlert(data){
+    console.log("alert received");
+    $("#alerts").text(data.message);
+    $("#alerts").removeClass('alert-success').addClass('alert-danger');
+    $("#stopButton").addClass('stopbutton');
+}
+
+function clearAlert(data){
+    console.log("clearing alert");
+    $("#alerts").text("Alert cleared.");
+    $("#alerts").removeClass('alert-danger').addClass('alert-success');
+}

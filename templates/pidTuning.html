@@ -1,0 +1,475 @@
+
+{% block content %}
+<div class="container-fluid">
+  <div class="card" id="motorAdjustmentAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseMotorAdjustment" aria-expanded="false" aria-controls="collapseMotorAdjustment">
+      <h4 class="card-title" id="motorAdjustmentHeader">
+        Motor Adjustment...
+      </h4>
+    </button>
+    <div id="collapseMotorAdjustment" class="collapse" aria-labelledby="motorAdjustmentHeader" data-parent="#motorAdjustmentAccordion">
+      <div class = "row">
+        <div class = "col-6">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Top Left Motor</h3>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',10.0)">
+                    <i data-feather="rotate-cw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',5.0)">
+                    <i data-feather="rotate-cw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',1.0)">
+                    <i data-feather="rotate-cw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',0.1)">
+                    <i data-feather="rotate-cw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',-10.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',-5.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',-1.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','L',-0.1)">
+                    <i data-feather="rotate-ccw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class = "col-6">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Top Right Motor</h3>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-10.0)">
+                    <i data-feather="rotate-cw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-5.0)">
+                    <i data-feather="rotate-cw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-1.0)">
+                    <i data-feather="rotate-cw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-0.1)">
+                    <i data-feather="rotate-cw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',10.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',5.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',1.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',0.1)">
+                    <i data-feather="rotate-ccw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--<div class = "row">
+        <div class = "col-6">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Bottom Left Motor</h3>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','M',-10.0)">
+                    <i data-feather="rotate-cw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','M',-5.0)">
+                    <i data-feather="rotate-cw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','M',-1.0)">
+                    <i data-feather="rotate-cw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','M',-0.1)">
+                    <i data-feather="rotate-cw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','N',10.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','N',5.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','N',1.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','N',0.1)">
+                    <i data-feather="rotate-ccw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class = "col-6">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Bottom Right Motor</h3>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-10.0)">
+                    <i data-feather="rotate-cw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-5.0)">
+                    <i data-feather="rotate-cw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-1.0)">
+                    <i data-feather="rotate-cw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',-0.1)">
+                    <i data-feather="rotate-cw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',10.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    10
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',5.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    5
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',1.0)">
+                    <i data-feather="rotate-ccw"></i>
+                    1
+                  </button>
+                </div>
+                <div class="col-3 mb-1 px-1">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="action('rotateSprocket','R',0.1)">
+                    <i data-feather="rotate-ccw"></i>
+                    0.1
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      -->
+    </div>
+  </div>
+  <div class="card" id="velocityPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseVelocityPID" aria-expanded="false" aria-controls="collapseVelocityPID">
+      <h4 class="card-title" id="velocityPIDHeader">
+        Velocity PID Testing...
+      </h4>
+    </button>
+    <div id="collapseVelocityPID" class="collapse" aria-labelledby="velocityPIDHeader" data-parent="#velocityPIDAccordion">
+      <div class = "row">
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Settings</h4>
+             <div class="row">
+               <div class="col">
+                 <div class="form-group">
+                   <label for="vMotor">Motor</label>
+                   <div id="vMotor" class="btn-group btn-group-toggle" data-toggle="buttons">
+                   <label class="btn btn-secondary active">
+                     <input type="radio" name="options" id="vMotorTL" autocomplete="off" value="L"> Top Left
+                   </label>
+                   <label class="btn btn-secondary">
+                     <input type="radio" name="options" id="vMotorTR" autocomplete="off" value="R"> Top Right
+                   </label>
+                  <!-- <label class="btn btn-secondary">
+                     <input type="radio" name="options" id="vMotorBL" autocomplete="off" value="M"> Bottom Left
+                   </label>
+                   <label class="btn btn-secondary">
+                     <input type="radio" name="options" id="vMotorBR" autocomplete="off" value="N"> Bottom Right
+                   </label>
+                   -->
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="vStart">Start</label>
+                 <input class="form-control" name="vStart" id="vStart" value="{{vStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="vStop">Stop</label>
+                 <input class="form-control" name="vStop" id="vStop" value="{{vStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="vSteps">Steps</label>
+                 <input class="form-control" name="vSteps" id="vSteps" value="{{vSteps}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="vVersion">Version</label>
+                 <input class="form-control" name="vVersion" id="vVersion" value="{{vVersion}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="KpV">KpV</label>
+                 <input class="form-control" name="KpV" id="KpV" value="{{KpV}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KiV">KiV</label>
+                 <input class="form-control" name="KiV" id="KiV" value="{{KiV}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KdV">KdV</label>
+                 <input class="form-control" name="KdV" id="KdV" value="{{KdV}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="vExecute();">Execute</button>
+         </div>
+       </div>
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Test Results</h4>
+           <div class="col">
+             <div id="vErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+         </div>
+       </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="positionPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapsePositionPID" aria-expanded="false" aria-controls="collapsePositionPID">
+      <h4 class="card-title" id="positionPIDHeader">
+        Position PID Testing...
+      </h4>
+    </button>
+    <div id="collapsePositionPID" class="collapse" aria-labelledby="positionPIDHeader" data-parent="#positionPIDAccordion">
+      <div class = "row">
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Settings</h4>
+             <div class="row">
+               <div class="col">
+                 <div class="form-group">
+                   <label for="pMotor">Motor</label>
+                   <div id="pMotor" class="btn-group btn-group-toggle" data-toggle="buttons">
+                   <label class="btn btn-secondary active">
+                     <input type="radio" name="options" id="pMotorTL" autocomplete="off" value="L" > Top Left
+                   </label>
+                   <label class="btn btn-secondary">
+                     <input type="radio" name="options" id="pMotorTR" autocomplete="off" value="R"> Top Right
+                   </label>
+                   <!--
+                   <label class="btn btn-secondary">
+                     <input type="radio" name="options" id="pMotorBL" autocomplete="off" value="M"> Bottom Left
+                   </label>
+                   <label class="btn btn-secondary">
+                     <input type="radio" name="options" id="pMotorBR" autocomplete="off" value="N"> Bottom Right
+                   </label>
+                   -->
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="pStart">Start</label>
+                 <input class="form-control" name="pStart" id="pStart" value="{{pStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="pStop">Stop</label>
+                 <input class="form-control" name="pStop" id="pStop" value="{{pStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="pSteps">Steps</label>
+                 <input class="form-control" name="pSteps" id="pSteps" value="{{pSteps}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="pVersion">Version</label>
+                 <input class="form-control" name="pVersion" id="pVersion" value="{{pVersion}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-6">
+               <div class="form-group">
+                 <label for="pTime">Time</label>
+                 <input class="form-control" name="pTime" id="pTime" value="{{pTime}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="KpP">KpP</label>
+                 <input class="form-control" name="KpP" id="KpP" value="{{KpP}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KiP">KiP</label>
+                 <input class="form-control" name="KiP" id="KiP" value="{{KiP}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KdV">KdP</label>
+                 <input class="form-control" name="KdP" id="KdP" value="{{KdP}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="pExecute();">Execute</button>
+         </div>
+       </div>
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Test Results</h4>
+           <div class="col">
+             <div id="pErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+         </div>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018l') }}" crossorigin="anonymous"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script> feather.replace() </script>
+{% endblock %}

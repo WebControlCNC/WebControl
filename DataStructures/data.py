@@ -72,6 +72,10 @@ class Data:
     connectionStatus = 0
     # is the calibration process currently underway 0 -> false
     calibrationInProcess = False
+    inPIDVelocityTest = False
+    inPIDPositionTest = False
+    PIDVelocityTestVersion = 0
+    PIDPositionTestVersion = 0
 
     """
     Pointers to Objects
@@ -132,6 +136,8 @@ class Data:
     previousPosY = 0.0
     previousPosZ = 0.0
 
+    shutdown = False
+    
     def __init__(self):
         """
 

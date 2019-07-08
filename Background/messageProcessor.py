@@ -99,6 +99,25 @@ class MessageProcessor(MakesmithInitFuncs):
                                 )
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
+
+                    ### Velocity PID Testing Processing###
+                    elif message[0:26] == "--PID Velocity Test Stop--":
+                        self.data.actions.velocityPIDTestRun("stop", "")
+                    elif self.data.inPIDVelocityTest:
+                        self.data.actions.velocityPIDTestRun("running", message)
+                    elif message[0:27] == "--PID Velocity Test Start--":
+                        self.data.actions.velocityPIDTestRun("start", "")
+                    ### END ###
+
+                    ### Position PID Testing Processing###
+                    elif message[0:26] == "--PID Position Test Stop--":
+                        self.data.actions.positionPIDTestRun("stop", "")
+                    elif self.data.inPIDPositionTest:
+                        self.data.actions.positionPIDTestRun("running", message)
+                    elif message[0:27] == "--PID Position Test Start--":
+                        self.data.actions.positionPIDTestRun("start", "")
+                    ### END ###
+
                     else:
                         self.data.ui_controller_queue.put(message)
 

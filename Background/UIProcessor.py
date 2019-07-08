@@ -71,12 +71,23 @@ class UIProcessor:
                                 if message.find("adjust Z-Axis") != -1:
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
+                                elif message.find("Unable to find valid") != -1:
+                                    self.sendAlert(message);
                                 else:
                                     self.activateModal("Notification:", message[9:], "notification")
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
+                                    self.sendAlert("Alarm: Sled Not Keeping Up")
+                                elif message.find("Position Lost") != -1:
+                                    self.sendAlert("Alarm: Position Lost.  Reset Chains.")
+                                else:
+                                    self.sendAlert(message);
+                            elif message[0:6] == "Unable to":
+                                if message.find("The sled is not keeping up") != -1:
                                     pass
-                                self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
+                                self.sendAlert("Alarm: Sled Not Keeping Up")
+
+                                #self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
                                 pass  # displaying all the 'ok' messages clutters up the display
                             else:
@@ -135,12 +146,23 @@ class UIProcessor:
             namespace="/MaslowCNC",
         )
 
+    def sendAlert(self, message):
+        data = json.dumps({"message":message})
+        socketio.emit("message", {"command": "alert", "data": data, "dataFormat": "json"},
+            namespace="/MaslowCNC",
+        )
+
     def sendControllerMessage(self, message):
         socketio.emit("message", {"command": "controllerMessage", "data": json.dumps(message), "dataFormat": "json"},
                       namespace="/MaslowCNC")
         #socketio.emit(
         #    "controllerMessage", {"data": message}, namespace="/MaslowCNC"
         #)
+
+    def sendWebMCPMessage(self, message):
+        #print(message)
+        #socketio.emit("message", {"command": json.dumps(message), "dataFormat": "json"},namespace="/WebMCP")
+        socketio.emit("shutdown",namespace="/WebMCP")
 
     def sendPositionMessage(self, position):
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
@@ -154,6 +176,15 @@ class UIProcessor:
         socketio.emit(
             "message", {"command":"cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
         )
+
+    def updatePIDData(self, message, _data=""):
+
+        data = json.dumps({"command": message, "data": _data})
+        print(data)
+        socketio.emit(
+            "message", {"command":"updatePIDData", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+        )
+
 
     def sendGcodeUpdate(self):
         if self.app.data.compressedGCode3D is not None:
@@ -184,6 +215,8 @@ class UIProcessor:
 
     def processMessage(self, _message):
         msg = json.loads(_message)
+        if msg["command"] == "WebMCP":
+            self.sendWebMCPMessage(msg["message"])
         if msg["command"] == "Action":
             if msg["message"] == "gcodeUpdate":
                 self.sendGcodeUpdate()
@@ -196,6 +229,12 @@ class UIProcessor:
                 self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
             elif msg["message"] == "updateCamera":
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
+            elif msg["message"] == "updatePIDData":
+                self.updatePIDData("updatePIDData", json.loads(msg["data"]))
+            elif msg["message"] == "clearAlert":
+                msg["data"] = json.dumps({"data":""})
+                socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
+                              namespace="/MaslowCNC")
             else:
                 if msg["message"] == "setAsPause":
                     msg["message"] = "requestedSetting"

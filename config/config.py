@@ -327,6 +327,7 @@ class Config(MakesmithInitFuncs):
                                 value = 0
 
                         if firmwareKey == 45:
+                            print(self.data.controllerFirmwareVersion)
                             self.data.console_queue.put("firmwareKey = 45")
                             if storedValue != "":
                                 self.sendErrorArray(firmwareKey, storedValue, data)
