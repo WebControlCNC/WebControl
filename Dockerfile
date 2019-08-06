@@ -26,8 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install numpy==1.16.2
 
 # Build OpenCV
-ADD tools/download_build_install_opencv.sh /download_build_install_opencv.sh
-RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv.sh
+# ADD tools/download_build_install_opencv.sh /download_build_install_opencv.sh
+# RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv.sh
 
 # Get other python dependencies
 ADD requirements.txt /requirements.txt
@@ -46,6 +46,14 @@ RUN apt-get update \
     && pio platform install --with-package framework-arduinoavr atmelavr \
     && pio lib -g install "Servo"
 
+ARG schmittjoshc_firmware_repo=https://github.com/schmittjoshc/Firmware.git
+ARG schmittjoshc_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
+RUN git clone $schmittjoshc_firmware_repo firmware/schmittjoshc \
+    && cd firmware/schmittjoshc \
+    && git checkout $schmittjoshc_firmware_sha \
+    && pio run -e megaatmega2560 \
+    && mkdir build \
+    && mv .pioenvs/megaatmega2560/firmware.hex build/$schmittjoshc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
 ARG madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
 #ARG madgrizzle_firmware_sha=95f7d4b5c431dec162d2e2eec7c6e42530298c4b

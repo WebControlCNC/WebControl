@@ -1,6 +1,5 @@
 
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import os
 import sys

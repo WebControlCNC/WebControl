@@ -720,33 +720,3 @@ class OpticalCalibration(MakesmithInitFuncs):
         (cnts, boundingBoxes) = zip(*sorted(zip(cnts, boundingBoxes), key=lambda b: b[1][i], reverse=reverse))
         # return the list of sorted contours and bounding boxes
         return cnts, boundingBoxes
-
-
-
-#import numpy as np
-#import cv2
-#import cv2.aruco as aruco
-#import pickle
-#import itertools
-
-#aruco_dict = aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
-#aruco_dict = aruco.Dictionary_create(96*48,6)
-#aruco_dict_bytes = aruco_dict.bytesList
-#aruco_dict_markerSize = aruco_dict.markerSize
-#aruco_dict_maxCorrectionBits = aruco_dict.maxCorrectionBits
-#aruco_board = aruco.GridBoard_create(16,16,0.04, 0.01, aruco_dict)
-#img = aruco.drawPlanarBoard(aruco_board,(2048,1024))
-#aruco_store = (aruco_dict_bytes,aruco_dict_markerSize,aruco_dict_maxCorrectionBits)
-#aruco_store_pickle = pickle.dump(aruco_store,open("aruco_dictionary.p","wb"))
-
-#aruco_store_depickle = pickle.load(open("aruco_dictionary.p","rb"))
-#aruco_dict = aruco.Dictionary_create(5*5,6)
-#aruco_dict.bytesList = aruco_store_depickle[0]
-#aruco_dict.markerSize = aruco_store_depickle[1]
-#aruco_dict.maxCorrectionBits = aruco_store_depickle[2]
-#aruco_board = aruco.GridBoard_create(96,48,0.04, 0.01, aruco_dict)
-#img = aruco.drawPlanarBoard(aruco_board,(2048,1024))
-#cv2.imwrite("aruco_board.png",img)
-#cv2.imshow('frame',img)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
