@@ -130,8 +130,15 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    xval_prev = -99990.0
+    yval_prev = -99990.0
+    zval_prev = -99990.0
+
     pausedzval = 0.0
 
+    """
+    GCode Position Values
+    """
     previousPosX = 0.0
     previousPosY = 0.0
     previousPosZ = 0.0

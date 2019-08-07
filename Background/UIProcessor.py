@@ -23,12 +23,12 @@ class UIProcessor:
                     time.sleep(2)
                     self.activateModal("Notification:",
                                        "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.","notification")
-                if self.app.data.opticalCalibrationImageUpdated is True:
-                    self.sendCalibrationImage(
-                        "OpticalCalibrationImageUpdated",
-                        self.app.data.opticalCalibrationImage,
-                    )
-                    self.app.data.opticalCalibrationImageUpdated = False
+                #if self.app.data.opticalCalibrationImageUpdated is True:
+                #    self.sendCalibrationImage(
+                #        "OpticalCalibrationImageUpdated",
+                #        self.app.data.opticalCalibrationImage,
+                #    )
+                #    self.app.data.opticalCalibrationImageUpdated = False
                 if self.app.data.cameraImageUpdated is True:
                     if time.time()-self.lastCameraTime > .25:
                         self.sendCameraMessage(
@@ -37,12 +37,12 @@ class UIProcessor:
                         )
                         self.app.data.cameraImageUpdated = False
                         self.lastCameraTime = time.time()
-                if self.app.data.opticalCalibrationTestImageUpdated is True:
-                    self.sendCalibrationImage(
-                        "OpticalCalibrationTestImageUpdated",
-                        self.app.data.opticalCalibrationTestImage,
-                    )
-                    self.app.data.opticalCalibrationTestImageUpdated = False
+                #if self.app.data.opticalCalibrationTestImageUpdated is True:
+                #    self.sendCalibrationImage(
+                #        "OpticalCalibrationTestImageUpdated",
+                #        self.app.data.opticalCalibrationTestImage,
+                #    )
+                #    self.app.data.opticalCalibrationTestImageUpdated = False
                 while ( not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
                     if not self.app.data.ui_controller_queue.empty():
                         message = self.app.data.ui_controller_queue.get()
@@ -124,21 +124,31 @@ class UIProcessor:
                 if math.isnan(self.app.data.zval):
                     self.sendControllerMessage("Unable to resolve z Kinematics.")
                     self.app.data.zval = 0
+
         except:
             self.app.data.console_queue.put("One Machine Position Report Command Misread")
             return
 
+        xdiff = abs(self.app.data.xval - self.app.data.xval_prev)
+        ydiff = abs(self.app.data.yval - self.app.data.yval_prev)
+        zdiff = abs(self.app.data.zval - self.app.data.zval_prev)
+
         percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
 
-        position = {
-            "xval": self.app.data.xval,
-            "yval": self.app.data.yval,
-            "zval": self.app.data.zval,
-            "pcom": percentComplete,
-            "state": state
-        }
+        if (xdiff + ydiff + zdiff) > 0.01:
+            position = {
+                "xval": self.app.data.xval,
+                "yval": self.app.data.yval,
+                "zval": self.app.data.zval,
+                "pcom": percentComplete,
+                "state": state
+            }
+            self.sendPositionMessage(position)
+            self.app.data.xval_prev = self.app.data.xval
+            self.app.data.yval_prev = self.app.data.yval
+            self.app.data.zval_prev = self.app.data.zval
+            #self.app.data.console_queue.put("Update position")
 
-        self.sendPositionMessage(position)
 
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
         data = json.dumps({"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType})

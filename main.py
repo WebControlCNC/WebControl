@@ -367,7 +367,6 @@ def test_connect():
 
     socketio.emit("my response", {"data": "Connected", "count": 0})
 
-
 @socketio.on("disconnect", namespace="/MaslowCNC")
 def test_disconnect():
     app.data.console_queue.put("Client disconnected")

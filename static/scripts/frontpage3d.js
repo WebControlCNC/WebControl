@@ -181,9 +181,9 @@ function unitSwitch(){
 }
 
 $(document).ready(function(){
-    settingRequest("Computed Settings","units");
-    settingRequest("Computed Settings","distToMove");
-    settingRequest("Computed Settings","homePosition");
+    //settingRequest("Computed Settings","units");
+    //settingRequest("Computed Settings","distToMove");
+    //settingRequest("Computed Settings","homePosition");
     action("statusRequest","cameraStatus");
     checkForGCodeUpdate();
     var controllerMessage = document.getElementById('controllerMessage');

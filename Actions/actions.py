@@ -845,6 +845,8 @@ class Actions(MakesmithInitFuncs):
                 except Exception as e:
                     self.data.console_queue.put(str(e))
             else:
+                if setting == "units":
+                    self.data.xval_prev = -99999.0 #force a new position send
                 retval = self.data.config.getValue(section, setting)
                 return setting, retval
         except Exception as e:

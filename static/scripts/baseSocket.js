@@ -16,6 +16,9 @@
           $("#clientStatus").text("Connected");
           $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
           $("#mobileClientStatus").removeClass('alert-danger').addClass('alert-success');
+          settingRequest("Computed Settings","units");
+          settingRequest("Computed Settings","distToMove");
+          settingRequest("Computed Settings","homePosition");
           //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
       });
 
