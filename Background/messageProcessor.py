@@ -25,9 +25,7 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.config.receivedSetting(message)
                     elif message[0] == "[":
                         if message[1:4] == "PE:":
-                            # todo:
-                            oo = 1
-                            # app.setErrorOnScreen(message)
+                            self.data.ui_controller_queue.put(message)
                         elif message[1:8] == "Measure":
                             measuredDist = float(message[9 : len(message) - 3])
                             try:

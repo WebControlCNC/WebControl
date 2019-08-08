@@ -217,6 +217,9 @@ class WebPageProcessor:
             positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
             page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
             return page, "Optical Calibration", True, "large", "content", False
+        elif pageID == "holeyCalibration":
+            page = render_template("holeyCalibration.html", pageID="holeyCalibration")
+            return page, "Holey Calibration", True, "large", "content", False
         elif pageID == "quickConfigure":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorOffsetY = self.data.config.getValue("Maslow Settings", "motorOffsetY")

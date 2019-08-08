@@ -55,6 +55,11 @@ function processPositionMessage(data){
   $('#machineState').html(data.state)
 }
 
+function processErrorValueMessage(data){
+ $('#leftError').css('width', data.leftError*100+'%').attr('aria-valuenow', data.leftError*100);
+ $('#rightError').css('width', data.rightError*100+'%').attr('aria-valuenow', data.rightError*100);
+}
+
 function processHomePositionMessage(data){
   $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
 }

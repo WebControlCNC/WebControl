@@ -51,9 +51,7 @@ class UIProcessor:
                                 self.setPosOnScreen(message)
                             elif message[0] == "[":
                                 if message[1:4] == "PE:":
-                                    # todo:
-                                    oo = 1
-                                    # app.setErrorOnScreen(message)
+                                    self.setErrorOnScreen(message)
                             elif message[0:13] == "Maslow Paused":
                                 self.app.data.console_queue.put("caught maslow paused")
                                 self.app.data.uploadFlag = 0
@@ -150,6 +148,44 @@ class UIProcessor:
             #self.app.data.console_queue.put("Update position")
 
 
+    def setErrorOnScreen(self, message):
+        limit = float(self.app.data.config.getValue("Advanced Settings", "positionErrorLimit"))
+        if limit != 0:
+            try:
+                with self.app.app_context():
+                    startpt = message.find(':') + 1
+                    endpt = message.find(',', startpt)
+                    leftErrorValueAsString = message[startpt:endpt]
+                    self.app.data.leftError = float(leftErrorValueAsString)/limit
+
+                    startpt = endpt + 1
+                    endpt = message.find(',', startpt)
+                    rightErrorValueAsString = message[startpt:endpt]
+                    self.app.data.rightError = float(rightErrorValueAsString)/limit
+
+                    if math.isnan(self.app.data.leftError):
+                        self.app.data.leftErrorValue = 0
+                    if math.isnan(self.app.data.rightError):
+                        self.app.data.rightErrorValue = 0
+            except:
+                self.app.data.console_queue.put("One Error Report Command Misread")
+                return
+
+            leftDiff = abs(self.app.data.leftError - self.app.data.leftError_prev)
+            rightDiff = abs(self.app.data.rightError - self.app.data.rightError_prev)
+
+            if (leftDiff + rightDiff ) >= 0.001:
+                errorValues = {
+                    "leftError": abs(self.app.data.leftError),
+                    "rightError": abs(self.app.data.rightError),
+                }
+                self.sendErrorValueMessage(errorValues)
+                self.app.data.leftError_prev = self.app.data.leftError
+                self.app.data.rightError_prev = self.app.data.rightError
+                #self.app.data.console_queue.put("Update error values")
+
+
+
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
         data = json.dumps({"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType})
         socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
@@ -176,6 +212,10 @@ class UIProcessor:
 
     def sendPositionMessage(self, position):
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
+                      namespace="/MaslowCNC")
+
+    def sendErrorValueMessage(self, position):
+        socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
 

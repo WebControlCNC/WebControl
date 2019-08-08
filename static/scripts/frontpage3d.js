@@ -241,6 +241,14 @@ function processPositionMessage(data){
   positionUpdate(data.xval,data.yval,data.zval);
 }
 
+function processErrorValueMessage(data){
+ //console.log(data.leftError);
+ $('#leftError').css('width', data.leftError*100+'%').attr('aria-valuenow', data.leftError*100);
+ $('#rightError').css('width', data.rightError*100+'%').attr('aria-valuenow', data.rightError*100);
+ //$('#errorValueMessage').html('left:'+data.leftError+' right:'+data.rightError);
+}
+
+
 function processHomePositionMessage(data){
   $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
   homePositionUpdate(data.xval,data.yval);

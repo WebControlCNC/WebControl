@@ -76,6 +76,9 @@
                      processPositionMessageOptical(data)
                 }
                 break;
+            case 'errorValueMessage':
+                processErrorValueMessage(data)
+                break;
             case 'homePositionMessage':
                 //completed
                 processHomePositionMessage(data);

@@ -18,6 +18,7 @@ from Background.WebMCPProcessor import ConsoleProcessor
 from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
+
 from os import listdir
 from os.path import isfile, join
 

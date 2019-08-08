@@ -4,6 +4,7 @@ from File.gcodeFile import GCodeFile
 from File.importFile import ImportFile
 from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
+from Actions.holeyCalibration import HoleyCalibration
 #from Actions.opticalCalibration import OpticalCalibration
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
@@ -24,6 +25,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     actions = Actions()
     triangularCalibration = TriangularCalibration()
 #    opticalCalibration = OpticalCalibration()
+    holeyCalibration = HoleyCalibration()
     messageProcessor = MessageProcessor()
     mcpProcessor = WebMCPProcessor()
     consoleProcessor = ConsoleProcessor()

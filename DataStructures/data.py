@@ -134,6 +134,11 @@ class Data:
     yval_prev = -99990.0
     zval_prev = -99990.0
 
+    leftError = 0.0
+    rightError = 0.0
+    leftError_prev = -99999.0
+    rightError_prev = -99999.9
+
     pausedzval = 0.0
 
     """

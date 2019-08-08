@@ -1,0 +1,10 @@
+
+{% block content %}
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/svg.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/holeyCalibration.js', version='12112018c') }}" crossorigin="anonymous"></script>
+<script> feather.replace() </script>
+{% endblock %}
