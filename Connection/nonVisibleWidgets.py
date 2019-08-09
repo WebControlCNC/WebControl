@@ -50,6 +50,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.importFile = self.importFile
         data.actions = self.actions
         data.triangularCalibration = self.triangularCalibration
+        data.holeyCalibration = self.holeyCalibration
 #        data.opticalCalibration = self.opticalCalibration
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
@@ -61,6 +62,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.importFile.setUpData(data)
         self.actions.setUpData(data)
         self.triangularCalibration.setUpData(data)
+        self.holeyCalibration.setUpData(data)
 #        self.opticalCalibration.setUpData(data)
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)

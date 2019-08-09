@@ -58,6 +58,16 @@
             "firmwareKey": 41
         },
         {
+            "default": 5.1685e-6,
+            "desc": "Elasticity of the Chain [mm/mm/N]\ndefault setting: 5.1685e-6",
+            "key": "chainElasticity",
+            "section": "Advanced Settings",
+            "title": "Chain Elasticity",
+            "type": "float",
+            "value": 5.1685e-6,
+            "firmwareKey": 75
+        },
+        {
             "default": "Top",
             "desc": "On which side of the motor sprockets do the chains leave from to connect to the sled\ndefault setting: Top",
             "key": "chainOverSprocket",
@@ -198,7 +208,7 @@
         {
             "default": 0,
             "desc": "Enable modifying x,y coordinates during calculations to account for errors determined by optical calibration\ndefault setting: 0",
-            "firmwareKey": 44,
+            "firmwareKey": 144,
             "key": "enableOpticalCalibration",
             "section": "Advanced Settings",
             "title": "Use Calibration Error Matrix (Experimental)",
@@ -599,6 +609,16 @@
             "title": "Distance Between Sled Mounting Points",
             "type": "string",
             "value": "310"
+        },
+        {
+            "default": 97.9,
+            "desc": "Weight of sled [N].\ndefault setting: 97.9",
+            "firmwareKey": 76,
+            "key": "sledWeight",
+            "section": "Maslow Settings",
+            "title": "Sled Weight",
+            "type": "float",
+            "value": 97.9
         },
         {
             "default": 139,

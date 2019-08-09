@@ -1,0 +1,17 @@
+{% block content %}
+<div class="container-fluid">
+  <pre id="editor">{{gcode}}
+  </pre>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/ace.js') }}" crossorigin="anonymous"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/twilight");
+    editor.session.setMode("ace/mode/javascript");
+</script>
+{% endblock %}
+
+

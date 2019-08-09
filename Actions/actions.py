@@ -21,6 +21,12 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "acceptTriangularCalibrationResults":
                 if not self.data.triangularCalibration.acceptTriangularCalibrationResults():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with accepting triangular calibration results.")
+            if msg["data"]["command"] == "cutHoleyCalibrationPattern":
+                if not self.data.holeyCalibration.CutTestPattern():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with cutting holey calibration pattern.")
+            elif msg["data"]["command"] == "acceptHoleyCalibrationResults":
+                if not self.data.holeyCalibration.acceptCalibrationResults():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with accepting holey calibration results.")
             elif msg["data"]["command"] == "resetChainLengths":
                 if not self.resetChainLengths():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting chain lengths.")
@@ -768,6 +774,25 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+
+    def holeyCalibrate(self, result):
+        try:
+            motorYoffsetEst, distanceBetweenMotors, leftChainTolerance, rightChainTolerance, calibrationError = self.data.holeyCalibration.Calibrate(
+                result
+            )
+            if not motorYoffsetEst:
+                return False
+            return (
+                motorYoffsetEst,
+                distanceBetweenMotors,
+                leftChainTolerance,
+                rightChainTolerance,
+                calibrationError,
+            )
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
 
     def sendGcode(self, gcode):
         try:

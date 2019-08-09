@@ -8,6 +8,7 @@ and using the data in this dict.
 import json
 import re
 import os
+import math
 from shutil import copyfile
 from pathlib import Path
 import time
@@ -327,27 +328,29 @@ class Config(MakesmithInitFuncs):
                                 value = 0
 
                         if firmwareKey == 45:
-                            print(self.data.controllerFirmwareVersion)
-                            self.data.console_queue.put("firmwareKey = 45")
-                            if storedValue != "":
-                                self.sendErrorArray(firmwareKey, storedValue, data)
-                            pass
+                            if self.data.controllerFirmwareVersion >= 100:
+                                print(self.data.controllerFirmwareVersion)
+                                self.data.console_queue.put("firmwareKey = 45")
+                                if storedValue != "":
+                                    self.sendErrorArray(firmwareKey, storedValue, data)
+                                pass
                         elif useStored is True:
-                            app.data.gcode_queue.put(
-                                "$" + str(firmwareKey) + "=" + str(storedValue)
-                            )
+                            strValue = self.firmwareKeyString(firmwareKey,storedValue)
+                            app.data.gcode_queue.put(strValue)
+                            #app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                         elif firmwareKey >= 47 and firmwareKey <= 58:
-                            if not self.isPercentClose(float(storedValue), float(value)):
-                                if not isImporting:
-                                    app.data.gcode_queue.put(
-                                        "$" + str(firmwareKey) + "=" + str(storedValue)
-                                    )
-                            else:
-                                break
+                            if self.data.controllerFirmwareVersion >= 100:
+                                if not self.isPercentClose(float(storedValue), float(value)):
+                                    if not isImporting:
+                                        strValue = self.firmwareKeyString(firmwareKey, storedValue)
+                                        app.data.gcode_queue.put(strValue)
+                                        # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
+                                else:
+                                    break
                         elif not self.isClose(float(storedValue), float(value)) and not isImporting:
-                                app.data.gcode_queue.put(
-                                    "$" + str(firmwareKey) + "=" + str(storedValue)
-                                )
+                            strValue = self.firmwareKeyString(firmwareKey, storedValue)
+                            app.data.gcode_queue.put(strValue)
+                            # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                         else:
                             break
         return
@@ -575,3 +578,23 @@ class Config(MakesmithInitFuncs):
         ### TODO: This does not currently fire on bools ##
         if key == "fps" or key == "videoSize" or key=="cameraSleep":
             self.data.camera.changeSetting(key, value)
+
+
+    def firmwareKeyString(self, firmwareKey, value):
+        strValue = self.firmwareKeyValue(value)
+        gc = "$" + str(firmwareKey) + "=" + strValue
+        return gc
+
+
+    def firmwareKeyValue(self, value):
+        try:
+            de = math.log(abs(value), 10)
+            ru = math.ceil(de)
+        except:
+            ru = 0
+        fmt = '{:' + str(int(max(max(7 - ru, 7), abs(ru)))) + '.' + str(int(6 - ru)) + 'f}'
+        try:
+            return fmt.format(value)
+        except:
+            print('firmwareKeyString Exception: value = ' + str(value))
+            return str(value)

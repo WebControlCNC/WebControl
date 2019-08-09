@@ -45,7 +45,6 @@
 }
 
 
-
 .loader {
     width: calc(100% - 0px);
 	height: calc(100% - 0px);
@@ -58,3 +57,14 @@
 @keyframes rotate {
 100% {transform: rotate(360deg);}
 }
+
+ #editor {
+        margin: 0;
+        position: relative;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60vh;
+    }
+

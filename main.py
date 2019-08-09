@@ -259,6 +259,34 @@ def triangularCalibration():
             resp.status_code = 500
             return resp
 
+@app.route("/holeyCalibration", methods=["POST"])
+def holeyCalibration():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        result = request.form
+        motorYoffsetEst, distanceBetweenMotors, leftChainTolerance, rightChainTolerance, calibrationError = app.data.actions.holeyCalibrate(
+            result
+        )
+        # print(returnVal)
+        if motorYoffsetEst:
+            message = {
+                "status": 200,
+                "data": {
+                    "motorYoffset": motorYoffsetEst,
+                    "distanceBetweenMotors": distanceBetweenMotors,
+                    "leftChainTolerance": leftChainTolerance,
+                    "rightChainTolerance": rightChainTolerance,
+                    "calibrationError": calibrationError
+                },
+            }
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
 
 @app.route("/opticalCalibration", methods=["POST"])
 def opticalCalibration():

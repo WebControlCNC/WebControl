@@ -83,6 +83,7 @@ class Data:
     serialPort = None  # this is a pointer to the program serial port object
     requestSerialClose = False  # this is used to request the serialThread to gracefully close the port
     triangularCalibration = None  # points to the triangular calibration object
+    holeyCalibration = None  # points to the triangular calibration object
 #    opticalCalibration = None  # points to the optical calibration object
 #    opticalCalibrationImage = None  # stores the current image
 #    opticalCalibrationImageUpdated = False  # stores whether its been updated or not

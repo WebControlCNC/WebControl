@@ -218,8 +218,20 @@ class WebPageProcessor:
             page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
             return page, "Optical Calibration", True, "large", "content", False
         elif pageID == "holeyCalibration":
-            page = render_template("holeyCalibration.html", pageID="holeyCalibration")
-            return page, "Holey Calibration", True, "large", "content", False
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
+            distanceBetweenMotors = self.data.config.getValue("Maslow Settings", "motorSpacingX")
+            leftChainTolerance = self.data.config.getValue("Advanced Settings", "leftChainTolerance")
+            rightChainTolerance = self.data.config.getValue("Advanced Settings", "rightChainTolerance")
+            page = render_template(
+                "holeyCalibration.html",
+                pageID="holeyCalibration",
+                motorYoffset=motorYoffset,
+                distanceBetweenMotors=distanceBetweenMotors,
+                leftChainTolerance=leftChainTolerance,
+                rightChainTolerance=rightChainTolerance,
+            )
+            return page, "Holey Calibration", True, "medium", "content", False
         elif pageID == "quickConfigure":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorOffsetY = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -252,9 +264,10 @@ class WebPageProcessor:
         elif pageID == "viewGcode":
             page = render_template("viewGcode.html", gcode=self.data.gcode)
             return page, "View GCode", False, "medium", "content", False
-        elif pageID == "sendGcode":
-            page = render_template("sendGcode.html")
-            return page, "Send GCode", False, "medium", "content", False
+        elif pageID == "editGCode":
+            text = self.gcodePreProcessor()
+            page = render_template("editGCode.html", gcode=text)
+            return page, "Edit GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "pidTuning":
             KpP = self.data.config.getValue("Advanced Settings", "KpPos")
             KiP = self.data.config.getValue("Advanced Settings", "KiPos")
@@ -275,3 +288,8 @@ class WebPageProcessor:
                                    pVersion=pVersion)
             return page, "PID Tuning", False, "large", "content", False
 
+    def gcodePreProcessor(self):
+        text = ""
+        for line in self.data.gcode:
+            text=text+line+"\n"
+        return text

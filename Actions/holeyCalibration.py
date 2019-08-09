@@ -21,12 +21,12 @@ class HoleyCalibration(MakesmithInitFuncs):
         # can't do much because data hasn't been initialized yet
         pass
 
-    SP_D = 3601.2
-    SP_motorOffsetY = 468.4
-    SP_rotationDiskRadius = 139.1
+    SP_D = 3629.025
+    SP_motorOffsetY = 503.4
+    SP_rotationDiskRadius = 138.1
     SP_leftChainTolerance = 0
     SP_rightChainTolerance = 0
-    SP_sledWeight = 97.9  # N
+    SP_sledWeight = 109.47  # N
     SP_chainOverSprocket = False
 
     Opt_D = 3601.2
@@ -58,6 +58,7 @@ class HoleyCalibration(MakesmithInitFuncs):
     OptimizationOutput = 0
 
     kin = kinematics.Kinematics()
+    kin.isQuadKinematics = False
 
     # Define function with input of (ideal lengths and) machine parameters (delta) and output of length error
     def LengthDeltaFromIdeal(self,
@@ -84,19 +85,22 @@ class HoleyCalibration(MakesmithInitFuncs):
         else:
             return Meas > 0.0
 
-    def CutTestPattern(self, data):
-        print('Cutting Holey Calibration Test Pattern')
-        data.gcode_queue.put("G21")
-        data.gcode_queue.put("G90")  # Switch to absolute mode
-        data.gcode_queue.put("G40")
-        data.gcode_queue.put("G17")
-        data.gcode_queue.put("M3")
+    def CutTestPattern(self):
+        self.data.console_queue.put('Cutting Holey Calibration Test Pattern')
+        self.data.gcode_queue.put("G21")
+        self.data.gcode_queue.put("G90")  # Switch to absolute mode
+        self.data.gcode_queue.put("G40")
+        self.data.gcode_queue.put("G17")
+        self.data.gcode_queue.put("M3")
         for idx in self.CutOrder:
             x, y = self.IdealCoordinates[idx]
-            print('cutting index: ' + str(idx + 1))
-            CutHole(data, x, y)
-        data.gcode_queue.put("G0 X0 Y0")
-        data.gcode_queue.put("M5")
+            self.data.console_queue.put('cutting index: ' + str(idx + 1))
+            self.data.gcode_queue.put("G0 X" + str(x) + " Y" + str(y))
+            self.data.gcode_queue.put("G0 Z-5")
+            self.data.gcode_queue.put("G0 Z5")
+
+        self.data.gcode_queue.put("G0 X0 Y0")
+        self.data.gcode_queue.put("M5")
 
     def CalculateMeasurements(self, HolePositions):
         #        aH1x,aH1y,aH2x,aH2y,aH3x,aH3y,aH4x,aH4y,aH5x,aH5y,aH6x,aH6y
@@ -104,10 +108,10 @@ class HoleyCalibration(MakesmithInitFuncs):
         for StartHoleIdx, EndHoleIdx in self.MeasurementMap:
             x1, y1 = HolePositions[StartHoleIdx - 1]
             x2, y2 = HolePositions[EndHoleIdx - 1]
-            Measurements.append(GeometricLength(x1, y1, x2, y2))
+            Measurements.append(self.GeometricLength(x1, y1, x2, y2))
         ToTopHole = 1
         Measurements.append(
-            GeometricLength(HolePositions[ToTopHole][0], HolePositions[ToTopHole][1], HolePositions[ToTopHole][0],
+            self.GeometricLength(HolePositions[ToTopHole][0], HolePositions[ToTopHole][1], HolePositions[ToTopHole][0],
                             self.kin.machineHeight / 2))
 
         return numpy.array(Measurements)
@@ -145,46 +149,52 @@ class HoleyCalibration(MakesmithInitFuncs):
     def SetMeasurements(self, Measurements):
         self.MeasuredLengthArray = numpy.array(Measurements)
 
-    def Calibrate(self):
+    def Calibrate(self, result):
+        self.InitializeIdealXyCoordinates()
+        measurements = self.processMeasurements(result)
+        self.SetMeasurements(measurements)
         self.OptimizationOutput = least_squares(self.LengthDeltaFromIdeal, numpy.array([0, 0, 0, 0]), jac='2-point',
                                                 diff_step=.1, ftol=1e-11)
         Deltas = self.OptimizationOutput.x
-        self.Opt_D = Deltas[0] + self.SP_D
-        self.Opt_motorOffsetY = Deltas[1] + self.SP_motorOffsetY
-        self.Opt_leftChainTolerance = Deltas[2] + self.SP_leftChainTolerance
-        self.Opt_rightChainTolerance = Deltas[3] + self.SP_rightChainTolerance
+        self.Opt_D = round(Deltas[0] + self.SP_D,5)
+        self.Opt_motorOffsetY = round(Deltas[1] + self.SP_motorOffsetY,5)
+        self.Opt_leftChainTolerance = round(Deltas[2] + self.SP_leftChainTolerance,5)
+        self.Opt_rightChainTolerance = round(Deltas[3] + self.SP_rightChainTolerance,5)
         self.kin.D = self.Opt_D
         self.kin.motorOffsetY = self.Opt_motorOffsetY
         self.kin.leftChainTolerance = self.Opt_leftChainTolerance
         self.kin.rightChainTolerance = self.Opt_rightChainTolerance
         self.kin.recomputeGeometry()
+        self.ReportCalibration()
+        return self.Opt_motorOffsetY, self.Opt_D, self.Opt_leftChainTolerance, self.Opt_rightChainTolerance, 1
+
 
     def ReportCalibration(self):
-        print('Optimized Errors')
+        self.data.console_queue.put('Optimized Errors')
         for idx, pts, ms, cal, er in zip(
                 range(self.MeasuredLengthArray.size),
                 self.MeasurementMap,
                 self.MeasuredLengthArray,
                 self.CalibratedLengths(),
                 self.CalibratedLengthError()):
-            print(('\tIndex                : {}' +
+            self.data.console_queue.put(('\tIndex                : {}' +
                    '\n\t\tPoints Span        : {} to {}' +
                    '\n\t\tMeasured Distance  : {}' +
                    '\n\t\tCalibrated Distance: {}' +
                    '\n\t\tDistance Error     : {}').format(
                 idx, pts[0], pts[1], ms, cal, er))
-        print("")
-        print("Distance Between Motors:")
-        print(self.Opt_D)
-        print("")
-        print("Motor Y Offset:")
-        print(self.Opt_motorOffsetY)
-        print("")
-        print("Left Chain Tolerance:")
-        print(self.Opt_leftChainTolerance)
-        print("")
-        print("Right Chain Tolerance:")
-        print(self.Opt_rightChainTolerance)
+        self.data.console_queue.put("")
+        self.data.console_queue.put("Distance Between Motors:")
+        self.data.console_queue.put(self.Opt_D)
+        self.data.console_queue.put("")
+        self.data.console_queue.put("Motor Y Offset:")
+        self.data.console_queue.put(self.Opt_motorOffsetY)
+        self.data.console_queue.put("")
+        self.data.console_queue.put("Left Chain Tolerance:")
+        self.data.console_queue.put(self.Opt_leftChainTolerance)
+        self.data.console_queue.put("")
+        self.data.console_queue.put("Right Chain Tolerance:")
+        self.data.console_queue.put(self.Opt_rightChainTolerance)
 
     def CalibratedLengths(self):
         return self.MeasuredLengthArray - self.OptimizationOutput.fun
@@ -220,11 +230,106 @@ class HoleyCalibration(MakesmithInitFuncs):
 
         self.SetMeasurements(Measurements)
 
-def GeometricLength(x1,y1,x2,y2):
-    return math.sqrt(math.pow(x1-x2,2) + math.pow(y1-y2,2))
+    def processMeasurements(self, result):
+        measurements = []
+        try:
+            M1 = float(result["M1"])
+            self.data.console_queue.put(M1)
+            measurements.append(M1)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M1." )
+            return False
+        try:
+            M2 = float(result["M2"])
+            self.data.console_queue.put(M2)
+            measurements.append(M2)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M2." )
+            return False
+        try:
+            M3 = float(result["M3"])
+            self.data.console_queue.put(M3)
+            measurements.append(M3)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M3." )
+            return False
+        try:
+            M4 = float(result["M4"])
+            self.data.console_queue.put(M4)
+            measurements.append(M4)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M4." )
+            return False
+        try:
+            M5 = float(result["M5"])
+            self.data.console_queue.put(M5)
+            measurements.append(M5)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M5." )
+            return False
+        try:
+            M6 = float(result["M6"])
+            self.data.console_queue.put(M6)
+            measurements.append(M6)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M6." )
+            return False
+        try:
+            M7 = float(result["M7"])
+            self.data.console_queue.put(M7)
+            measurements.append(M7)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M7." )
+            return False
+        try:
+            M8 = float(result["M8"])
+            self.data.console_queue.put(M8)
+            measurements.append(M8)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M8.")
+            return False
+        try:
+            M9 = float(result["M9"])
+            self.data.console_queue.put(M9)
+            measurements.append(M9)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M9." )
+            return False
+        try:
+            M10 = float(result["M10"])
+            self.data.console_queue.put(M10)
+            measurements.append(M10)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M10." )
+            return False
+        try:
+            M11 = float(result["M11"])
+            self.data.console_queue.put(M11)
+            measurements.append(M11)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M11." )
+            return False
+        try:
+            M12 = float(result["M12"])
+            self.data.console_queue.put(M12)
+            measurements.append(M12)
+        except:
+            self.data.message_queue.put("Message: Please enter a number for the distance M12." )
+            return False
+        return measurements
 
-def CutHole(data,x,y):
-    print('Cutting point, x='+str(x)+', y='+str(y))
-    data.gcode_queue.put("G0 X"+str(x)+" Y"+str(y))
-    data.gcode_queue.put("G0 Z-5")
-    data.gcode_queue.put("G0 Z5")
+    def GeometricLength(self,x1,y1,x2,y2):
+        return math.sqrt(math.pow(x1-x2,2) + math.pow(y1-y2,2))
+
+    def acceptCalibrationResults(self):
+        self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(self.Opt_motorOffsetY))
+        self.data.config.setValue('Maslow Settings', 'motorSpacingX', str(self.Opt_D))
+        self.data.config.setValue('Advanced Settings', 'leftChainTolerance', str(self.Opt_leftChainTolerance))
+        self.data.config.setValue('Advanced Settings', 'rightChainTolerance', str(self.Opt_rightChainTolerance))
+
+        self.data.gcode_queue.put("G21 ")
+        self.data.gcode_queue.put("G90 ")
+        self.data.gcode_queue.put("G40 ")
+        self.data.gcode_queue.put("G0 X0 Y0 ")
+        return True
+
