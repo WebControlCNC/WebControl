@@ -225,6 +225,11 @@ class Actions(MakesmithInitFuncs):
 
     def defineHome(self, posX, posY):
         try:
+            #oldHomeX = self.data.xval
+            #oldHomeY = self.data.yval
+            oldHomeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+            oldHomeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+
             if self.data.units == "MM":
                 scaleFactor = 25.4
             else:
@@ -235,16 +240,22 @@ class Actions(MakesmithInitFuncs):
             else:
                 homeX=round(self.data.xval,4)
                 homeY=round(self.data.yval,4)
-            self.data.gcodeShift = [
-                homeX,
-                homeY
-            ]
+            #self.data.gcodeShift = [
+            #    homeX,
+            #    homeY
+            #]
+            self.data.gcodeShift = [ homeX-oldHomeX, homeY-oldHomeY ]
+
             self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
             self.data.config.setValue("Advanced Settings", "homeY", str(homeY))
             position = {"xval": homeX, "yval": homeY}
             self.data.ui_queue1.put("Action", "homePositionMessage", position)
             self.data.console_queue.put("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
-            self.data.gcodeFile.loadUpdateFile()
+            self.data.console_queue.put(self.data.gcode)
+            text=""
+            for line in self.data.gcode:
+                text = text + line + "\n"
+            self.data.gcodeFile.loadUpdateFile(text)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -1239,6 +1250,28 @@ class Actions(MakesmithInitFuncs):
                 self.data.inPIDPositionTest = True
                 self.data.PIDPositionTestData = []
                 print("PID position test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def updateGCode(self, gcode):
+        try:
+            print(gcode)
+            homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+            homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+
+            if self.data.units == "MM":
+                scaleFactor = 25.4
+            else:
+                scaleFactor = 1.0
+            self.data.gcodeShift = [
+                homeX,
+                homeY
+            ]
+
+            self.data.gcodeFile.loadUpdateFile(gcode)
+            self.data.ui_queue1.put("Action", "gcodeUpdate", "")
+            return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False

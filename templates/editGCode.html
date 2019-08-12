@@ -1,4 +1,5 @@
 {% block content %}
+<input id="pageID" type="hidden" value="{{pageID}}">
 <div class="container-fluid">
   <pre id="editor">{{gcode}}
   </pre>
@@ -10,8 +11,31 @@
 <script>
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/twilight");
-    editor.session.setMode("ace/mode/javascript");
+    editor.session.setMode("ace/mode/gcode");
 </script>
+
+<script>
+function onFooterSubmit(){
+    var url = $("#pageID").val();
+    var data = editor.getValue();
+    console.log(data)
+    $.ajax({
+        url : '/'+url,
+        type: "POST",
+        data: {gcode:data},
+        success: function (data) {
+          console.log("success");
+            $('#contentModal').modal('toggle')
+        },
+        error: function (jXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
+}
+
+</script>
+
 {% endblock %}
+
 
 

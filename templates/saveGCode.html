@@ -1,0 +1,44 @@
+{% block content %}
+<div class="container-fluid">
+  <form class="form" id="gcodeForm">
+    <input id="saveOrOpen" type="hidden" value="{{saveOrOpen}}">
+    <div class="form-group">
+      <label for="directorySelect">Selected Directory</label>
+      <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+        {% for directory in directories %}
+          <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
+            {{directory if directory != '.' else './'}}
+          </option>
+        {% endfor %}
+      </select>
+      <label for="fileSelect">File</label>
+      <select id="fileSelect" class="custom-select" name="fileSelect" data-group="{{title}}">
+        {% for file in files %}
+          <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
+            {{file["file"]}}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="form-group">
+        <label for="fileName">File Name</label>
+        <input id="fileName" class="form-control" name="fileName" value="{{lastSelectedFile}}">
+      </div>
+
+    </div>
+    <button type="submit" class="btn btn-primary mt-1">Submit</button>
+    <div id="gcCircle">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
+        </div>
+
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/saveGCode.js', version='11102018a') }}" crossorigin="anonymous"></script>
+{% endblock %}

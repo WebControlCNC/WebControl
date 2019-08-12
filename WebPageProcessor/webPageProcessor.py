@@ -139,9 +139,39 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory="."
             page = render_template(
-                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory
+                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
             )
             return page, "Open GCode", False, "medium", "content", False
+        elif pageID == "saveGCode":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
+            home = self.data.config.getHome()
+            homedir = home + "/.WebControl/gcode"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory": _dir, "file": file})
+            except Exception as e:
+                print(e)
+            # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory = "."
+            page = render_template(
+                "saveGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
+                lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+            )
+            return page, "Open GCode", False, "medium", "content", False
+
         elif pageID == "uploadGCode":
             validExtensions = self.data.config.getValue(
                 "WebControl Settings", "validExtensions"
@@ -265,9 +295,15 @@ class WebPageProcessor:
             page = render_template("viewGcode.html", gcode=self.data.gcode)
             return page, "View GCode", False, "medium", "content", False
         elif pageID == "editGCode":
-            text = self.gcodePreProcessor()
-            page = render_template("editGCode.html", gcode=text)
-            return page, "Edit GCode", False, "medium", "content", "footerSubmit"
+            homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+            homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+            text = ""
+            for line in self.data.gcode:
+                newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
+                text = text + newLine + "\n"
+            #text = self.gcodePreProcessor()
+            page = render_template("editGCode.html", gcode=text, pageID="editGCode",)
+            return page, "Edit GCode", True, "medium", "content", "footerSubmit"
         elif pageID == "pidTuning":
             KpP = self.data.config.getValue("Advanced Settings", "KpPos")
             KiP = self.data.config.getValue("Advanced Settings", "KiPos")

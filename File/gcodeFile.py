@@ -44,21 +44,41 @@ class GCodeFile(MakesmithInitFuncs):
         sendStr = json.dumps([ob.__dict__ for ob in self.data.gcodeFile.line3D])
         return sendStr
 
-    def loadUpdateFile(self):
+    def saveFile(self, fileName, directory):
+        return True
+        #if fileName is "":
+
+
+
+    def loadUpdateFile(self, gcode=""):
+        print(gcode)
         if self.data.units == "MM":
             self.canvasScaleFactor = self.MILLIMETERS
         else:
             self.canvasScaleFactor = self.INCHES
 
-        filename = self.data.gcodeFile.filename
-        del self.line3D[:]
-        if filename is "":  # Blank the g-code if we're loading "nothing"
-            self.data.gcode = ""
-            return False
+        if gcode == "":
+            filename = self.data.gcodeFile.filename
+            del self.line3D[:]
+            if filename is "":  # Blank the g-code if we're loading "nothing"
+                self.data.gcode = ""
+                return False
+
+            try:
+                filterfile = open(filename, "r")
+            except Exception as e:
+                self.data.console_queue.put(str(e))
+                self.data.console_queue.put("Gcode File Error")
+                self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
+                self.data.gcodeFile.filename = ""
+                return False
+            rawfilters = filterfile.read()
+            filterfile.close()  # closes the filter save file
+        else:
+            del self.line3D[:]
+            rawfilters = gcode
 
         try:
-            filterfile = open(filename, "r")
-            rawfilters = filterfile.read()
             filtersparsed = rawfilters #get rid of this if above is uncommented)
             filtersparsed = re.sub(
                 r";([^\n]*)\n", "\n", filtersparsed
@@ -94,7 +114,8 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
 
-            filterfile.close()  # closes the filter save file
+
+
             # Find gcode indicies of z moves
             self.data.zMoves = [0]
             zList = []
@@ -322,15 +343,21 @@ class GCodeFile(MakesmithInitFuncs):
         del self.line3D[:]
 
 
-    def moveLine(self, gCodeLine):
+    def moveLine(self, gCodeLine, dehome = False, homeX=0, homeY=0):
 
         originalLine = gCodeLine
+        if dehome:
+            shiftX = -homeX
+            shiftY = -homeY
+        else:
+            shiftX = self.data.gcodeShift[0]
+            shiftY = self.data.gcodeShift[1]
 
         try:
             gCodeLine = gCodeLine.upper() + " "
             x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if x:
-                q = abs(float(x.groups()[0])+self.data.gcodeShift[0])
+                q = abs(float(x.groups()[0])+shiftX)
                 if self.truncate >= 0:
                     q = str(round(q, self.truncate))
                 else:
@@ -350,13 +377,13 @@ class GCodeFile(MakesmithInitFuncs):
                     )  # use the number of digits after the decimal place
                 gCodeLine = (
                     gCodeLine[0 : x.start() + 1]
-                    + (fmtX % (float(x.groups()[0]) + self.data.gcodeShift[0]))
+                    + (fmtX % (float(x.groups()[0]) + shiftX))
                     + gCodeLine[x.end() :]
                 )
 
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
-                q = abs(float(y.groups()[0])+self.data.gcodeShift[1])
+                q = abs(float(y.groups()[0])+shiftY)
                 if self.truncate >= 0:
                     q = str(round(q, self.truncate))
                 else:
@@ -372,7 +399,7 @@ class GCodeFile(MakesmithInitFuncs):
                     fmtY = "%0%.%sf" % len(eNtnY)
                 gCodeLine = (
                     gCodeLine[0 : y.start() + 1]
-                    + (fmtY % (float(y.groups()[0]) + self.data.gcodeShift[1]))
+                    + (fmtY % (float(y.groups()[0]) + shiftY))
                     + gCodeLine[y.end() :]
                 )
             return gCodeLine
@@ -510,8 +537,11 @@ class GCodeFile(MakesmithInitFuncs):
             scaleFactor = 1.0;
         else:
             scaleFactor = 1/25.4;
-        self.xPosition = self.data.gcodeShift[0] * scaleFactor
-        self.yPosition = self.data.gcodeShift[1] * scaleFactor
+        #before, gcode shift = home X
+        #self.xPosition = self.data.gcodeShift[0] * scaleFactor
+        #self.yPosition = self.data.gcodeShift[1] * scaleFactor
+        self.xPosition = float(self.data.config.getValue("Advanced Settings", "homeX")) * scaleFactor
+        self.yPosition = float(self.data.config.getValue("Advanced Settings", "homeY")) * scaleFactor
         self.zPosition = 0
 
         self.prependString = "G00 "

@@ -192,6 +192,36 @@ def openGCode():
             resp.status_code = 500
             return resp
 
+@app.route("/saveGCode", methods=["POST"])
+def saveGCode():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        print(request.form)
+        f = request.form["fileName"]
+        d = request.form["selectedDirectory"]
+        app.data.console_queue.put("selectedGcode="+f)
+        app.data.config.setValue("Computed Settings", "lastSelectedDirectory",d)
+        home = app.data.config.getHome()
+        returnVal = app.data.gcodeFile.saveFile(f, home+"/.WebControl/gcode/"+d)
+        '''
+        tDir = f.split("/")
+        app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
+        app.data.config.setValue("Maslow Settings", "openFile", tDir[1])
+        returnVal = app.data.gcodeFile.loadUpdateFile()
+        '''
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
 
 @app.route("/importFile", methods=["POST"])
 def importFile():
@@ -315,6 +345,22 @@ def quickConfigure():
         resp.status_code = 200
         return resp
 
+@app.route("/editGCode", methods=["POST"])
+def editGCode():
+    app.data.logger.resetIdler()
+    #print(request.form["gcode"])
+    if request.method == "POST":
+        returnVal = app.data.actions.updateGCode(request.form["gcode"])
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
 def checkInRequested():
