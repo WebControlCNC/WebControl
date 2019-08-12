@@ -5,7 +5,7 @@ from File.importFile import ImportFile
 from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
 from Actions.holeyCalibration import HoleyCalibration
-#from Actions.opticalCalibration import OpticalCalibration
+from Actions.opticalCalibration import OpticalCalibration
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
@@ -24,7 +24,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     importFile = ImportFile()
     actions = Actions()
     triangularCalibration = TriangularCalibration()
-#    opticalCalibration = OpticalCalibration()
+    opticalCalibration = OpticalCalibration()
     holeyCalibration = HoleyCalibration()
     messageProcessor = MessageProcessor()
     mcpProcessor = WebMCPProcessor()
@@ -51,7 +51,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.actions = self.actions
         data.triangularCalibration = self.triangularCalibration
         data.holeyCalibration = self.holeyCalibration
-#        data.opticalCalibration = self.opticalCalibration
+        data.opticalCalibration = self.opticalCalibration
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
@@ -63,7 +63,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.actions.setUpData(data)
         self.triangularCalibration.setUpData(data)
         self.holeyCalibration.setUpData(data)
-#        self.opticalCalibration.setUpData(data)
+        self.opticalCalibration.setUpData(data)
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)

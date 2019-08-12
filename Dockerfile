@@ -24,17 +24,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # OpenCV dependency
 RUN pip install numpy==1.16.2
+RUN pip install scipy==1.3.1
 
 # Build OpenCV
-# ADD tools/download_build_install_opencv.sh /download_build_install_opencv.sh
-# RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv.sh
+ADD tools/download_build_install_opencv.sh /download_build_install_opencv.sh
+RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv.sh
 
 # Get other python dependencies
-ADD requirements.txt /requirements.txt
-# Remove opencv and numpy from requirements (since they're already installed)
-RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/numpy.*/d' /requirements.txt
-# TODO: Maybe we can cache wheel files outside this container, for more granular reuse when requiremnts.txt changes
-RUN pip install -r /requirements.txt
+ADD holeyrequirements.txt /holeyrequirements.txt
+# Remove opencv, scipy and numpy from requirements (since they're already installed)
+RUN sed -i '/opencv-python.*/d' /holeyrequirements.txt && sed -i '/scipy.*/d' /holeyrequirements.txt && sed -i '/numpy.*/d' /holeyrequirements.txt
+# TODO: Maybe we can cache wheel files outside this container, for more granular reuse when holeyrequiremnts.txt changes
+RUN pip install -r /holeyrequirements.txt
 
 # Download and compile the Arduino firmware
 # Generates the firmware as /firmware/.pioenvs/megaatmega2560/firmware.hex
@@ -46,14 +47,7 @@ RUN apt-get update \
     && pio platform install --with-package framework-arduinoavr atmelavr \
     && pio lib -g install "Servo"
 
-ARG schmittjoshc_firmware_repo=https://github.com/schmittjoshc/Firmware.git
-ARG schmittjoshc_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
-RUN git clone $schmittjoshc_firmware_repo firmware/schmittjoshc \
-    && cd firmware/schmittjoshc \
-    && git checkout $schmittjoshc_firmware_sha \
-    && pio run -e megaatmega2560 \
-    && mkdir build \
-    && mv .pioenvs/megaatmega2560/firmware.hex build/$schmittjoshc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+
 ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
 ARG madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
 #ARG madgrizzle_firmware_sha=95f7d4b5c431dec162d2e2eec7c6e42530298c4b
@@ -62,7 +56,7 @@ RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
     && git checkout $madgrizzle_firmware_sha \
     && pio run -e megaatmega2560 \
     && mkdir build \
-    && mv .pioenvs/megaatmega2560/firmware.hex build/$madgrizzle_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+    && mv .pio/build/megaatmega2560/firmware.hex build/$madgrizzle_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 ARG maslowcnc_firmware_repo=https://github.com/MaslowCNC/Firmware.git
 ARG maslowcnc_firmware_sha=d0943e2a2f29faef4c07585a00638d0f822e5daf
 RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
@@ -70,7 +64,16 @@ RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && git checkout $maslowcnc_firmware_sha \
     && pio run -e megaatmega2560 \
     && mkdir build \
-    && mv .pioenvs/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+    && mv .pio/build/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+ARG holey_firmware_repo=https://github.com/madgrizzle/HoleyFirmware.git
+ARG holey_firmware_sha=658b62e76fd0530a796c4aec81acfb139ab1b681
+RUN git clone $holey_firmware_repo firmware/holey \
+    && cd firmware/holey \
+    && git checkout $holey_firmware_sha \
+    && pio run -e megaatmega2560 \
+    && mkdir build \
+    && mv .pio/build/megaatmega2560/firmware.hex build/$holey_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+
 
 ADD . /WebControl
 # Clean up the /WebControl dir a bit to slim it down
@@ -84,8 +87,8 @@ FROM arm32v7/python:3.5.6-slim-stretch
 
 # Pip wheels compiled in the builder
 COPY --from=builder /root/.cache /root/.cache
-# requirements.txt with opencv and numpy removed
-COPY --from=builder /requirements.txt /requirements.txt
+# holeyrequirements.txt with opencv, scipy and numpy removed
+COPY --from=builder /holeyrequirements.txt /holeyrequirements.txt
 # Required shared libraries
 COPY --from=builder /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so
 COPY --from=builder /usr/lib/libf77blas.so /usr/lib/libf77blas.so
@@ -96,7 +99,7 @@ COPY --from=builder /usr/lib/libblas.so.3 /usr/lib/libblas.so.3
 COPY --from=builder /usr/lib/arm-linux-gnueabihf/libgfortran.so.3 /usr/lib/arm-linux-gnueabihf/libgfortran.so.3
 COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
 
-RUN pip install numpy==1.16.2 && pip install -r /requirements.txt && rm -rf /root/.cache
+RUN pip install numpy==1.16.2 && pip install scipy==1.3.1 && pip install -r /holeyrequirements.txt && rm -rf /root/.cache
 
 
 # Install avrdude
@@ -108,6 +111,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get -y autoremove
 # Copy in the pre-compiled firmware
 COPY --from=builder /firmware/madgrizzle/build/* /firmware/madgrizzle/
+COPY --from=builder /firmware/holey/build/* /firmware/holey/
 COPY --from=builder /firmware/maslowcnc/build/* /firmware/maslowcnc/
 
 # Copy the pre-compiled source from the builder

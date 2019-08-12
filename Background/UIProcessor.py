@@ -23,12 +23,12 @@ class UIProcessor:
                     time.sleep(2)
                     self.activateModal("Notification:",
                                        "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.","notification")
-                #if self.app.data.opticalCalibrationImageUpdated is True:
-                #    self.sendCalibrationImage(
-                #        "OpticalCalibrationImageUpdated",
-                #        self.app.data.opticalCalibrationImage,
-                #    )
-                #    self.app.data.opticalCalibrationImageUpdated = False
+                if self.app.data.opticalCalibrationImageUpdated is True:
+                    self.sendCalibrationImage(
+                        "OpticalCalibrationImageUpdated",
+                        self.app.data.opticalCalibrationImage,
+                    )
+                    self.app.data.opticalCalibrationImageUpdated = False
                 if self.app.data.cameraImageUpdated is True:
                     if time.time()-self.lastCameraTime > .25:
                         self.sendCameraMessage(
@@ -37,12 +37,12 @@ class UIProcessor:
                         )
                         self.app.data.cameraImageUpdated = False
                         self.lastCameraTime = time.time()
-                #if self.app.data.opticalCalibrationTestImageUpdated is True:
-                #    self.sendCalibrationImage(
-                #        "OpticalCalibrationTestImageUpdated",
-                #        self.app.data.opticalCalibrationTestImage,
-                #    )
-                #    self.app.data.opticalCalibrationTestImageUpdated = False
+                if self.app.data.opticalCalibrationTestImageUpdated is True:
+                    self.sendCalibrationImage(
+                        "OpticalCalibrationTestImageUpdated",
+                        self.app.data.opticalCalibrationTestImage,
+                    )
+                    self.app.data.opticalCalibrationTestImageUpdated = False
                 while ( not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
                     if not self.app.data.ui_controller_queue.empty():
                         message = self.app.data.ui_controller_queue.get()

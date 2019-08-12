@@ -183,6 +183,11 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading stock firmware.")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Stock firmware update complete.")
+            elif msg["data"]["command"] == "upgradeHoleyFirmware":
+                if not self.upgradeFirmware(2):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading holey firmware.")
+                else:
+                    self.data.ui_queue1.put("Alert", "Alert", "Custom firmware update complete.")
             elif msg["data"]["command"] == "adjustChain":
                 if not self.adjustChain(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting chain.")
@@ -886,6 +891,9 @@ class Actions(MakesmithInitFuncs):
             if version == 1:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
                 path = "/firmware/maslowcnc/*.hex"
+            if version == 2:
+                self.data.ui_queue1.put("SpinnerMessage", "", "Holey Firmware Update in Progress, Please Wait.")
+                path = "/firmware/holey/*.hex"
             time.sleep(.5)
             for filename in glob.glob(path):
                 port = self.data.comport

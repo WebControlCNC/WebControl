@@ -30,6 +30,7 @@ class Data:
     version = "101.25"
     stockFirmwareVersion = ""
     customFirmwareVersion = ""
+    holeyFirmwareVersion = ""
     controllerFirmwareVersion = 0
     # all of the available COM ports
     comPorts = []
@@ -84,11 +85,11 @@ class Data:
     requestSerialClose = False  # this is used to request the serialThread to gracefully close the port
     triangularCalibration = None  # points to the triangular calibration object
     holeyCalibration = None  # points to the triangular calibration object
-#    opticalCalibration = None  # points to the optical calibration object
-#    opticalCalibrationImage = None  # stores the current image
-#    opticalCalibrationImageUpdated = False  # stores whether its been updated or not
-#    opticalCalibrationTestImage = None  # stores the current image
-#    opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
+    opticalCalibration = None  # points to the optical calibration object
+    opticalCalibrationImage = None  # stores the current image
+    opticalCalibrationImageUpdated = False  # stores whether its been updated or not
+    opticalCalibrationTestImage = None  # stores the current image
+    opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
     cameraImage = None
     cameraImageUpdated = False
     continuousCamera = False

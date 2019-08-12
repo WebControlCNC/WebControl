@@ -86,7 +86,12 @@ class HoleyCalibration(MakesmithInitFuncs):
             return Meas > 0.0
 
     def CutTestPattern(self):
+        oldUnits = self.data.units
+        #self.data.units = "MM"
+        if oldUnits != "MM":
+            self.data.actions.updateSetting("toMM", 0, True)
         self.data.console_queue.put('Cutting Holey Calibration Test Pattern')
+        self.InitializeIdealXyCoordinates()
         self.data.gcode_queue.put("G21")
         self.data.gcode_queue.put("G90")  # Switch to absolute mode
         self.data.gcode_queue.put("G40")
@@ -101,6 +106,9 @@ class HoleyCalibration(MakesmithInitFuncs):
 
         self.data.gcode_queue.put("G0 X0 Y0")
         self.data.gcode_queue.put("M5")
+        if oldUnits != "MM":
+            self.data.actions.updateSetting("toInches", 0, True)
+        return True
 
     def CalculateMeasurements(self, HolePositions):
         #        aH1x,aH1y,aH2x,aH2y,aH3x,aH3y,aH4x,aH4y,aH5x,aH5y,aH6x,aH6y
