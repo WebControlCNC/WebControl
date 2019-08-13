@@ -304,6 +304,10 @@ class WebPageProcessor:
             #text = self.gcodePreProcessor()
             page = render_template("editGCode.html", gcode=text, pageID="editGCode",)
             return page, "Edit GCode", True, "medium", "content", "footerSubmit"
+        elif pageID == "sendGCode":
+            text = self.data.sentCustomGCode
+            page = render_template("editGCode.html", gcode=text, pageID="sendGCode", )
+            return page, "Edit GCode", True, "medium", "content", "footerSubmit"
         elif pageID == "pidTuning":
             KpP = self.data.config.getValue("Advanced Settings", "KpPos")
             KiP = self.data.config.getValue("Advanced Settings", "KiPos")

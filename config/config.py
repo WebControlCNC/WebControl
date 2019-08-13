@@ -146,7 +146,7 @@ class Config(MakesmithInitFuncs):
                             self.processChange(self.settings[section][x]["key"], int(value))
                         updated = True
                         if "firmwareKey" in self.settings[section][x]:
-                            if self.settings[section][x]["firmwareKey"] != 45:
+                            if self.settings[section][x]["firmwareKey"] != 85:
                                 self.syncFirmwareKey(
                                     self.settings[section][x]["firmwareKey"],
                                     storedValue,
@@ -327,10 +327,10 @@ class Config(MakesmithInitFuncs):
                             else:
                                 value = 0
 
-                        if firmwareKey == 45:
+                        if firmwareKey == 85:
                             if self.data.controllerFirmwareVersion >= 100:
                                 print(self.data.controllerFirmwareVersion)
-                                self.data.console_queue.put("firmwareKey = 45")
+                                self.data.console_queue.put("firmwareKey = 85")
                                 if storedValue != "":
                                     self.sendErrorArray(firmwareKey, storedValue, data)
                                 pass
@@ -338,7 +338,7 @@ class Config(MakesmithInitFuncs):
                             strValue = self.firmwareKeyString(firmwareKey,storedValue)
                             app.data.gcode_queue.put(strValue)
                             #app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
-                        elif firmwareKey >= 47 and firmwareKey <= 58:
+                        elif firmwareKey >= 87 and firmwareKey <= 98:
                             if self.data.controllerFirmwareVersion >= 100:
                                 if not self.isPercentClose(float(storedValue), float(value)):
                                     if not isImporting:
@@ -546,6 +546,7 @@ class Config(MakesmithInitFuncs):
                     self.setValue("Computed Settings", "chainOverSprocketComputed", 1, True)
             elif value == "Bottom":
                 if currentValue != 2:
+                    self.setValue("Computed Settings", "chainOverSprocketComputed", 2, True)
                     self.setValue("Computed Settings", "chainOverSprocketComputed", 2, True)
 
         if key == "fPWM" or doAll is True:

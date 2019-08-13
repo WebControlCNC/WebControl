@@ -24,6 +24,7 @@ class Data:
     clients = []
     gcode = []
     gcodeFileUnits = "INCHES"
+    sentCustomGCode = ""
     compressedGCode = None
     compressedGCode3D = None
 

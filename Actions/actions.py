@@ -224,6 +224,8 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def defineHome(self, posX, posY):
+        print("posx = "+str(posX)+", posy="+str(posY)+", units="+ str(self.data.units))
+        print("xval = "+str(self.data.xval) + ", yval=" + str(self.data.yval))
         try:
             #oldHomeX = self.data.xval
             #oldHomeY = self.data.yval
@@ -244,6 +246,8 @@ class Actions(MakesmithInitFuncs):
             #    homeX,
             #    homeY
             #]
+            print("homeX= "+str(homeX) + ", homeY= " + str(homeY))
+            print("oldHomeX= "+str(oldHomeX) + ", oldHomeY= " + str(oldHomeY))
             self.data.gcodeShift = [ homeX-oldHomeX, homeY-oldHomeY ]
 
             self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
@@ -622,11 +626,16 @@ class Actions(MakesmithInitFuncs):
                   self.data.gcodeShift[1] * scaleFactor,
                 ]
                 self.data.config.setValue("Computed Settings", "distToMove", value)
-                self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
-                self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
+                oldHomeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+                oldHomeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+                self.data.config.setValue("Advanced Settings", "homeX", oldHomeX * scaleFactor)
+                self.data.config.setValue("Advanced Settings", "homeY", oldHomeY * scaleFactor)
+                #self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
+                #self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
                 self.data.ui_queue1.put("Action", "unitsUpdate", "")
                 self.data.ui_queue1.put("Action", "distToMoveUpdate", "")
-                position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
+                #position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
+                position = {"xval": oldHomeX * scaleFactor, "yval": oldHomeY * scaleFactor}
                 self.data.ui_queue1.put("Action", "homePositionMessage", position)
                 self.sendGCodePositionUpdate()
             elif setting == "toInchesZ":
@@ -810,8 +819,9 @@ class Actions(MakesmithInitFuncs):
             return False
 
 
-    def sendGcode(self, gcode):
+    def sendGCode(self, gcode):
         try:
+            self.data.sentCustomGCode = gcode
             self.data.gcode_queue.put(gcode)
             return True
         except Exception as e:
@@ -1256,7 +1266,7 @@ class Actions(MakesmithInitFuncs):
 
     def updateGCode(self, gcode):
         try:
-            print(gcode)
+            #print(gcode)
             homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
             homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
 

@@ -243,12 +243,12 @@ def importFile():
             resp.status_code = 500
             return resp
 
-@app.route("/sendGcode", methods=["POST"])
+@app.route("/sendGCode", methods=["POST"])
 def sendGcode():
     app.data.logger.resetIdler()
     #print(request.form)#["gcodeInput"])
     if request.method == "POST":
-        returnVal = app.data.actions.sendGcode(request.form["gcodeInput"])
+        returnVal = app.data.actions.sendGCode(request.form["gcode"])
         if returnVal:
             message = {"status": 200}
             resp = jsonify("success")
