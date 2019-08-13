@@ -45,8 +45,21 @@ class GCodeFile(MakesmithInitFuncs):
         return sendStr
 
     def saveFile(self, fileName, directory):
+        if fileName is "":  # Blank the g-code if we're loading "nothing"
+            return False
+        if directory is "":
+            return False
+        try:
+            gfile = open(directory+fileName, "w+")
+            gfile.writelines(map(lambda s: s+ '\n', self.data.gcode))
+            gfile.close()
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            self.data.console_queue.put("Gcode File Error")
+            self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
+            self.data.gcodeFile.filename = ""
+            return False
         return True
-        #if fileName is "":
 
 
 
