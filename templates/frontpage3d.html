@@ -15,26 +15,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid h-100">
-  <div class="row justify-content-start h-100">
-    <div id="workarea" class="col">
-      <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
-      <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
-      <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
-      <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>
-    </div>
-    <div id="fpCircle" style="display: none;">
-      <div class="loader">
-        <div class="loader">
-          <div class="loader">
-            <div class="loader">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col my-sidebar">
-      <div class="h-100 d-flex flex-column">
+<div class="container-fluid d-flex flex-row-reverse">
+    <div class="flex-fixed-width-item"><!--"col my-sidebar">-->
         <h3>Controls</h3>
         <div class="row">
           <div class="col mb-1">
@@ -166,7 +148,6 @@
           </div>
 
         </div>
-
         <div class="row">
           <div class="col-3 mb-1">
             <h5>Home:</h5>
@@ -202,10 +183,25 @@
             <h3>Controller Messages</h3>
           </div>
         </div>
-        <div class="row scrollText flex-grow-1" id='controllerMessage'>
+        <div class="scrollText w-100" id='controllerMessage'></div>
+    </div>
+    <div id="workarea" class="flex-grow-1"> <!--class="col">-->
+        <div class="btn-group" role="group">
+            <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+        </div>
+      <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
+      <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>
+    </div>
+    <div id="fpCircle" style="display: none;">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 </div>
 {% endblock %}
