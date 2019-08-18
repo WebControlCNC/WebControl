@@ -368,6 +368,7 @@ def downloadDiagnostics():
     if request.method == "GET":
         returnVal = app.data.actions.downloadDiagnostics()
         if  returnVal != False:
+            print(returnVal)
             return send_file(returnVal)
         else:
             resp = jsonify("failed")
