@@ -211,6 +211,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "executePositionPIDTest":
                 if not self.positionPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+            elif msg["data"]["command"] == "clearLogs":
+                if not self.clearLogs():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
 
         except Exception as e:
             print(str(e))
@@ -1300,6 +1303,14 @@ class Actions(MakesmithInitFuncs):
             zipObj.write(path1, os.path.basename(path1))
             zipObj.close()
             return filename
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def clearLogs(self):
+        try:
+            retval = self.data.logger.deleteLogFiles()
+            return retval
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False

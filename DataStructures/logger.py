@@ -131,6 +131,33 @@ class Logger(MakesmithInitFuncs):
 
         return
 
+    def deleteLogFiles(self):
+        """
+        Delete log files
+        """
+        success1 = False
+        for x in range(0, 1000):
+            try:
+                os.remove(self.home+"/.WebControl/"+"log.txt")
+                success1 = True
+                break
+            except:
+                success1 = False
+
+        success2 = False
+        for x in range(0, 1000):
+            try:
+                os.remove(self.home+"/.WebControl/"+"alog.txt")
+                success2 = True
+                break
+            except:
+                success2 = False
+
+        if success1 and success2:
+            return True
+        else:
+            return False
+
     def writeErrorValueToLog(self, error):
         """
 
