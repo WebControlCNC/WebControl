@@ -1,29 +1,33 @@
 .my-sidebar {
     -ms-flex: 0 0 460px;
     flex: 0 0 460px;
-    min-height: calc(100vh - 70px)
+    height: calc(100vh - 85px)
 }
 
 .flex-fixed-width-item {
     flex: 0 0 410px;
+    height: calc(100vh - 85px);
 }
 
 
 .scrollText {
-    height: 20vh;
+    height: calc(100vh - 720px);
     overflow-y: scroll;
 }
 
 .container-fluid {
-    height: 85vh;
 }
 
 html, body{
-  height: 85vh;
+  height: 100vh;
 }
 
 .flex-fill {
   flex:1;
+}
+
+#workarea {
+    height: calc(100vh - 85px);
 }
 
 
