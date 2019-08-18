@@ -125,7 +125,18 @@ class HoleyCalibration(MakesmithInitFuncs):
         return numpy.array(Measurements)
 
     def InitializeIdealXyCoordinates(self):
-
+        self.SP_D = float(self.data.config.getValue("Maslow Settings", "motorSpacingX"))
+        self.SP_motorOffsetY = float(self.data.config.getValue("Maslow Settings", "motorOffsetY"))
+        self.SP_rotationDiskRadius = float(self.data.config.getValue("Advanced Settings", "rotationRadius"))
+        self.SP_leftChainTolerance = float(self.data.config.getValue("Advanced Settings", "leftChainTolerance"))
+        self.SP_rightChainTolerance = float(self.data.config.getValue("Advanced Settings", "rightChainTolerance"))
+        self.SP_sledWeight = float(self.data.config.getValue("Maslow Settings", "sledWeight"))
+        if self.data.config.getValue("Advanced Settings", "chainOverSprocket") == "Top":
+            self.SP_chainOverSprocket = 1
+        else:
+            self.SP_chainOverSprocket = 2
+        self.kin.machineHeight = float(self.data.config.getValue("Maslow Settings","bedHeight"))
+        self.kin.machineWidth = float(self.data.config.getValue("Maslow Settings","bedWidth"))
         workspaceHeight = self.kin.machineHeight
         workspaceWidth = self.kin.machineWidth
         aH1x = -(workspaceWidth / 2.0 - 254.0)
