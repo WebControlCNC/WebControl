@@ -10,6 +10,7 @@ import serial.tools.list_ports
 import glob
 import json
 import time
+from zipfile import ZipFile
 import datetime
 
 class Actions(MakesmithInitFuncs):
@@ -1282,6 +1283,23 @@ class Actions(MakesmithInitFuncs):
             self.data.gcodeFile.loadUpdateFile(gcode)
             self.data.ui_queue1.put("Action", "gcodeUpdate", "")
             return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def downloadDiagnostics(self):
+        try:
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            filename = self.data.config.home+"/.WebControl"+"wc_diagnostics_"+timestr+".zip"
+            zipObj = ZipFile(filename, 'w')
+            path1 = self.data.config.home+"/.WebControl/webcontrol.json"
+            zipObj.write(path1, os.path.basename(path1))
+            path1 = self.data.config.home + "/.WebControl/alog.txt"
+            zipObj.write(path1, os.path.basename(path1))
+            path1 = self.data.config.home + "/.WebControl/log.txt"
+            zipObj.write(path1, os.path.basename(path1))
+            zipObj.close()
+            return filename
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False

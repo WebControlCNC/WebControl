@@ -9,7 +9,7 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash, Response
+from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
@@ -361,6 +361,19 @@ def editGCode():
             resp = jsonify("failed")
             resp.status_code = 500
             return resp
+
+@app.route("/downloadDiagnostics", methods=["GET"])
+def downloadDiagnostics():
+    app.data.logger.resetIdler()
+    if request.method == "GET":
+        returnVal = app.data.actions.downloadDiagnostics()
+        if  returnVal != False:
+            return send_file(returnVal)
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
 def checkInRequested():

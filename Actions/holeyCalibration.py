@@ -345,10 +345,5 @@ class HoleyCalibration(MakesmithInitFuncs):
         self.data.config.setValue('Maslow Settings', 'motorSpacingX', str(self.Opt_D))
         self.data.config.setValue('Advanced Settings', 'leftChainTolerance', str(self.Opt_leftChainTolerance))
         self.data.config.setValue('Advanced Settings', 'rightChainTolerance', str(self.Opt_rightChainTolerance))
-
-        self.data.gcode_queue.put("G21 ")
-        self.data.gcode_queue.put("G90 ")
-        self.data.gcode_queue.put("G40 ")
-        self.data.gcode_queue.put("G0 X0 Y0 ")
         return True
 
