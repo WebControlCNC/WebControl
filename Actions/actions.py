@@ -589,6 +589,23 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+
+    def touchZ(self):
+        try:
+            plungeDepth = self.data.config.getValue("Advanced Settings", "maxTouchProbePlungeDistance")
+            revertToInches = False
+            if self.data.units == "INCHES":
+                revertToInches = True
+                self.data.gcode_queue.put("G21")
+            self.data.gcode_queue.put("G90 G38.2 Z-" + plungeDepth + " F1 M02")
+            if revertToInches:
+                self.data.gcode_queue.put("G20")
+            self.data.measureRequest = self.defineZ0()
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
     def updateSetting(self, setting, value, fromGcode = False):
         try:
             self.data.console_queue.put("at update setting from gcode("+str(fromGcode)+"): "+setting)

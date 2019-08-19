@@ -192,20 +192,26 @@ class WebPageProcessor:
             page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
             return page, "Upload GCode", False, "medium", "content", False
         elif pageID == "importGCini":
-            page = render_template("importFile.html")
+            url = "importFile"
+            page = render_template("importFile.html", url=url)
             return page, "Import groundcontrol.ini", False, "medium", "content", False
+        elif pageID == "importWCJSON":
+            url = "importFileWCJSON"
+            page = render_template("importFile.html", url=url)
+            return page, "Import webcontrol.json", False, "medium", "content", False
         elif pageID == "actions":
             if self.data.controllerFirmwareVersion < 100:
                 enableCustom = False
             else:
                 enableCustom = True
             page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom)
-            return page, "Actions", False, "medium", "content", False
+            return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
-            page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
+            touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
+            page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")

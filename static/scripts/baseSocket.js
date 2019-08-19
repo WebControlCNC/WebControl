@@ -48,6 +48,13 @@
       });
 
       socket.on('message', function(msg){
+          //blink activity indicator
+          $("#activity").removeClass('alert-dark').addClass('alert-warning');
+          $("#mobileClientActivity").removeClass('alert-dark').addClass('alert-warning');
+          setTimeout(function(){
+            $("#activity").removeClass('alert-warning').addClass('alert-dark');
+            $("#mobileClientActivity").removeClass('alert-warning').addClass('alert-dark');
+          },125);
           //#console.log(msg.dataFormat);
           if (msg.dataFormat=='json')
             data = JSON.parse(msg.data);

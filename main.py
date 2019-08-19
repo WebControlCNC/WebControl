@@ -243,6 +243,26 @@ def importFile():
             resp.status_code = 500
             return resp
 
+@app.route("/importFileWCJSON", methods=["POST"])
+def importFileJSON():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        f = request.files["file"]
+        home = app.data.config.getHome()
+        secureFilename = home + "/.WebControl/imports/" + secure_filename(f.filename)
+        f.save(secureFilename)
+        returnVal = app.data.importFile.importWebControlJSON(secureFilename)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
 @app.route("/sendGCode", methods=["POST"])
 def sendGcode():
     app.data.logger.resetIdler()

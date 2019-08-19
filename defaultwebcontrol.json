@@ -1,13 +1,22 @@
 {
     "Advanced Settings": [
         {
-            "default": 0.0,
-            "desc": "Max depth the z axis should plunge in order to find the touch probe\ndefault setting: 0.0",
+            "default": 0,
+            "desc": "Enable the use of a touch plate to allow for automatic setting of Z-Axis zero.  DO NOT ENABLE UNLESS YOU HAVE A TOUCH PLATE!\ndefault setting: disabled",
+            "key": "touchPlate",
+            "section": "Advanced Settings",
+            "title": "Enable Use of Touch Plates",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 10.0,
+            "desc": "Max depth in millimeters the z axis should plunge in order to find the touch probe\ndefault setting: 10 mm",
             "key": "maxTouchProbePlungeDistance",
             "section": "Advanced Settings",
-            "title": "Max touch Z-axis plunge",
+            "title": "Max Touch Z-axis Plunge",
             "type": "string",
-            "value": "50"
+            "value": "10"
         },
         {
             "default": 8113.73,

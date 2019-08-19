@@ -171,9 +171,12 @@ $.fn.scrollBottom = function() {
 function setupStatusButtons(){
   if (isMobile){
       $('#mobileClientStatus').show();
+      $('#mobileClientActivity').show();
       $('#mobileControllerStatus').show();
   } else {
     $('#mobileClientStatus').hide();
+    $('#mobileClientActivity').hide();
     $('#mobileControllerStatus').hide();
   }
 }
+
