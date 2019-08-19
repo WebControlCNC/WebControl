@@ -215,6 +215,13 @@ class SerialPortThread(MakesmithInitFuncs):
                     if self.data.gcode_queue.empty() != True:
                         command = self.data.gcode_queue.get_nowait() + " "
                         self._write(command)
+                        if command.find("G20") != -1:
+                            if self.data.units != "INCHES":
+                                self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+                        if command.find("G21") != -1:
+                            if self.data.units != "MM":
+                                self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+                        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
 
                 # Send the next line of gcode to the machine if we're running a program. Will send lines to buffer if there is space
                 # and the feature is turned on

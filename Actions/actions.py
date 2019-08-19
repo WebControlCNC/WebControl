@@ -616,7 +616,8 @@ class Actions(MakesmithInitFuncs):
                         scaleFactor = 1.0/25.4
                     self.data.tolerance = 0.020
                     self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
-                    self.data.gcode_queue.put("G20 ")
+                    if not fromGcode:
+                        self.data.gcode_queue.put("G20 ")
                 else:
                     self.data.units = "MM"
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
@@ -624,7 +625,8 @@ class Actions(MakesmithInitFuncs):
                         scaleFactor = 25.4
                     self.data.tolerance = 0.5
                     self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
-                    self.data.gcode_queue.put("G21 ")
+                    if not fromGcode:
+                        self.data.gcode_queue.put("G21 ")
                 self.data.gcodeShift = [
                   self.data.gcodeShift[0] * scaleFactor,
                   self.data.gcodeShift[1] * scaleFactor,
@@ -826,7 +828,9 @@ class Actions(MakesmithInitFuncs):
     def sendGCode(self, gcode):
         try:
             self.data.sentCustomGCode = gcode
-            self.data.gcode_queue.put(gcode)
+            gcodeLines = gcode.splitlines()
+            for line in gcodeLines:
+                self.data.gcode_queue.put(line)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
