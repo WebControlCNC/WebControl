@@ -608,7 +608,7 @@ class Actions(MakesmithInitFuncs):
 
     def updateSetting(self, setting, value, fromGcode = False):
         try:
-            self.data.console_queue.put("at update setting from gcode("+str(fromGcode)+"): "+setting)
+            self.data.console_queue.put("at update setting from gcode("+str(fromGcode)+"): "+setting+" with value: "+str(value))
             if setting == "toInches" or setting == "toMM":
                 scaleFactor = 0
                 if fromGcode:

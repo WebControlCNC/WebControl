@@ -211,7 +211,10 @@ class WebPageProcessor:
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
-            page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+            if isMobile:
+                page = render_template("zaxis_mobile.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+            else:
+                page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")

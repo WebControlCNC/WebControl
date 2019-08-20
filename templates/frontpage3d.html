@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='11102018h') }}" crossorigin="anonymous">
   <!--<style> #workarea {background-color: #AAA; width: 100%; height: 100%; border: 1px solid black;}</style>-->
 {% endblock %}
 
@@ -188,7 +188,7 @@
         <div class="scrollText w-100" id='controllerMessage'></div>
     </div>
     <div id="workarea" class="flex-grow-1"> <!--class="col">-->
-        <div class="btn-group" role="group">
+        <div id="button3DResetGroup" class="btn-group" role="group">
             <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
             <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
         </div>

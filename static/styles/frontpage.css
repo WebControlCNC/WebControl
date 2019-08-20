@@ -34,20 +34,11 @@ html, body{
 /*#button3D, #buttonReset {*/
 #button3DResetGroup{
     position: absolute;
-    display: block;
+    display: inline-block;
     z-index: 95;
-}
-/*    top: 0%;*/
-
-/*
-#button3D {
     left: 1%;
-}
 
-#buttonReset {
-    left: 95%;
 }
-*/
 
 #cameraDiv1 {
     position: absolute;

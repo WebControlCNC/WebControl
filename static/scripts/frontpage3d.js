@@ -131,6 +131,18 @@ scene.add(gcodePos);
 
 animate();
 
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
@@ -168,14 +180,10 @@ function gcodePositionUpdate(x,y){
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
-    //$("#units").text("INCHES");
-    distToMove = Math.round($("#distToMove").val()/25.4,3)
-    //$("#distToMove").val(distToMove);
+    distToMove = (parseFloat($("#distToMove").val())/25.4).toFixed(3)
     updateSetting('toInches',distToMove);
   } else {
-    //$("#units").text("MM");
-    distToMove = Math.round($("#distToMove").val()*25.4,3)
-    //$("#distToMove").val(distToMove);
+    distToMove = (parseFloat($("#distToMove").val())*25.4).toFixed(3)
     updateSetting('toMM',distToMove);
   }
 }

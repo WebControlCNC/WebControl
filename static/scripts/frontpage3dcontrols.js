@@ -1,10 +1,10 @@
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
-    distToMove = Math.round($("#distToMove").val()/25.4,3)
+    distToMove = (parseFloat($("#distToMove").val())/25.4).toFixed(3)
     updateSetting('toInches',distToMove);
   } else {
-    distToMove = Math.round($("#distToMove").val()*25.4,3)
+    distToMove = (parseFloat($("#distToMove").val())*25.4).toFixed(3)
     updateSetting('toMM',distToMove);
   }
 }
