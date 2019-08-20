@@ -32,7 +32,7 @@ scene.background= new THREE.Color(0xdddddd);
 var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );
 var blueLineMaterial = new THREE.LineBasicMaterial( {color:0x0000ff });
-var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00ff00 });
+var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00aa00 });
 var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
 var blackLineMaterial = new THREE.LineBasicMaterial( {color:0x000000 });
 
