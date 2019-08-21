@@ -19,7 +19,7 @@ class UIQueue(Queue):
         #    data = dictionary # these are text lines, so no need to jsonify
         #else:
         try:
-            print(dictionary)
+            #print(dictionary)
             data = json.dumps(dictionary)
         except Exception as e:
             print("####")

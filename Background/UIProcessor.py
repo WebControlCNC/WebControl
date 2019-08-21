@@ -3,20 +3,32 @@ from __main__ import socketio
 import time
 import math
 import json
+import psutil
 from flask import render_template
 
 class UIProcessor:
 
     app = None
     lastCameraTime = 0
+    lastHealthCheck = 0
     
     def start(self, _app):
         
         self.app = _app
         self.app.data.console_queue.put("starting UI")
+
         with self.app.app_context():
             while True:
+                currentTime = time.time()
+                if currentTime-self.lastHealthCheck > 5:
+                    self.lastHealthCheck = currentTime
+                    load = psutil.cpu_percent(interval=None)
+                    healthData = {
+                        "cpuUsage": load
+                    }
+                    self.sendHealthMessage(healthData)
                 time.sleep(0.001)
+
                 if self.app.data.config.firstRun:
                     self.app.data.console_queue.put("here at firstRun")
                     self.app.data.config.firstRun = False
@@ -247,6 +259,9 @@ class UIProcessor:
         socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
+    def sendHealthMessage(self, healthData):
+        socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
+                      namespace="/MaslowCNC")
 
     def sendCameraMessage(self, message, _data=""):
 

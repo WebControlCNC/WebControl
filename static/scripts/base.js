@@ -6,6 +6,11 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
   isMobile = true;
 }
 
+function processHealthMessage(data){
+    //console.log(data.cpuUsage);
+    $("#cpuUsage").text(Math.round(data.cpuUsage).toString()+"%");
+    $("#mobileCPUUsage").text(Math.round(data.cpuUsage).toString()+"%");
+}
 
 function processControllerStatus(data){
     if (data.status=="disconnected"){
@@ -176,11 +181,11 @@ $.fn.scrollBottom = function() {
 function setupStatusButtons(){
   if (isMobile){
       $('#mobileClientStatus').show();
-      $('#mobileClientActivity').show();
+      $('#mobileCPUUsage').show();
       $('#mobileControllerStatus').show();
   } else {
     $('#mobileClientStatus').hide();
-    $('#mobileClientActivity').hide();
+    $('#mobileCPUUsage').hide();
     $('#mobileControllerStatus').hide();
   }
 }

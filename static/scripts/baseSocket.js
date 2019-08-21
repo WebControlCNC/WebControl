@@ -49,18 +49,23 @@
 
       socket.on('message', function(msg){
           //blink activity indicator
-          $("#activity").removeClass('alert-dark').addClass('alert-warning');
-          $("#mobileClientActivity").removeClass('alert-dark').addClass('alert-warning');
+          $("#cpuUsage").removeClass('alert-success').addClass('alert-warning');
+          $("#mobileCPUUsage").removeClass('alert-success').addClass('alert-warning');
           setTimeout(function(){
-            $("#activity").removeClass('alert-warning').addClass('alert-dark');
-            $("#mobileClientActivity").removeClass('alert-warning').addClass('alert-dark');
+            $("#cpuUsage").removeClass('alert-warning').addClass('alert-success');
+            $("#mobileCPUUsage").removeClass('alert-warning').addClass('alert-success');
           },125);
           //#console.log(msg.dataFormat);
           if (msg.dataFormat=='json')
             data = JSON.parse(msg.data);
           else
             data = msg.data;
+          //console.log(msg.command);
           switch(msg.command) {
+            case 'healthMessage':
+                //completed
+                processHealthMessage(data);
+                break;
             case 'controllerMessage':
                 //completed
                 processControllerMessage(data);
