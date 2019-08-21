@@ -15,6 +15,7 @@ container.appendChild(renderer.domElement);
 var imageShowing = 1
 
 var gcode = new THREE.Group();
+//var cutTrailGroup = new THREE.Group();
 
 var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -35,6 +36,7 @@ var blueLineMaterial = new THREE.LineBasicMaterial( {color:0x0000ff });
 var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00aa00 });
 var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
 var blackLineMaterial = new THREE.LineBasicMaterial( {color:0x000000 });
+var grayLineMaterial = new THREE.LineBasicMaterial( {color:0x777777 });
 
 var greenLineDashedMaterial = new THREE.LineDashedMaterial( {color:0x00ff00, dashSize:.1, gapSize: .1} );
 var blackDashedMaterial = new THREE.LineDashedMaterial( {color:0x000000, dashSize:.5, gapSize: .5} );
@@ -125,9 +127,32 @@ gcodePos.add(gcodePosVerticalLine);
 gcodePos.add(gcodePosCircle);
 gcodePos.position.set(0,0,0);
 
+var computedSledHorizontalLineSegments = new THREE.Geometry();
+computedSledHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.5, 0, 0));
+computedSledHorizontalLineSegments.vertices.push(new THREE.Vector3(1.5, 0, 0));
+var computedSledHorizontalLine = new THREE.LineSegments(computedSledHorizontalLineSegments, grayLineMaterial);
+
+var computedSledVerticalLineSegments = new THREE.Geometry();
+computedSledVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.5, 0));
+computedSledVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.5, 0));
+var computedSledVerticalLine = new THREE.LineSegments(computedSledVerticalLineSegments, grayLineMaterial);
+
+var computedSledCircleGeometry = new THREE.CircleGeometry(1,32);
+var computedSledCircleEdges = new THREE.EdgesGeometry(computedSledCircleGeometry)
+var computedSledCircle = new THREE.LineSegments(computedSledCircleEdges,grayLineMaterial);
+
+var computedSled = new THREE.Group();
+computedSled.add(computedSledHorizontalLine);
+computedSled.add(computedSledVerticalLine);
+computedSled.add(computedSledCircle);
+computedSled.position.set(0,0,0);
+
+
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
+
+var isComputedEnabled = false;
 
 animate();
 
@@ -156,6 +181,8 @@ function positionUpdate(x,y,z){
         z /= 25.4
     }
     sled.position.set(x,y,z);
+    computedSled.position.setComponent(2,z-0.01);
+
     //console.log("x="+x+", y="+y+", z="+z)
 }
 
@@ -253,7 +280,53 @@ function processErrorValueMessage(data){
  //console.log(data.leftError);
  $('#leftError').css('width', data.leftError*100+'%').attr('aria-valuenow', data.leftError*100);
  $('#rightError').css('width', data.rightError*100+'%').attr('aria-valuenow', data.rightError*100);
- //$('#errorValueMessage').html('left:'+data.leftError+' right:'+data.rightError);
+ //check to see if data is valid (i.e., not -999999)
+ console.log(data.computedEnabled);
+ if ( !data.computedEnabled )
+ {
+    if (isComputedEnabled){
+        scene.remove(computedSled);
+        //scene.remove(cutTrailGroup);
+        isComputedEnabled = false;
+    }
+    return;
+ }
+ else
+ {
+     var x = data.computedX/25.4;
+     var y = data.computedY/25.4;
+     if ($("#units").text()==""){
+        x /= 25.4
+        y /= 25.4
+     }
+     //console.log(x+", "+y);
+     /*var cutTrail = new THREE.Geometry();
+     cutTrail.vertices.push(new THREE.Vector3(computedSled.position.getComponent(0), computedSled.position.getComponent(1), computedSled.position.getComponent(2)));
+     */
+     computedSled.position.setComponent(0,x);
+     computedSled.position.setComponent(1,y);
+     /*
+     cutTrail.vertices.push(new THREE.Vector3(x, y, computedSled.position.getComponent(2)));
+     console.log(cutTrail.vertices);
+     cutTrailLine = new THREE.Line(cutTrail, greenLineMaterial);
+     scene.add(cutTrailLine);
+     cutTrailGroup.add(cutTrailLine);
+
+     if (isComputedEnabled)
+     {
+        scene.remove(cutTrailGroup);
+        scene.add(cutTrailGroup);
+     }
+     console.log(cutTrailGroup);
+     */
+     if (!isComputedEnabled){
+        scene.add(computedSled);
+        //scene.add(cutTrailGroup);
+        isComputedEnabled = true;
+     }
+ }
+ //following always comes in mm so convert to inches for 3d space
+
 }
 
 

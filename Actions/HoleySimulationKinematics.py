@@ -1,7 +1,8 @@
 import math
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
-class Kinematics():
+class Kinematics(MakesmithInitFuncs):
     '''
     The Kinematics module relates the lengths of the chains to the position of the cutting head
     in X-Y space.
@@ -386,7 +387,7 @@ class Kinematics():
 
         return aChainLength, bChainLength
 
-    def forward(self, chainALength, chainBLength):
+    def forward(self, chainALength, chainBLength, xGuess = -10, yGuess = 10):
         '''
 
         Take the chain lengths and return an XY position
@@ -398,9 +399,6 @@ class Kinematics():
         # apply any offsets for slipped links
         chainALength = chainALength + (self.chain1Offset * self.R)
         chainBLength = chainBLength + (self.chain2Offset * self.R)
-
-        xGuess = -10
-        yGuess = 10
 
         guessCount = 0
 
@@ -550,5 +548,59 @@ class Kinematics():
         Temp = ((math.sqrt(YPlus * YPlus - self.R * self.R) / self.R) - (
                     self.y + YPlus - self.h * math.sin(Psi)) / Denominator)
         return Temp
+
+    def updateSetting(self, firmwareKey, value):
+
+        if firmwareKey == 2:
+            self.D = float(value)
+        elif firmwareKey == 13:
+            self.R = float(value/3.141592/2)
+        elif firmwareKey == 1:
+            self.machineHeight = float(value)
+        elif firmwareKey == 0:
+            self.machineWidth = float(value)
+        elif firmwareKey == 3:
+            self.motorOffsetY = float(value)
+        elif firmwareKey == 40:
+            self.leftChainTolerance = float(value)
+        elif firmwareKey == 41:
+            self.rightChainTolerance = float(value)
+        elif firmwareKey == 45:
+            self.chainElasticity = float(value)
+        elif firmwareKey == 46:
+            self.sledWeight = float(value)
+        elif firmwareKey == 8:
+            self.rotationDiskRadius = float(value)
+        elif firmwareKey == 37:
+            self.chainSagCorrection = float(value)
+        elif firmwareKey == 38:
+            self.chainOverSprocket = int(value)
+        elif firmwareKey == 7:
+            if int(value) == 1:
+                self.isQuadKinematics = True
+            else:
+                self.isQuadKinematics = False
+        self._xCordOfMotor = self.D / 2
+        self._yCordOfMotor = self.machineHeight / 2 + self.motorOffsetY
+
+    def initializeSettings(self):
+        self.D = float(self.data.config.getValue("Maslow Settings","motorSpacingX"))
+        self.R = float(self.data.config.getValue("Computed Settings","distPerRot"))/3.141592/2
+        self.machineHeight = float(self.data.config.getValue("Maslow Settings","bedHeight"))
+        self.machineWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))
+        self.motorOffsetY = float(self.data.config.getValue("Maslow Settings", "motorOffsetY"))
+        self.leftChainTolerance = float(self.data.config.getValue("Advanced Settings", "leftChainTolerance"))
+        self.rightChainTolerance = float(self.data.config.getValue("Advanced Settings", "rightChainTolerance"))
+        self.chainElasticity = float(self.data.config.getValue("Advanced Settings", "chainElasticity"))
+        self.sledWeight = float(self.data.config.getValue("Maslow Settings", "sledWeight"))
+        self.rotationDiskRadius = float(self.data.config.getValue("Advanced Settings", "rotationRadius"))
+        self.chainSagCorrection = float(self.data.config.getValue("Advanced Settings", "chainSagCorrection"))
+        self.chainOverSprocket = int(self.data.config.getValue("Computed Settings", "chainOverSprocketComputed"))
+        kinematicsType = int(self.data.config.getValue("Computed Settings", "kinematicsTypeComputed"))
+        if kinematicsType == 1:
+            self.isQuadKinematics = True
+        else:
+            self.isQuadKinematics = False
+
 
 

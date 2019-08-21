@@ -150,6 +150,7 @@ class UIProcessor:
 
     def setErrorOnScreen(self, message):
         limit = float(self.app.data.config.getValue("Advanced Settings", "positionErrorLimit"))
+        computedEnabled = int(self.app.data.config.getValue("WebControl Settings", "computedPosition"))
         if limit != 0:
             try:
                 with self.app.app_context():
@@ -162,6 +163,31 @@ class UIProcessor:
                     endpt = message.find(',', startpt)
                     rightErrorValueAsString = message[startpt:endpt]
                     self.app.data.rightError = float(rightErrorValueAsString)/limit
+
+                    if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 100 and computedEnabled > 0:
+
+                        startpt = endpt + 1
+                        endpt = message.find(',', startpt)
+                        bufferSizeValueAsString = message[startpt:endpt]
+                        self.app.data.bufferSize = int(bufferSizeValueAsString)
+
+                        startpt = endpt + 1
+                        endpt = message.find(',', startpt)
+                        leftChainLengthAsString = message[startpt:endpt]
+                        self.app.data.leftChain = float(leftChainLengthAsString)
+
+                        startpt = endpt + 1
+                        endpt = message.find(']', startpt)
+                        rightChainLengthAsString = message[startpt:endpt]
+                        self.app.data.rightChain = float(rightChainLengthAsString)
+
+                        self.app.data.computedX, self.app.data.computedY = self.app.data.holeyKinematics.forward(self.app.data.leftChain, self.app.data.rightChain, self.app.data.xval, self.app.data.yval )
+                        #print("leftChain=" + str(self.app.data.leftChain) + ", rightChain=" + str(self.app.data.rightChain)+", x= "+str(self.app.data.computedX)+", y= "+str(self.app.data.computedY))
+                        computedEnabled = 1
+                    else:
+                        self.app.data.computedX = -999999
+                        self.app.data.computedY = -999999
+                        computedEnabled = 0
 
                     if math.isnan(self.app.data.leftError):
                         self.app.data.leftErrorValue = 0
@@ -178,6 +204,9 @@ class UIProcessor:
                 errorValues = {
                     "leftError": abs(self.app.data.leftError),
                     "rightError": abs(self.app.data.rightError),
+                    "computedX": self.app.data.computedX,
+                    "computedY": self.app.data.computedY,
+                    "computedEnabled": computedEnabled
                 }
                 self.sendErrorValueMessage(errorValues)
                 self.app.data.leftError_prev = self.app.data.leftError

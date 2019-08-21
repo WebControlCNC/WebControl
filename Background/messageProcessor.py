@@ -66,7 +66,7 @@ class MessageProcessor(MakesmithInitFuncs):
                         )
                         # Check that version numbers match
                         self.data.controllerFirmwareVersion = float(message[16-len(message):])
-                        print(self.data.controllerFirmwareVersion)
+                        #print(self.data.controllerFirmwareVersion)
                         '''
                         if self.data.controllerFirmwareVersion < 100:
                             self.data.ui_queue1.put("Alert", "Alert",
@@ -79,7 +79,11 @@ class MessageProcessor(MakesmithInitFuncs):
                             )
                         else:
                         '''
-                        if self.data.controllerFirmwareVersion < float(self.data.version):
+                        tmpVersion = self.data.controllerFirmwareVersion
+                        if tmpVersion > 50 and tmpVersion <100:
+                            tmpVersion = round(tmpVersion -50,3)
+
+                        if tmpVersion < float(self.data.version):
                             self.data.ui_queue1.put("Alert", "Alert",
                                 "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl.</p>"
                                 + "<p>WebControl Version "
@@ -88,7 +92,7 @@ class MessageProcessor(MakesmithInitFuncs):
                                 + message
                                 + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest WebControl-compatible code.</p>"
                             )
-                        if self.data.controllerFirmwareVersion > float(self.data.version):
+                        if tmpVersion > float(self.data.version):
                             self.data.ui_queue1.put("Alert", "Alert",
                                 "<p>Warning, your version of WebControl is out of date and may not work with this firmware version</p>"
                                 + "<p>WebControl Version "

@@ -934,6 +934,15 @@
         },
         {
             "default": 0,
+            "desc": "Enable on-screen reporting of actual sled position computed from chain lengths reported by controller.  MAY CAUSE WEBCONTROL TO SLOW DOWN!\ndefault setting: disabled",
+            "key": "computedPosition",
+            "section": "WebControl Settings",
+            "title": "Computed Sled Position",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
             "desc": "Timeout logging after specified seconds of user and gcode processing activity, 0 value disables timeout\ndefault setting: 0",
             "key": "loggingTimeout",
             "section": "WebControl Settings",

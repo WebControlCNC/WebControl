@@ -338,18 +338,21 @@ class Config(MakesmithInitFuncs):
                             strValue = self.firmwareKeyString(firmwareKey,storedValue)
                             app.data.gcode_queue.put(strValue)
                             #app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
+                            self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
                         elif firmwareKey >= 87 and firmwareKey <= 98:
                             if self.data.controllerFirmwareVersion >= 100:
                                 if not self.isPercentClose(float(storedValue), float(value)):
                                     if not isImporting:
                                         strValue = self.firmwareKeyString(firmwareKey, storedValue)
                                         app.data.gcode_queue.put(strValue)
+                                        self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
                                         # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                                 else:
                                     break
                         elif not self.isClose(float(storedValue), float(value)) and not isImporting:
                             strValue = self.firmwareKeyString(firmwareKey, storedValue)
                             app.data.gcode_queue.put(strValue)
+                            self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
                             # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                         else:
                             break

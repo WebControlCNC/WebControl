@@ -142,6 +142,23 @@ class Data:
     leftError_prev = -99999.0
     rightError_prev = -99999.9
 
+    """
+    Chain lengths as reported by controller
+    """
+    leftChain = 1610
+    rightChain = 1610
+
+    """
+    Sled position computed from controller reported chain lengths
+    """
+    computedX = 0
+    computedY = 0
+
+    """
+    Buffer size as reported by controller
+    """
+    bufferSize = 127
+
     pausedzval = 0.0
 
     """

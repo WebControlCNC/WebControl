@@ -5,6 +5,7 @@ from File.importFile import ImportFile
 from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
 from Actions.holeyCalibration import HoleyCalibration
+from Actions.HoleySimulationKinematics import Kinematics as HoleyKinematics
 from Actions.opticalCalibration import OpticalCalibration
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
@@ -26,6 +27,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     triangularCalibration = TriangularCalibration()
     opticalCalibration = OpticalCalibration()
     holeyCalibration = HoleyCalibration()
+    holeyKinematics = HoleyKinematics()
     messageProcessor = MessageProcessor()
     mcpProcessor = WebMCPProcessor()
     consoleProcessor = ConsoleProcessor()
@@ -51,6 +53,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.actions = self.actions
         data.triangularCalibration = self.triangularCalibration
         data.holeyCalibration = self.holeyCalibration
+        data.holeyKinematics = self.holeyKinematics
         data.opticalCalibration = self.opticalCalibration
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
@@ -63,11 +66,15 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.actions.setUpData(data)
         self.triangularCalibration.setUpData(data)
         self.holeyCalibration.setUpData(data)
+        self.holeyKinematics.setUpData(data)
         self.opticalCalibration.setUpData(data)
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
         self.camera.setUpData(data)
         self.camera.getSettings()
+
+        #set up kinematics with current settings
+        self.holeyKinematics.initializeSettings()
         #self.camera.start()
 
