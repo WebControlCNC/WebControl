@@ -68,7 +68,12 @@ function processActivateModal(data){
       } else {
         $('#notificationCircle').hide();
       }
-      message = data.message; //JSON.parse(data.message);
+      if (data.title=="Alert"){
+          //data is coming in as a jsonified string.. need to drop the extra quotes
+          message = JSON.parse(data.message);
+      }
+      else
+          message = data.message; //JSON.parse(data.message);
     }
     $modalDialog.removeClass('modal-lg');
     $modalDialog.removeClass('modal-sm');

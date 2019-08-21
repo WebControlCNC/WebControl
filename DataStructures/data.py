@@ -28,7 +28,7 @@ class Data:
     compressedGCode = None
     compressedGCode3D = None
 
-    version = "101.25"
+    version = "1.27"
     stockFirmwareVersion = ""
     customFirmwareVersion = ""
     holeyFirmwareVersion = ""
