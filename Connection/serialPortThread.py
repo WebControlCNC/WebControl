@@ -248,7 +248,7 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.data.console_queue.put("Connection Timed Out")
                     #print("Connection Timed Out")
                     #self.data.ui_queue.put("Connection Timed Out\n")
-                    self.data.ui_queue1.put("TextMessage", "", "Connection Timed Out")
+                    #self.data.ui_queue1.put("TextMessage", "", "Connection Timed Out")
                     if self.data.uploadFlag:
                         self.data.ui_queue1.put("Alert", "Connection Lost",
                                                 "Message: USB connection lost. This has likely caused the machine to loose it's calibration, which can cause erratic behavior. It is recommended to stop the program, remove the sled, and perform the chain calibration process. Press Continue to override and proceed with the cut.")

@@ -219,7 +219,10 @@ class WebPageProcessor:
         elif pageID == "setSprockets":
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
+            if isMobile:
+                page = render_template("setSprockets_mobile.html", chainExtendLength=chainExtendLength)
+            else:
+                page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
             return page, "Set Sprockets", False, "medium", "content", False
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")

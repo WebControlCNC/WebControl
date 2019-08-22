@@ -9,6 +9,15 @@
     height: calc(100vh - 85px);
 }
 
+.text-nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-wrap {
+    white-space: normal !important;
+}
 
 .scrollText {
     height: calc(100vh - 720px);

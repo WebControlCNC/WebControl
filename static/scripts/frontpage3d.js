@@ -636,15 +636,15 @@ function processControllerMessage(data){
     $('#controllerMessage').scrollBottom();
 }
 
-function processAlert(data){
-    console.log("alert received");
-    $("#alerts").html("<marquee behavior='scroll' direction='left'>"+data.message+"</marquee>");
-    $("#alerts").removeClass('alert-success').addClass('alert-danger');
+function processAlarm(data){
+    console.log("alarm received");
+    $("#alarms").html("<marquee behavior='scroll' direction='left'>"+data.message+"</marquee>");
+    $("#alarms").removeClass('alert-success').addClass('alert-danger');
     $("#stopButton").addClass('stopbutton');
 }
 
-function clearAlert(data){
-    console.log("clearing alert");
-    $("#alerts").text("Alert cleared.");
-    $("#alerts").removeClass('alert-danger').addClass('alert-success');
+function clearAlarm(data){
+    console.log("clearing alarm");
+    $("#alarms").text("Alarm cleared.");
+    $("#alarms").removeClass('alert-danger').addClass('alert-success');
 }

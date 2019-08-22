@@ -8,8 +8,8 @@
   <script src="{{ url_for('static',filename='scripts/socket.io-2.1.1.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/jquery-3.3.1.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/bootstrap.bundle.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018g') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018h') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018m') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018m') }}" crossorigin="anonymous"></script>
 
   <script type="text/javascript" charset="utf-8">
   </script>
@@ -125,19 +125,19 @@
     </div>
   </div>
 
-  <div class="modal" id="alarmModal" tabindex="-1" role="dialog">
-    <div id="alarmDialog" class="modal-dialog {{modalStyle}}" role="document">
+  <div class="modal" id="alertModal" tabindex="-1" role="dialog">
+    <div id="alertDialog" class="modal-dialog {{modalStyle}}" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 id="alarmModalTitle" class="modal-title">Modal title</h5>
+          <h5 id="alertModalTitle" class="modal-title">Modal title</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div id="alarmModalText" class="modal-body">
+        <div id="alertModalText" class="modal-body">
         </div>
         <div class="modal-footer">
-          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alarm</button>
+          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alert</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

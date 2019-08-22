@@ -29,6 +29,7 @@ function processControllerStatus(data){
 function processActivateModal(data){
     var $modal, $modalTitle, $modalText
     var message
+    console.log(data)
     if (data.modalType == "content"){
       $modal = $('#contentModal');
       $modalDialog = $('#contentDialog');
@@ -39,19 +40,22 @@ function processActivateModal(data){
       } else {
         $('#footerSubmit').hide();
       }
+      console.log("content modal")
+      //message = JSON.parse(data.message);
       message = data.message;
     }
-    else if (data.modalType == "alarm") {
-      $modal = $('#alarmModal');
-      $modalDialog = $('#alarmDialog');
-      $modalTitle = $('#alarmModalTitle');
-      $modalText = $('#alarmModalText');
+    else if (data.modalType == "alert") {
+      $modal = $('#alertModal');
+      $modalDialog = $('#alertDialog');
+      $modalTitle = $('#alertModalTitle');
+      $modalText = $('#alertModalText');
       if (data.resume=="clear"){
           $('#clearButton').show();
       } else {
           $('#clearButton').hide();
       }
-      message = data.mesage; //JSON.parse(data.message);
+      //data is coming in as a jsonified string.. need to drop the extra quotes
+      message = JSON.parse(data.message);
     }
     else{
       $modal = $('#notificationModal');
@@ -73,12 +77,7 @@ function processActivateModal(data){
       } else {
         $('#notificationCircle').hide();
       }
-      if (data.title=="Alert"){
-          //data is coming in as a jsonified string.. need to drop the extra quotes
-          message = JSON.parse(data.message);
-      }
-      else
-          message = data.message; //JSON.parse(data.message);
+      message = data.message;
     }
     $modalDialog.removeClass('modal-lg');
     $modalDialog.removeClass('modal-sm');

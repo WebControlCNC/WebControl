@@ -101,6 +101,7 @@
                 break;
             case 'activateModal':
                 //completed
+                console.log(msg)
                 processActivateModal(data);
                 break;
             case 'requestedSetting':
@@ -159,11 +160,11 @@
                 //completed
                 updatePIDData(data);
                 break;
-            case 'alert':
-                processAlert(data);
+            case 'alarm':
+                processAlarm(data);
                 break;
-            case 'clearAlert':
-                clearAlert(data);
+            case 'clearAlarm':
+                clearAlarm(data);
                 break;
             default:
                 console.log("!!!!!!");

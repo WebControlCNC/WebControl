@@ -82,20 +82,20 @@ class UIProcessor:
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 elif message.find("Unable to find valid") != -1:
-                                    self.sendAlert(message);
+                                    self.sendAlarm(message);
                                 else:
                                     self.activateModal("Notification:", message[9:], "notification")
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
-                                    self.sendAlert("Alarm: Sled Not Keeping Up")
+                                    self.sendAlarm("Alarm: Sled Not Keeping Up")
                                 elif message.find("Position Lost") != -1:
-                                    self.sendAlert("Alarm: Position Lost.  Reset Chains.")
+                                    self.sendAlarm("Alarm: Position Lost.  Reset Chains.")
                                 else:
-                                    self.sendAlert(message);
+                                    self.sendAlarm(message);
                             elif message[0:6] == "Unable to":
                                 if message.find("The sled is not keeping up") != -1:
                                     pass
-                                self.sendAlert("Alarm: Sled Not Keeping Up")
+                                self.sendAlarm("Alarm: Sled Not Keeping Up")
 
                                 #self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
@@ -233,9 +233,9 @@ class UIProcessor:
             namespace="/MaslowCNC",
         )
 
-    def sendAlert(self, message):
+    def sendAlarm(self, message):
         data = json.dumps({"message":message})
-        socketio.emit("message", {"command": "alert", "data": data, "dataFormat": "json"},
+        socketio.emit("message", {"command": "alarm", "data": data, "dataFormat": "json"},
             namespace="/MaslowCNC",
         )
 
@@ -325,7 +325,7 @@ class UIProcessor:
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
             elif msg["message"] == "updatePIDData":
                 self.updatePIDData("updatePIDData", json.loads(msg["data"]))
-            elif msg["message"] == "clearAlert":
+            elif msg["message"] == "clearAlarm":
                 msg["data"] = json.dumps({"data":""})
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
                               namespace="/MaslowCNC")
@@ -349,7 +349,7 @@ class UIProcessor:
             #    self.app.data.console_queue.put("found adjust Z-Axis in message")
             #    self.activateModal("Notification:", message[9:], "notification", resume="resume")
             #else:
-            self.activateModal(msg["message"], msg["data"], "notification")
+            self.activateModal(msg["message"], msg["data"], "alert")
         elif msg["command"] == "SpinnerMessage":
             self.activateModal("Notification:", msg["data"], "notification", progress="spinner")
 

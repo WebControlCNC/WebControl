@@ -355,7 +355,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             # TODO: app.onUploadFlagChange(self.stopRun, 0)
             self.data.console_queue.put("Gcode stopped")
-            self.data.ui_queue1.put("Action", "clearAlert", "")
+            self.data.ui_queue1.put("Action", "clearAlarm", "")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))

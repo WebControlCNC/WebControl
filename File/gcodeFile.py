@@ -50,8 +50,15 @@ class GCodeFile(MakesmithInitFuncs):
         if directory is "":
             return False
         try:
-            gfile = open(directory+fileName, "w+")
-            gfile.writelines(map(lambda s: s+ '\n', self.data.gcode))
+            homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+            homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+            gfile = open(directory + fileName, "w+")
+            for line in self.data.gcode:
+                newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
+                gfile.write(newLine+'\n')
+
+            #gfile = open(directory+fileName, "w+")
+            #gfile.writelines(map(lambda s: s+ '\n', self.data.gcode))
             gfile.close()
         except Exception as e:
             self.data.console_queue.put(str(e))
