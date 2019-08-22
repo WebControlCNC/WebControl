@@ -35,6 +35,7 @@ ADD holeyrequirements.txt /holeyrequirements.txt
 # Remove opencv, scipy and numpy from requirements (since they're already installed)
 RUN sed -i '/opencv-python.*/d' /holeyrequirements.txt && sed -i '/scipy.*/d' /holeyrequirements.txt && sed -i '/numpy.*/d' /holeyrequirements.txt
 # TODO: Maybe we can cache wheel files outside this container, for more granular reuse when holeyrequiremnts.txt changes
+RUN pwd
 RUN pip install -r /holeyrequirements.txt
 
 # Download and compile the Arduino firmware
@@ -65,7 +66,7 @@ RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && pio run -e megaatmega2560 \
     && mkdir build \
     && mv .pio/build/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
-RUN pwd
+
 ARG  holey_firmware_repo=https://github.com/madgrizzle/HoleyFirmware.git
 ARG  holey_firmware_sha=658b62e76fd0530a796c4aec81acfb139ab1b681
 RUN git clone $holey_firmware_repo firmware/holey \

@@ -22,7 +22,7 @@ class UIProcessor:
                 currentTime = time.time()
                 if currentTime-self.lastHealthCheck > 5:
                     self.lastHealthCheck = currentTime
-                    load = psutil.cpu_percent(interval=None)
+                    load = max(psutil.cpu_percent(interval=None, percpu=True))
                     healthData = {
                         "cpuUsage": load
                     }
