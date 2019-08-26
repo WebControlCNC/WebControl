@@ -1001,5 +1001,251 @@
             "type": "float",
             "value": 0.001
         }
+    ],
+    "GPIO Settings": [
+        {
+            "default": "",
+            "desc": "GPIO2 functionality",
+            "key": "gpio2",
+            "section": "GPIO Settings",
+            "title": "GPIO2",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO3 functionality",
+            "key": "gpio3",
+            "section": "GPIO Settings",
+            "title": "GPIO3",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO4 functionality",
+            "key": "gpio4",
+            "section": "GPIO Settings",
+            "title": "GPIO4",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO5 functionality",
+            "key": "gpio5",
+            "section": "GPIO Settings",
+            "title": "GPIO5",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO6 functionality",
+            "key": "gpio6",
+            "section": "GPIO Settings",
+            "title": "GPIO6",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO7 functionality",
+            "key": "gpio7",
+            "section": "GPIO Settings",
+            "title": "GPIO7",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO8 functionality",
+            "key": "gpio8",
+            "section": "GPIO Settings",
+            "title": "GPIO8",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO9 functionality",
+            "key": "gpio9",
+            "section": "GPIO Settings",
+            "title": "GPIO9",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO10 functionality",
+            "key": "gpio10",
+            "section": "GPIO Settings",
+            "title": "GPIO10",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO11 functionality",
+            "key": "gpio11",
+            "section": "GPIO Settings",
+            "title": "GPIO11",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO12 functionality",
+            "key": "gpio12",
+            "section": "GPIO Settings",
+            "title": "GPIO12",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO13 functionality",
+            "key": "gpio13",
+            "section": "GPIO Settings",
+            "title": "GPIO13",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO14 functionality",
+            "key": "gpio14",
+            "section": "GPIO Settings",
+            "title": "GPIO14",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO15 functionality",
+            "key": "gpio15",
+            "section": "GPIO Settings",
+            "title": "GPIO15",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO16 functionality",
+            "key": "gpio16",
+            "section": "GPIO Settings",
+            "title": "GPIO16",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO17 functionality",
+            "key": "gpio17",
+            "section": "GPIO Settings",
+            "title": "GPIO17",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO18 functionality",
+            "key": "gpio18",
+            "section": "GPIO Settings",
+            "title": "GPIO18",
+            "type": "options",
+            "value": ""
+       }        ,
+        {
+            "default": "",
+            "desc": "GPIO19 functionality",
+            "key": "gpio19",
+            "section": "GPIO Settings",
+            "title": "GPIO19",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO20 functionality",
+            "key": "gpio20",
+            "section": "GPIO Settings",
+            "title": "GPIO20",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO21 functionality",
+            "key": "gpio21",
+            "section": "GPIO Settings",
+            "title": "GPIO21",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO22 functionality",
+            "key": "gpio22",
+            "section": "GPIO Settings",
+            "title": "GPIO22",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO23 functionality",
+            "key": "gpio23",
+            "section": "GPIO Settings",
+            "title": "GPIO23",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO24 functionality",
+            "key": "gpio24",
+            "section": "GPIO Settings",
+            "title": "GPIO24",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO25 functionality",
+            "key": "gpio25",
+            "section": "GPIO Settings",
+            "title": "GPIO25",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO26 functionality",
+            "key": "gpio26",
+            "section": "GPIO Settings",
+            "title": "GPIO26",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO27 functionality",
+            "key": "gpio27",
+            "section": "GPIO Settings",
+            "title": "GPIO27",
+            "type": "options",
+            "value": ""
+       }
+
+
+
+
+
+
+
+
+
+
     ]
 }

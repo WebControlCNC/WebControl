@@ -94,6 +94,7 @@ class Data:
     cameraImage = None
     cameraImageUpdated = False
     continuousCamera = False
+    gpioActions = None
 
     """
 

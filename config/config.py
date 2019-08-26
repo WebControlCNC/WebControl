@@ -222,12 +222,12 @@ class Config(MakesmithInitFuncs):
     def updateSettings(self, section, result):
         for x in range(len(self.settings[section])):
             setting = self.settings[section][x]["key"]
-            self.data.console_queue.put(setting)
             if setting in result:
                 resultValue = result[setting]
             else:
                 resultValue = 0
-
+            strValue = setting+" = "+str(resultValue)
+            self.data.console_queue.put(strValue)
             #do a special check for comport because if its open, we need to close existing connection
             if setting == "COMport":
                 currentSetting = self.data.config.getValue(section, setting)

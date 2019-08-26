@@ -143,6 +143,16 @@ def cameraSettings():
         resp.status_code = 200
         return resp
 
+@app.route("/gpioSettings", methods=["POST"])
+def gpioSettings():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        result = request.form
+        app.data.config.updateSettings("GPIO Settings", result)
+        message = {"status": 200}
+        resp = jsonify(message)
+        resp.status_code = 200
+        return resp
         
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():

@@ -7,6 +7,7 @@ from Actions.triangularCalibration import TriangularCalibration
 from Actions.holeyCalibration import HoleyCalibration
 from Actions.HoleySimulationKinematics import Kinematics as HoleyKinematics
 from Actions.opticalCalibration import OpticalCalibration
+from Actions.gpioActions import GPIOActions
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
@@ -32,6 +33,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     mcpProcessor = WebMCPProcessor()
     consoleProcessor = ConsoleProcessor()
     camera = WebcamVideoStream()
+    gpioActions = GPIOActions()
 
     def setUpData(self, data):
         """
@@ -59,6 +61,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
         data.camera = self.camera
+        data.gpioActions = self.gpioActions
 
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
@@ -73,6 +76,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.consoleProcessor.setUpData(data)
         self.camera.setUpData(data)
         self.camera.getSettings()
+        self.gpioActions.setUpData(data)
+        self.gpioActions.setup()
 
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()

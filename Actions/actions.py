@@ -12,8 +12,13 @@ import json
 import time
 from zipfile import ZipFile
 import datetime
+from gpiozero.pins.mock import MockFactory
+from gpiozero import Device
 
 class Actions(MakesmithInitFuncs):
+
+    Device.pin_factory = MockFactory()
+
     def processAction(self, msg):
         try:
             if msg["data"]["command"] == "cutTriangularCalibrationPattern":
@@ -854,6 +859,23 @@ class Actions(MakesmithInitFuncs):
             return False
     
     def macro(self, number):
+        '''
+        try:
+            if number == 1:
+                print("here")
+                btn_pin = Device.pin_factory.pin(2)
+                btn_pin.drive_low()
+                return True
+            if number == 2:
+                print("here2")
+                self.data.gpioActions.setGPIOAction(3, "Stop")
+                return True
+
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+        '''
         try:
             if number == 1:
                 macro = self.data.config.getValue("Maslow Settings", "macro1")

@@ -114,6 +114,32 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "Camera Settings", False, "medium", "content", "footerSubmit"
+        elif pageID == "gpioSettings":
+            setValues = self.data.config.getJSONSettingSection("GPIO Settings")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
+            options = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center"]
+            if isMobile:
+                page = render_template(
+                    "gpio_mobile.html",
+                    title="GPIO Settings",
+                    settings=setValues,
+                    options=options,
+                    pageID="gpioSettings",
+                    enableCustom=enableCustom,
+                )
+            else:
+                page = render_template(
+                    "gpio.html",
+                    title="GPIO Settings",
+                    settings=setValues,
+                    options=options,
+                    pageID="gpioSettings",
+                    enableCustom=enableCustom,
+                )
+            return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
