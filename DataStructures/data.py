@@ -46,6 +46,8 @@ class Data:
     # holds the address of the g-code file so that the gcode can be refreshed
     gcodeFile = ""
     importFile = ""
+    # holds the current gcode x,y,z position
+    currentGcodePost = [0.0, 0.0, 0.0]
     # the current position of the cutting head
     currentpos = [0.0, 0.0, 0.0]
     target = [0.0, 0.0, 0.0]

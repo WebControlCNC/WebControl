@@ -1,25 +1,29 @@
 {% block content %}
 <div class="container-fluid">
   <form class="form" id="gcodeForm" method="post" enctype=multipart/form-data>
-    <div class="form-group">
-      <label for="directorySelect">Selected Directory</label>
-      <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
-        {% for directory in directories %}
-          <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
-            {{directory if directory != '.' else './'}}
-          </option>
-        {% endfor %}
-      </select>
-      <label for="fileSelect">File</label>
-      <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
-        {% for file in files %}
-          <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
-            {{file["file"]}}
-          </option>
-        {% endfor %}
-      </select>
+    <div class="form-group mb-3">
+      <div class="row mb-3">
+        <label for="directorySelect">Select Directory</label>
+        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+          {% for directory in directories %}
+            <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
+              {{directory if directory != '.' else './'}}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="row">
+        <label for="fileSelect">Select File</label>
+        <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
+          {% for file in files %}
+            <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
+              {{file["file"]}}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
-    <button type="submit" class="btn btn-primary mt-1">Submit</button>
+    <!--<button type="submit" class="btn btn-primary mt-1">Submit</button>-->
     <div id="gcCircle">
       <div class="loader">
         <div class="loader">
@@ -34,5 +38,5 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/openGCode.js', version='11102018a') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/openGCode.js', version='11102018b') }}" crossorigin="anonymous"></script>
 {% endblock %}

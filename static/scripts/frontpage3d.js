@@ -29,7 +29,7 @@ toggle3DView(); // makes it not true and applies appropriate settings
 controls.saveState();
 
 var scene = new THREE.Scene();
-scene.background= new THREE.Color(0xdddddd);
+scene.background= new THREE.Color(0xeeeeee);
 var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );
 var blueLineMaterial = new THREE.LineBasicMaterial( {color:0x0000ff });
@@ -38,7 +38,7 @@ var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
 var blackLineMaterial = new THREE.LineBasicMaterial( {color:0x000000 });
 var grayLineMaterial = new THREE.LineBasicMaterial( {color:0x777777 });
 
-var greenLineDashedMaterial = new THREE.LineDashedMaterial( {color:0x00ff00, dashSize:.1, gapSize: .1} );
+var greenLineDashedMaterial = new THREE.LineDashedMaterial( {color:0x00aa00, dashSize:.1, gapSize: .1} );
 var blackDashedMaterial = new THREE.LineDashedMaterial( {color:0x000000, dashSize:.5, gapSize: .5} );
 
 var outerFrameShape = new THREE.Geometry();
@@ -195,12 +195,13 @@ function homePositionUpdate(x,y){
     home.position.set(x,y,0);
 }
 
-function gcodePositionUpdate(x,y){
+function gcodePositionUpdate(x,y,z){
     if ($("#units").text()=="MM"){
         x /= 25.4
         y /= 25.4
+        z /= 25.4
     }
-    gcodePos.position.set(x,y,0);
+    gcodePos.position.set(x,y,z);
     //console.log("x="+x+", y="+y)
 }
 
@@ -336,10 +337,10 @@ function processHomePositionMessage(data){
 }
 
 function processGCodePositionMessage(data){
-  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' Zpos:'+parseFloat(data.zval).toFixed(2));
   $('#gcodeLine').html(data.gcodeLine);
   $('#gcodeLineIndex').val(data.gcodeLineIndex)
-  gcodePositionUpdate(data.xval,data.yval);
+  gcodePositionUpdate(data.xval,data.yval,data.zval);
 }
 
 function gcodeUpdate(msg){
@@ -403,6 +404,20 @@ function gcodeUpdateCompressed(data){
           gcode.add(gcodeUndashed);
 
         }
+      } else {
+        var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
+        var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+        var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,greenLineMaterial);
+        gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+        gcode.add(gcodeCircle);
+
+        var gcodeLineSegments = new THREE.Geometry();
+        gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+        gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[1][2]));
+        gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
+        gcode.add(gcodeUndashed);
+
+
       }
     });
     //gcode.move(originX,originY)

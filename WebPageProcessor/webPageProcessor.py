@@ -167,7 +167,7 @@ class WebPageProcessor:
             page = render_template(
                 "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
             )
-            return page, "Open GCode", False, "medium", "content", False
+            return page, "Open GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "saveGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
@@ -196,7 +196,7 @@ class WebPageProcessor:
                 "saveGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
                 lastSelectedDirectory=lastSelectedDirectory, isOpen=False
             )
-            return page, "Open GCode", False, "medium", "content", False
+            return page, "Save GCode", False, "medium", "content", "footerSubmit"
 
         elif pageID == "uploadGCode":
             validExtensions = self.data.config.getValue(
@@ -216,7 +216,7 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
             page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
-            return page, "Upload GCode", False, "medium", "content", False
+            return page, "Upload GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "importGCini":
             url = "importFile"
             page = render_template("importFile.html", url=url)

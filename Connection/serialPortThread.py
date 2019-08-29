@@ -221,7 +221,7 @@ class SerialPortThread(MakesmithInitFuncs):
                         if command.find("G21") != -1:
                             if self.data.units != "MM":
                                 self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
-                        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
+                        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
 
                 # Send the next line of gcode to the machine if we're running a program. Will send lines to buffer if there is space
                 # and the feature is turned on

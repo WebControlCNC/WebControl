@@ -52,13 +52,15 @@ class GCodeFile(MakesmithInitFuncs):
         try:
             homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
             homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
-            gfile = open(directory + fileName, "w+")
+            fileToWrite = directory + "/" + fileName
+            gfile = open(fileToWrite, "w+")
+            print(fileToWrite)
             for line in self.data.gcode:
                 newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
                 gfile.write(newLine+'\n')
-
             #gfile = open(directory+fileName, "w+")
             #gfile.writelines(map(lambda s: s+ '\n', self.data.gcode))
+            print("Closing File")
             gfile.close()
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -256,15 +258,15 @@ class GCodeFile(MakesmithInitFuncs):
                 if True:
                     if zTarget - self.zPosition > 0:
                         # Color(0, 1, 0)
-                        radius = 1
+                        radius = 2
                     else:
                         # Color(1, 0, 0)
-                        radius = 2
+                        radius = 1
 
                     self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line3D[-1].type = "circle"
                     self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
-                    self.addPoint3D(radius, 0, self.zPosition)
+                    self.addPoint3D(radius, 0, zTarget)
                     self.line3D[-1].dashed = False
 
             self.xPosition = xTarget
@@ -364,6 +366,21 @@ class GCodeFile(MakesmithInitFuncs):
         """
 
         del self.line3D[:]
+
+    def clearGcodeFile(self):
+        """
+
+        clearGcodeFile deletes the lines and arcs and the file
+
+        """
+
+        del self.line3D[:]
+
+        self.data.gcode = []
+        self.updateGcode()
+        self.data.gcodeFile.isChanged = True
+
+
 
 
     def moveLine(self, gCodeLine, dehome = False, homeX=0, homeY=0):

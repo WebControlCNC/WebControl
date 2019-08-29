@@ -336,9 +336,15 @@ class Actions(MakesmithInitFuncs):
             if len(self.data.gcode)>0:
                 if self.data.gcodeIndex >0:
                     self.processGCode()
-                self.data.uploadFlag = 1
-                self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
-                self.data.gcodeIndex += 1
+                    self.sendGCodePositionUpdate(recalculate=True)
+                    #self.data.console_queue.put("Run Paused")
+                    #self.data.ui_queue1.put("Action", "setAsResume", "")
+                    #self.data.pausedzval = self.data.zval
+                else:
+                    #self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
+                    self.data.uploadFlag = 1
+                    #self.data.gcodeIndex += 1
+
                 return True
             else:
                 return False
@@ -430,6 +436,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.uploadFlag = self.data.previousUploadStatus
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
             else:
+                self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
             #self.data.quick_queue.put("~")
@@ -458,7 +465,7 @@ class Actions(MakesmithInitFuncs):
 
     def clearGCode(self):
         try:
-            self.data.gcodeFile.clearGcode()
+            self.data.gcodeFile.clearGcodeFile()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -503,7 +510,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcodeIndex = targetIndex
 
             try:
-                retval = self.sendGCodePositionUpdate()
+                retval = self.sendGCodePositionUpdate(recalculate=True)
                 return retval
             except Exception as e:
                 self.data.console_queue.put(str(e))
@@ -665,7 +672,7 @@ class Actions(MakesmithInitFuncs):
                 #position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
                 position = {"xval": oldHomeX * scaleFactor, "yval": oldHomeY * scaleFactor}
                 self.data.ui_queue1.put("Action", "homePositionMessage", position)
-                self.sendGCodePositionUpdate()
+                self.sendGCodePositionUpdate(recalculate=True)
             elif setting == "toInchesZ":
                 self.data.units = "INCHES"
                 self.data.config.setValue(
@@ -986,35 +993,53 @@ class Actions(MakesmithInitFuncs):
             print(e)
         return True
 
-    def sendGCodePositionUpdate(self, gCodeLineIndex=None):
+    def sendGCodePositionUpdate(self, gCodeLineIndex=None, recalculate=False):
         if self.data.gcode:
             if gCodeLineIndex is None:
                 gCodeLineIndex = self.data.gcodeIndex
             gCodeLine = self.data.gcode[gCodeLineIndex]
-            x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-            if x:
-                xTarget = float(x.groups()[0])
-                self.data.previousPosX = xTarget
+            #print("Gcode index"+str(gCodeLineIndex)+" : "+ gCodeLine )
+            if not recalculate:
+                #print("not recalculating.. uploadFlag ="+str(self.data.uploadFlag))
+
+                x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+                if x:
+                    xTarget = float(x.groups()[0])
+                    self.data.previousPosX = xTarget
+                else:
+                    #xTarget = None
+                    xTarget = self.data.previousPosX
+
+                y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+
+                if y:
+                    yTarget = float(y.groups()[0])
+                    self.data.previousPosY = yTarget
+                else:
+                    #yTarget = None
+                    yTarget = self.data.previousPosY
+
+                z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+
+                if z:
+                    zTarget = float(z.groups()[0])
+                    self.data.previousPosZ = zTarget
+                else:
+                    #zTarget = None
+                    zTarget = self.data.previousPosZ
             else:
-                xTarget = None
-
-            y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-
-            if y:
-                yTarget = float(y.groups()[0])
-                self.data.previousPosY = yTarget
-            else:
-                yTarget = None
-
-            if xTarget is None or yTarget is None:
+                #if xTarget is None or yTarget is None:
                 xTarget, yTarget, zTarget = self.findPositionAt(self.data.gcodeIndex)
+
             scaleFactor = 1.0
             if self.data.gcodeFileUnits == "MM" and self.data.units=="INCHES":
                 scaleFactor = 1/25.4
             if self.data.gcodeFileUnits == "INCHES" and self.data.units=="MM":
                 scaleFactor = 25.4
 
-            position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine, "gcodeLineIndex":gCodeLineIndex}
+            #position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine, "gcodeLineIndex":gCodeLineIndex}
+            position = {"xval": xTarget * scaleFactor, "yval": yTarget * scaleFactor,"zval": zTarget * scaleFactor, "gcodeLine": gCodeLine, "gcodeLineIndex": gCodeLineIndex}
+
             self.data.ui_queue1.put("Action", "gcodePositionMessage", position)
             return True
 
@@ -1177,6 +1202,7 @@ class Actions(MakesmithInitFuncs):
                                 zpos = zpos + float(_zpos.groups()[0])
                             else:
                                 zpos = float(_zpos.groups()[0])
+        print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpoz="+str(zpos)+" for index="+str(index))
         return xpos, ypos, zpos
 
     def adjustChain(self, chain):

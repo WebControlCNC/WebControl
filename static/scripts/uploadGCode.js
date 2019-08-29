@@ -13,7 +13,7 @@ $(document).ready(function () {
         if (directory!="")
             action("createDirectory",directory);
      });
-
+    /*
     $('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
 
@@ -36,5 +36,32 @@ $(document).ready(function () {
                 alert(errorThrown);
             }
         });
-    });
+    });*/
 });
+
+$("#gcodeFile").on("change",function(){
+  var fileName = $(this).val().split("\\").pop();
+  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
+
+function onFooterSubmit(){
+    var formdata = new FormData($('#gcodeForm')[0]);
+    //var formdata = $("#gcodeForm").serialize();
+    $.ajax({
+        url : '/uploadGCode',
+        type: "POST",
+        data: formdata,
+        mimeTypes:"multipart/form-data",
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function (data) {
+          console.log("success");
+            $('#contentModal').modal('toggle')
+            checkForGCodeUpdate();
+        },
+        error: function (jXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
+}

@@ -7,7 +7,7 @@ $(document).ready(function () {
     refreshList();
     $("#directorySelect").change(refreshList);
 
-    $('#gcodeForm').on('submit', function(e) {
+    /*$('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
         $('#gcCircle').show();
         var formdata = new FormData(this);
@@ -27,7 +27,7 @@ $(document).ready(function () {
                 $('#gcCircle').hide();
             }
         });
-    });
+    });*/
 });
 
 function refreshList(){
@@ -45,4 +45,32 @@ function refreshList(){
         $(this).remove();
       }
   });
+}
+
+
+
+function onFooterSubmit(){
+    //var formdata = $("#gcodeForm").serialize();
+    $('#gcCircle').show();
+    var formdata = new FormData($('#gcodeForm')[0]);
+
+    $.ajax({
+        url : '/saveGCode',
+        type: "POST",
+        data: formdata,
+        mimeTypes:"multipart/form-data",
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function (data) {
+          console.log("success");
+            $('#contentModal').modal('toggle')
+            checkForGCodeUpdate();
+            $('#gcCircle').hide();
+        },
+        error: function (jXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+            $('#gcCircle').hide();
+        }
+    });
 }
