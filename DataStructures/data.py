@@ -97,6 +97,7 @@ class Data:
     cameraImageUpdated = False
     continuousCamera = False
     gpioActions = None
+    boardManager = None
 
     """
 

@@ -219,7 +219,8 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "clearLogs":
                 if not self.clearLogs():
                     self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
-
+            else:
+                self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
         except Exception as e:
             print(str(e))
             

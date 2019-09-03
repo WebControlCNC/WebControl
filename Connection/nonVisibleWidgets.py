@@ -12,6 +12,7 @@ from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
 from Background.webcamVideoStream import WebcamVideoStream
+from Boards.boardManager import BoardManager
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -34,6 +35,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     consoleProcessor = ConsoleProcessor()
     camera = WebcamVideoStream()
     gpioActions = GPIOActions()
+    boardManager = BoardManager()
 
     def setUpData(self, data):
         """
@@ -62,6 +64,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.consoleProcessor = self.consoleProcessor
         data.camera = self.camera
         data.gpioActions = self.gpioActions
+        data.boardManager = self.boardManager
 
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
@@ -78,6 +81,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.camera.getSettings()
         self.gpioActions.setUpData(data)
         self.gpioActions.setup()
+        self.boardManager.setUpData(data)
 
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()

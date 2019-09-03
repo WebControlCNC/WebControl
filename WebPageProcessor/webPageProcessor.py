@@ -365,6 +365,11 @@ class WebPageProcessor:
                                    vVersion=vVersion,
                                    pVersion=pVersion)
             return page, "PID Tuning", False, "large", "content", False
+        elif pageID == "editBoard":
+            page = render_template("editBoard.html")
+            return page, "Create/Edit Board", False, "medium", "content", "footerSubmit"
+        else:
+            self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 
     def gcodePreProcessor(self):
         text = ""
