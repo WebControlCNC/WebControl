@@ -10,7 +10,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018h') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019e') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -188,9 +188,16 @@
         <div class="scrollText w-100" id='controllerMessage'></div>
     </div>
     <div id="workarea" class="flex-grow-1"> <!--class="col">-->
-        <div id="button3DResetGroup" class="btn-group" role="group">
+        <!--<div id="button3DResetGroup" class="btn-group" role="group">
             <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
             <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+            <div id="cursorPosition" class="alert alert-success alert-dismissible">Cursor Position</div>
+        </div>-->
+        <div id="button3DResetGroup"><!-- class="btn-toolbar" role="toolbar">-->
+            <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+            <!--<button class="btn btn-secondary btn-sm" type="button" id="cursorPosition">Cursor Position</button>-->
+            <span id="cursorPosition" class="btn btn-secondary btn-sm">Cursor Position</span>
         </div>
       <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
       <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>

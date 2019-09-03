@@ -42,16 +42,21 @@ html, body{
 
 #workarea {
     height: calc(100vh - 85px);
+    cursor: none;
 }
 
 
 /*#button3D, #buttonReset {*/
 #button3DResetGroup{
     position: absolute;
-    display: inline-block;
+    /*display: inline-block;*/
     z-index: 95;
     left: 1%;
 
+}
+
+#cursorPosition {
+    cursor: none;
 }
 
 #cameraDiv1 {

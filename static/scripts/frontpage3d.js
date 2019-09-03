@@ -33,6 +33,7 @@ scene.background= new THREE.Color(0xeeeeee);
 var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );
 var blueLineMaterial = new THREE.LineBasicMaterial( {color:0x0000ff });
+var lightBlueLineMaterial = new THREE.LineBasicMaterial( {color:0xadd8e6 });
 var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00aa00 });
 var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
 var blackLineMaterial = new THREE.LineBasicMaterial( {color:0x000000 });
@@ -147,10 +148,47 @@ computedSled.add(computedSledVerticalLine);
 computedSled.add(computedSledCircle);
 computedSled.position.set(0,0,0);
 
+var cursorHorizontalLineSegments = new THREE.Geometry();
+cursorHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.5, 0, 0));
+cursorHorizontalLineSegments.vertices.push(new THREE.Vector3(1.5, 0, 0));
+var cursorHorizontalLine = new THREE.LineSegments(cursorHorizontalLineSegments, blueLineMaterial);
+
+var cursorVerticalLineSegments = new THREE.Geometry();
+cursorVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.5, 0));
+cursorVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.5, 0));
+var cursorVerticalLine = new THREE.LineSegments(cursorVerticalLineSegments, blueLineMaterial);
+
+var cursorCircleGeometry = new THREE.CircleGeometry(1,32);
+var cursorCircleEdges = new THREE.EdgesGeometry(cursorCircleGeometry)
+var cursorCircle = new THREE.LineSegments(cursorCircleEdges,blueLineMaterial);
+
+var cursor = new THREE.Group();
+cursor.add(cursorHorizontalLine);
+cursor.add(cursorVerticalLine);
+cursor.add(cursorCircle);
+cursor.position.set(0,0,0);
+
+
+var cursorVLineGeometry = new THREE.BufferGeometry();
+var cursorVLinePositions = new Float32Array(2*3);
+cursorVLineGeometry.addAttribute( 'position', new THREE.BufferAttribute(cursorVLinePositions, 3));
+cursorVLineGeometry.setDrawRange(0, 2);
+var cursorVLine = new THREE.Line(cursorVLineGeometry, lightBlueLineMaterial);
+scene.add(cursorVLine);
+
+var cursorHLineGeometry = new THREE.BufferGeometry();
+var cursorHLinePositions = new Float32Array(2*3);
+cursorHLineGeometry.addAttribute( 'position', new THREE.BufferAttribute(cursorHLinePositions, 3));
+cursorHLineGeometry.setDrawRange(0, 2);
+var cursorHLine = new THREE.Line(cursorHLineGeometry, lightBlueLineMaterial);
+scene.add(cursorHLine);
+
+
 
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
+scene.add(cursor);
 
 var isComputedEnabled = false;
 
@@ -566,10 +604,9 @@ function cursorPosition(){
     var vec = new THREE.Vector3(); // create once and reuse
     var pos = new THREE.Vector3(); // create once and reuse
     vec.set(
-        ( ( event.clientX - rect.left ) / ( rect.width - rect.left ) ) * 2 - 1,
+        ( ( event.clientX - rect.left ) / ( rect.right - rect.left ) ) * 2 - 1,
         - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
         0.5 );
-
 
     vec.unproject( camera );
 
@@ -662,4 +699,46 @@ function clearAlarm(data){
     console.log("clearing alarm");
     $("#alarms").text("Alarm cleared.");
     $("#alarms").removeClass('alert-danger').addClass('alert-success');
+}
+
+
+document.onmousemove = function(event){
+    pos = cursorPosition();
+    cursor.position.set(pos.x,pos.y,pos.z);
+    var linePosX = confine(pos.x,-48, 48);
+    var linePosY = confine(pos.y,-24, 24);
+
+    var positions = cursorVLine.geometry.attributes.position.array;
+    positions[0]=linePosX;
+    positions[1]=24;
+    positions[2]=-0.001;
+    positions[3]=linePosX;
+    positions[4]=-24;
+    positions[5]=-0.001;
+    cursorVLine.geometry.attributes.position.needsUpdate=true;
+
+    positions = cursorHLine.geometry.attributes.position.array;
+    positions[0]=48;
+    positions[1]=linePosY;
+    positions[2]=-0.001;
+    positions[3]=-48;
+    positions[4]=linePosY;
+    positions[5]=-0.001;
+    cursorHLine.geometry.attributes.position.needsUpdate=true;
+
+
+    if ($("#units").text()=="MM"){
+        pos.x *= 25.4
+        pos.y *= 25.4
+    }
+    $("#cursorPosition").text("X: "+pos.x.toFixed(2)+", Y: "+pos.y.toFixed(2));
+}
+
+function confine(value, low, high)
+{
+    if (value<low)
+        return low;
+    if (value>high)
+        return high;
+    return value;
 }
