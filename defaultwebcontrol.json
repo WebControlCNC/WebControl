@@ -557,6 +557,12 @@
             "key": "lastSelectedDirectory",
             "type": "string",
             "value": "."
+        },
+        {
+            "default": ".",
+            "key": "lastSelectedBoardDirectory",
+            "type": "string",
+            "value": "."
         }
     ],
     "Maslow Settings": [
@@ -731,6 +737,15 @@
             "title": "Buffer Gcode",
             "type": "bool",
             "value": 0
+        },
+        {
+            "default": "",
+            "desc": "The path to the open board file\\ndefault setting: your home directory",
+            "key": "openBoardFile",
+            "section": "Maslow Settings",
+            "title": "Open Board File",
+            "type": "string",
+            "value": ""
         }
     ],
     "Optical Calibration Settings": [

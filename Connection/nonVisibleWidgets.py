@@ -82,6 +82,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.gpioActions.setUpData(data)
         self.gpioActions.setup()
         self.boardManager.setUpData(data)
+        self.boardManager.initializeNewBoard()
 
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()

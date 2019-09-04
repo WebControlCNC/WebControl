@@ -174,6 +174,7 @@ var cursorVLinePositions = new Float32Array(2*3);
 cursorVLineGeometry.addAttribute( 'position', new THREE.BufferAttribute(cursorVLinePositions, 3));
 cursorVLineGeometry.setDrawRange(0, 2);
 var cursorVLine = new THREE.Line(cursorVLineGeometry, lightBlueLineMaterial);
+cursorVLine.frustumCulled = false;
 scene.add(cursorVLine);
 
 var cursorHLineGeometry = new THREE.BufferGeometry();
@@ -181,9 +182,29 @@ var cursorHLinePositions = new Float32Array(2*3);
 cursorHLineGeometry.addAttribute( 'position', new THREE.BufferAttribute(cursorHLinePositions, 3));
 cursorHLineGeometry.setDrawRange(0, 2);
 var cursorHLine = new THREE.Line(cursorHLineGeometry, lightBlueLineMaterial);
+cursorHLine.frustumCulled = false;
 scene.add(cursorHLine);
 
+var boardCutLinesGeometry = new THREE.BufferGeometry();
+var boardCutLinesPositions = new Float32Array(1000*3);
+boardCutLinesGeometry.addAttribute( 'position', new THREE.BufferAttribute(boardCutLinesPositions, 3));
+boardCutLinesGeometry.setDrawRange(0, 100);
+var boardCutLines = new THREE.Line(boardCutLinesGeometry, redLineMaterial);
+boardCutLines.frustumCulled = false;
+scene.add(boardCutLines);
 
+var boardGroup = new THREE.Group();
+
+var boardOutlineGeometry = new THREE.BoxBufferGeometry(96,48,0.75);
+var boardFillMaterial = new THREE.MeshBasicMaterial({ color: 0xD2B48C, opacity: 0.5, transparent:true})
+var boardOutlineMaterial = new THREE.MeshBasicMaterial({ color: 0x783E04, wireframe:true, wireframeLinewidth: 4})
+var boardOutlineFill = new THREE.Mesh(boardOutlineGeometry, boardFillMaterial);
+var boardOutlineOutline = new THREE.Mesh(boardOutlineGeometry, boardOutlineMaterial);
+boardGroup.add(boardOutlineFill);
+boardGroup.add(boardOutlineOutline);
+
+boardGroup.position.set(0,0,-0.75/2);
+scene.add(boardGroup);
 
 scene.add(sled);
 scene.add(home);
@@ -741,4 +762,54 @@ function confine(value, low, high)
     if (value>high)
         return high;
     return value;
+}
+
+function boardDataUpdate(data){
+  console.log("updating board data");
+  console.log(data.width);
+
+  boardOutlineGeometry.dispose();
+  boardOutlineGeometry = new THREE.BoxBufferGeometry(data.width,data.height,data.thickness);
+  boardOutlineFill.geometry = boardOutlineGeometry;
+  boardOutlineOutline.geometry = boardOutlineGeometry;
+  boardOutlineFill.geometry.needsUpdate=true;
+  boardOutlineOutline.geometry.needsUpdate=true;
+  boardGroup.position.set(data.centerX,data.centerY,data.thickness/-2.0);
+  $("#boardID").text("Board: "+data.boardID);
+  $("#boardMaterial").text("Material: "+data.material)
+
+}
+
+
+function boardCutDataUpdateCompressed(data){
+  console.log("updating board cut data compressed");
+  if (data!=null){
+    var uncompressed = pako.inflate(data);
+    var _str = ab2str(uncompressed);
+    var data = JSON.parse(_str)
+    var index = 0;
+    var lineIndex =0;
+    var positions = boardCutLines.geometry.attributes.position.array;
+    data.forEach(function(lines) {
+        lines.forEach(function(line) {
+            if (lineIndex<1000){
+                 //console.log(line)
+                 positions[index++]=line[0];
+                 positions[index++]=line[1];
+                 positions[index++]=line[2];
+            }
+            lineIndex++;
+        });
+    });
+    for (var x=lineIndex; x<1000; x++){
+        positions[index++]=0;
+        positions[index++]=0;
+        positions[index++]=0;
+    }
+    console.log(positions);
+    boardCutLines.geometry.setDrawRange( 0, lineIndex-1 );
+    boardCutLines.geometry.attributes.position.needsUpdate=true;
+  }
+  $("#fpCircle").hide();
+
 }

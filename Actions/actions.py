@@ -219,6 +219,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "clearLogs":
                 if not self.clearLogs():
                     self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
+            elif msg["data"]["command"] == "boardProcessGCode":
+                if not self.data.boardManager.processGCode():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with processing gcode")
             else:
                 self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
         except Exception as e:
@@ -1384,4 +1387,5 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+
 

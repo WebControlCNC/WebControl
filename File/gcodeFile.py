@@ -65,7 +65,7 @@ class GCodeFile(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             self.data.console_queue.put("Gcode File Error")
-            self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
+            self.data.ui_queue1.put("Alert", "Alert", "Cannot save gcode file.")
             self.data.gcodeFile.filename = ""
             return False
         return True
@@ -608,3 +608,12 @@ class GCodeFile(MakesmithInitFuncs):
         th.start()
 
 
+    def getLinePoints(self):
+
+        points = []
+        for line in self.line3D:
+            for point in line.points:
+                if point[2]<0:
+                    newPoint = [point[0],point[1]]
+                    points.append(newPoint)
+        return points

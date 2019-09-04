@@ -366,8 +366,74 @@ class WebPageProcessor:
                                    pVersion=pVersion)
             return page, "PID Tuning", False, "large", "content", False
         elif pageID == "editBoard":
-            page = render_template("editBoard.html")
+            board = self.data.boardManager.getCurrentBoard()
+            page = render_template("editBoard.html",
+                                   boardID=board.boardID,
+                                   material=board.material,
+                                   height=board.height,
+                                   width=board.width,
+                                   thickness=board.thickness,
+                                   centerX=board.centerX,
+                                   centerY=board.centerY,
+                                   pageID="editBoard")
             return page, "Create/Edit Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "saveBoard":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedBoardDirectory")
+            home = self.data.config.getHome()
+            homedir = home + "/.WebControl/boards"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory": _dir, "file": file})
+            except Exception as e:
+                print(e)
+            # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory = "."
+            page = render_template(
+                "saveBoard.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
+                lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+            )
+            return page, "Save Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "openBoard":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedBoardDirectory")
+            home = self.data.config.getHome()
+            homedir = home+"/.WebControl/boards"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory":_dir, "file":file})
+            except Exception as e:
+                print(e)
+           # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory="."
+            page = render_template(
+                "openBoard.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
+            )
+            return page, "Open Board", False, "medium", "content", "footerSubmit"
         else:
             self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 

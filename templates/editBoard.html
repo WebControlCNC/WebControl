@@ -1,40 +1,68 @@
 
 {% block content %}
 <div class="container-fluid">
-  <form id="calibrateForm">
+  <form id="editBoardForm">
       <input id="pageID" type="hidden" value="{{pageID}}">
-      <div class="card">
+      <div class="card row">
           <h4 class="card-title">
-            Board Dimensions
+            Board Details
           </h4>
           <div class="card-body">
             <div class="form-group">
-              <label for="width">Width</label>
-              <input id="width" class="form-control" name="width" value="96">
-              <small class="form-text text-muted">Enter value in inches only</small>
+              <label for="boardID">Board ID</label>
+              <input id="boardID" class="form-control" name="boardID" value="{{boardID}}">
+              <small class="form-text text-muted">Enter an indentifier for the board</small>
             </div>
             <div class="form-group">
-              <label for="height">Height</label>
-              <input id="height" class="form-control" name="height" value="48">
-              <small class="form-text text-muted">Enter value in inches only</small>
+              <label for="material">Material</label>
+              <input id="material" class="form-control" name="material" value="{{material}}">
+              <small class="form-text text-muted">Enter type of material</small>
             </div>
           </div>
       </div>
-      <div class="card">
-          <h4 class="card-title">
-            Board Position
-          </h4>
-          <div class="card-body">
-            <div class="form-group">
-              <label for="centerX">Center X</label>
-              <input id="centerX" class="form-control" name="centerX" value="0">
-              <small class="form-text text-muted">Enter value in inches only</small>
-            </div>
-            <div class="form-group">
-              <label for="centerY">Center Y</label>
-              <input id="centerY" class="form-control" name="centerY" value="0">
-              <small class="form-text text-muted">Enter value in inches only</small>
-            </div>
+      <div class="row">
+          <div class="card col-6">
+              <h4 class="card-title">
+                Board Dimensions
+              </h4>
+              <div class="card-body">
+                  <div class="row">
+                        <div class="form-group col-6">
+                          <label for="width">Width</label>
+                          <input id="width" class="form-control" name="width" value="{{width}}">
+                          <small class="form-text text-muted">Enter value in inches only</small>
+                        </div>
+                        <div class="form-group col-6">
+                          <label for="height">Height</label>
+                          <input id="height" class="form-control" name="height" value="{{height}}">
+                          <small class="form-text text-muted">Enter value in inches only</small>
+                        </div>
+                        <div class="form-group col-6">
+                          <label for="Thickness">Thickness</label>
+                          <input id="thickness" class="form-control" name="thickness" value="{{thickness}}">
+                          <small class="form-text text-muted">Enter value in inches only</small>
+                        </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card col-6">
+              <h4 class="card-title">
+                Board Position
+              </h4>
+              <div class="card-body">
+                  <div class="row">
+                        <div class="form-group col-6">
+                          <label for="centerX">Center X</label>
+                          <input id="centerX" class="form-control" name="centerX" value="{{centerX}}">
+                          <small class="form-text text-muted">Enter value in inches only</small>
+                        </div>
+                        <div class="form-group col-6">
+                          <label for="centerY">Center Y</label>
+                          <input id="centerY" class="form-control" name="centerY" value="{{centerY}}">
+                          <small class="form-text text-muted">Enter value in inches only</small>
+                        </div>
+                  </div>
+              </div>
           </div>
       </div>
   </form>
@@ -43,23 +71,21 @@
 
 {% block javascript %}
 <script>
-$(document).ready(function () {
-    $('#calibrateForm').on('submit', function(e) {
-        e.preventDefault();
-        var url = $("#pageID").val()
-        $.ajax({
-            url : '/'+url,
-            type: "POST",
-            data: $(this).serialize(),
-            success: function (msg) {
-              console.log("success");
-            },
-            error: function (jXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            }
-        });
+function onFooterSubmit(){
+    var url = $("#pageID").val()
+    $.ajax({
+        url : '/'+url,
+        type: "POST",
+        data: $("#editBoardForm").serialize(),
+        success: function (data) {
+          console.log("success");
+            $('#contentModal').modal('toggle')
+        },
+        error: function (jXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
     });
-});
+}
 
 </script>
 {% endblock %}

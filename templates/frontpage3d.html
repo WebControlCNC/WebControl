@@ -10,7 +10,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019e') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019o') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -198,6 +198,8 @@
             <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
             <!--<button class="btn btn-secondary btn-sm" type="button" id="cursorPosition">Cursor Position</button>-->
             <span id="cursorPosition" class="btn btn-secondary btn-sm">Cursor Position</span>
+            <span id="boardID" class="btn btn-secondary btn-sm">Board ID</span>
+            <span id="boardMaterial" class="btn btn-secondary btn-sm">Board Material</span>
         </div>
       <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
       <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>

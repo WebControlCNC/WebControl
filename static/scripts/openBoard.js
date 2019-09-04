@@ -26,14 +26,12 @@ function refreshList(){
 }
 
 
-
 function onFooterSubmit(){
-    //var formdata = $("#gcodeForm").serialize();
     $('#gcCircle').show();
-    var formdata = new FormData($('#gcodeForm')[0]);
+    var formdata = new FormData($('#boardForm')[0]);
 
     $.ajax({
-        url : '/saveGCode',
+        url : '/openBoard',
         type: "POST",
         data: formdata,
         mimeTypes:"multipart/form-data",

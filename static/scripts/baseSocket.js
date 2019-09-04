@@ -122,6 +122,12 @@
             case 'gcodeUpdateCompressed':
                 gcodeUpdateCompressed(data);
                 break;
+            case 'boardDataUpdate':
+                boardDataUpdate(data);
+                break;
+            case 'boardCutDataUpdateCompressed':
+                boardCutDataUpdateCompressed(data);
+                break;
             case 'updatePorts':
                 //completed
                 if (typeof updatePorts === "function") {

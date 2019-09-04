@@ -292,6 +292,31 @@ class UIProcessor:
                           namespace="/MaslowCNC", )
             self.app.data.console_queue.put("Sent Gcode compressed")
 
+    def sendBoardUpdate(self):
+        boardData = self.app.data.boardManager.getCurrentBoard().getBoardInfoJSON()
+        if boardData is not None:
+            self.app.data.console_queue.put("Sending Board Data compressed")
+            socketio.emit("message", {"command": "showFPSpinner",
+                                      "data": 1, "dataFormat": "int"},
+                          namespace="/MaslowCNC", )
+            time.sleep(0.25)
+            socketio.emit("message", {"command": "boardDataUpdate",
+                                      "data": boardData, "dataFormat": "json"},
+                          namespace="/MaslowCNC", )
+            self.app.data.console_queue.put("Sent Board Data compressed")
+
+        cutData = self.app.data.boardManager.getCurrentBoard().getCompressedCutData()
+        if cutData is not None:
+            self.app.data.console_queue.put("Sending Board Cut Data compressed")
+            socketio.emit("message", {"command": "showFPSpinner",
+                                      "data": 1, "dataFormat": "int"},
+                          namespace="/MaslowCNC", )
+            time.sleep(0.25)
+            socketio.emit("message", {"command": "boardCutDataUpdateCompressed",
+                                      "data": cutData, "dataFormat": "base64"},
+                          namespace="/MaslowCNC", )
+            self.app.data.console_queue.put("Sent Board Cut Data compressed")
+
     def unitsUpdate(self):
         units = self.app.data.config.getValue(
             "Computed Settings", "units"
@@ -314,6 +339,8 @@ class UIProcessor:
         if msg["command"] == "Action":
             if msg["message"] == "gcodeUpdate":
                 self.sendGcodeUpdate()
+            if msg["message"] == "boardUpdate":
+                self.sendBoardUpdate()
             elif msg["message"] == "unitsUpdate":
                 self.unitsUpdate()
             elif msg["message"] == "distToMoveUpdate":

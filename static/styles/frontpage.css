@@ -55,6 +55,10 @@ html, body{
 
 }
 
+#cursorPosition{
+    width: 125px;
+}
+
 #cursorPosition {
     cursor: none;
 }

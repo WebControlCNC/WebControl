@@ -40,7 +40,9 @@ class Config(MakesmithInitFuncs):
         if not os.path.isdir(self.home+"/.WebControl/imports"):
             print("creating "+self.home+"/.WebControl/imports directory")
             os.mkdir(self.home+"/.WebControl/imports")
-
+        if not os.path.isdir(self.home+"/.WebControl/boards"):
+            print("creating "+self.home+"/.WebControl/boards directory")
+            os.mkdir(self.home+"/.WebControl/boards")
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it

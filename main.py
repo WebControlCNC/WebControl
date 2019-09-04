@@ -222,6 +222,52 @@ def saveGCode():
         returnVal = app.data.gcodeFile.loadUpdateFile()
         '''
         if returnVal:
+            app.data.config.setValue("Maslow Settings", "openFile", f)
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+@app.route("/openBoard", methods=["POST"])
+def openBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        f = request.form["selectedBoard"]
+        app.data.console_queue.put("selectedBoard="+str(f))
+        tDir = f.split("/")
+        app.data.config.setValue("Computed Settings","lastSelectedBoardDirectory",tDir[0])
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/boards/" + f
+        app.data.config.setValue("Maslow Settings", "openBoardFile", tDir[1])
+        returnVal = app.data.boardManager.loadBoard(home+"/.WebControl/boards/"+f)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+@app.route("/saveBoard", methods=["POST"])
+def saveBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        print(request.form)
+        f = request.form["fileName"]
+        d = request.form["selectedDirectory"]
+        app.data.console_queue.put("selectedBoard="+f)
+        app.data.config.setValue("Computed Settings", "lastSelectedBoardDirectory",d)
+        home = app.data.config.getHome()
+        returnVal = app.data.boardManager.saveBoard(f, home+"/.WebControl/boards/"+d)
+        if returnVal:
             message = {"status": 200}
             resp = jsonify(message)
             resp.status_code = 200
@@ -400,6 +446,20 @@ def downloadDiagnostics():
         if  returnVal != False:
             print(returnVal)
             return send_file(returnVal)
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
+@app.route("/editBoard", methods=["POST"])
+def editBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        returnVal = app.data.boardManager.editBoard(request.form)
+        if returnVal:
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
         else:
             resp = jsonify("failed")
             resp.status_code = 500
