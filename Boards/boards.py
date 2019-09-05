@@ -19,6 +19,8 @@ class Board():
 
     boardPoints = []
     cutPoints = []
+    cutPoints2 = []
+    pointsPerInch = 1
 
     compressedCutData = None
 
@@ -58,12 +60,18 @@ class Board():
         return
 
     def updateCutPoints(self, data):
+        self.cutPoints = data
+        self.compressCutData()
+
+    '''
+    def updateCutPointsOld(self, data):
         self.cutPoints = []
         line = []
         for points in data:
             line.append([points[0],points[1],0])
         self.cutPoints.append(line)
         self.compressCutData()
+    '''
 
     def getPoints(self):
         return self.boardPoints

@@ -1,5 +1,6 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Boards.boards import Board
+import math
 import numpy as np
 from scipy.spatial import ConvexHull, convex_hull_plot_2d
 
@@ -65,11 +66,78 @@ class BoardManager(MakesmithInitFuncs):
             return False
         return True
 
+    ''' 
+    def processGCode1(self):
+        board = self.currentBoard
+        points = self.data.gcodeFile.getLinePoints()
+        cutPoints = [False for i in range(48*96)]
+        for line in points:
+            if line[0]>=-48 and line[0]<=48 and line[1]>=-24 and line[1]<=24:
+
+                cutPoints[int(line[0])+48+(int(line[1])+24)*96] = True
+        print(cutPoints)
+        self.currentBoard.updateCutPoints2(cutPoints)
+        self.data.ui_queue1.put("Action", "boardUpdate", "")
+        return True
+    '''
+    def processGCode(self):
+        boardWidth = self.currentBoard.width
+        boardHeight = self.currentBoard.height
+        boardLeftX = self.currentBoard.centerX - boardWidth/2
+        boardRightX = self.currentBoard.centerX + boardWidth / 2
+        boardTopY = self.currentBoard.centerY + boardWidth/2
+        boardBottomY = self.currentBoard.centerY - boardWidth / 2
+
+        pointsX = math.ceil(boardWidth)
+        pointsY = math.ceil(boardHeight)
+        offsetX = pointsX / 2
+        offsetY = pointsY / 2
+        cutPoints = [False for i in range( pointsX * pointsY )]
+
+        for line in self.data.gcodeFile.line3D:
+            if line.type=="circle":
+                if line.points[0][0] >= boardLeftX and line.points[0][0] <= boardRightX and line.points[0][1] >= boardBottomY and line.points[0][1] <= boardTopY and line.points[0][2] < 0:
+                    cutPoints[int(line.points[0][0] + offsetX) + int(line.points[0][1] + offsetY) * pointsX] = True
+            else:
+                for x in range(len(line.points)):
+                    if x != len(line.points)-1:
+                        x0 = line.points[x][0]
+                        y0 = line.points[x][1]
+                        z0 = line.points[x][2]
+
+                        x1 = line.points[x+1][0]
+                        y1 = line.points[x+1][1]
+                        z1 = line.points[x+1][2]
+
+                        lineLength = math.sqrt( (x0-x1) ** 2 + (y0-y1) ** 2 + (z0-z1) ** 2)
+                        if lineLength > 0.25:
+                            for l in range(int(lineLength)*4):
+                                xa = x0 + (x1 - x0) / (lineLength * 4) * l
+                                ya = y0 + (y1 - y0) / (lineLength * 4) * l
+                                za = z0 + (z1 - z0) / (lineLength * 4) * l
+                                if za < 0:
+                                    if xa >= boardLeftX and xa <= boardRightX and ya >= boardBottomY and ya <= boardTopY:
+                                        cutPoints[round(xa + offsetX) + round(ya + offsetY) * pointsX] = True
+                        else:
+                            if line.points[x][2] < 0:
+                                if line.points[x][0] >= boardLeftX and line.points[x][0] <= boardRightX and line.points[x][1] >= boardBottomY and line.points[x][1] <= boardTopY:
+                                    cutPoints[round(line.points[x][0] + offsetX) + round(line.points[x][1] + offsetY) * pointsX] = True
+                    else:
+                        if line.points[x][2] < 0:
+                            if line.points[x][0] >= boardLeftX and line.points[x][0] <= boardRightX and line.points[x][1] >= boardBottomY and line.points[x][1] <= boardTopY:
+                                cutPoints[round(line.points[x][0] + offsetX) + round(line.points[x][1] + offsetY) * pointsX] = True
+
+        self.currentBoard.updateCutPoints(cutPoints)
+        self.data.ui_queue1.put("Action", "boardUpdate", "")
+        return True
+
+    '''
     def processGCode(self):
         #points = np.random.rand(30,2)
         points = self.data.gcodeFile.getLinePoints()
         #try:
         index = 0
+        
         for line in points:
             #print(line)
             point = np.zeros(2)
@@ -98,6 +166,6 @@ class BoardManager(MakesmithInitFuncs):
         #    return False
 
         return True
-
+    '''
 
 

@@ -2,7 +2,13 @@
 
 //setInterval(function(){ alert("Hello"); }, 3000);
 
-
+var boardWidth = 96
+var boardHeight = 48
+var boardThickness = 0.75
+var boardCenterX = 0
+var boardCenterY = 0
+var boardID = "-"
+var boardMaterial = "-"
 
 var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-20;
@@ -766,22 +772,77 @@ function confine(value, low, high)
 
 function boardDataUpdate(data){
   console.log("updating board data");
-  console.log(data.width);
+  boardWidth = data.width;
+  boardHeight = data.height;
+  boardThickness = data.thickness;
+  boardCenterX = data.centerX;
+  boardCenterY = data.centerY;
+  boardID = data.boardID;
+  boardMaterial = data.material;
 
   boardOutlineGeometry.dispose();
-  boardOutlineGeometry = new THREE.BoxBufferGeometry(data.width,data.height,data.thickness);
+  boardOutlineGeometry = new THREE.BoxBufferGeometry(boardWidth,boardHeight,boardThickness);
   boardOutlineFill.geometry = boardOutlineGeometry;
   boardOutlineOutline.geometry = boardOutlineGeometry;
   boardOutlineFill.geometry.needsUpdate=true;
   boardOutlineOutline.geometry.needsUpdate=true;
-  boardGroup.position.set(data.centerX,data.centerY,data.thickness/-2.0);
-  $("#boardID").text("Board: "+data.boardID);
-  $("#boardMaterial").text("Material: "+data.material)
+  boardGroup.position.set(boardCenterX,boardCenterY,boardThickness/-2.0);
+  $("#boardID").text("Board: "+boardID);
+  $("#boardMaterial").text("Material: "+boardMaterial)
+
+}
+
+function boardCutDataUpdateCompressed(data){
+  console.log("updating board cut data compressed");
+  if (data!=null){
+    var cutSquareGroup = new THREE.Group();
+    var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
+    var uncompressed = pako.inflate(data);
+    var _str = ab2str(uncompressed);
+    var data = JSON.parse(_str)
+    for (var x =0; x<96; x++){
+        for (var y =0; y<48; y++){
+            if (data[x+y*96]){
+                console.log(x+", "+y);
+                var geometry = new THREE.PlaneGeometry(1,1);
+                var plane = new THREE.Mesh(geometry, cutSquareMaterial);
+                plane.position.set(x-48, y-24, 0);
+                cutSquareGroup.add(plane);
+            }
+        }
+    }
+    scene.add(cutSquareGroup);
+
+    /*var index = 0;
+    var lineIndex =0;
+    var positions = boardCutLines.geometry.attributes.position.array;
+    data.forEach(function(lines) {
+        lines.forEach(function(line) {
+            if (lineIndex<1000){
+                 //console.log(line)
+                 positions[index++]=line[0];
+                 positions[index++]=line[1];
+                 positions[index++]=line[2];
+            }
+            lineIndex++;
+        });
+    });
+    for (var x=lineIndex; x<1000; x++){
+        positions[index++]=0;
+        positions[index++]=0;
+        positions[index++]=0;
+    }
+    console.log(positions);
+    boardCutLines.geometry.setDrawRange( 0, lineIndex-1 );
+    boardCutLines.geometry.attributes.position.needsUpdate=true;
+    */
+  }
+  $("#fpCircle").hide();
 
 }
 
 
-function boardCutDataUpdateCompressed(data){
+/*function boardCutDataUpdateCompressed(data){
   console.log("updating board cut data compressed");
   if (data!=null){
     var uncompressed = pako.inflate(data);
@@ -813,3 +874,4 @@ function boardCutDataUpdateCompressed(data){
   $("#fpCircle").hide();
 
 }
+*/
