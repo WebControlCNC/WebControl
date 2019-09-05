@@ -203,9 +203,10 @@ var boardGroup = new THREE.Group();
 
 var boardOutlineGeometry = new THREE.BoxBufferGeometry(96,48,0.75);
 var boardFillMaterial = new THREE.MeshBasicMaterial({ color: 0xD2B48C, opacity: 0.5, transparent:true})
-var boardOutlineMaterial = new THREE.MeshBasicMaterial({ color: 0x783E04, wireframe:true, wireframeLinewidth: 4})
 var boardOutlineFill = new THREE.Mesh(boardOutlineGeometry, boardFillMaterial);
-var boardOutlineOutline = new THREE.Mesh(boardOutlineGeometry, boardOutlineMaterial);
+var boardOutlineMaterial = new THREE.LineBasicMaterial({ color: 0x783E04})
+var boardEdgesGeometry = new THREE.EdgesGeometry( boardOutlineGeometry )
+var boardOutlineOutline = new THREE.LineSegments( boardEdgesGeometry, boardOutlineMaterial);
 boardGroup.add(boardOutlineFill);
 boardGroup.add(boardOutlineOutline);
 
@@ -783,9 +784,17 @@ function boardDataUpdate(data){
   boardOutlineGeometry.dispose();
   boardOutlineGeometry = new THREE.BoxBufferGeometry(boardWidth,boardHeight,boardThickness);
   boardOutlineFill.geometry = boardOutlineGeometry;
-  boardOutlineOutline.geometry = boardOutlineGeometry;
+  boardEdgesGeometry = new THREE.EdgesGeometry( boardOutlineGeometry )
+  boardOutlineOutline.geometry = boardEdgesGeometry;
+  //boardOutlineOutline.geometry = boardOutlineGeometry;
   boardOutlineFill.geometry.needsUpdate=true;
   boardOutlineOutline.geometry.needsUpdate=true;
+
+  //boardOutlineMaterial = new THREE.LineBasicMaterial({ color: 0x783E04})
+
+  //boardOutlineOutline = new THREE.LineSegments( boardEdgesGeometry, boardOutlineMaterial);
+
+
   boardGroup.position.set(boardCenterX,boardCenterY,boardThickness/-2.0);
   $("#boardID").text("Board: "+boardID);
   $("#boardMaterial").text("Material: "+boardMaterial)
@@ -796,7 +805,8 @@ function boardCutDataUpdateCompressed(data){
   console.log("updating board cut data compressed");
   if (data!=null){
     var cutSquareGroup = new THREE.Group();
-    var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
+    //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
+    var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00});
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
