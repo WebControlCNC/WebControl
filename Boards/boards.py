@@ -99,13 +99,15 @@ class Board():
         print(boardData)
 
     def compressCutData(self):
-        print(self.cutPoints)
         tstr = json.dumps(self.cutPoints)
-        print("here1")
         out = io.BytesIO()
-        print("here2")
         with gzip.GzipFile(fileobj=out, mode="w") as f:
             f.write(tstr.encode())
-        print("here3")
         self.compressedCutData = out.getvalue()
-        print("here4")
+
+    def getUnCompressedCutDataJSON(self):
+        tstr = json.dumps(self.cutPoints)
+        return tstr
+
+    def updateCompressedCutData(self, data):
+        self.compressedCutData = data

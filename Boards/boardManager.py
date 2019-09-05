@@ -1,6 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Boards.boards import Board
 import math
+import base64
 import numpy as np
 from scipy.spatial import ConvexHull, convex_hull_plot_2d
 
@@ -39,6 +40,11 @@ class BoardManager(MakesmithInitFuncs):
             print(fileToWrite)
             boardData = self.currentBoard.getBoardInfoJSON()
             file.write(boardData+'\n')
+            boardCutData = self.currentBoard.getCompressedCutData()
+            boardCutData = base64.b64encode(boardCutData)
+            boardCutData = boardCutData.decode('utf-8')
+            file.write(boardCutData)
+            file.write('\n')
             print("Closing File")
             file.close()
         except Exception as e:
@@ -56,6 +62,9 @@ class BoardManager(MakesmithInitFuncs):
             print(fileName)
             lines = file.readlines()
             self.currentBoard.updateBoardInfoJSON(lines[0])
+            if (len(lines)>1):
+                loadedCutData = base64.b64decode(lines[1].encode('utf-8'))
+                self.currentBoard.updateCompressedCutData(loadedCutData)
             print("Closing File")
             file.close()
             self.data.ui_queue1.put("Action", "boardUpdate", "")
@@ -95,9 +104,12 @@ class BoardManager(MakesmithInitFuncs):
         cutPoints = [False for i in range( pointsX * pointsY )]
 
         for line in self.data.gcodeFile.line3D:
-            if line.type=="circle":
+            if line.type == "circle":
                 if line.points[0][0] >= boardLeftX and line.points[0][0] <= boardRightX and line.points[0][1] >= boardBottomY and line.points[0][1] <= boardTopY and line.points[0][2] < 0:
-                    cutPoints[int(line.points[0][0] + offsetX) + int(line.points[0][1] + offsetY) * pointsX] = True
+                    pointx = self.constrain(round(line.points[0][0] + offsetX), 0, pointsX)
+                    pointy = self.constrain(round(line.points[0][1] + offsetY), 0, pointsY)
+                    cutPoints[pointx + pointy * pointsX] = True
+                    #cutPoints[int(line.points[0][0] + offsetX) + int(line.points[0][1] + offsetY) * pointsX] = True
             else:
                 for x in range(len(line.points)):
                     if x != len(line.points)-1:
@@ -117,19 +129,44 @@ class BoardManager(MakesmithInitFuncs):
                                 za = z0 + (z1 - z0) / (lineLength * 4) * l
                                 if za < 0:
                                     if xa >= boardLeftX and xa <= boardRightX and ya >= boardBottomY and ya <= boardTopY:
-                                        cutPoints[round(xa + offsetX) + round(ya + offsetY) * pointsX] = True
+                                        pointx = self.constrain(round(xa + offsetX), 0, pointsX)
+                                        pointy = self.constrain(round(ya + offsetY), 0, pointsY)
+                                        cutPoints[pointx + pointy * pointsX] = True
+                                        #cutPoints[round(xa + offsetX) + round(ya + offsetY) * pointsX] = True
+
                         else:
                             if line.points[x][2] < 0:
                                 if line.points[x][0] >= boardLeftX and line.points[x][0] <= boardRightX and line.points[x][1] >= boardBottomY and line.points[x][1] <= boardTopY:
-                                    cutPoints[round(line.points[x][0] + offsetX) + round(line.points[x][1] + offsetY) * pointsX] = True
+                                    #try:
+                                    pointx = self.constrain(round(line.points[x][0] + offsetX), 0, pointsX)
+                                    pointy = self.constrain(round(line.points[x][1] + offsetY), 0, pointsY)
+                                    cutPoints[pointx + pointy * pointsX] = True
+                                    #except Exception as e:
+                                    #    print("x=" + str(line.points[x][0]) + ", y=" + str(line.points[x][1]))
+                                    #    print("offsetX=" + str(offsetX) + ", offsetY=" + str(offsetY))
+                                    #    print("pointx=" + str(pointx) + ", pointy=" + str(pointy))
+                                    #    print("pointsX=" + str(pointsX) + ", pointsY=" + str(pointsY))
+
                     else:
                         if line.points[x][2] < 0:
                             if line.points[x][0] >= boardLeftX and line.points[x][0] <= boardRightX and line.points[x][1] >= boardBottomY and line.points[x][1] <= boardTopY:
-                                cutPoints[round(line.points[x][0] + offsetX) + round(line.points[x][1] + offsetY) * pointsX] = True
+                                print(4)
+                                pointx = self.constrain(round(line.points[x][0] + offsetX), 0, pointsX)
+                                pointy = self.constrain(round(line.points[x][1] + offsetY), 0, pointsY)
+                                cutPoints[pointx + pointy * pointsX] = True
+                                #cutPoints[round(line.points[x][0] + offsetX) + round(line.points[x][1] + offsetY) * pointsX] = True
+                                print(-4)
 
         self.currentBoard.updateCutPoints(cutPoints)
         self.data.ui_queue1.put("Action", "boardUpdate", "")
         return True
+
+    def constrain(self, value, lower, upper):
+        if value < lower:
+            return lower
+        if value > upper-1:
+            return upper-1
+        return value
 
     '''
     def processGCode(self):

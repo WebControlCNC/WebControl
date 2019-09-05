@@ -800,13 +800,19 @@ function boardCutDataUpdateCompressed(data){
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
-    for (var x =0; x<96; x++){
-        for (var y =0; y<48; y++){
-            if (data[x+y*96]){
+
+    var pointsX = Math.ceil(boardWidth)
+    var pointsY = Math.ceil(boardHeight)
+    var offsetX = pointsX / 2
+    var offsetY = pointsY / 2
+
+    for (var x =0; x<pointsX; x++){
+        for (var y =0; y<pointsY; y++){
+            if (data[x+y*pointsX]){
                 console.log(x+", "+y);
                 var geometry = new THREE.PlaneGeometry(1,1);
                 var plane = new THREE.Mesh(geometry, cutSquareMaterial);
-                plane.position.set(x-48, y-24, 0);
+                plane.position.set(x-offsetX, y-offsetY, 0);
                 cutSquareGroup.add(plane);
             }
         }
