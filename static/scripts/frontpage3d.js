@@ -808,7 +808,7 @@ function boardCutDataUpdateCompressed(data){
   }
   if (data!=null){
     //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
-    var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00});
+    var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xff6666});
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
@@ -824,7 +824,7 @@ function boardCutDataUpdateCompressed(data){
                 console.log(x+", "+y);
                 var geometry = new THREE.PlaneGeometry(1,1);
                 var plane = new THREE.Mesh(geometry, cutSquareMaterial);
-                plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0);
+                plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
                 cutSquareGroup.add(plane);
             }
         }
