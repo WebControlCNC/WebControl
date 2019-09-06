@@ -14,7 +14,7 @@
         </select>
         </div>
       <div class="row mb-3">
-        <label for="fileSelect">Current File Name</label>
+        <label for="fileSelect">Existing Files</label>
         <select id="fileSelect" class="custom-select" name="fileSelect" data-group="{{title}}">
           {% for file in files %}
             <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>

@@ -9,6 +9,8 @@ var boardCenterX = 0
 var boardCenterY = 0
 var boardID = "-"
 var boardMaterial = "-"
+var cutSquareGroup = new THREE.Group();
+var showBoard = false;
 
 var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-20;
@@ -211,12 +213,13 @@ boardGroup.add(boardOutlineFill);
 boardGroup.add(boardOutlineOutline);
 
 boardGroup.position.set(0,0,-0.75/2);
-scene.add(boardGroup);
+//scene.add(boardGroup);
 
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
 scene.add(cursor);
+//scene.add(cutSquareGroup);
 
 var isComputedEnabled = false;
 
@@ -287,7 +290,7 @@ $(document).ready(function(){
     //settingRequest("Computed Settings","distToMove");
     //settingRequest("Computed Settings","homePosition");
     action("statusRequest","cameraStatus");
-    checkForGCodeUpdate();
+    //checkForGCodeUpdate();
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
     //var $controllerMessage = $("#controllerMessage");
@@ -786,25 +789,24 @@ function boardDataUpdate(data){
   boardOutlineFill.geometry = boardOutlineGeometry;
   boardEdgesGeometry = new THREE.EdgesGeometry( boardOutlineGeometry )
   boardOutlineOutline.geometry = boardEdgesGeometry;
-  //boardOutlineOutline.geometry = boardOutlineGeometry;
+
   boardOutlineFill.geometry.needsUpdate=true;
   boardOutlineOutline.geometry.needsUpdate=true;
-
-  //boardOutlineMaterial = new THREE.LineBasicMaterial({ color: 0x783E04})
-
-  //boardOutlineOutline = new THREE.LineSegments( boardEdgesGeometry, boardOutlineMaterial);
-
-
   boardGroup.position.set(boardCenterX,boardCenterY,boardThickness/-2.0);
-  $("#boardID").text("Board: "+boardID);
-  $("#boardMaterial").text("Material: "+boardMaterial)
+
+  $("#boardID").text("Board: "+boardID+", Material: "+boardMaterial);
+
 
 }
 
 function boardCutDataUpdateCompressed(data){
   console.log("updating board cut data compressed");
+  if (cutSquareGroup.children.length!=0) {
+    for (var i = cutSquareGroup.children.length -1; i>=0; i--){
+        cutSquareGroup.remove(cutSquareGroup.children[i]);
+    }
+  }
   if (data!=null){
-    var cutSquareGroup = new THREE.Group();
     //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
     var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00});
     var uncompressed = pako.inflate(data);
@@ -822,72 +824,27 @@ function boardCutDataUpdateCompressed(data){
                 console.log(x+", "+y);
                 var geometry = new THREE.PlaneGeometry(1,1);
                 var plane = new THREE.Mesh(geometry, cutSquareMaterial);
-                plane.position.set(x-offsetX, y-offsetY, 0);
+                plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0);
                 cutSquareGroup.add(plane);
             }
         }
     }
-    scene.add(cutSquareGroup);
-
-    /*var index = 0;
-    var lineIndex =0;
-    var positions = boardCutLines.geometry.attributes.position.array;
-    data.forEach(function(lines) {
-        lines.forEach(function(line) {
-            if (lineIndex<1000){
-                 //console.log(line)
-                 positions[index++]=line[0];
-                 positions[index++]=line[1];
-                 positions[index++]=line[2];
-            }
-            lineIndex++;
-        });
-    });
-    for (var x=lineIndex; x<1000; x++){
-        positions[index++]=0;
-        positions[index++]=0;
-        positions[index++]=0;
-    }
-    console.log(positions);
-    boardCutLines.geometry.setDrawRange( 0, lineIndex-1 );
-    boardCutLines.geometry.attributes.position.needsUpdate=true;
-    */
   }
   $("#fpCircle").hide();
 
 }
 
-
-/*function boardCutDataUpdateCompressed(data){
-  console.log("updating board cut data compressed");
-  if (data!=null){
-    var uncompressed = pako.inflate(data);
-    var _str = ab2str(uncompressed);
-    var data = JSON.parse(_str)
-    var index = 0;
-    var lineIndex =0;
-    var positions = boardCutLines.geometry.attributes.position.array;
-    data.forEach(function(lines) {
-        lines.forEach(function(line) {
-            if (lineIndex<1000){
-                 //console.log(line)
-                 positions[index++]=line[0];
-                 positions[index++]=line[1];
-                 positions[index++]=line[2];
-            }
-            lineIndex++;
-        });
-    });
-    for (var x=lineIndex; x<1000; x++){
-        positions[index++]=0;
-        positions[index++]=0;
-        positions[index++]=0;
+function toggleBoard(){
+    if (showBoard) {
+        showBoard = false;
+        scene.remove(cutSquareGroup);
+        scene.remove(boardGroup);
+        $("#boardID").removeClass('btn-primary').addClass('btn-secondary');
+    } else {
+        showBoard = true;
+        scene.add(cutSquareGroup);
+        scene.add(boardGroup);
+        $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
     }
-    console.log(positions);
-    boardCutLines.geometry.setDrawRange( 0, lineIndex-1 );
-    boardCutLines.geometry.attributes.position.needsUpdate=true;
-  }
-  $("#fpCircle").hide();
-
 }
-*/
+

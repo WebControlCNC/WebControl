@@ -295,18 +295,14 @@ class UIProcessor:
     def sendBoardUpdate(self):
         boardData = self.app.data.boardManager.getCurrentBoard().getBoardInfoJSON()
         if boardData is not None:
-            self.app.data.console_queue.put("Sending Board Data compressed")
-            socketio.emit("message", {"command": "showFPSpinner",
-                                      "data": 1, "dataFormat": "int"},
-                          namespace="/MaslowCNC", )
-            time.sleep(0.25)
+            self.app.data.console_queue.put("Sending Board Data")
             socketio.emit("message", {"command": "boardDataUpdate",
                                       "data": boardData, "dataFormat": "json"},
                           namespace="/MaslowCNC", )
-            self.app.data.console_queue.put("Sent Board Data compressed")
+            self.app.data.console_queue.put("Sent Board Data")
 
         cutData = self.app.data.boardManager.getCurrentBoard().getCompressedCutData()
-        if cutData is not None:
+        if True: #cutData is not None:
             self.app.data.console_queue.put("Sending Board Cut Data compressed")
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": 1, "dataFormat": "int"},

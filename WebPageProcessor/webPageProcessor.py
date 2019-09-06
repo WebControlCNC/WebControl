@@ -367,20 +367,29 @@ class WebPageProcessor:
             return page, "PID Tuning", False, "large", "content", False
         elif pageID == "editBoard":
             board = self.data.boardManager.getCurrentBoard()
+            scale = 1
+            units = "inches"
+            if self.data.units == "MM":
+                scale = 25.4
+                units = "mm"
             page = render_template("editBoard.html",
+                                   units=units,
                                    boardID=board.boardID,
                                    material=board.material,
-                                   height=board.height,
-                                   width=board.width,
-                                   thickness=board.thickness,
-                                   centerX=board.centerX,
-                                   centerY=board.centerY,
+                                   height=round(board.height*scale, 2),
+                                   width=round(board.width*scale, 2),
+                                   thickness=round(board.thickness*scale, 2),
+                                   centerX=round(board.centerX*scale, 2),
+                                   centerY=round(board.centerY*scale, 2),
+                                   routerHorz=self.data.xval,
+                                   routerVert=self.data.yval,
                                    pageID="editBoard")
             return page, "Create/Edit Board", False, "medium", "content", "footerSubmit"
         elif pageID == "saveBoard":
-            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
-            print(lastSelectedFile)
+            #lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
+            #print(lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedBoardDirectory")
+            lastSelectedFile = self.data.boardManager.getCurrentBoardFilename()
             home = self.data.config.getHome()
             homedir = home + "/.WebControl/boards"
             directories = []

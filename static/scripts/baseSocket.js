@@ -19,7 +19,8 @@
           settingRequest("Computed Settings","units");
           settingRequest("Computed Settings","distToMove");
           settingRequest("Computed Settings","homePosition");
-          //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
+          checkForGCodeUpdate();
+          checkForBoardUpdate();
       });
 
       socket.on('disconnect', function(msg) {

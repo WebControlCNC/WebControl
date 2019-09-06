@@ -172,6 +172,11 @@ function checkForGCodeUpdate(){
     socket.emit('checkForGCodeUpdate',{data:"Please"});
 }
 
+function checkForBoardUpdate(){
+    socket.emit('checkForBoardUpdate',{data:"Please"});
+}
+
+
 $.fn.scrollBottom = function() {
     return $(this).scrollTop($(this)[0].scrollHeight);
 };

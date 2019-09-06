@@ -267,6 +267,7 @@ def saveBoard():
         app.data.config.setValue("Computed Settings", "lastSelectedBoardDirectory",d)
         home = app.data.config.getHome()
         returnVal = app.data.boardManager.saveBoard(f, home+"/.WebControl/boards/"+d)
+        app.data.config.setValue("Maslow Settings", "openBoardFile", f)
         if returnVal:
             message = {"status": 200}
             resp = jsonify(message)
@@ -581,6 +582,11 @@ def checkForGCodeUpdate(msg):
     app.data.ui_queue1.put("Action", "unitsUpdate", "")
     app.data.ui_queue1.put("Action", "gcodeUpdate", "")
 
+@socketio.on("checkForBoardUpdate", namespace="/MaslowCNC")
+def checkForBoardUpdate(msg):
+    app.data.logger.resetIdler()
+    # this currently doesn't check for updated board, it just resends it..
+    app.data.ui_queue1.put("Action", "boardUpdate", "")
 
 @socketio.on_error_default
 def default_error_handler(e):

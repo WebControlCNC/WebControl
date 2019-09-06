@@ -1,67 +1,64 @@
 import json
 import gzip
 import io
+import math
 
 
 class Board():
     def __init__(self):
         # can't do much because data hasn't been initialized yet
         pass
-
-    width = 95
-    height = 47
-    thickness = 0.75
+    width = 0
+    height = 0
+    thickness = 0
     centerX = 0
     centerY = 0
 
     boardID = "Undefined"
     material = "Undefined"
+    boardFilename = ""
 
     boardPoints = []
     cutPoints = []
     cutPoints2 = []
     pointsPerInch = 1
 
-    compressedCutData = None
+    compressedCutData = ""
 
-    def updateBoardInfo(self, boardID, material, height, width, thickness, centerX, centerY):
+
+    def updateBoardInfo(self, boardID, material, height, width, thickness, centerX, centerY, units):
+
         try:
-            self.width = float(width)
-            self.height = float(height)
-            self.thickness = float(thickness)
-            self.centerX = float(centerX)
-            self.centerY = float(centerY)
+            scale = 1
+            if units == "mm":
+                scale = 25.4
+            self.width = round(float(width)/scale,2)
+            self.height = round(float(height)/scale,2)
+            self.thickness = round(float(thickness)/scale,2)
+            self.centerX = round(float(centerX)/scale,2)
+            self.centerY = round(float(centerY)/scale,2)
             self.boardID = boardID
             self.material = material
-            self.updateBoardPoints()
             return True
         except Exception as e:
+            print(e)
             return False
 
-    def updateBoardPoints(self):
-        '''
-        self.boardPoints = []
-
-        outline = []
-        outline.append([self.centerX - self.width/2.0, self.centerY + self.height/2.0, 0])
-        outline.append([self.centerX + self.width / 2.0, self.centerY + self.height / 2.0, 0])
-        outline.append([self.centerX + self.width / 2.0, self.centerY - self.height / 2.0, 0])
-        outline.append([self.centerX - self.width / 2.0, self.centerY - self.height / 2.0, 0])
-        outline.append([self.centerX - self.width / 2.0, self.centerY + self.height / 2.0, 0])
-        self.boardPoints.append(outline)
-
-        coutline = []
-        coutline.append([self.centerX - self.width/2.0, self.centerY + self.height/2.0, 0])
-        coutline.append([self.centerX - self.width / 2.0, self.centerY - self.height / 2.0, 0])
-        self.boardPoints.append(coutline)
-
-        self.compressCuytutData()
-        '''
-        return
-
     def updateCutPoints(self, data):
-        self.cutPoints = data
+        pointsX = math.ceil(self.width)
+        pointsY = math.ceil(self.height)
+
+        if len(self.cutPoints) == 0:
+            print("cutpoints = []")
+            self.cutPoints = data
+        else:
+            for x in range(len(self.cutPoints)):
+                if data[x] == True:
+                    self.cutPoints[x] = True
         self.compressCutData()
+
+    def setFilename(self, data):
+        self.boardFilename = data
 
     '''
     def updateCutPointsOld(self, data):
@@ -83,7 +80,7 @@ class Board():
         return self.compressedCutData
 
     def getBoardInfoJSON(self):
-        tstr = json.dumps({"width": self.width, "height": self.height, "thickness": self.thickness, "centerX": self.centerX, "centerY": self.centerY, "boardID":self.boardID, "material":self.material})
+        tstr = json.dumps({"width": self.width, "height": self.height, "thickness": self.thickness, "centerX": self.centerX, "centerY": self.centerY, "boardID":self.boardID, "material":self.material, "fileName":self.boardFilename})
         return tstr
 
     def updateBoardInfoJSON(self, data):
@@ -95,7 +92,7 @@ class Board():
         self.centerY = boardData["centerY"]
         self.boardID = boardData["boardID"]
         self.material = boardData["material"]
-        self.updateBoardPoints()
+        self.boardFilename = boardData["fileName"]
         print(boardData)
 
     def compressCutData(self):
@@ -110,4 +107,14 @@ class Board():
         return tstr
 
     def updateCompressedCutData(self, data):
+        print("here0")
         self.compressedCutData = data
+        mem = io.BytesIO(data)
+        f = gzip.GzipFile(fileobj=mem, mode="rb")
+        print(f)
+        self.cutPoints = json.loads(f.read().decode())
+        print(self.cutPoints)
+
+    def clearCutPoints(self):
+        self.cutPoints = None
+        self.compressedCutData = None

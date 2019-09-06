@@ -14,17 +14,25 @@ class BoardManager(MakesmithInitFuncs):
 
     def initializeNewBoard(self):
         self.currentBoard = Board()
+        bedWidth = round(float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4,2);
+        bedHeight = round(float(self.data.config.getValue("Maslow Settings", "bedHeight"))/25.4,2);
+
+        self.currentBoard.updateBoardInfo("-", "-", bedHeight, bedWidth, 0.75, 0, 0, "inches")
+        self.currentBoard.compressCutData()
 
     def getCurrentBoard(self):
         return self.currentBoard
 
+    def getCurrentBoardFilename(self):
+        return self.currentBoard.boardFilename
+
     def editBoard(self, result):
         #try:
-            if self.currentBoard.updateBoardInfo(result["boardID"], result["material"], result["height"], result["width"], result["thickness"], result["centerX"], result["centerY"]):
-                self.data.ui_queue1.put("Action", "boardUpdate", "")
-                return True
-            else:
-                return False
+        if self.currentBoard.updateBoardInfo(result["boardID"], result["material"], result["height"], result["width"], result["thickness"], result["centerX"], result["centerY"], result["units"]):
+            self.data.ui_queue1.put("Action", "boardUpdate", "")
+            return True
+        else:
+            return False
         #except Exception as e:
         #    self.data.console_queue.put(str(e))
         #    return False
@@ -38,11 +46,15 @@ class BoardManager(MakesmithInitFuncs):
             fileToWrite = directory + "/" + fileName
             file = open(fileToWrite, "w+")
             print(fileToWrite)
+            self.currentBoard.setFilename(fileName)
             boardData = self.currentBoard.getBoardInfoJSON()
             file.write(boardData+'\n')
             boardCutData = self.currentBoard.getCompressedCutData()
+            print("here1")
             boardCutData = base64.b64encode(boardCutData)
+            print("here2")
             boardCutData = boardCutData.decode('utf-8')
+            print("here3")
             file.write(boardCutData)
             file.write('\n')
             print("Closing File")
@@ -99,8 +111,9 @@ class BoardManager(MakesmithInitFuncs):
 
         pointsX = math.ceil(boardWidth)
         pointsY = math.ceil(boardHeight)
-        offsetX = pointsX / 2
-        offsetY = pointsY / 2
+        offsetX = pointsX / 2 - self.currentBoard.centerX
+        offsetY = pointsY / 2 - self.currentBoard.centerY
+
         cutPoints = [False for i in range( pointsX * pointsY )]
 
         for line in self.data.gcodeFile.line3D:
@@ -158,6 +171,11 @@ class BoardManager(MakesmithInitFuncs):
                                 print(-4)
 
         self.currentBoard.updateCutPoints(cutPoints)
+        self.data.ui_queue1.put("Action", "boardUpdate", "")
+        return True
+
+    def clearBoard(self):
+        self.currentBoard.clearCutPoints()
         self.data.ui_queue1.put("Action", "boardUpdate", "")
         return True
 
