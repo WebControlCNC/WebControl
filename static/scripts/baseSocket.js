@@ -49,6 +49,7 @@
       });
 
       socket.on('message', function(msg){
+          //console.log(msg);
           //blink activity indicator
           $("#cpuUsage").removeClass('alert-success').addClass('alert-warning');
           $("#mobileCPUUsage").removeClass('alert-success').addClass('alert-warning');
@@ -114,6 +115,7 @@
                 updateDirectories(data);
                 break;
             case 'gcodeUpdate':
+                console.log("---gcodeUpdate received via socket---");
                 gcodeUpdate(msg.message);
                 break;
             case 'showFPSpinner':

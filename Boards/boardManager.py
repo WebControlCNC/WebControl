@@ -183,6 +183,15 @@ class BoardManager(MakesmithInitFuncs):
             return upper-1
         return value
 
+    def trimBoard(self, result):
+        trimTop = round(float(result["trimTop"]),3)
+        trimBottom = round(float(result["trimBottom"]),3)
+        trimLeft = round(float(result["trimLeft"]),3)
+        trimRight = round(float(result["trimRight"]),3)
+        retval = self.currentBoard.trimBoard(trimTop, trimBottom, trimLeft, trimRight)
+        self.data.ui_queue1.put("Action", "boardUpdate", "")
+        return retval
+
     '''
     def processGCode(self):
         #points = np.random.rand(30,2)

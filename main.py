@@ -466,6 +466,20 @@ def editBoard():
             resp.status_code = 500
             return resp
 
+@app.route("/trimBoard", methods=["POST"])
+def trimBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        returnVal = app.data.boardManager.trimBoard(request.form)
+        if returnVal:
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
 def checkInRequested():

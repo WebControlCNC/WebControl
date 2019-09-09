@@ -372,7 +372,11 @@ class WebPageProcessor:
             if self.data.units == "MM":
                 scale = 25.4
                 units = "mm"
-            page = render_template("editBoard.html",
+            if isMobile:
+                pageName = "editBoard_mobile.html"
+            else:
+                pageName = "editBoard.html"
+            page = render_template(pageName,
                                    units=units,
                                    boardID=board.boardID,
                                    material=board.material,
@@ -385,6 +389,21 @@ class WebPageProcessor:
                                    routerVert=self.data.yval,
                                    pageID="editBoard")
             return page, "Create/Edit Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "trimBoard":
+            board = self.data.boardManager.getCurrentBoard()
+            scale = 1
+            units = "inches"
+            if self.data.units == "MM":
+                scale = 25.4
+                units = "mm"
+            if isMobile:
+                pageName = "trimBoard.html"
+            else:
+                pageName = "trimBoard.html"
+            page = render_template(pageName,
+                                   units=units,
+                                   pageID="trimBoard")
+            return page, "Trim Board", False, "medium", "content", "footerSubmit"
         elif pageID == "saveBoard":
             #lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
             #print(lastSelectedFile)

@@ -218,7 +218,8 @@ boardGroup.position.set(0,0,-0.75/2);
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
-scene.add(cursor);
+if (!isMobile)
+    scene.add(cursor);
 //scene.add(cutSquareGroup);
 
 var isComputedEnabled = false;
@@ -414,25 +415,6 @@ function processGCodePositionMessage(data){
 
 function gcodeUpdate(msg){
   console.log("updating gcode");
-/*  if (gcode!=null) {
-    //console.log("removing gcode");
-    gcode.remove();
-  }
-  width = startWidth*startZoom/draw.zoom();
-  gcode = draw.group();
-  var data = JSON.parse(msg.data)
-  data.forEach(function(line) {
-    //console.log(line)
-    if (line.type=='line'){
-      if (line.dashed==true) {
-        gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#AA0'}))
-      } else {
-        gcode.add(draw.polyline(line.points).fill('none').stroke({width:width, color: '#00F'}))
-      }
-    }
-    gcode.move(originX,originY)
-  });
-  */
 }
 function gcodeUpdateCompressed(data){
   console.log("updating gcode compressed");
@@ -445,7 +427,7 @@ function gcodeUpdateCompressed(data){
   var gcodeLineSegments = new THREE.Geometry();
   var gcodeDashedLineSegments = new THREE.Geometry();
 
-  if (data!=null){
+  if ((data!=null) && (data!="")){
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
@@ -495,8 +477,12 @@ function gcodeUpdateCompressed(data){
     //var gcodeUndashed = new THREE.LineSegments(gcodeLineSegments, blueLineMaterial)
     //gcode.add(gcodeDashed);
     //gcode.add(gcodeUndashed);
-    scene.add(gcode);
+    //scene.add(gcode);
     //console.log(gcodeUndashed);
+    scene.add(gcode);
+  }
+  else{
+    scene.remove(gcode);
   }
   $("#fpCircle").hide();
 
@@ -732,37 +718,39 @@ function clearAlarm(data){
     $("#alarms").removeClass('alert-danger').addClass('alert-success');
 }
 
-
 document.onmousemove = function(event){
-    pos = cursorPosition();
-    cursor.position.set(pos.x,pos.y,pos.z);
-    var linePosX = confine(pos.x,-48, 48);
-    var linePosY = confine(pos.y,-24, 24);
+    if (!isMobile)
+    {
+        pos = cursorPosition();
+        cursor.position.set(pos.x,pos.y,pos.z);
+        var linePosX = confine(pos.x,-48, 48);
+        var linePosY = confine(pos.y,-24, 24);
 
-    var positions = cursorVLine.geometry.attributes.position.array;
-    positions[0]=linePosX;
-    positions[1]=24;
-    positions[2]=-0.001;
-    positions[3]=linePosX;
-    positions[4]=-24;
-    positions[5]=-0.001;
-    cursorVLine.geometry.attributes.position.needsUpdate=true;
+        var positions = cursorVLine.geometry.attributes.position.array;
+        positions[0]=linePosX;
+        positions[1]=24;
+        positions[2]=-0.001;
+        positions[3]=linePosX;
+        positions[4]=-24;
+        positions[5]=-0.001;
+        cursorVLine.geometry.attributes.position.needsUpdate=true;
 
-    positions = cursorHLine.geometry.attributes.position.array;
-    positions[0]=48;
-    positions[1]=linePosY;
-    positions[2]=-0.001;
-    positions[3]=-48;
-    positions[4]=linePosY;
-    positions[5]=-0.001;
-    cursorHLine.geometry.attributes.position.needsUpdate=true;
+        positions = cursorHLine.geometry.attributes.position.array;
+        positions[0]=48;
+        positions[1]=linePosY;
+        positions[2]=-0.001;
+        positions[3]=-48;
+        positions[4]=linePosY;
+        positions[5]=-0.001;
+        cursorHLine.geometry.attributes.position.needsUpdate=true;
 
 
-    if ($("#units").text()=="MM"){
-        pos.x *= 25.4
-        pos.y *= 25.4
+        if ($("#units").text()=="MM"){
+            pos.x *= 25.4
+            pos.y *= 25.4
+        }
+        $("#cursorPosition").text("X: "+pos.x.toFixed(2)+", Y: "+pos.y.toFixed(2));
     }
-    $("#cursorPosition").text("X: "+pos.x.toFixed(2)+", Y: "+pos.y.toFixed(2));
 }
 
 function confine(value, low, high)
@@ -809,24 +797,34 @@ function boardCutDataUpdateCompressed(data){
   if (data!=null){
     //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
     var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xff6666});
+    var noncutSquareMaterial = new THREE.MeshBasicMaterial( {color:0x333333});
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
 
     var pointsX = Math.ceil(boardWidth)
     var pointsY = Math.ceil(boardHeight)
+    console.log("boardWidth="+boardWidth)
+    console.log("boardHeight="+boardHeight)
+    console.log("boardCenterY="+boardCenterY)
     var offsetX = pointsX / 2
     var offsetY = pointsY / 2
 
     for (var x =0; x<pointsX; x++){
         for (var y =0; y<pointsY; y++){
             if (data[x+y*pointsX]){
-                console.log(x+", "+y);
+                //console.log(x+", "+y);
                 var geometry = new THREE.PlaneGeometry(1,1);
                 var plane = new THREE.Mesh(geometry, cutSquareMaterial);
                 plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
                 cutSquareGroup.add(plane);
-            }
+            }/*
+            else{
+                var geometry = new THREE.PlaneGeometry(1,1);
+                var plane = new THREE.Mesh(geometry, noncutSquareMaterial);
+                plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
+                cutSquareGroup.add(plane);
+            }*/
         }
     }
   }

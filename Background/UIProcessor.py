@@ -291,6 +291,11 @@ class UIProcessor:
                                       "data": self.app.data.compressedGCode3D, "dataFormat": "base64"},
                           namespace="/MaslowCNC", )
             self.app.data.console_queue.put("Sent Gcode compressed")
+        else:
+            socketio.emit("message", {"command": "gcodeUpdateCompressed",
+                                      "data": "", "dataFormat": "base64"},
+                          namespace="/MaslowCNC", )
+
 
     def sendBoardUpdate(self):
         boardData = self.app.data.boardManager.getCurrentBoard().getBoardInfoJSON()
@@ -335,7 +340,7 @@ class UIProcessor:
         if msg["command"] == "Action":
             if msg["message"] == "gcodeUpdate":
                 self.sendGcodeUpdate()
-            if msg["message"] == "boardUpdate":
+            elif msg["message"] == "boardUpdate":
                 self.sendBoardUpdate()
             elif msg["message"] == "unitsUpdate":
                 self.unitsUpdate()

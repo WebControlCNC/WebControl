@@ -1,0 +1,140 @@
+
+{% block content %}
+<div class="container-fluid">
+  <form id="editBoardForm">
+      <input id="pageID" type="hidden" value="{{pageID}}">
+      <input id="routerVert" type="hidden" value="{{routerVert}}">
+      <input id="routerHorz" type="hidden" value="{{routerHorz}}">
+      <input id="units" type="hidden" name="units" value="{{units}}">
+      <h4 class="card-title">
+        Board Details
+      </h4>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="boardID">Board ID</label>
+          <input id="boardID" class="form-control" name="boardID" value="{{boardID}}">
+          <small class="form-text text-muted">Enter an indentifier for the board</small>
+        </div>
+        <div class="form-group">
+          <label for="material">Material</label>
+          <input id="material" class="form-control" name="material" value="{{material}}">
+          <small class="form-text text-muted">Enter type of material</small>
+        </div>
+      </div>
+      <h4 class="card-title">
+        Board Dimensions
+      </h4>
+      <div class="card-body">
+          <div class="row">
+                <div class="form-group col-6">
+                  <label for="width">Width</label>
+                  <input id="width" class="form-control" name="width" value="{{width}}">
+                  <small class="form-text text-muted">Enter value in {{units}} only</small>
+                </div>
+                <div class="form-group col-6">
+                  <label for="height">Height</label>
+                  <input id="height" class="form-control" name="height" value="{{height}}">
+                  <small class="form-text text-muted">Enter value in {{units}} only</small>
+                </div>
+                <div class="form-group col-6">
+                  <label for="Thickness">Thickness</label>
+                  <input id="thickness" class="form-control" name="thickness" value="{{thickness}}">
+                  <small class="form-text text-muted">Enter value in {{units}} only</small>
+                </div>
+          </div>
+      </div>
+      <h4 class="card-title">
+        Board Position
+      </h4>
+      <div class="card-body">
+          <div class="row">
+                <div class="form-group col-6">
+                  <label for="centerX">Center X</label>
+                  <input id="centerX" class="form-control" name="centerX" value="{{centerX}}">
+                  <small class="form-text text-muted">Enter value in {{units}} only</small>
+                </div>
+                <div class="form-group col-6">
+                  <label for="centerY">Center Y</label>
+                  <input id="centerY" class="form-control" name="centerY" value="{{centerY}}">
+                  <small class="form-text text-muted">Enter value in {{units}} only</small>
+                </div>
+          </div>
+          <div class = "row">
+            <h5>Align Board to Router</h5>
+          </div>
+          <div class="row mb-2">
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(1,-1)">Top Left</button>
+              </div>
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(1,0)">Top</button>
+              </div>
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(1,1)">Top Right</button>
+              </div>
+          </div>
+          <div class="row mb-2">
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(0,-1)">Left</button>
+              </div>
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(-2, -2)">Center</button>
+              </div>
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(0, 1)">Right</button>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(-1, -1)">Btm Left</button>
+              </div>
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(0, -1)">Bottom</button>
+              </div>
+              <div class="col-4">
+                  <button type="button" class="btn btn-sm btn-block" onclick="align(-1, -1)">Btm Right</button>
+              </div>
+          </div>
+      </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+function onFooterSubmit(){
+    var url = $("#pageID").val()
+    $.ajax({
+        url : '/'+url,
+        type: "POST",
+        data: $("#editBoardForm").serialize(),
+        success: function (data) {
+          console.log("success");
+            $('#contentModal').modal('toggle')
+        },
+        error: function (jXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
+}
+
+function align(vert, horz){
+    rVert = parseFloat($("#routerVert").val());
+    rHorz = parseFloat($("#routerHorz").val());
+    height = parseFloat($("#height").val());
+    width = parseFloat($("#width").val());
+    if (vert == 1)
+        $("#centerY").val((rVert-height/2.0).toFixed(2));
+    else if (vert == -1)
+        $("#centerY").val((rVert+height/2.0).toFixed(2));
+    else if (vert == -2)
+        $("#centerY").val((rVert).toFixed(2));
+    if (horz == 1)
+        $("#centerX").val((rHorz-width/2.0).toFixed(2));
+    else if (horz == -1)
+        $("#centerX").val((rHorz+width/2.0).toFixed(2));
+    else if (horz == -2)
+        $("#centerX").val((rHorz).toFixed(2));
+}
+</script>
+{% endblock %}

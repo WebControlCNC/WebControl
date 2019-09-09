@@ -57,6 +57,38 @@ class Board():
                     self.cutPoints[x] = True
         self.compressCutData()
 
+    def trimBoard(self, trimTop, trimBottom, trimLeft, trimRight):
+        aPointsX = math.ceil(self.width)
+        aPointsY = math.ceil(self.height)
+        bPointsX = math.ceil(self.width - trimLeft - trimRight)
+        bPointsY = math.ceil(self.height - trimTop - trimBottom)
+
+        bCutPoints  = [False for i in range( bPointsX * bPointsY )]
+
+        print(aPointsX)
+        print(aPointsY)
+        print(bPointsX)
+        print(bPointsY)
+        print(trimTop)
+        print(trimBottom)
+        print(trimLeft)
+        print(trimRight)
+
+        if (len(self.cutPoints)!=0):
+            for x in range(bPointsX):
+                for y in range(bPointsY):
+                    ax = x + int(trimLeft)
+                    ay = y + int(trimBottom)
+                    ib = x+y*bPointsX
+                    ia = ax+ay*aPointsX
+                    #print(str(ib) +", "+ str(ia))
+                    bCutPoints[ib] = self.cutPoints[ia]
+        self.cutPoints = bCutPoints
+        self.height = self.height - trimTop - trimBottom
+        self.width = self.width - trimLeft - trimRight
+        self.compressCutData()
+        return True
+
     def setFilename(self, data):
         self.boardFilename = data
 
@@ -116,5 +148,5 @@ class Board():
         print(self.cutPoints)
 
     def clearCutPoints(self):
-        self.cutPoints = None
+        self.cutPoints = []
         self.compressedCutData = None
