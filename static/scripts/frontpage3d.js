@@ -10,7 +10,7 @@ var boardCenterY = 0
 var boardID = "-"
 var boardMaterial = "-"
 var cutSquareGroup = new THREE.Group();
-var showBoard = false;
+var showBoard = true;
 
 var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-20;
@@ -213,7 +213,10 @@ boardGroup.add(boardOutlineFill);
 boardGroup.add(boardOutlineOutline);
 
 boardGroup.position.set(0,0,-0.75/2);
-//scene.add(boardGroup);
+
+scene.add(cutSquareGroup);
+scene.add(boardGroup);
+
 
 scene.add(sled);
 scene.add(home);
@@ -431,7 +434,7 @@ function gcodeUpdateCompressed(data){
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
-    console.log(data)
+    //console.log(data)
     var pX, pY, pZ = -99999.9
     var gcodeDashed;
     var gcodeUndashed;
@@ -828,6 +831,7 @@ function boardCutDataUpdateCompressed(data){
         }
     }
   }
+  var e = new Date();
   $("#fpCircle").hide();
 
 }
