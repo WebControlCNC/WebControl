@@ -125,7 +125,7 @@ class Board():
         self.boardID = boardData["boardID"]
         self.material = boardData["material"]
         self.boardFilename = boardData["fileName"]
-        print(boardData)
+        #print(boardData)
 
     def compressCutData(self):
         tstr = json.dumps(self.cutPoints)
@@ -139,13 +139,12 @@ class Board():
         return tstr
 
     def updateCompressedCutData(self, data):
-        print("here0")
         self.compressedCutData = data
         mem = io.BytesIO(data)
         f = gzip.GzipFile(fileobj=mem, mode="rb")
-        print(f)
+        #print(f)
         self.cutPoints = json.loads(f.read().decode())
-        print(self.cutPoints)
+        #print(self.cutPoints)
 
     def clearCutPoints(self):
         self.cutPoints = []

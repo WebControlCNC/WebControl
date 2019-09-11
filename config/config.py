@@ -7,7 +7,7 @@ and using the data in this dict.
 """
 import json
 import re
-import os
+import os, sys
 import math
 from shutil import copyfile
 from pathlib import Path
@@ -21,18 +21,22 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 class Config(MakesmithInitFuncs):
     settings = {}
     defaults = {}
-    home = ""
+    home = "."
+    home1 = "."
     firstRun = False
 
     def __init__(self):
         self.home = str(Path.home())
+        if hasattr(sys, '_MEIPASS'):
+            self.home1 = os.path.join(sys._MEIPASS)
+            print(self.home1)
         print("Initializing Configuration")
         if not os.path.isdir(self.home+"/.WebControl"):
             print("creating "+self.home+"/.WebControl directory")
             os.mkdir(self.home+"/.WebControl")
         if not os.path.exists(self.home+"/.WebControl/webcontrol.json"):
             print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
-            copyfile("defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
+            copyfile(self.home1+"/defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
         if not os.path.isdir(self.home+"/.WebControl/gcode"):
             print("creating "+self.home+"/.WebControl/gcode directory")
@@ -46,7 +50,7 @@ class Config(MakesmithInitFuncs):
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it
-        with open("defaultwebcontrol.json", "r") as infile:
+        with open(self.home1+"/defaultwebcontrol.json", "r") as infile:
             self.defaults = json.load(infile)
         updated = False
         for section in self.defaults:
