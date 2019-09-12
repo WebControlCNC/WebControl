@@ -17,6 +17,7 @@ class SerialPort(MakesmithInitFuncs):
     The actual connection is run in a separate thread by an instance of a SerialPortThread object.
 
     """
+    serialPortRequest = ""
 
     # COMports = ListProperty(("Available Ports:", "None"))
 
@@ -74,5 +75,11 @@ class SerialPort(MakesmithInitFuncs):
             #self.data.ui_queue.put(
             #    "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
             #)  # the "_" facilitates the parse
+
+    def closeConnection(self):
+        self.serialPortRequest = "requestToClose"
+
+    def getConnectionStatus(self):
+        return self.serialPortRequest
 
 

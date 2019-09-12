@@ -968,25 +968,56 @@ class Actions(MakesmithInitFuncs):
 
     def upgradeFirmware(self, version):
         try:
+            if hasattr(sys, '_MEIPASS'):
+                home = os.path.join(sys._MEIPASS)
+                print(home)
+            else:
+                home = ""
             if version == 0:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
-                path = "/firmware/madgrizzle/*.hex"
+                path = home+"/firmware/madgrizzle/*.hex"
             if version == 1:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
-                path = "/firmware/maslowcnc/*.hex"
+                path = home+"/firmware/maslowcnc/*.hex"
             if version == 2:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Holey Firmware Update in Progress, Please Wait.")
-                path = "/firmware/holey/*.hex"
+                path = home+"/firmware/holey/*.hex"
             time.sleep(.5)
-            for filename in glob.glob(path):
-                port = self.data.comport
-                cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
-                os.system(cmd)
-                self.data.ui_queue1.put("Action", "closeModals", "Notification")
-                return True
+            print(path)
+            t0 = time.time()*1000
+            portClosed = False
+            self.data.serialPort.closeConnection()
+            while (time.time()*1000 - t0) < 5000:
+                if self.data.serialPort.getConnectionStatus():
+                    portClosed = True
+                    print("portClosed0")
+                    break
+            time.sleep(1.5)
+            if portClosed:
+                for filename in glob.glob(path):
+                    port = self.data.comport
+                    print(port)
+                    print(home)
+                    print(filename)
+                    if home != "":
+                        cmd = "\"C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\avrdude\" -Cavr/avrdude.conf -v -patmega2560 -cwiring -P" + port + " -b115200 -D -Uflash:w:" + filename + ":i"
+                    else:
+                        cmd = "avr/avrdude -Cavr/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
+                    print(cmd)
+                    x = os.system(cmd)
+                    self.data.connectionStatus = 0
+                    print(x)
+                    print("closing modals")
+                    self.data.ui_queue1.put("Action", "closeModals", "Notification:")
+                    return True
+            else:
+                self.data.ui_queue1.put("Action", "closeModals", "Notification:")
+                print("Port not closed")
+                return False
         except Exception as e:
             self.data.console_log.put(str(e))
             return False
+
 
     def createDirectory(self, _directory):
         try:

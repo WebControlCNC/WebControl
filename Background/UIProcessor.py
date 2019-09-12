@@ -367,7 +367,8 @@ class UIProcessor:
                 elif msg["message"] == "updatePorts":
                     msg["data"] = json.dumps(self.app.data.comPorts)
                 elif msg["message"] == "closeModals":
-                    msg["data"] = json.dumps({"title": msg["data"]})
+                    title = json.loads(msg["data"])
+                    msg["data"] = json.dumps({"title": title}) #msg["data"]})
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"}, namespace="/MaslowCNC")
         elif msg["command"] == "TextMessage":
             socketio.emit("message", {"command": "controllerMessage", "data": msg["data"], "dataFormat": "json"},

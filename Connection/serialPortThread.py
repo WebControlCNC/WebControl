@@ -30,6 +30,8 @@ class SerialPortThread(MakesmithInitFuncs):
     # could be smaller (0.02) however larger number doesn't seem to impact performance
     MINTimePerLine = 0.05
 
+    serialInstance = None
+
     def _write(self, message, isQuickCommand=False):
         # message = message + 'L' + str(len(message) + 1 + 2 + len(str(len(message))) )
 
@@ -115,6 +117,16 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.data.console_queue.put("Gcode Ended")
                     #print("Gcode Ended")
 
+    def closeConnection(self):
+        if self.serialInstance is not None:
+            self.serialInstance.close()
+            self.data.serialPort.serialPortRequest = "Closed"
+            print("connection closed at serialPortThread")
+        else:
+            print("serial Instance is none??")
+        return
+
+
     def getmessage(self):
         # opens a serial connection called self.serialInstance
 
@@ -179,6 +191,11 @@ class SerialPortThread(MakesmithInitFuncs):
                 # Read serial line from machine if available
                 # -------------------------------------------------------------------------------------
                 lineFromMachine = ""
+
+                if self.data.serialPort.serialPortRequest == "requestToClose":
+                    self.closeConnection()
+                    # do not change status yet...
+                    return
 
                 try:
                     if self.serialInstance.in_waiting > 0:

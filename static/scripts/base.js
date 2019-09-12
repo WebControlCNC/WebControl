@@ -29,7 +29,7 @@ function processControllerStatus(data){
 function processActivateModal(data){
     var $modal, $modalTitle, $modalText
     var message
-    console.log(data)
+    //console.log(data)
     if (data.modalType == "content"){
       $modal = $('#contentModal');
       $modalDialog = $('#contentDialog');
@@ -108,9 +108,12 @@ function processActivateModal(data){
 }
 
 function closeModals(data){
+    console.log(data)
     if ($('#notificationModal').data('name') == data.title)
     {
+      console.log("here, closing notification modal");
       $('#notificationModal').modal('hide');
+      $('#notificationCircle').hide()
     }
 }
 
