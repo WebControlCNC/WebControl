@@ -1,13 +1,22 @@
 {
     "Advanced Settings": [
         {
-            "default": 0.0,
-            "desc": "Max depth the z axis should plunge in order to find the touch probe\ndefault setting: 0.0",
+            "default": 0,
+            "desc": "Enable the use of a touch plate to allow for automatic setting of Z-Axis zero.  DO NOT ENABLE UNLESS YOU HAVE A TOUCH PLATE!\ndefault setting: disabled",
+            "key": "touchPlate",
+            "section": "Advanced Settings",
+            "title": "Enable Use of Touch Plates",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 10.0,
+            "desc": "Max depth in millimeters the z axis should plunge in order to find the touch probe\ndefault setting: 10 mm",
             "key": "maxTouchProbePlungeDistance",
             "section": "Advanced Settings",
-            "title": "Max touch Z-axis plunge",
+            "title": "Max Touch Z-axis Plunge",
             "type": "string",
-            "value": "50"
+            "value": "10"
         },
         {
             "default": 8113.73,
@@ -56,6 +65,16 @@
             "type": "string",
             "value": "0",
             "firmwareKey": 41
+        },
+        {
+            "default": 5.1685e-6,
+            "desc": "Elasticity of the Chain [mm/mm/N]\ndefault setting: 5.1685e-6",
+            "key": "chainElasticity",
+            "section": "Advanced Settings",
+            "title": "Chain Elasticity",
+            "type": "float",
+            "value": 5.1685e-6,
+            "firmwareKey": 45
         },
         {
             "default": "Top",
@@ -198,7 +217,7 @@
         {
             "default": 0,
             "desc": "Enable modifying x,y coordinates during calculations to account for errors determined by optical calibration\ndefault setting: 0",
-            "firmwareKey": 44,
+            "firmwareKey": 144,
             "key": "enableOpticalCalibration",
             "section": "Advanced Settings",
             "title": "Use Calibration Error Matrix (Experimental)",
@@ -208,7 +227,7 @@
         {
             "default": 0,
             "desc": "Selects use interpolation of calibration error matrix or curve fit\ndefault setting: 0",
-            "firmwareKey": 46,
+            "firmwareKey": 86,
             "key": "useInterpolationOrCurve",
             "section": "Advanced Settings",
             "title": "Use Interpolation (True) or Curve Fit (False) (Experimental)",
@@ -538,6 +557,12 @@
             "key": "lastSelectedDirectory",
             "type": "string",
             "value": "."
+        },
+        {
+            "default": ".",
+            "key": "lastSelectedBoardDirectory",
+            "type": "string",
+            "value": "."
         }
     ],
     "Maslow Settings": [
@@ -599,6 +624,16 @@
             "title": "Distance Between Sled Mounting Points",
             "type": "string",
             "value": "310"
+        },
+        {
+            "default": 97.9,
+            "desc": "Weight of sled [N].\ndefault setting: 97.9",
+            "firmwareKey": 46,
+            "key": "sledWeight",
+            "section": "Maslow Settings",
+            "title": "Sled Weight",
+            "type": "float",
+            "value": 97.9
         },
         {
             "default": 139,
@@ -702,96 +737,105 @@
             "title": "Buffer Gcode",
             "type": "bool",
             "value": 0
+        },
+        {
+            "default": "",
+            "desc": "The path to the open board file\\ndefault setting: your home directory",
+            "key": "openBoardFile",
+            "section": "Maslow Settings",
+            "title": "Open Board File",
+            "type": "string",
+            "value": ""
         }
     ],
     "Optical Calibration Settings": [
         {
             "default": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-            "firmwareKey": 45,
+            "firmwareKey": 85,
             "key": "xyErrorArray",
             "type": "string",
             "value": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
         },
         {
             "default": "0",
-            "firmwareKey": 47,
+            "firmwareKey": 87,
             "key": "calX0",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 48,
+            "firmwareKey": 88,
             "key": "calX1",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 49,
+            "firmwareKey": 89,
             "key": "calX2",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 50,
+            "firmwareKey": 90,
             "key": "calX3",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 51,
+            "firmwareKey": 91,
             "key": "calX4",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 52,
+            "firmwareKey": 92,
             "key": "calX5",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 53,
+            "firmwareKey": 93,
             "key": "calY0",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 54,
+            "firmwareKey": 94,
             "key": "calY1",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 55,
+            "firmwareKey": 95,
             "key": "calY2",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 56,
+            "firmwareKey": 96,
             "key": "calY3",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 57,
+            "firmwareKey": 97,
             "key": "calY4",
             "type": "string",
             "value": "0"
         },
         {
             "default": "0",
-            "firmwareKey": 58,
+            "firmwareKey": 98,
             "key": "calY5",
             "type": "string",
             "value": "0"
@@ -905,6 +949,15 @@
         },
         {
             "default": 0,
+            "desc": "Enable on-screen reporting of actual sled position computed from chain lengths reported by controller.  MAY CAUSE WEBCONTROL TO SLOW DOWN!\ndefault setting: disabled",
+            "key": "computedPosition",
+            "section": "WebControl Settings",
+            "title": "Computed Sled Position",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
             "desc": "Timeout logging after specified seconds of user and gcode processing activity, 0 value disables timeout\ndefault setting: 0",
             "key": "loggingTimeout",
             "section": "WebControl Settings",
@@ -963,5 +1016,251 @@
             "type": "float",
             "value": 0.001
         }
+    ],
+    "GPIO Settings": [
+        {
+            "default": "",
+            "desc": "GPIO2 functionality",
+            "key": "gpio2",
+            "section": "GPIO Settings",
+            "title": "GPIO2",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO3 functionality",
+            "key": "gpio3",
+            "section": "GPIO Settings",
+            "title": "GPIO3",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO4 functionality",
+            "key": "gpio4",
+            "section": "GPIO Settings",
+            "title": "GPIO4",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO5 functionality",
+            "key": "gpio5",
+            "section": "GPIO Settings",
+            "title": "GPIO5",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO6 functionality",
+            "key": "gpio6",
+            "section": "GPIO Settings",
+            "title": "GPIO6",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO7 functionality",
+            "key": "gpio7",
+            "section": "GPIO Settings",
+            "title": "GPIO7",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO8 functionality",
+            "key": "gpio8",
+            "section": "GPIO Settings",
+            "title": "GPIO8",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO9 functionality",
+            "key": "gpio9",
+            "section": "GPIO Settings",
+            "title": "GPIO9",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO10 functionality",
+            "key": "gpio10",
+            "section": "GPIO Settings",
+            "title": "GPIO10",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO11 functionality",
+            "key": "gpio11",
+            "section": "GPIO Settings",
+            "title": "GPIO11",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO12 functionality",
+            "key": "gpio12",
+            "section": "GPIO Settings",
+            "title": "GPIO12",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO13 functionality",
+            "key": "gpio13",
+            "section": "GPIO Settings",
+            "title": "GPIO13",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO14 functionality",
+            "key": "gpio14",
+            "section": "GPIO Settings",
+            "title": "GPIO14",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO15 functionality",
+            "key": "gpio15",
+            "section": "GPIO Settings",
+            "title": "GPIO15",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO16 functionality",
+            "key": "gpio16",
+            "section": "GPIO Settings",
+            "title": "GPIO16",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO17 functionality",
+            "key": "gpio17",
+            "section": "GPIO Settings",
+            "title": "GPIO17",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO18 functionality",
+            "key": "gpio18",
+            "section": "GPIO Settings",
+            "title": "GPIO18",
+            "type": "options",
+            "value": ""
+       }        ,
+        {
+            "default": "",
+            "desc": "GPIO19 functionality",
+            "key": "gpio19",
+            "section": "GPIO Settings",
+            "title": "GPIO19",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO20 functionality",
+            "key": "gpio20",
+            "section": "GPIO Settings",
+            "title": "GPIO20",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO21 functionality",
+            "key": "gpio21",
+            "section": "GPIO Settings",
+            "title": "GPIO21",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO22 functionality",
+            "key": "gpio22",
+            "section": "GPIO Settings",
+            "title": "GPIO22",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO23 functionality",
+            "key": "gpio23",
+            "section": "GPIO Settings",
+            "title": "GPIO23",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO24 functionality",
+            "key": "gpio24",
+            "section": "GPIO Settings",
+            "title": "GPIO24",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO25 functionality",
+            "key": "gpio25",
+            "section": "GPIO Settings",
+            "title": "GPIO25",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO26 functionality",
+            "key": "gpio26",
+            "section": "GPIO Settings",
+            "title": "GPIO26",
+            "type": "options",
+            "value": ""
+       },
+        {
+            "default": "",
+            "desc": "GPIO27 functionality",
+            "key": "gpio27",
+            "section": "GPIO Settings",
+            "title": "GPIO27",
+            "type": "options",
+            "value": ""
+       }
+
+
+
+
+
+
+
+
+
+
     ]
 }

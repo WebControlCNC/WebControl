@@ -4,12 +4,12 @@
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/bootstrap.min.css', version='10262018a') }}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/switches.css', version='10262018a') }}" crossorigin="anonymous">
-  <link rel="stylesheet" href="{{ url_for('static',filename='styles/base.css', version='10262019b') }}" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/base.css', version='10262019j') }}" crossorigin="anonymous">
   <script src="{{ url_for('static',filename='scripts/socket.io-2.1.1.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/jquery-3.3.1.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/bootstrap.bundle.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018b') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018h') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018m') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018m') }}" crossorigin="anonymous"></script>
 
   <script type="text/javascript" charset="utf-8">
   </script>
@@ -18,6 +18,8 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" data-name="">
     <a class="navbar-brand" href="#">WebControl</a>
     <button id="mobileClientStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>
+    <!--<div id="mobileClientActivity" class="alert alert-dark alert-circle alert-sm"></div>-->
+    <div id="mobileCPUUsage" class="alert alert-success alert-sm">0%</div>
     <button id="mobileControllerStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -30,10 +32,11 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
             <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('saveGCode');">Save</a>
             <a class="dropdown-item" href="#" onclick="requestPage('uploadGCode');">Upload</a>
             <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('viewGcode');">View</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('sendGcode');">Send</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('editGCode');">View/Edit</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('sendGCode');">Send Custom GCode</a>
           </div>
         </li>
         <li class="nav-item">
@@ -44,17 +47,34 @@
             Settings
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-            <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Setttings</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Settings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl Settings</a>
             <a class="dropdown-item" href="#" onclick="requestPage('cameraSettings');">Camera Settings</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('gpioSettings');">GPIO Settings</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Boards
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
+            <a class="dropdown-item" href="#" onclick="requestPage('openBoard');">Open Board</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('saveBoard');">Save Board</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('editBoard');">Create/Edit Board</a>
+            <a class="dropdown-item" href="#" onclick="requestPage('trimBoard');">Trim Board</a>
+            <a class="dropdown-item" href="#" onclick="action('boardProcessGCode');">Process GCode</a>
+            <a class="dropdown-item" href="#" onclick="action('boardClearBoard');">Clear Board</a>
           </div>
         </li>
       </ul>
       <div id="clientStatus" class="alert alert-danger">Not Connect</div>
+      <!--<div id="activity" class="alert alert-success alert-circle alert-sm"></div>-->
+      <div id="cpuUsage" class="alert alert-success">0%</div>
       <div id="controllerStatus" class="alert alert-danger">Not Connect</div>
     </div>
 </nav>
+
 <body>
   <section class="content">
     <header>
@@ -98,8 +118,8 @@
     </div>
   </div>
 
-  <div class="modal" id="contentModal" tabindex="-1" role="dialog">
-    <div id="contentDialog" class="modal-dialog {{modalStyle}}" role="document">
+  <div class="modal" id="contentModal" tabindex="-1" role="dialog" >
+    <div id="contentDialog" class="modal-dialog {{modalStyle}}" role="document" >
       <div class="modal-content">
         <div class="modal-header">
           <h5 id="contentModalTitle" class="modal-title">Modal title</h5>
@@ -119,19 +139,19 @@
     </div>
   </div>
 
-  <div class="modal" id="alarmModal" tabindex="-1" role="dialog">
-    <div id="alarmDialog" class="modal-dialog {{modalStyle}}" role="document">
+  <div class="modal" id="alertModal" tabindex="-1" role="dialog">
+    <div id="alertDialog" class="modal-dialog {{modalStyle}}" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 id="alarmModalTitle" class="modal-title">Modal title</h5>
+          <h5 id="alertModalTitle" class="modal-title">Modal title</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div id="alarmModalText" class="modal-body">
+        <div id="alertModalText" class="modal-body">
         </div>
         <div class="modal-footer">
-          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alarm</button>
+          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alert</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

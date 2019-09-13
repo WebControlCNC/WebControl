@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css') }}" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='11102018j') }}" crossorigin="anonymous">
   <!--<style> #workarea {background-color: #AAA; width: 100%; height: 100%; border: 1px solid black;}</style>-->
 {% endblock %}
 
@@ -10,32 +10,15 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018h') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019o') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid h-100">
-  <div class="row justify-content-start h-100">
-    <div id="workarea" class="col">
-      <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
-      <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
-      <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
-      <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>
-    </div>
-    <div id="fpCircle" style="display: none;">
-      <div class="loader">
-        <div class="loader">
-          <div class="loader">
-            <div class="loader">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col my-sidebar">
-      <div class="h-100 d-flex flex-column">
+<div class="container-fluid d-flex flex-row-reverse">
+    <div class="flex-fixed-width-item"><!--"col my-sidebar">-->
         <h3>Controls</h3>
+        <div>
         <div class="row">
           <div class="col mb-1">
             <button type="button" class="btn btn-secondary btn-block" onclick="action('move','upLeft',$('#distToMove').val())"><i data-feather="arrow-up-left"></i></button>
@@ -92,7 +75,7 @@
         </div>
         <div class="row">
           <div class="col mb-1">
-            <div id="alerts" class="alert alert-success alert-dismissible col-md-12">No alerts</div>
+            <div id="alarms" class="alert alert-success alert-dismissible col-md-12">No alarms</div>
           </div>
         </div>
         <div class="row">
@@ -139,7 +122,7 @@
             <h5>Line:</h5>
           </div>
           <div class="col-9 mb-1">
-            <div id='gcodeLine'></div>
+            <div class="text-nowrap" id='gcodeLine'></div>
           </div>
         </div>
         <div class="row">
@@ -149,6 +132,22 @@
           <div class="col-9">
             <div id='positionMessage'></div>
           </div>
+        </div>
+        <div class="row">
+          <div class="col-3">
+            <h5>Error:</h5>
+          </div>
+          <div class="col-4">
+            <div class="progress">
+              <div id="leftError" class = "progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="progress">
+              <div id="rightError" class = "progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
         </div>
         <div class="row">
           <div class="col-3 mb-1">
@@ -185,10 +184,34 @@
             <h3>Controller Messages</h3>
           </div>
         </div>
-        <div class="row scrollText flex-grow-1" id='controllerMessage'>
+        </div>
+        <div class="scrollText w-100" id='controllerMessage'></div>
+    </div>
+    <div id="workarea" class="flex-grow-1"> <!--class="col">-->
+        <!--<div id="button3DResetGroup" class="btn-group" role="group">
+            <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+            <div id="cursorPosition" class="alert alert-success alert-dismissible">Cursor Position</div>
+        </div>-->
+        <div id="button3DResetGroup"><!-- class="btn-toolbar" role="toolbar">-->
+            <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
+            <!--<button class="btn btn-secondary btn-sm" type="button" id="cursorPosition">Cursor Position</button>-->
+            <span id="cursorPosition" class="btn btn-secondary btn-sm">Cursor Position</span>
+            <button id="boardID" class="btn btn-primary btn-sm" onclick="toggleBoard()">...</button>
+        </div>
+      <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
+      <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>
+    </div>
+    <div id="fpCircle" style="display: none;">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 </div>
 {% endblock %}

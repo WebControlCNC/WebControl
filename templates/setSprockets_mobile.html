@@ -1,0 +1,145 @@
+
+{% block content %}
+<div class="container-fluid">
+  <h4>Left Motor</h4>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',360.0)">
+        <i data-feather="refresh-cw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',10.0)">
+        <i data-feather="rotate-cw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',1)">
+        <i data-feather="rotate-cw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',0.1)">
+        <i data-feather="rotate-cw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',-360.0)">
+        <i data-feather="refresh-ccw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',-10.0)">
+        <i data-feather="rotate-ccw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',-1)">
+        <i data-feather="rotate-ccw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','L',-0.1)">
+        <i data-feather="rotate-ccw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <h4>Right Motor</h4>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',-360.0)">
+        <i data-feather="refresh-cw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',-10.0)">
+        <i data-feather="rotate-cw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',-1)">
+        <i data-feather="rotate-cw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',-0.1)">
+        <i data-feather="rotate-cw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',360.0)">
+        <i data-feather="refresh-ccw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',10.0)">
+        <i data-feather="rotate-ccw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',1)">
+        <i data-feather="rotate-ccw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1 px-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','R',0.1)">
+        <i data-feather="rotate-ccw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprocketAutomatic')">Automatic</button>
+    </div>
+    <div class="col mb-1">
+      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="setSprocketsZero()">Define Zero</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6 mb-1">
+      <button disabled type="button" id="leftChainDefault" class="btn btn-lg btn-secondary btn-block btn-wrap" onclick="action('adjustChain','left')">Left To {{chainExtendLength}}mm</button>
+    </div>
+    <div class="col-6 mb-1">
+      <button disabled type="button" id="rightChainDefault" class="btn btn-lg btn-secondary btn-block btn-wrap" onclick="action('adjustChain', 'right')">Right To {{chainExtendLength}}mm</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-1">
+      <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault')">Manually Set Chains At {{chainExtendLength}} mm</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+   <script src="{{ url_for('static',filename='scripts/setSprockets.js', version='10262027a') }}" crossorigin="anonymous"></script>
+   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+   <script>feather.replace() </script>
+{% endblock %}

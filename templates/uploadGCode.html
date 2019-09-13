@@ -2,8 +2,8 @@
 <div class="container-fluid">
   <form id="gcodeForm" method="post" enctype=multipart/form-data>
     <div class="form-group">
-      <div class="row">
-        <label for="directorySelect">Directory</label>
+      <div class="row mb-2">
+        <label for="directorySelect">Select Target Directory</label>
         <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
           {% for directory in directories %}
             <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
@@ -11,19 +11,28 @@
             </option>
           {% endfor %}
         </select>
-        <button type="button" class="btn btn-info" id="newDirectoryButton">New Directory</button>
+        <button type="button" class="btn btn-info" id="newDirectoryButton">Create New Directory</button>
         <input type="input" name="newDirectory" id="newDirectory">
       </div>
       <div class="row">
-        <label for="gcodeFile" class="mt-1">GCode File</label>
-        <input type="file" class="form-control-file" name="file" id="gcodeFile" accept="{{validExtensions}}">
+        Select File to Upload
+      </div>
+      <div class="row mb-2">
+
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="gcodeFile" name="file" accept="{{validExtensions}}">
+            <label class="custom-file-label" for="gcodeFile">Choose file</label>
+          </div>
+        <!--label for="gcodeFile" class="mt-1">Select GCode File</label>
+        <input type="file" class="form-control-file" name="file" id="gcodeFile" accept="{{validExtensions}}">-->
       </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <!--<button type="submit" class="btn btn-primary">Submit</button>-->
   </form>
 </div>
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/uploadGCode.js', version='11102020a') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/uploadGCode.js', version='11102020j') }}" crossorigin="anonymous"></script>
+
 {% endblock %}

@@ -24,12 +24,14 @@ class Data:
     clients = []
     gcode = []
     gcodeFileUnits = "INCHES"
+    sentCustomGCode = ""
     compressedGCode = None
     compressedGCode3D = None
 
-    version = "101.25"
+    version = "1.27"
     stockFirmwareVersion = ""
     customFirmwareVersion = ""
+    holeyFirmwareVersion = ""
     controllerFirmwareVersion = 0
     # all of the available COM ports
     comPorts = []
@@ -44,6 +46,8 @@ class Data:
     # holds the address of the g-code file so that the gcode can be refreshed
     gcodeFile = ""
     importFile = ""
+    # holds the current gcode x,y,z position
+    currentGcodePost = [0.0, 0.0, 0.0]
     # the current position of the cutting head
     currentpos = [0.0, 0.0, 0.0]
     target = [0.0, 0.0, 0.0]
@@ -83,6 +87,7 @@ class Data:
     serialPort = None  # this is a pointer to the program serial port object
     requestSerialClose = False  # this is used to request the serialThread to gracefully close the port
     triangularCalibration = None  # points to the triangular calibration object
+    holeyCalibration = None  # points to the triangular calibration object
     opticalCalibration = None  # points to the optical calibration object
     opticalCalibrationImage = None  # stores the current image
     opticalCalibrationImageUpdated = False  # stores whether its been updated or not
@@ -91,6 +96,8 @@ class Data:
     cameraImage = None
     cameraImageUpdated = False
     continuousCamera = False
+    gpioActions = None
+    boardManager = None
 
     """
 
@@ -130,11 +137,46 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    xval_prev = -99990.0
+    yval_prev = -99990.0
+    zval_prev = -99990.0
+
+    leftError = 0.0
+    rightError = 0.0
+    leftError_prev = -99999.0
+    rightError_prev = -99999.9
+
+    """
+    Chain lengths as reported by controller
+    """
+    leftChain = 1610
+    rightChain = 1610
+
+    """
+    Sled position computed from controller reported chain lengths
+    """
+    computedX = 0
+    computedY = 0
+
+    """
+    Buffer size as reported by controller
+    """
+    bufferSize = 127
+
     pausedzval = 0.0
 
+    """
+    GCode Position Values
+    """
     previousPosX = 0.0
     previousPosY = 0.0
     previousPosZ = 0.0
+
+    """
+    Board data
+    """
+    currentBoard = None
+
 
     shutdown = False
     

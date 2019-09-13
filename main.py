@@ -9,7 +9,7 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash, Response
+from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
@@ -18,8 +18,14 @@ from Background.WebMCPProcessor import ConsoleProcessor
 from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
+
 from os import listdir
 from os.path import isfile, join
+
+
+
+
+
 
 
 app.data = Data()
@@ -137,6 +143,16 @@ def cameraSettings():
         resp.status_code = 200
         return resp
 
+@app.route("/gpioSettings", methods=["POST"])
+def gpioSettings():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        result = request.form
+        app.data.config.updateSettings("GPIO Settings", result)
+        message = {"status": 200}
+        resp = jsonify(message)
+        resp.status_code = 200
+        return resp
         
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
@@ -186,6 +202,83 @@ def openGCode():
             resp.status_code = 500
             return resp
 
+@app.route("/saveGCode", methods=["POST"])
+def saveGCode():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        print(request.form)
+        f = request.form["fileName"]
+        d = request.form["selectedDirectory"]
+        app.data.console_queue.put("selectedGcode="+f)
+        app.data.config.setValue("Computed Settings", "lastSelectedDirectory",d)
+        home = app.data.config.getHome()
+        returnVal = app.data.gcodeFile.saveFile(f, home+"/.WebControl/gcode/"+d)
+        '''
+        tDir = f.split("/")
+        app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
+        app.data.config.setValue("Maslow Settings", "openFile", tDir[1])
+        returnVal = app.data.gcodeFile.loadUpdateFile()
+        '''
+        if returnVal:
+            app.data.config.setValue("Maslow Settings", "openFile", f)
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+@app.route("/openBoard", methods=["POST"])
+def openBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        f = request.form["selectedBoard"]
+        app.data.console_queue.put("selectedBoard="+str(f))
+        tDir = f.split("/")
+        app.data.config.setValue("Computed Settings","lastSelectedBoardDirectory",tDir[0])
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/boards/" + f
+        app.data.config.setValue("Maslow Settings", "openBoardFile", tDir[1])
+        returnVal = app.data.boardManager.loadBoard(home+"/.WebControl/boards/"+f)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+@app.route("/saveBoard", methods=["POST"])
+def saveBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        print(request.form)
+        f = request.form["fileName"]
+        d = request.form["selectedDirectory"]
+        app.data.console_queue.put("selectedBoard="+f)
+        app.data.config.setValue("Computed Settings", "lastSelectedBoardDirectory",d)
+        home = app.data.config.getHome()
+        returnVal = app.data.boardManager.saveBoard(f, home+"/.WebControl/boards/"+d)
+        app.data.config.setValue("Maslow Settings", "openBoardFile", f)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
 
 @app.route("/importFile", methods=["POST"])
 def importFile():
@@ -207,12 +300,32 @@ def importFile():
             resp.status_code = 500
             return resp
 
-@app.route("/sendGcode", methods=["POST"])
+@app.route("/importFileWCJSON", methods=["POST"])
+def importFileJSON():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        f = request.files["file"]
+        home = app.data.config.getHome()
+        secureFilename = home + "/.WebControl/imports/" + secure_filename(f.filename)
+        f.save(secureFilename)
+        returnVal = app.data.importFile.importWebControlJSON(secureFilename)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
+@app.route("/sendGCode", methods=["POST"])
 def sendGcode():
     app.data.logger.resetIdler()
     #print(request.form)#["gcodeInput"])
     if request.method == "POST":
-        returnVal = app.data.actions.sendGcode(request.form["gcodeInput"])
+        returnVal = app.data.actions.sendGCode(request.form["gcode"])
         if returnVal:
             message = {"status": 200}
             resp = jsonify("success")
@@ -253,6 +366,34 @@ def triangularCalibration():
             resp.status_code = 500
             return resp
 
+@app.route("/holeyCalibration", methods=["POST"])
+def holeyCalibration():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        result = request.form
+        motorYoffsetEst, distanceBetweenMotors, leftChainTolerance, rightChainTolerance, calibrationError = app.data.actions.holeyCalibrate(
+            result
+        )
+        # print(returnVal)
+        if motorYoffsetEst:
+            message = {
+                "status": 200,
+                "data": {
+                    "motorYoffset": motorYoffsetEst,
+                    "distanceBetweenMotors": distanceBetweenMotors,
+                    "leftChainTolerance": leftChainTolerance,
+                    "rightChainTolerance": rightChainTolerance,
+                    "calibrationError": calibrationError
+                },
+            }
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
 
 @app.route("/opticalCalibration", methods=["POST"])
 def opticalCalibration():
@@ -280,6 +421,64 @@ def quickConfigure():
         resp = jsonify(message)
         resp.status_code = 200
         return resp
+
+@app.route("/editGCode", methods=["POST"])
+def editGCode():
+    app.data.logger.resetIdler()
+    #print(request.form["gcode"])
+    if request.method == "POST":
+        returnVal = app.data.actions.updateGCode(request.form["gcode"])
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
+@app.route("/downloadDiagnostics", methods=["GET"])
+def downloadDiagnostics():
+    app.data.logger.resetIdler()
+    if request.method == "GET":
+        returnVal = app.data.actions.downloadDiagnostics()
+        if  returnVal != False:
+            print(returnVal)
+            return send_file(returnVal)
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
+@app.route("/editBoard", methods=["POST"])
+def editBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        returnVal = app.data.boardManager.editBoard(request.form)
+        if returnVal:
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
+@app.route("/trimBoard", methods=["POST"])
+def trimBoard():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        returnVal = app.data.boardManager.trimBoard(request.form)
+        if returnVal:
+            resp = jsonify("success")
+            resp.status_code = 200
+            return resp
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
 
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
@@ -362,7 +561,6 @@ def test_connect():
 
     socketio.emit("my response", {"data": "Connected", "count": 0})
 
-
 @socketio.on("disconnect", namespace="/MaslowCNC")
 def test_disconnect():
     app.data.console_queue.put("Client disconnected")
@@ -398,6 +596,11 @@ def checkForGCodeUpdate(msg):
     app.data.ui_queue1.put("Action", "unitsUpdate", "")
     app.data.ui_queue1.put("Action", "gcodeUpdate", "")
 
+@socketio.on("checkForBoardUpdate", namespace="/MaslowCNC")
+def checkForBoardUpdate(msg):
+    app.data.logger.resetIdler()
+    # this currently doesn't check for updated board, it just resends it..
+    app.data.ui_queue1.put("Action", "boardUpdate", "")
 
 @socketio.on_error_default
 def default_error_handler(e):

@@ -7,7 +7,8 @@ and using the data in this dict.
 """
 import json
 import re
-import os
+import os, sys
+import math
 from shutil import copyfile
 from pathlib import Path
 import time
@@ -20,18 +21,22 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 class Config(MakesmithInitFuncs):
     settings = {}
     defaults = {}
-    home = ""
+    home = "."
+    home1 = "."
     firstRun = False
 
     def __init__(self):
         self.home = str(Path.home())
+        if hasattr(sys, '_MEIPASS'):
+            self.home1 = os.path.join(sys._MEIPASS)
+            print(self.home1)
         print("Initializing Configuration")
         if not os.path.isdir(self.home+"/.WebControl"):
             print("creating "+self.home+"/.WebControl directory")
             os.mkdir(self.home+"/.WebControl")
         if not os.path.exists(self.home+"/.WebControl/webcontrol.json"):
             print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
-            copyfile("defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
+            copyfile(self.home1+"/defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
         if not os.path.isdir(self.home+"/.WebControl/gcode"):
             print("creating "+self.home+"/.WebControl/gcode directory")
@@ -39,11 +44,13 @@ class Config(MakesmithInitFuncs):
         if not os.path.isdir(self.home+"/.WebControl/imports"):
             print("creating "+self.home+"/.WebControl/imports directory")
             os.mkdir(self.home+"/.WebControl/imports")
-
+        if not os.path.isdir(self.home+"/.WebControl/boards"):
+            print("creating "+self.home+"/.WebControl/boards directory")
+            os.mkdir(self.home+"/.WebControl/boards")
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it
-        with open("defaultwebcontrol.json", "r") as infile:
+        with open(self.home1+"/defaultwebcontrol.json", "r") as infile:
             self.defaults = json.load(infile)
         updated = False
         for section in self.defaults:
@@ -145,7 +152,7 @@ class Config(MakesmithInitFuncs):
                             self.processChange(self.settings[section][x]["key"], int(value))
                         updated = True
                         if "firmwareKey" in self.settings[section][x]:
-                            if self.settings[section][x]["firmwareKey"] != 45:
+                            if self.settings[section][x]["firmwareKey"] != 85:
                                 self.syncFirmwareKey(
                                     self.settings[section][x]["firmwareKey"],
                                     storedValue,
@@ -221,12 +228,12 @@ class Config(MakesmithInitFuncs):
     def updateSettings(self, section, result):
         for x in range(len(self.settings[section])):
             setting = self.settings[section][x]["key"]
-            self.data.console_queue.put(setting)
             if setting in result:
                 resultValue = result[setting]
             else:
                 resultValue = 0
-
+            strValue = setting+" = "+str(resultValue)
+            self.data.console_queue.put(strValue)
             #do a special check for comport because if its open, we need to close existing connection
             if setting == "COMport":
                 currentSetting = self.data.config.getValue(section, setting)
@@ -326,28 +333,33 @@ class Config(MakesmithInitFuncs):
                             else:
                                 value = 0
 
-                        if firmwareKey == 45:
-                            print(self.data.controllerFirmwareVersion)
-                            self.data.console_queue.put("firmwareKey = 45")
-                            if storedValue != "":
-                                self.sendErrorArray(firmwareKey, storedValue, data)
-                            pass
+                        if firmwareKey == 85:
+                            if self.data.controllerFirmwareVersion >= 100:
+                                print(self.data.controllerFirmwareVersion)
+                                self.data.console_queue.put("firmwareKey = 85")
+                                if storedValue != "":
+                                    self.sendErrorArray(firmwareKey, storedValue, data)
+                                pass
                         elif useStored is True:
-                            app.data.gcode_queue.put(
-                                "$" + str(firmwareKey) + "=" + str(storedValue)
-                            )
-                        elif firmwareKey >= 47 and firmwareKey <= 58:
-                            if not self.isPercentClose(float(storedValue), float(value)):
-                                if not isImporting:
-                                    app.data.gcode_queue.put(
-                                        "$" + str(firmwareKey) + "=" + str(storedValue)
-                                    )
-                            else:
-                                break
+                            strValue = self.firmwareKeyString(firmwareKey,storedValue)
+                            app.data.gcode_queue.put(strValue)
+                            #app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
+                            self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
+                        elif firmwareKey >= 87 and firmwareKey <= 98:
+                            if self.data.controllerFirmwareVersion >= 100:
+                                if not self.isPercentClose(float(storedValue), float(value)):
+                                    if not isImporting:
+                                        strValue = self.firmwareKeyString(firmwareKey, storedValue)
+                                        app.data.gcode_queue.put(strValue)
+                                        self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
+                                        # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
+                                else:
+                                    break
                         elif not self.isClose(float(storedValue), float(value)) and not isImporting:
-                                app.data.gcode_queue.put(
-                                    "$" + str(firmwareKey) + "=" + str(storedValue)
-                                )
+                            strValue = self.firmwareKeyString(firmwareKey, storedValue)
+                            app.data.gcode_queue.put(strValue)
+                            self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
+                            # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                         else:
                             break
         return
@@ -544,6 +556,7 @@ class Config(MakesmithInitFuncs):
             elif value == "Bottom":
                 if currentValue != 2:
                     self.setValue("Computed Settings", "chainOverSprocketComputed", 2, True)
+                    self.setValue("Computed Settings", "chainOverSprocketComputed", 2, True)
 
         if key == "fPWM" or doAll is True:
             if doAll is True:
@@ -575,3 +588,23 @@ class Config(MakesmithInitFuncs):
         ### TODO: This does not currently fire on bools ##
         if key == "fps" or key == "videoSize" or key=="cameraSleep":
             self.data.camera.changeSetting(key, value)
+
+
+    def firmwareKeyString(self, firmwareKey, value):
+        strValue = self.firmwareKeyValue(value)
+        gc = "$" + str(firmwareKey) + "=" + strValue
+        return gc
+
+
+    def firmwareKeyValue(self, value):
+        try:
+            de = math.log(abs(value), 10)
+            ru = math.ceil(de)
+        except:
+            ru = 0
+        fmt = '{:' + str(int(max(max(7 - ru, 7), abs(ru)))) + '.' + str(int(6 - ru)) + 'f}'
+        try:
+            return fmt.format(value)
+        except:
+            print('firmwareKeyString Exception: value = ' + str(value))
+            return str(value)

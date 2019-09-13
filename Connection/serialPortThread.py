@@ -30,6 +30,8 @@ class SerialPortThread(MakesmithInitFuncs):
     # could be smaller (0.02) however larger number doesn't seem to impact performance
     MINTimePerLine = 0.05
 
+    serialInstance = None
+
     def _write(self, message, isQuickCommand=False):
         # message = message + 'L' + str(len(message) + 1 + 2 + len(str(len(message))) )
 
@@ -115,6 +117,16 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.data.console_queue.put("Gcode Ended")
                     #print("Gcode Ended")
 
+    def closeConnection(self):
+        if self.serialInstance is not None:
+            self.serialInstance.close()
+            self.data.serialPort.serialPortRequest = "Closed"
+            print("connection closed at serialPortThread")
+        else:
+            print("serial Instance is none??")
+        return
+
+
     def getmessage(self):
         # opens a serial connection called self.serialInstance
 
@@ -180,6 +192,11 @@ class SerialPortThread(MakesmithInitFuncs):
                 # -------------------------------------------------------------------------------------
                 lineFromMachine = ""
 
+                if self.data.serialPort.serialPortRequest == "requestToClose":
+                    self.closeConnection()
+                    # do not change status yet...
+                    return
+
                 try:
                     if self.serialInstance.in_waiting > 0:
                         lineFromMachine = self.serialInstance.readline().decode()
@@ -215,6 +232,13 @@ class SerialPortThread(MakesmithInitFuncs):
                     if self.data.gcode_queue.empty() != True:
                         command = self.data.gcode_queue.get_nowait() + " "
                         self._write(command)
+                        if command.find("G20") != -1:
+                            if self.data.units != "INCHES":
+                                self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+                        if command.find("G21") != -1:
+                            if self.data.units != "MM":
+                                self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+                        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
 
                 # Send the next line of gcode to the machine if we're running a program. Will send lines to buffer if there is space
                 # and the feature is turned on
@@ -241,7 +265,7 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.data.console_queue.put("Connection Timed Out")
                     #print("Connection Timed Out")
                     #self.data.ui_queue.put("Connection Timed Out\n")
-                    self.data.ui_queue1.put("TextMessage", "", "Connection Timed Out")
+                    #self.data.ui_queue1.put("TextMessage", "", "Connection Timed Out")
                     if self.data.uploadFlag:
                         self.data.ui_queue1.put("Alert", "Connection Lost",
                                                 "Message: USB connection lost. This has likely caused the machine to loose it's calibration, which can cause erratic behavior. It is recommended to stop the program, remove the sled, and perform the chain calibration process. Press Continue to override and proceed with the cut.")

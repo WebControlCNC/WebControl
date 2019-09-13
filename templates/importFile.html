@@ -1,3 +1,4 @@
+
 {% block content %}
 <div class="container-fluid">
   <form id="importForm" method="post" enctype=multipart/form-data>
@@ -19,7 +20,7 @@ $(document).ready(function () {
         var formdata = new FormData(this);
 
         $.ajax({
-            url : '/importFile',
+            url : '/{{url}}',
             type: "POST",
             data: formdata,
             mimeTypes:"multipart/form-data",

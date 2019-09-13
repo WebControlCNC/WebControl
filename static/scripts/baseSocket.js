@@ -16,7 +16,11 @@
           $("#clientStatus").text("Connected");
           $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
           $("#mobileClientStatus").removeClass('alert-danger').addClass('alert-success');
-          //checkForGCodeUpdate(); // don't think this is needed here anymore.. called by frontpage.js
+          settingRequest("Computed Settings","units");
+          settingRequest("Computed Settings","distToMove");
+          settingRequest("Computed Settings","homePosition");
+          checkForGCodeUpdate();
+          checkForBoardUpdate();
       });
 
       socket.on('disconnect', function(msg) {
@@ -45,12 +49,25 @@
       });
 
       socket.on('message', function(msg){
+          //console.log(msg);
+          //blink activity indicator
+          $("#cpuUsage").removeClass('alert-success').addClass('alert-warning');
+          $("#mobileCPUUsage").removeClass('alert-success').addClass('alert-warning');
+          setTimeout(function(){
+            $("#cpuUsage").removeClass('alert-warning').addClass('alert-success');
+            $("#mobileCPUUsage").removeClass('alert-warning').addClass('alert-success');
+          },125);
           //#console.log(msg.dataFormat);
           if (msg.dataFormat=='json')
             data = JSON.parse(msg.data);
           else
             data = msg.data;
+          //console.log(msg.command);
           switch(msg.command) {
+            case 'healthMessage':
+                //completed
+                processHealthMessage(data);
+                break;
             case 'controllerMessage':
                 //completed
                 processControllerMessage(data);
@@ -73,6 +90,9 @@
                      processPositionMessageOptical(data)
                 }
                 break;
+            case 'errorValueMessage':
+                processErrorValueMessage(data)
+                break;
             case 'homePositionMessage':
                 //completed
                 processHomePositionMessage(data);
@@ -83,6 +103,7 @@
                 break;
             case 'activateModal':
                 //completed
+                console.log(msg)
                 processActivateModal(data);
                 break;
             case 'requestedSetting':
@@ -94,6 +115,7 @@
                 updateDirectories(data);
                 break;
             case 'gcodeUpdate':
+                console.log("---gcodeUpdate received via socket---");
                 gcodeUpdate(msg.message);
                 break;
             case 'showFPSpinner':
@@ -102,6 +124,12 @@
                 break;
             case 'gcodeUpdateCompressed':
                 gcodeUpdateCompressed(data);
+                break;
+            case 'boardDataUpdate':
+                boardDataUpdate(data);
+                break;
+            case 'boardCutDataUpdateCompressed':
+                boardCutDataUpdateCompressed(data);
                 break;
             case 'updatePorts':
                 //completed
@@ -141,11 +169,11 @@
                 //completed
                 updatePIDData(data);
                 break;
-            case 'alert':
-                processAlert(data);
+            case 'alarm':
+                processAlarm(data);
                 break;
-            case 'clearAlert':
-                clearAlert(data);
+            case 'clearAlarm':
+                clearAlarm(data);
                 break;
             default:
                 console.log("!!!!!!");

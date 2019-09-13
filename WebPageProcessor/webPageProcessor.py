@@ -114,6 +114,32 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "Camera Settings", False, "medium", "content", "footerSubmit"
+        elif pageID == "gpioSettings":
+            setValues = self.data.config.getJSONSettingSection("GPIO Settings")
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
+            options = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center"]
+            if isMobile:
+                page = render_template(
+                    "gpio_mobile.html",
+                    title="GPIO Settings",
+                    settings=setValues,
+                    options=options,
+                    pageID="gpioSettings",
+                    enableCustom=enableCustom,
+                )
+            else:
+                page = render_template(
+                    "gpio.html",
+                    title="GPIO Settings",
+                    settings=setValues,
+                    options=options,
+                    pageID="gpioSettings",
+                    enableCustom=enableCustom,
+                )
+            return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
@@ -139,9 +165,39 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory="."
             page = render_template(
-                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory
+                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
             )
-            return page, "Open GCode", False, "medium", "content", False
+            return page, "Open GCode", False, "medium", "content", "footerSubmit"
+        elif pageID == "saveGCode":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
+            home = self.data.config.getHome()
+            homedir = home + "/.WebControl/gcode"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory": _dir, "file": file})
+            except Exception as e:
+                print(e)
+            # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory = "."
+            page = render_template(
+                "saveGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
+                lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+            )
+            return page, "Save GCode", False, "medium", "content", "footerSubmit"
+
         elif pageID == "uploadGCode":
             validExtensions = self.data.config.getValue(
                 "WebControl Settings", "validExtensions"
@@ -160,27 +216,39 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
             page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
-            return page, "Upload GCode", False, "medium", "content", False
+            return page, "Upload GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "importGCini":
-            page = render_template("importFile.html")
+            url = "importFile"
+            page = render_template("importFile.html", url=url)
             return page, "Import groundcontrol.ini", False, "medium", "content", False
+        elif pageID == "importWCJSON":
+            url = "importFileWCJSON"
+            page = render_template("importFile.html", url=url)
+            return page, "Import webcontrol.json", False, "medium", "content", False
         elif pageID == "actions":
             if self.data.controllerFirmwareVersion < 100:
                 enableCustom = False
             else:
                 enableCustom = True
-            page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, enableCustom=enableCustom)
-            return page, "Actions", False, "medium", "content", False
+            page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom)
+            return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
-            page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ)
+            touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
+            if isMobile:
+                page = render_template("zaxis_mobile.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+            else:
+                page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
+            if isMobile:
+                page = render_template("setSprockets_mobile.html", chainExtendLength=chainExtendLength)
+            else:
+                page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
             return page, "Set Sprockets", False, "medium", "content", False
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
@@ -217,6 +285,21 @@ class WebPageProcessor:
             positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
             page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
             return page, "Optical Calibration", True, "large", "content", False
+        elif pageID == "holeyCalibration":
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
+            distanceBetweenMotors = self.data.config.getValue("Maslow Settings", "motorSpacingX")
+            leftChainTolerance = self.data.config.getValue("Advanced Settings", "leftChainTolerance")
+            rightChainTolerance = self.data.config.getValue("Advanced Settings", "rightChainTolerance")
+            page = render_template(
+                "holeyCalibration.html",
+                pageID="holeyCalibration",
+                motorYoffset=motorYoffset,
+                distanceBetweenMotors=distanceBetweenMotors,
+                leftChainTolerance=leftChainTolerance,
+                rightChainTolerance=rightChainTolerance,
+            )
+            return page, "Holey Calibration", True, "medium", "content", False
         elif pageID == "quickConfigure":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorOffsetY = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -249,9 +332,20 @@ class WebPageProcessor:
         elif pageID == "viewGcode":
             page = render_template("viewGcode.html", gcode=self.data.gcode)
             return page, "View GCode", False, "medium", "content", False
-        elif pageID == "sendGcode":
-            page = render_template("sendGcode.html")
-            return page, "Send GCode", False, "medium", "content", False
+        elif pageID == "editGCode":
+            homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+            homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+            text = ""
+            for line in self.data.gcode:
+                newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
+                text = text + newLine + "\n"
+            #text = self.gcodePreProcessor()
+            page = render_template("editGCode.html", gcode=text, pageID="editGCode",)
+            return page, "Edit GCode", True, "medium", "content", "footerSubmit"
+        elif pageID == "sendGCode":
+            text = self.data.sentCustomGCode
+            page = render_template("editGCode.html", gcode=text, pageID="sendGCode", )
+            return page, "Edit GCode", True, "medium", "content", "footerSubmit"
         elif pageID == "pidTuning":
             KpP = self.data.config.getValue("Advanced Settings", "KpPos")
             KiP = self.data.config.getValue("Advanced Settings", "KiPos")
@@ -271,4 +365,108 @@ class WebPageProcessor:
                                    vVersion=vVersion,
                                    pVersion=pVersion)
             return page, "PID Tuning", False, "large", "content", False
+        elif pageID == "editBoard":
+            board = self.data.boardManager.getCurrentBoard()
+            scale = 1
+            units = "inches"
+            if self.data.units == "MM":
+                scale = 25.4
+                units = "mm"
+            if isMobile:
+                pageName = "editBoard_mobile.html"
+            else:
+                pageName = "editBoard.html"
+            page = render_template(pageName,
+                                   units=units,
+                                   boardID=board.boardID,
+                                   material=board.material,
+                                   height=round(board.height*scale, 2),
+                                   width=round(board.width*scale, 2),
+                                   thickness=round(board.thickness*scale, 2),
+                                   centerX=round(board.centerX*scale, 2),
+                                   centerY=round(board.centerY*scale, 2),
+                                   routerHorz=self.data.xval,
+                                   routerVert=self.data.yval,
+                                   pageID="editBoard")
+            return page, "Create/Edit Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "trimBoard":
+            board = self.data.boardManager.getCurrentBoard()
+            scale = 1
+            units = "inches"
+            if self.data.units == "MM":
+                scale = 25.4
+                units = "mm"
+            if isMobile:
+                pageName = "trimBoard.html"
+            else:
+                pageName = "trimBoard.html"
+            page = render_template(pageName,
+                                   units=units,
+                                   pageID="trimBoard")
+            return page, "Trim Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "saveBoard":
+            #lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
+            #print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedBoardDirectory")
+            lastSelectedFile = self.data.boardManager.getCurrentBoardFilename()
+            home = self.data.config.getHome()
+            homedir = home + "/.WebControl/boards"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory": _dir, "file": file})
+            except Exception as e:
+                print(e)
+            # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory = "."
+            page = render_template(
+                "saveBoard.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
+                lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+            )
+            return page, "Save Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "openBoard":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openBoardFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedBoardDirectory")
+            home = self.data.config.getHome()
+            homedir = home+"/.WebControl/boards"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory":_dir, "file":file})
+            except Exception as e:
+                print(e)
+           # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory="."
+            page = render_template(
+                "openBoard.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
+            )
+            return page, "Open Board", False, "medium", "content", "footerSubmit"
+        else:
+            self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 
+    def gcodePreProcessor(self):
+        text = ""
+        for line in self.data.gcode:
+            text=text+line+"\n"
+        return text

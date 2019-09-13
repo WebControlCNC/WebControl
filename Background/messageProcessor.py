@@ -25,9 +25,7 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.config.receivedSetting(message)
                     elif message[0] == "[":
                         if message[1:4] == "PE:":
-                            # todo:
-                            oo = 1
-                            # app.setErrorOnScreen(message)
+                            self.data.ui_controller_queue.put(message)
                         elif message[1:8] == "Measure":
                             measuredDist = float(message[9 : len(message) - 3])
                             try:
@@ -68,7 +66,8 @@ class MessageProcessor(MakesmithInitFuncs):
                         )
                         # Check that version numbers match
                         self.data.controllerFirmwareVersion = float(message[16-len(message):])
-                        print(self.data.controllerFirmwareVersion)
+                        #print(self.data.controllerFirmwareVersion)
+                        '''
                         if self.data.controllerFirmwareVersion < 100:
                             self.data.ui_queue1.put("Alert", "Alert",
                                 "<p>Warning, you are using stock firmware with WebControl.  Custom features will be disabled.</p>"
@@ -79,24 +78,29 @@ class MessageProcessor(MakesmithInitFuncs):
                                 + "</p>"
                             )
                         else:
-                            if self.data.controllerFirmwareVersion < float(self.data.version):
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                    "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl.</p>"
-                                    + "<p>WebControl Version "
-                                    + str(self.data.version)
-                                    + "</p><p>"
-                                    + message
-                                    + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest WebControl-compatible code.</p>"
-                                )
-                            if self.data.controllerFirmwareVersion > float(self.data.version):
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                    "<p>Warning, your version of WebControl is out of date and may not work with this firmware version</p>"
-                                    + "<p>WebControl Version "
-                                    + str(self.data.version)
-                                    + "</p><p>"
-                                    + message
-                                    + "</p><p>Please, update WebControl via WebMCP.</p>"
-                                )
+                        '''
+                        tmpVersion = self.data.controllerFirmwareVersion
+                        if tmpVersion > 50 and tmpVersion <100:
+                            tmpVersion = round(tmpVersion -50,3)
+
+                        if tmpVersion < float(self.data.version):
+                            self.data.ui_queue1.put("Alert", "Alert",
+                                "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl.</p>"
+                                + "<p>WebControl Version "
+                                + str(self.data.version)
+                                + "</p><p>"
+                                + message
+                                + "</p><p>Please, click Actions->Update Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                            )
+                        if tmpVersion > float(self.data.version):
+                            self.data.ui_queue1.put("Alert", "Alert",
+                                "<p>Warning, your version of WebControl is out of date and may not work with this firmware version</p>"
+                                + "<p>WebControl Version "
+                                + str(self.data.version)
+                                + "</p><p>"
+                                + message
+                                + "</p><p>Please, update WebControl via WebMCP.</p>"
+                            )
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
 

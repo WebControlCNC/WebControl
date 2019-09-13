@@ -6,6 +6,11 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
   isMobile = true;
 }
 
+function processHealthMessage(data){
+    //console.log(data.cpuUsage);
+    $("#cpuUsage").text(Math.round(data.cpuUsage).toString()+"%");
+    $("#mobileCPUUsage").text(Math.round(data.cpuUsage).toString()+"%");
+}
 
 function processControllerStatus(data){
     if (data.status=="disconnected"){
@@ -24,6 +29,7 @@ function processControllerStatus(data){
 function processActivateModal(data){
     var $modal, $modalTitle, $modalText
     var message
+    //console.log(data)
     if (data.modalType == "content"){
       $modal = $('#contentModal');
       $modalDialog = $('#contentDialog');
@@ -34,19 +40,22 @@ function processActivateModal(data){
       } else {
         $('#footerSubmit').hide();
       }
+      console.log("content modal")
+      //message = JSON.parse(data.message);
       message = data.message;
     }
-    else if (data.modalType == "alarm") {
-      $modal = $('#alarmModal');
-      $modalDialog = $('#alarmDialog');
-      $modalTitle = $('#alarmModalTitle');
-      $modalText = $('#alarmModalText');
+    else if (data.modalType == "alert") {
+      $modal = $('#alertModal');
+      $modalDialog = $('#alertDialog');
+      $modalTitle = $('#alertModalTitle');
+      $modalText = $('#alertModalText');
       if (data.resume=="clear"){
           $('#clearButton').show();
       } else {
           $('#clearButton').hide();
       }
-      message = data.mesage; //JSON.parse(data.message);
+      //data is coming in as a jsonified string.. need to drop the extra quotes
+      message = JSON.parse(data.message);
     }
     else{
       $modal = $('#notificationModal');
@@ -68,7 +77,7 @@ function processActivateModal(data){
       } else {
         $('#notificationCircle').hide();
       }
-      message = data.message; //JSON.parse(data.message);
+      message = data.message;
     }
     $modalDialog.removeClass('modal-lg');
     $modalDialog.removeClass('modal-sm');
@@ -99,9 +108,12 @@ function processActivateModal(data){
 }
 
 function closeModals(data){
+    console.log(data)
     if ($('#notificationModal').data('name') == data.title)
     {
+      console.log("here, closing notification modal");
       $('#notificationModal').modal('hide');
+      $('#notificationCircle').hide()
     }
 }
 
@@ -163,6 +175,11 @@ function checkForGCodeUpdate(){
     socket.emit('checkForGCodeUpdate',{data:"Please"});
 }
 
+function checkForBoardUpdate(){
+    socket.emit('checkForBoardUpdate',{data:"Please"});
+}
+
+
 $.fn.scrollBottom = function() {
     return $(this).scrollTop($(this)[0].scrollHeight);
 };
@@ -171,9 +188,12 @@ $.fn.scrollBottom = function() {
 function setupStatusButtons(){
   if (isMobile){
       $('#mobileClientStatus').show();
+      $('#mobileCPUUsage').show();
       $('#mobileControllerStatus').show();
   } else {
     $('#mobileClientStatus').hide();
+    $('#mobileCPUUsage').hide();
     $('#mobileControllerStatus').hide();
   }
 }
+

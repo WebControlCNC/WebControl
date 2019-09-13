@@ -1,18 +1,18 @@
 
 function unitSwitch(){
   if ( $("#units").text()=="MM") {
-    distToMove = Math.round($("#distToMove").val()/25.4,3)
+    distToMove = (parseFloat($("#distToMove").val())/25.4).toFixed(3)
     updateSetting('toInches',distToMove);
   } else {
-    distToMove = Math.round($("#distToMove").val()*25.4,3)
+    distToMove = (parseFloat($("#distToMove").val())*25.4).toFixed(3)
     updateSetting('toMM',distToMove);
   }
 }
 
 $(document).ready(function(){
-    settingRequest("Computed Settings","units");
-    settingRequest("Computed Settings","distToMove");
-    settingRequest("Computed Settings","homePosition");
+    //settingRequest("Computed Settings","units");
+    //settingRequest("Computed Settings","distToMove");
+    //settingRequest("Computed Settings","homePosition");
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
 });
@@ -53,6 +53,11 @@ function processPositionMessage(data){
   $('#positionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' ZPos:'+parseFloat(data.zval).toFixed(2));
   $('#percentComplete').html(data.pcom)
   $('#machineState').html(data.state)
+}
+
+function processErrorValueMessage(data){
+ $('#leftError').css('width', data.leftError*100+'%').attr('aria-valuenow', data.leftError*100);
+ $('#rightError').css('width', data.rightError*100+'%').attr('aria-valuenow', data.rightError*100);
 }
 
 function processHomePositionMessage(data){
@@ -106,15 +111,15 @@ function processControllerMessage(data){
     $('#controllerMessage').scrollBottom();
 }
 
-function processAlert(data){
-    console.log("alert received");
-    $("#alerts").text(data.message);
-    $("#alerts").removeClass('alert-success').addClass('alert-danger');
+function processAlarm(data){
+    console.log("alarm received");
+    $("#alarms").html("<marquee behavior='scroll' direction='left'>"+data.message+"</marquee>");
+    $("#alarms").removeClass('alert-success').addClass('alert-danger');
     $("#stopButton").addClass('stopbutton');
 }
 
-function clearAlert(data){
-    console.log("clearing alert");
-    $("#alerts").text("Alert cleared.");
-    $("#alerts").removeClass('alert-danger').addClass('alert-success');
+function clearAlarm(data){
+    console.log("clearing alarm");
+    $("#alarms").text("Alarm cleared.");
+    $("#alarms").removeClass('alert-danger').addClass('alert-success');
 }

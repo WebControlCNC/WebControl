@@ -3,20 +3,32 @@ from __main__ import socketio
 import time
 import math
 import json
+import psutil
 from flask import render_template
 
 class UIProcessor:
 
     app = None
     lastCameraTime = 0
+    lastHealthCheck = 0
     
     def start(self, _app):
         
         self.app = _app
         self.app.data.console_queue.put("starting UI")
+
         with self.app.app_context():
             while True:
+                currentTime = time.time()
+                if currentTime-self.lastHealthCheck > 5:
+                    self.lastHealthCheck = currentTime
+                    load = max(psutil.cpu_percent(interval=None, percpu=True))
+                    healthData = {
+                        "cpuUsage": load
+                    }
+                    self.sendHealthMessage(healthData)
                 time.sleep(0.001)
+
                 if self.app.data.config.firstRun:
                     self.app.data.console_queue.put("here at firstRun")
                     self.app.data.config.firstRun = False
@@ -51,9 +63,7 @@ class UIProcessor:
                                 self.setPosOnScreen(message)
                             elif message[0] == "[":
                                 if message[1:4] == "PE:":
-                                    # todo:
-                                    oo = 1
-                                    # app.setErrorOnScreen(message)
+                                    self.setErrorOnScreen(message)
                             elif message[0:13] == "Maslow Paused":
                                 self.app.data.console_queue.put("caught maslow paused")
                                 self.app.data.uploadFlag = 0
@@ -72,20 +82,20 @@ class UIProcessor:
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 elif message.find("Unable to find valid") != -1:
-                                    self.sendAlert(message);
+                                    self.sendAlarm(message);
                                 else:
                                     self.activateModal("Notification:", message[9:], "notification")
                             elif message[0:6] == "ALARM:":
                                 if message.find("The sled is not keeping up") != -1:
-                                    self.sendAlert("Alarm: Sled Not Keeping Up")
+                                    self.sendAlarm("Alarm: Sled Not Keeping Up")
                                 elif message.find("Position Lost") != -1:
-                                    self.sendAlert("Alarm: Position Lost.  Reset Chains.")
+                                    self.sendAlarm("Alarm: Position Lost.  Reset Chains.")
                                 else:
-                                    self.sendAlert(message);
+                                    self.sendAlarm(message);
                             elif message[0:6] == "Unable to":
                                 if message.find("The sled is not keeping up") != -1:
                                     pass
-                                self.sendAlert("Alarm: Sled Not Keeping Up")
+                                self.sendAlarm("Alarm: Sled Not Keeping Up")
 
                                 #self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
@@ -124,21 +134,98 @@ class UIProcessor:
                 if math.isnan(self.app.data.zval):
                     self.sendControllerMessage("Unable to resolve z Kinematics.")
                     self.app.data.zval = 0
+
         except:
             self.app.data.console_queue.put("One Machine Position Report Command Misread")
             return
 
+        xdiff = abs(self.app.data.xval - self.app.data.xval_prev)
+        ydiff = abs(self.app.data.yval - self.app.data.yval_prev)
+        zdiff = abs(self.app.data.zval - self.app.data.zval_prev)
+
         percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
 
-        position = {
-            "xval": self.app.data.xval,
-            "yval": self.app.data.yval,
-            "zval": self.app.data.zval,
-            "pcom": percentComplete,
-            "state": state
-        }
+        if (xdiff + ydiff + zdiff) > 0.01:
+            position = {
+                "xval": self.app.data.xval,
+                "yval": self.app.data.yval,
+                "zval": self.app.data.zval,
+                "pcom": percentComplete,
+                "state": state
+            }
+            self.sendPositionMessage(position)
+            self.app.data.xval_prev = self.app.data.xval
+            self.app.data.yval_prev = self.app.data.yval
+            self.app.data.zval_prev = self.app.data.zval
+            #self.app.data.console_queue.put("Update position")
 
-        self.sendPositionMessage(position)
+
+    def setErrorOnScreen(self, message):
+        limit = float(self.app.data.config.getValue("Advanced Settings", "positionErrorLimit"))
+        computedEnabled = int(self.app.data.config.getValue("WebControl Settings", "computedPosition"))
+        if limit != 0:
+            try:
+                with self.app.app_context():
+                    startpt = message.find(':') + 1
+                    endpt = message.find(',', startpt)
+                    leftErrorValueAsString = message[startpt:endpt]
+                    self.app.data.leftError = float(leftErrorValueAsString)/limit
+
+                    startpt = endpt + 1
+                    endpt = message.find(',', startpt)
+                    rightErrorValueAsString = message[startpt:endpt]
+                    self.app.data.rightError = float(rightErrorValueAsString)/limit
+
+                    if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 100 and computedEnabled > 0:
+
+                        startpt = endpt + 1
+                        endpt = message.find(',', startpt)
+                        bufferSizeValueAsString = message[startpt:endpt]
+                        self.app.data.bufferSize = int(bufferSizeValueAsString)
+
+                        startpt = endpt + 1
+                        endpt = message.find(',', startpt)
+                        leftChainLengthAsString = message[startpt:endpt]
+                        self.app.data.leftChain = float(leftChainLengthAsString)
+
+                        startpt = endpt + 1
+                        endpt = message.find(']', startpt)
+                        rightChainLengthAsString = message[startpt:endpt]
+                        self.app.data.rightChain = float(rightChainLengthAsString)
+
+                        self.app.data.computedX, self.app.data.computedY = self.app.data.holeyKinematics.forward(self.app.data.leftChain, self.app.data.rightChain, self.app.data.xval, self.app.data.yval )
+                        #print("leftChain=" + str(self.app.data.leftChain) + ", rightChain=" + str(self.app.data.rightChain)+", x= "+str(self.app.data.computedX)+", y= "+str(self.app.data.computedY))
+                        computedEnabled = 1
+                    else:
+                        self.app.data.computedX = -999999
+                        self.app.data.computedY = -999999
+                        computedEnabled = 0
+
+                    if math.isnan(self.app.data.leftError):
+                        self.app.data.leftErrorValue = 0
+                    if math.isnan(self.app.data.rightError):
+                        self.app.data.rightErrorValue = 0
+            except:
+                self.app.data.console_queue.put("One Error Report Command Misread")
+                return
+
+            leftDiff = abs(self.app.data.leftError - self.app.data.leftError_prev)
+            rightDiff = abs(self.app.data.rightError - self.app.data.rightError_prev)
+
+            if (leftDiff + rightDiff ) >= 0.001:
+                errorValues = {
+                    "leftError": abs(self.app.data.leftError),
+                    "rightError": abs(self.app.data.rightError),
+                    "computedX": self.app.data.computedX,
+                    "computedY": self.app.data.computedY,
+                    "computedEnabled": computedEnabled
+                }
+                self.sendErrorValueMessage(errorValues)
+                self.app.data.leftError_prev = self.app.data.leftError
+                self.app.data.rightError_prev = self.app.data.rightError
+                #self.app.data.console_queue.put("Update error values")
+
+
 
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
         data = json.dumps({"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType})
@@ -146,9 +233,9 @@ class UIProcessor:
             namespace="/MaslowCNC",
         )
 
-    def sendAlert(self, message):
+    def sendAlarm(self, message):
         data = json.dumps({"message":message})
-        socketio.emit("message", {"command": "alert", "data": data, "dataFormat": "json"},
+        socketio.emit("message", {"command": "alarm", "data": data, "dataFormat": "json"},
             namespace="/MaslowCNC",
         )
 
@@ -168,6 +255,13 @@ class UIProcessor:
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
+    def sendErrorValueMessage(self, position):
+        socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
+                      namespace="/MaslowCNC")
+
+    def sendHealthMessage(self, healthData):
+        socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
+                      namespace="/MaslowCNC")
 
     def sendCameraMessage(self, message, _data=""):
 
@@ -197,6 +291,32 @@ class UIProcessor:
                                       "data": self.app.data.compressedGCode3D, "dataFormat": "base64"},
                           namespace="/MaslowCNC", )
             self.app.data.console_queue.put("Sent Gcode compressed")
+        else:
+            socketio.emit("message", {"command": "gcodeUpdateCompressed",
+                                      "data": "", "dataFormat": "base64"},
+                          namespace="/MaslowCNC", )
+
+
+    def sendBoardUpdate(self):
+        boardData = self.app.data.boardManager.getCurrentBoard().getBoardInfoJSON()
+        if boardData is not None:
+            self.app.data.console_queue.put("Sending Board Data")
+            socketio.emit("message", {"command": "boardDataUpdate",
+                                      "data": boardData, "dataFormat": "json"},
+                          namespace="/MaslowCNC", )
+            self.app.data.console_queue.put("Sent Board Data")
+
+        cutData = self.app.data.boardManager.getCurrentBoard().getCompressedCutData()
+        if True: #cutData is not None:
+            self.app.data.console_queue.put("Sending Board Cut Data compressed")
+            socketio.emit("message", {"command": "showFPSpinner",
+                                      "data": 1, "dataFormat": "int"},
+                          namespace="/MaslowCNC", )
+            time.sleep(0.25)
+            socketio.emit("message", {"command": "boardCutDataUpdateCompressed",
+                                      "data": cutData, "dataFormat": "base64"},
+                          namespace="/MaslowCNC", )
+            self.app.data.console_queue.put("Sent Board Cut Data compressed")
 
     def unitsUpdate(self):
         units = self.app.data.config.getValue(
@@ -220,6 +340,8 @@ class UIProcessor:
         if msg["command"] == "Action":
             if msg["message"] == "gcodeUpdate":
                 self.sendGcodeUpdate()
+            elif msg["message"] == "boardUpdate":
+                self.sendBoardUpdate()
             elif msg["message"] == "unitsUpdate":
                 self.unitsUpdate()
             elif msg["message"] == "distToMoveUpdate":
@@ -231,7 +353,7 @@ class UIProcessor:
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
             elif msg["message"] == "updatePIDData":
                 self.updatePIDData("updatePIDData", json.loads(msg["data"]))
-            elif msg["message"] == "clearAlert":
+            elif msg["message"] == "clearAlarm":
                 msg["data"] = json.dumps({"data":""})
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
                               namespace="/MaslowCNC")
@@ -245,7 +367,8 @@ class UIProcessor:
                 elif msg["message"] == "updatePorts":
                     msg["data"] = json.dumps(self.app.data.comPorts)
                 elif msg["message"] == "closeModals":
-                    msg["data"] = json.dumps({"title": msg["data"]})
+                    title = json.loads(msg["data"])
+                    msg["data"] = json.dumps({"title": title}) #msg["data"]})
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"}, namespace="/MaslowCNC")
         elif msg["command"] == "TextMessage":
             socketio.emit("message", {"command": "controllerMessage", "data": msg["data"], "dataFormat": "json"},
@@ -255,7 +378,7 @@ class UIProcessor:
             #    self.app.data.console_queue.put("found adjust Z-Axis in message")
             #    self.activateModal("Notification:", message[9:], "notification", resume="resume")
             #else:
-            self.activateModal(msg["message"], msg["data"], "notification")
+            self.activateModal(msg["message"], msg["data"], "alert")
         elif msg["command"] == "SpinnerMessage":
             self.activateModal("Notification:", msg["data"], "notification", progress="spinner")
 

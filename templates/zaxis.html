@@ -16,7 +16,7 @@
       </div>
       <div class="row">
         <div class="col-4 mb-1">
-            <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="$('#contentModal').modal('hide');">Done</button>
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('touchZ')" {{'' if touchPlate else 'disabled'}} >Touch</button>
         </div>
         <div class="col-4 mb-1">
           <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('defineZ0');">Define Zero</button>
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="col-3 mb-1">
-      <button type="button" class="btn  btn-lg btn-block btn-danger" onclick="action('stopZ');">Stop</button>
+      <button type="button" class="btn  btn-lg btn-block btn-danger" style="height:100%" onclick="action('stopZ');">Stop</button>
     </div>
   </div>
 </div>

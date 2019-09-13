@@ -1,0 +1,117 @@
+
+{% block content %}
+<div class="container-fluid">
+  <h5>Cut Test Pattern</h5>
+  <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutHoleyCalibrationPattern');">Cut Holey Calibration Pattern</button>
+  <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">Stop</button>
+  <h5>Measurements</h5>
+  <div class="card">
+    <div class="card-body">
+      <form id="calibrateForm">
+        <input id="pageID" type="hidden" value="{{pageID}}">
+        <div class="form-group">
+          <div class="form-group">
+            <label for="M1">M1</label>
+            <input id="M1" class="form-control" name="M1" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M2">M2</label>
+            <input id="M2" class="form-control" name="M2" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M3">M3</label>
+            <input id="M3" class="form-control" name="M3" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M4">M4</label>
+            <input id="M4" class="form-control" name="M4" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M5">M5</label>
+            <input id="M5" class="form-control" name="M5" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M6">M6</label>
+            <input id="M6" class="form-control" name="M6" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M7">M7</label>
+            <input id="M7" class="form-control" name="M7" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M8">M8</label>
+            <input id="M8" class="form-control" name="M8" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M9">M9</label>
+            <input id="M9" class="form-control" name="M9" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M10">M10</label>
+            <input id="M10" class="form-control" name="M10" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M11">M11</label>
+            <input id="M11" class="form-control" name="M11" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <div class="form-group">
+            <label for="M12">M12</label>
+            <input id="M12" class="form-control" name="M12" value="0">
+            <small class="form-text text-muted">Enter value in mm only</small>
+          </div>
+          <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <h5>Parameters</h5>
+  <p><label id="motorYoffset">Height of Motors: {{motorYoffset}}</label></p>
+  <p><label id="distanceBetweenMotors">Distance Between Motors: {{distanceBetweenMotors}}</label></p>
+  <p><label id="leftChainTolerance">Left Chain Tolerance: {{leftChainTolerance}}</label></p>
+  <p><label id="rightChainTolerance">Right Chain Tolerance: {{rightChainTolerance}}</label></p>
+  <p><label id="calibrationError">Calibration Error: n/a</label></p>
+  <button id="acceptCalibration" disabled type="Accept" class="btn btn-lg btn-block btn-primary" onclick="action('acceptHoleyCalibrationResults',0,0);$('#contentModal').modal('toggle')">Accept Results</button>
+
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function () {
+    $('#calibrateForm').on('submit', function(e) {
+        e.preventDefault();
+        var url = $("#pageID").val()
+        $.ajax({
+            url : '/'+url,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (msg) {
+              console.log("success");
+              $("#motorYoffset").html("Height of Motors: "+msg.data.motorYoffset);
+              $("#distanceBetweenMotors").html("Distance Between Motors: "+msg.data.distanceBetweenMotors);
+              $("#leftChainTolerance").html("Left Chain Tolerance: "+msg.data.leftChainTolerance);
+              $("#rightChainTolerance").html("Right Chain Tolerance: "+msg.data.rightChainTolerance);
+              $("#calibrationError").html("Calibration Error: "+msg.data.calibrationError);
+              $("#acceptCalibration").prop("disabled", false);
+
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+});
+
+</script>
+{% endblock %}

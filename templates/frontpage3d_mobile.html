@@ -10,7 +10,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018d') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018e') }}" crossorigin="anonymous"></script>
 <script> feather.replace() </script>
 {% endblock %}
 
@@ -154,6 +154,22 @@
     </div>
   </div>
   <div class="row">
+    <div class="col-3">
+      <h5>Error:</h5>
+    </div>
+    <div class="col-4">
+      <div class="progress">
+        <div id="leftError" class = "progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="progress">
+        <div id="rightError" class = "progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-3 mb-1">
       <h5>Home:</h5>
     </div>
@@ -175,13 +191,16 @@
       <div id='machineState'></div>
     </div>
   </div>
-  <div class="row">
+  <div class="row mb-1">
     <div class="col-6">
       <button class="btn btn-secondary btn-block" type="button" id="mobilebutton3D" onclick="toggle3DView()">3D</button>
     </div>
     <div class="col-6">
       <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonReset" onclick="resetView()">Reset</button>
     </div>
+  </div>
+  <div class="row mb-1">
+    <button id="boardID" class="btn btn-primary btn-block" onclick="toggleBoard()">...</button>
   </div>
   <div id="workarea" class="row" style="height:400px">
   </div>
@@ -211,7 +230,7 @@
     </div>
     <div class="row">
       <div class="col mb-1">
-        <div class="scrollText" id='controllerMessage'></div>
+        <div class="scrollTextMobile" id='controllerMessage'></div>
       </div>
     </div>
   </div>

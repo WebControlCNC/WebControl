@@ -1,3 +1,12 @@
+{% block javascript %}
+  <script>
+	  function downloadDiagnostics() {
+			$.get("downloadDiagnostics", function(data,status){
+				console.log(data)
+			});
+	  }
+  </script>
+{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -11,6 +20,8 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Move to Default Location</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('testMotors');$('#contentModal').modal('hide');">Test Motors/Encoders</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('queryCamera');$('#contentModal').modal('hide');">Query Camera</button>
+				<a class="btn btn-lg btn-block btn-secondary" href="downloadDiagnostics?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Download Diagnostics File</a>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
 				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">Shutdown WebControl/WebMCP</button>
 			</div>
 		</div>
@@ -20,20 +31,23 @@
 			<div class="card-body">
 				<h4 class="card-title">Calibration/Setup</h4>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importGCini');$('#contentModal').modal('hide');">Import groundcontrol.ini File</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importWCJSON');$('#contentModal').modal('hide');">Import webcontrol.json File</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('quickConfigure');$('#contentModal').modal('hide');">Quick Configure</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets Vertical</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');">Triangular Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');">Holey Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('pidTuning');$('#contentModal').modal('hide');">PID Tuning</button>
 			</div>
 		</div>
 	</div>
-   <div class="col p-2">
+   	<div class="col p-2">
 		<div class="card">
 			<div class="card-body">
 				<h4 class="card-title">Controller</h4>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeCustomFirmware');$('#contentModal').modal('hide');">Upgrade Custom Firmware:{{customFirmwareVersion}}</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeStockFirmware');$('#contentModal').modal('hide');">Upgrade Stock Firmware:{{stockFirmwareVersion}}</button>
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeHoleyFirmware');$('#contentModal').modal('hide');">Upgrade Holey Firmware:{{holeyFirmwareVersion}}</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('reportSettings');$('#contentModal').modal('hide');">Sync Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Settings');$('#contentModal').modal('hide');">Wipe Controller Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Maslow');$('#contentModal').modal('hide');">Wipe Controller Positional Data</button>
@@ -41,5 +55,8 @@
  			</div>
 		</div>
 	</div>
+  </div>
 </div>
 {% endblock %}
+
+
