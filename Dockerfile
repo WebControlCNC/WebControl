@@ -31,12 +31,12 @@ ADD tools/download_build_install_opencv.sh /download_build_install_opencv.sh
 RUN chmod +x /download_build_install_opencv.sh && /download_build_install_opencv.sh
 
 # Get other python dependencies
-ADD holeyrequirements.txt /holeyrequirements.txt
+ADD requirements.txt /requirements.txt
 # Remove opencv, scipy and numpy from requirements (since they're already installed)
-RUN sed -i '/opencv-python.*/d' /holeyrequirements.txt && sed -i '/scipy.*/d' /holeyrequirements.txt && sed -i '/numpy.*/d' /holeyrequirements.txt
-# TODO: Maybe we can cache wheel files outside this container, for more granular reuse when holeyrequiremnts.txt changes
+RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/scipy.*/d' /requirements.txt && sed -i '/numpy.*/d' /requirements.txt
+# TODO: Maybe we can cache wheel files outside this container, for more granular reuse when requiremnts.txt changes
 RUN pwd
-RUN pip install -r /holeyrequirements.txt
+RUN pip install -r /requirements.txt
 
 # Download and compile the Arduino firmware
 # Generates the firmware as /firmware/.pioenvs/megaatmega2560/firmware.hex
@@ -66,9 +66,9 @@ RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && pio run -e megaatmega2560 \
     && mkdir build \
     && mv .pio/build/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
-
-ARG  holey_firmware_repo=https://github.com/madgrizzle/HoleyFirmware.git
-ARG  holey_firmware_sha=658b62e76fd0530a796c4aec81acfb139ab1b681
+RUN pwd
+ARG  holey_firmware_repo=https://github.com/madgrizzle/Firmware.git
+ARG  holey_firmware_sha=950fb23396171cbd456c2d4149455cc45f5e6bc3
 RUN git clone $holey_firmware_repo firmware/holey \
     && cd firmware/holey \
     && git checkout $holey_firmware_sha \
@@ -89,8 +89,8 @@ FROM arm32v7/python:3.5.6-slim-stretch
 
 # Pip wheels compiled in the builder
 COPY --from=builder /root/.cache /root/.cache
-# holeyrequirements.txt with opencv, scipy and numpy removed
-COPY --from=builder /holeyrequirements.txt /holeyrequirements.txt
+# requirements.txt with opencv, scipy and numpy removed
+COPY --from=builder /requirements.txt /requirements.txt
 # Required shared libraries
 COPY --from=builder /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so
 COPY --from=builder /usr/lib/libf77blas.so /usr/lib/libf77blas.so
@@ -101,7 +101,7 @@ COPY --from=builder /usr/lib/libblas.so.3 /usr/lib/libblas.so.3
 COPY --from=builder /usr/lib/arm-linux-gnueabihf/libgfortran.so.3 /usr/lib/arm-linux-gnueabihf/libgfortran.so.3
 COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
 
-RUN pip install numpy==1.16.2 && pip install scipy==1.3.1 && pip install -r /holeyrequirements.txt && rm -rf /root/.cache
+RUN pip install numpy==1.16.2 && pip install scipy==1.3.1 && pip install -r /requirements.txt && rm -rf /root/.cache
 
 
 # Install avrdude
