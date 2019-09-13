@@ -11,6 +11,7 @@ class MessageProcessor(MakesmithInitFuncs):
     """
 
     def start(self):
+
         while True:
             time.sleep(0.001)
             while (

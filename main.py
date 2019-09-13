@@ -1,6 +1,7 @@
 # main.py
 from app import app, socketio
 from gevent import monkey
+import webbrowser
 
 monkey.patch_all()
 
@@ -560,6 +561,10 @@ def test_connect():
         app.data.serialPort.openConnection()
 
     socketio.emit("my response", {"data": "Connected", "count": 0})
+    address = app.data.hostAddress
+    data = json.dumps({"hostAddress": address})
+    print(data)
+    socketio.emit("message", {"command": "hostAddress", "data": data, "dataFormat":"json"}, namespace="/MaslowCNC",)
 
 @socketio.on("disconnect", namespace="/MaslowCNC")
 def test_disconnect():
@@ -601,6 +606,7 @@ def checkForBoardUpdate(msg):
     app.data.logger.resetIdler()
     # this currently doesn't check for updated board, it just resends it..
     app.data.ui_queue1.put("Action", "boardUpdate", "")
+
 
 @socketio.on_error_default
 def default_error_handler(e):

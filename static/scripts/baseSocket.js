@@ -1,5 +1,6 @@
   var socket
   var controllerMessages = [];
+  var hostAddress = "..."
   $(document).ready(function(){
       namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
       // the socket.io documentation recommends sending an explicit package upon connection
@@ -9,11 +10,16 @@
       setupStatusButtons();
   });
 
+  function processHostAddress(data){
+      hostAddress = data["hostAddress"]
+      $("#clientStatus").text("Connected to "+hostAddress);
+  }
+
   function setListeners(){
       console.log("setting Listeners");
       socket.on('connect', function(msg) {
           socket.emit('my event', {data: 'I\'m connected!'});
-          $("#clientStatus").text("Connected");
+          $("#clientStatus").text("Connected: "+hostAddress);
           $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
           $("#mobileClientStatus").removeClass('alert-danger').addClass('alert-success');
           settingRequest("Computed Settings","units");
@@ -25,6 +31,7 @@
 
       socket.on('disconnect', function(msg) {
           $("#clientStatus").text("Not Connected");
+          hostAddress = "Not Connected"
           $("#clientStatus").removeClass('alert-success').addClass('alert-outline-danger');
           $("#mobileClientStatus").removeClass('alert-success').addClass('alert-danger');
           $("#controllerStatus").removeClass('alert-success').removeClass('alert-danger').addClass('alert-secondary');
@@ -57,7 +64,7 @@
             $("#cpuUsage").removeClass('alert-warning').addClass('alert-success');
             $("#mobileCPUUsage").removeClass('alert-warning').addClass('alert-success');
           },125);
-          //#console.log(msg.dataFormat);
+          console.log(msg.command);
           if (msg.dataFormat=='json')
             data = JSON.parse(msg.data);
           else
@@ -67,6 +74,10 @@
             case 'healthMessage':
                 //completed
                 processHealthMessage(data);
+                break;
+            case 'hostAddress':
+                //completed
+                processHostAddress(data);
                 break;
             case 'controllerMessage':
                 //completed
