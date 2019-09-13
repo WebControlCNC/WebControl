@@ -4,6 +4,7 @@ import time
 import math
 import json
 import psutil
+import webbrowser
 from flask import render_template
 
 class UIProcessor:

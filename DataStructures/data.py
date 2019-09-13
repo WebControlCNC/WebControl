@@ -179,6 +179,8 @@ class Data:
 
 
     shutdown = False
+
+    hostAddress = "-"
     
     def __init__(self):
         """
