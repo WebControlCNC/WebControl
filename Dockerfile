@@ -66,9 +66,9 @@ RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && pio run -e megaatmega2560 \
     && mkdir build \
     && mv .pio/build/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
-
-ARG  holey_firmware_repo=https://github.com/madgrizzle/HoleyFirmware.git
-ARG  holey_firmware_sha=658b62e76fd0530a796c4aec81acfb139ab1b681
+RUN pwd
+ARG  holey_firmware_repo=https://github.com/madgrizzle/Firmware.git
+ARG  holey_firmware_sha=950fb23396171cbd456c2d4149455cc45f5e6bc3
 RUN git clone $holey_firmware_repo firmware/holey \
     && cd firmware/holey \
     && git checkout $holey_firmware_sha \
