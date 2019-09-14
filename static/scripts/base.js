@@ -179,6 +179,9 @@ function checkForBoardUpdate(){
     socket.emit('checkForBoardUpdate',{data:"Please"});
 }
 
+function checkForHostAddress(){
+    socket.emit('checkForHostAddress',{data:"Please"});
+}
 
 $.fn.scrollBottom = function() {
     return $(this).scrollTop($(this)[0].scrollHeight);

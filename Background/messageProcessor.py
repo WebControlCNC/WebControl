@@ -11,6 +11,7 @@ class MessageProcessor(MakesmithInitFuncs):
     """
 
     def start(self):
+
         while True:
             time.sleep(0.001)
             while (
@@ -80,9 +81,40 @@ class MessageProcessor(MakesmithInitFuncs):
                         else:
                         '''
                         tmpVersion = self.data.controllerFirmwareVersion
-                        if tmpVersion > 50 and tmpVersion <100:
-                            tmpVersion = round(tmpVersion -50,3)
+                        if tmpVersion <50:
+                            if tmpVersion < float(self.data.stockFirmwareVersion):
 
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                                        "<p>Warning, you are running a stock firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
+                                                        + "</p><p>Please, click Actions->Upgrade Stock Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                        )
+                            elif tmpVersion > float(self.data.stockFirmwareVersion):
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                                        "<p>Warning, you are running a stock firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                        )
+
+                        if tmpVersion >= 50 and tmpVersion < 100:
+                            if tmpVersion < float(self.data.holeyFirmwareVersion)+50:
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                                        "<p>Warning, you are running a Holey Calibration firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
+                                                        + "</p><p>Please, click Actions->Upgrade Holey Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                        )
+                            elif tmpVersion > float(self.data.holeyFirmwareVersion)+50:
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                                        "<p>Warning, you are running a Holey Calibration firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                        )
+                        if tmpVersion >= 100:
+                            if tmpVersion < float(self.data.customFirmwareVersion)+100:
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                                        "<p>Warning, you are running a custom firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
+                                                        + "</p><p>Please, click Actions->Upgrade Custom Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                       )
+                            elif tmpVersion > float(self.data.customFirmwareVersion)+100:
+                                self.data.ui_queue1.put("Alert", "Alert",
+                                                    "<p>Warning, you are running a custom firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                    )
+
+                        '''
                         if tmpVersion < float(self.data.version):
                             self.data.ui_queue1.put("Alert", "Alert",
                                 "<p>Warning, your firmware is out of date and may not work correctly with this version of WebControl.</p>"
@@ -101,6 +133,7 @@ class MessageProcessor(MakesmithInitFuncs):
                                 + message
                                 + "</p><p>Please, update WebControl via WebMCP.</p>"
                             )
+                        '''
                     elif message == "ok\r\n":
                         pass  # displaying all the 'ok' messages clutters up the display
 

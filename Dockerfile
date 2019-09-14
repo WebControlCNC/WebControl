@@ -59,7 +59,7 @@ RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
     && mkdir build \
     && mv .pio/build/megaatmega2560/firmware.hex build/$madgrizzle_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 ARG maslowcnc_firmware_repo=https://github.com/MaslowCNC/Firmware.git
-ARG maslowcnc_firmware_sha=d0943e2a2f29faef4c07585a00638d0f822e5daf
+ARG maslowcnc_firmware_sha=e1e0d020fff1f4f7c6b403a26a85a16546b7e15b
 RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && cd firmware/maslowcnc \
     && git checkout $maslowcnc_firmware_sha \

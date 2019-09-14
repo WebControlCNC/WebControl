@@ -7,6 +7,8 @@ from os import listdir
 from os.path import isfile, join
 from flask import render_template
 import os
+import webbrowser
+import socket
 
 class WebPageProcessor:
 
@@ -14,6 +16,11 @@ class WebPageProcessor:
 
     def __init__(self, data):
         self.data = data
+        print("opening browser")
+        webbrowser.open_new_tab("http://localhost:5000")
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        self.data.hostAddress = host_ip+":5000"
 
     def createWebPage(self, pageID, isMobile, args):
         # returns a page and a bool specifying whether the user has to click close to exit modal
@@ -230,7 +237,11 @@ class WebPageProcessor:
                 enableCustom = False
             else:
                 enableCustom = True
-            page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom)
+            if self.data.controllerFirmwareVersion < 50:
+                enableHoley = False
+            else:
+                enableHoley = True
+            page = render_template("actions.html", customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley)
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")

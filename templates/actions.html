@@ -35,8 +35,8 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('quickConfigure');$('#contentModal').modal('hide');">Quick Configure</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets Vertical</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');">Triangular Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');">Holey Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('pidTuning');$('#contentModal').modal('hide');">PID Tuning</button>
 			</div>
 		</div>

@@ -583,6 +583,11 @@ class Config(MakesmithInitFuncs):
             version = filename.split("-")
             version = version[1].split(".hex")
             self.data.stockFirmwareVersion = version[0]
+        path = "firmware/holey/*.hex"
+        for filename in glob.glob(path):
+            version = filename.split("-")
+            version = version[1].split(".hex")
+            self.data.holeyFirmwareVersion = version[0]
 
     def processChange(self, key, value):
         ### TODO: This does not currently fire on bools ##
