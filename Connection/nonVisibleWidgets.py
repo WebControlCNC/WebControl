@@ -1,3 +1,5 @@
+import sys
+import os
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Connection.serialPort import SerialPort
 from File.gcodeFile import GCodeFile
@@ -65,6 +67,10 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.camera = self.camera
         data.gpioActions = self.gpioActions
         data.boardManager = self.boardManager
+
+        if hasattr(sys, '_MEIPASS'):
+            data.platform = "WIN"
+            data.platformHome = sys._MEIPASS
 
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)
