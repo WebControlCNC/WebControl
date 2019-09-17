@@ -102,6 +102,23 @@ class Config(MakesmithInitFuncs):
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )
 
+    def checkForTouchedPort(self):
+        home = self.home
+        path = home+"/.WebControl/webcontrol-*.port"
+        print(path)
+        try:
+            for filename in glob.glob(path):
+                print(filename)
+                port = filename.split("-")
+                port = port[1].split(".port")
+                print(port[0])
+                self.data.config.setValue("WebControl Settings", "webPort", port[0])
+                os.remove(filename)
+        except Exception as e:
+            print(e)
+            return False
+        return True
+
     def getHome(self):
         return self.home
 

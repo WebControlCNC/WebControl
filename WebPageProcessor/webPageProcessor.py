@@ -16,11 +16,6 @@ class WebPageProcessor:
 
     def __init__(self, data):
         self.data = data
-        print("opening browser")
-        webbrowser.open_new_tab("http://localhost:5000")
-        host_name = socket.gethostname()
-        host_ip = socket.gethostbyname(host_name)
-        self.data.hostAddress = host_ip+":5000"
 
     def createWebPage(self, pageID, isMobile, args):
         # returns a page and a bool specifying whether the user has to click close to exit modal
