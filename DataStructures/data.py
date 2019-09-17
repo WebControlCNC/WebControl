@@ -181,6 +181,8 @@ class Data:
     shutdown = False
 
     hostAddress = "-"
+    platform = "RPI"
+    platformHome = ""
     
     def __init__(self):
         """

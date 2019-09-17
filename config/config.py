@@ -573,17 +573,21 @@ class Config(MakesmithInitFuncs):
                     self.setValue("Computed Settings", "fPWMComputed", 3, True)
 
     def parseFirmwareVersions(self):
-        path = "firmware/madgrizzle/*.hex"
+        home = "."
+        if hasattr(sys, '_MEIPASS'):
+            home = os.path.join(sys._MEIPASS)
+            print(self.home)
+        path = home+"/firmware/madgrizzle/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
             version = version[1].split(".hex")
             self.data.customFirmwareVersion = version[0]
-        path = "firmware/maslowcnc/*.hex"
+        path = home+"/firmware/maslowcnc/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
             version = version[1].split(".hex")
             self.data.stockFirmwareVersion = version[0]
-        path = "firmware/holey/*.hex"
+        path = home+"/firmware/holey/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
             version = version[1].split(".hex")

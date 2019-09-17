@@ -234,8 +234,12 @@ class Actions(MakesmithInitFuncs):
 
     def shutdown(self):
         try:
-            self.data.ui_queue1.put("WebMCP","shutdown","")
-            return True
+            print(self.data.platform)
+            if self.data.platform == "WIN":
+                os._exit(0)
+            else:
+                self.data.ui_queue1.put("WebMCP", "shutdown", "")
+                return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
@@ -968,9 +972,9 @@ class Actions(MakesmithInitFuncs):
 
     def upgradeFirmware(self, version):
         try:
-            if hasattr(sys, '_MEIPASS'):
-                home = os.path.join(sys._MEIPASS)
-                print(home)
+            if self.data.platform == "WIN":
+                home = os.path.join(self.data.platformHome)
+                #print(home)
             else:
                 home = ""
             if version == 0:

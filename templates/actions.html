@@ -22,7 +22,7 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('queryCamera');$('#contentModal').modal('hide');">Query Camera</button>
 				<a class="btn btn-lg btn-block btn-secondary" href="downloadDiagnostics?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Download Diagnostics File</a>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">Shutdown WebControl/WebMCP</button>
+				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
 			</div>
 		</div>
 	</div>
