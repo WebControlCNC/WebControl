@@ -2,6 +2,7 @@
 from app import app, socketio
 from gevent import monkey
 import webbrowser
+import socket
 
 monkey.patch_all()
 
@@ -617,5 +618,25 @@ def default_error_handler(e):
 if __name__ == "__main__":
     app.debug = False
     app.config["SECRET_KEY"] = "secret!"
-    socketio.run(app, use_reloader=False, host="0.0.0.0")
+    #look for touched file
+    app.data.config.checkForTouchedPort()
+    webPort = app.data.config.getValue("WebControl Settings", "webPort")
+    webPortInt = 5000
+    try:
+        webPortInt = int(webPort)
+        if webPortInt < 0 or webPortInt > 65535:
+            webPortInt = 5000
+    except Exception as e:
+        app.data.console_queue.put(e)
+        app.data.console_queue.put("Invalid port assignment found in webcontrol.json")
+
+    print("opening browser")
+    webPortStr = str(webPortInt)
+    webbrowser.open_new_tab("http://localhost:"+webPortStr)
+    host_name = socket.gethostname()
+    host_ip = socket.gethostbyname(host_name)
+    app.data.hostAddress = host_ip + ":" + webPortStr
+
+    socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
     # socketio.run(app, host='0.0.0.0')
+

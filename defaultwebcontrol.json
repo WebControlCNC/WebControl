@@ -982,6 +982,15 @@
             "title": "Enable 3D Display",
             "type": "bool",
             "value": "0"
+        },
+        {
+            "default": 5000,
+            "desc": "Web interface Port Number used to access WebControl from browser.  Requires restart to change.\ndefault setting: 5000",
+            "key": "webPort",
+            "section": "WebControl Settings",
+            "title": "Web Port Number",
+            "type": "int",
+            "value": 5000
         }
     ],
     "Camera Settings": [
