@@ -235,7 +235,7 @@ class Actions(MakesmithInitFuncs):
     def shutdown(self):
         try:
             print(self.data.platform)
-            if self.data.platform == "WIN":
+            if self.data.platform == "PYINSTALLER":
                 os._exit(0)
             else:
                 self.data.ui_queue1.put("WebMCP", "shutdown", "")
@@ -972,7 +972,7 @@ class Actions(MakesmithInitFuncs):
 
     def upgradeFirmware(self, version):
         try:
-            if self.data.platform == "WIN":
+            if self.data.platform == "PYINSTALLER":
                 home = os.path.join(self.data.platformHome)
                 #print(home)
             else:
