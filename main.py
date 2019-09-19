@@ -3,6 +3,7 @@ from app import app, socketio
 from gevent import monkey
 import webbrowser
 import socket
+import math
 
 monkey.patch_all()
 
@@ -614,6 +615,14 @@ def default_error_handler(e):
     app.data.console_queue.put(request.event["message"])  # "my error event"
     app.data.console_queue.put(request.event["args"])  # (data,)1
 
+
+@app.template_filter('isnumber')
+def isnumber(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 if __name__ == "__main__":
     app.debug = False

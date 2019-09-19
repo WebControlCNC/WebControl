@@ -46,7 +46,7 @@
                 <label for="switch-{{setting.key}}"></label>
               </span>
             {% else %}
-              <input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+              <input name="{{setting.key}}" {{'type="number"' | safe if setting.value | isnumber else '' }} data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
             {% endif %}
           </div>
         </div>
