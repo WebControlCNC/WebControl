@@ -69,7 +69,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.boardManager = self.boardManager
 
         if hasattr(sys, '_MEIPASS'):
-            data.platform = "WIN"
+            data.platform = "PYINSTALLER"
             data.platformHome = sys._MEIPASS
 
         self.serialPort.setUpData(data)
