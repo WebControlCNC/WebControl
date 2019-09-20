@@ -29,9 +29,9 @@ class Data:
     compressedGCode3D = None
 
     version = "1.27"
-    stockFirmwareVersion = ""
-    customFirmwareVersion = ""
-    holeyFirmwareVersion = ""
+    stockFirmwareVersion = None
+    customFirmwareVersion = None
+    holeyFirmwareVersion = None
     controllerFirmwareVersion = 0
     # all of the available COM ports
     comPorts = []

@@ -82,37 +82,39 @@ class MessageProcessor(MakesmithInitFuncs):
                         '''
                         tmpVersion = self.data.controllerFirmwareVersion
                         if tmpVersion <50:
-                            if tmpVersion < float(self.data.stockFirmwareVersion):
-
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                                        "<p>Warning, you are running a stock firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
-                                                        + "</p><p>Please, click Actions->Upgrade Stock Firmware to update the controller to the latest WebControl-compatible code.</p>"
-                                                        )
-                            elif tmpVersion > float(self.data.stockFirmwareVersion):
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                                        "<p>Warning, you are running a stock firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
-                                                        )
+                            if self.data.stockFirmwareVersion is not None:
+                                if tmpVersion < float(self.data.stockFirmwareVersion):
+                                    self.data.ui_queue1.put("Alert", "Alert",
+                                                            "<p>Warning, you are running a stock firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
+                                                            + "</p><p>Please, click Actions->Upgrade Stock Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                            )
+                                elif tmpVersion > float(self.data.stockFirmwareVersion):
+                                    self.data.ui_queue1.put("Alert", "Alert",
+                                                            "<p>Warning, you are running a stock firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                            )
 
                         if tmpVersion >= 50 and tmpVersion < 100:
-                            if tmpVersion < float(self.data.holeyFirmwareVersion)+50:
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                                        "<p>Warning, you are running a Holey Calibration firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
-                                                        + "</p><p>Please, click Actions->Upgrade Holey Firmware to update the controller to the latest WebControl-compatible code.</p>"
-                                                        )
-                            elif tmpVersion > float(self.data.holeyFirmwareVersion)+50:
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                                        "<p>Warning, you are running a Holey Calibration firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
-                                                        )
+                            if self.data.holeyFirmwareVersion is not None:
+                                if tmpVersion < float(self.data.holeyFirmwareVersion)+50:
+                                    self.data.ui_queue1.put("Alert", "Alert",
+                                                                "<p>Warning, you are running a Holey Calibration firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
+                                                                + "</p><p>Please, click Actions->Upgrade Holey Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                                )
+                                elif tmpVersion > float(self.data.holeyFirmwareVersion)+50:
+                                    self.data.ui_queue1.put("Alert", "Alert",
+                                                            "<p>Warning, you are running a Holey Calibration firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                            )
                         if tmpVersion >= 100:
-                            if tmpVersion < float(self.data.customFirmwareVersion)+100:
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                                        "<p>Warning, you are running a custom firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
-                                                        + "</p><p>Please, click Actions->Upgrade Custom Firmware to update the controller to the latest WebControl-compatible code.</p>"
-                                                       )
-                            elif tmpVersion > float(self.data.customFirmwareVersion)+100:
-                                self.data.ui_queue1.put("Alert", "Alert",
-                                                    "<p>Warning, you are running a custom firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
-                                                    )
+                            if self.data.customFirmwareVersion is not None:
+                                if tmpVersion < float(self.data.customFirmwareVersion)+100:
+                                    self.data.ui_queue1.put("Alert", "Alert",
+                                                            "<p>Warning, you are running a custom firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
+                                                            + "</p><p>Please, click Actions->Upgrade Custom Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                           )
+                                elif tmpVersion > float(self.data.customFirmwareVersion)+100:
+                                    self.data.ui_queue1.put("Alert", "Alert",
+                                                        "<p>Warning, you are running a custom firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                        )
 
                         '''
                         if tmpVersion < float(self.data.version):

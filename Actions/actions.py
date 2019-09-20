@@ -21,6 +21,7 @@ class Actions(MakesmithInitFuncs):
 
     def processAction(self, msg):
         try:
+            #test
             if msg["data"]["command"] == "cutTriangularCalibrationPattern":
                 if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with cutting triangular calibration pattern.")
