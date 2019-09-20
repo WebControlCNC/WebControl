@@ -1043,7 +1043,7 @@ class Actions(MakesmithInitFuncs):
                 gCodeLineIndex = self.data.gcodeIndex
             gCodeLine = self.data.gcode[gCodeLineIndex]
             #print("Gcode index"+str(gCodeLineIndex)+" : "+ gCodeLine )
-            if not recalculate:
+            if not recalculate and gCodeLine.find("(") == -1:
                 #print("not recalculating.. uploadFlag ="+str(self.data.uploadFlag))
 
                 x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)

@@ -393,60 +393,62 @@ class GCodeFile(MakesmithInitFuncs):
             shiftX = self.data.gcodeShift[0]
             shiftY = self.data.gcodeShift[1]
 
-        try:
-            gCodeLine = gCodeLine.upper() + " "
-            x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-            if x:
-                q = abs(float(x.groups()[0])+shiftX)
-                if self.truncate >= 0:
-                    q = str(round(q, self.truncate))
-                else:
-                    q = str(q)
+        if gCodeLine.find("(") == -1:
+            try:
+                gCodeLine = gCodeLine.upper() + " "
+                x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+                if x:
+                    q = abs(float(x.groups()[0])+shiftX)
+                    if self.truncate >= 0:
+                        q = str(round(q, self.truncate))
+                    else:
+                        q = str(q)
 
-                eNtnX = re.sub("\-?\d\.|\d*e-","",q,)  # strip off everything but the decimal part or e-notation exponent
+                    eNtnX = re.sub("\-?\d\.|\d*e-","",q,)  # strip off everything but the decimal part or e-notation exponent
 
-                e = re.search(".*e-", q)
+                    e = re.search(".*e-", q)
 
-                if e:
-                    fmtX = (
-                        "%0%.%sf" % eNtnX
-                    )  # if e-notation, use the exponent from the e notation
-                else:
-                    fmtX = "%0%.%sf" % len(
-                        eNtnX
-                    )  # use the number of digits after the decimal place
-                gCodeLine = (
-                    gCodeLine[0 : x.start() + 1]
-                    + (fmtX % (float(x.groups()[0]) + shiftX))
-                    + gCodeLine[x.end() :]
-                )
+                    if e:
+                        fmtX = (
+                            "%0%.%sf" % eNtnX
+                        )  # if e-notation, use the exponent from the e notation
+                    else:
+                        fmtX = "%0%.%sf" % len(
+                            eNtnX
+                        )  # use the number of digits after the decimal place
+                    gCodeLine = (
+                        gCodeLine[0 : x.start() + 1]
+                        + (fmtX % (float(x.groups()[0]) + shiftX))
+                        + gCodeLine[x.end() :]
+                    )
 
-            y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
-            if y:
-                q = abs(float(y.groups()[0])+shiftY)
-                if self.truncate >= 0:
-                    q = str(round(q, self.truncate))
-                else:
-                    q = str(q)
+                y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+                if y:
+                    q = abs(float(y.groups()[0])+shiftY)
+                    if self.truncate >= 0:
+                        q = str(round(q, self.truncate))
+                    else:
+                        q = str(q)
 
-                eNtnY = re.sub("\-?\d\.|\d*e-", "", q, )
+                    eNtnY = re.sub("\-?\d\.|\d*e-", "", q, )
 
-                e = re.search(".*e-", q )
+                    e = re.search(".*e-", q )
 
-                if e:
-                    fmtY = "%0%.%sf" % eNtnY
-                else:
-                    fmtY = "%0%.%sf" % len(eNtnY)
-                gCodeLine = (
-                    gCodeLine[0 : y.start() + 1]
-                    + (fmtY % (float(y.groups()[0]) + shiftY))
-                    + gCodeLine[y.end() :]
-                )
-            return gCodeLine
-        except ValueError:
-            self.data.console_queue.put("line could not be moved:")
-            self.data.console_queue.put(originalLine)
-            return originalLine
+                    if e:
+                        fmtY = "%0%.%sf" % eNtnY
+                    else:
+                        fmtY = "%0%.%sf" % len(eNtnY)
+                    gCodeLine = (
+                        gCodeLine[0 : y.start() + 1]
+                        + (fmtY % (float(y.groups()[0]) + shiftY))
+                        + gCodeLine[y.end() :]
+                    )
+                return gCodeLine
+            except ValueError:
+                self.data.console_queue.put("line could not be moved:")
+                self.data.console_queue.put(originalLine)
+                return originalLine
+        return originalLine
 
     def loadNextLine(self):
         """
