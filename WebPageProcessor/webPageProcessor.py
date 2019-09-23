@@ -472,6 +472,21 @@ class WebPageProcessor:
                 "openBoard.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
             )
             return page, "Open Board", False, "medium", "content", "footerSubmit"
+        elif pageID == "about":
+            if isMobile:
+                pageName = "about.html"
+            else:
+                pageName = "about.html"
+            page = render_template(pageName, pageID="about")
+            return page, "About", False, "medium", "content", False
+        elif pageID == "gettingStarted":
+            if isMobile:
+                pageName = "gettingStarted.html"
+            else:
+                pageName = "gettingStarted.html"
+            page = render_template(pageName, pageID="gettingStarted")
+            return page, "Getting Started", False, "medium", "content", False
+
         else:
             self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 
