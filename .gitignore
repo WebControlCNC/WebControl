@@ -7,6 +7,10 @@ ENV/
 env.bak/
 venv.bak/
 
+#pyyinstaller
+build
+dist
+
 #logs
 log.txt
 alog.txt
