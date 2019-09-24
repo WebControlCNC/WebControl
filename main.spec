@@ -4,10 +4,10 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Windows\\System32\\downlevel', 'C:\\Users\\john\\PycharmProjects\\WebControl'],
+             pathex=['C:\\Windows\\System32\\downlevel', 'C:\\Users\\john\\PycharmProjects\\WebControl', 'C:\\Users\\jhoga\\Documents\\GitHub\\WebControl'],
              binaries=[],
              datas=[('templates', 'templates'), ('firmware','firmware'), ('static', 'static'), ('defaultwebcontrol.json', '.')],
-             hiddenimports=['flask', 'clr', 'gevent', 'gevent-websocket', 'engineio.async_gevent'],
+             hiddenimports=['flask', 'clr', 'gevent', 'gevent-websocket', 'engineio.async_gevent', 'psutil'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
