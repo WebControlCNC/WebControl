@@ -1,10 +1,16 @@
 # WebControl
 
-WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
+WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi, Windows 10, or linux (Debian) machines and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
 
 ![Screenshot](https://user-images.githubusercontent.com/218876/47197523-ac1d9e00-d31b-11e8-93c8-93a84a7eb0cf.png)
 
-## Getting Started
+## Notice
+
+I will be moving all releases to a pyinstaller created executable, including for the Raspberry Pi.  I've got to sort out a way to manage upgrading/updating the software, so I will continue to build docker images for the Raspberry Pi's until I do.
+
+See details near the end of this page on using the pyinstaller version for Windows, linux, and Raspberry Pi
+
+## Getting Started for Raspberry Pi
 
 These instructions are based upon using a Raspberry Pi (RPi) for running WebControl.  WebControl should be able to be run on any computer capable of running Python 3.  
 
@@ -73,6 +79,24 @@ So, if you don't want to use WebMCP, you can issue the following command to down
 docker pull madgrizzle/webcontrol
 docker run -it -v $HOME/.WebControl:/root/.WebControl -p 5000:5000 --privileged madgrizzle/webcontrol python main.py
 ```
+
+## Alternative Installations
+
+### Windows 10 and Linux Single-File Releases
+
+For Windows 10 and Linux (Debian-based, such as Ubuntu) machines, users can download the latest single-file release, extract it, and run webcontrol.  As a single-file release, it is completely portable and does not require an installation.  The file unpacks itself into a temporary directory and runs.  If you have a very slow computer, it might take a while to unpack.  In that case, it is recommended to use the single-directory release which extracts into a single directory containing unpacked files.  Startup is much quicker using single-directory releases versus a single-file release.
+
+Check out the release page at:
+
+https://github.com/madgrizzle/WebControl/releases
+
+### Raspberry Pi (3B+ & Zero W)
+
+For Raspberry Pi's, single-directory releases are your best option.  It can take up to a minute to unpack a single-file release on a Raspberry Pi 3B+.  Single-directory releases unpack the files into the directory so startup is much quicker.  Both the Raspberry Pi 3B+ and Zero W have been tested to work with webcontrol.  Other versions likely would also.  I recommend the 3B+ if you are trying to decide.
+
+Check out the release page at:
+
+https://github.com/madgrizzle/WebControl/releases
 
 ## Built With
 
