@@ -33,6 +33,19 @@ class Data:
     customFirmwareVersion = None
     holeyFirmwareVersion = None
     controllerFirmwareVersion = 0
+
+    '''
+    Version Updater
+    '''
+    lastChecked = -1
+    pyInstallCurrentVersion = 0.904
+    pyInstallUpdateAvailable = False
+    pyInstallUpdateBrowserUrl = ""
+    pyInstallUpdateVersion = 0
+    pyInstallPlatform = "win"
+    pyInstallType = "singlefile"
+
+
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used
@@ -183,7 +196,9 @@ class Data:
     hostAddress = "-"
     platform = "RPI"
     platformHome = ""
-    
+
+
+
     def __init__(self):
         """
 

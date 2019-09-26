@@ -567,6 +567,8 @@ def test_connect():
     data = json.dumps({"hostAddress": address})
     print(data)
     socketio.emit("message", {"command": "hostAddress", "data": data, "dataFormat":"json"}, namespace="/MaslowCNC",)
+    if app.data.pyInstallUpdateAvailable:
+        app.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
 
 @socketio.on("disconnect", namespace="/MaslowCNC")
 def test_disconnect():

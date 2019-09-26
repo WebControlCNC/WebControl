@@ -240,7 +240,14 @@ class WebPageProcessor:
                 docker = True
             else:
                 docker = False
-            page = render_template("actions.html", docker=docker, customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley)
+            docker=False
+            if self.data.pyInstallUpdateAvailable:
+                updateAvailable = True
+                updateRelease = self.data.pyInstallUpdateVersion
+            else:
+                updateAvailable = False
+                updateRelease = "N/A"
+            page = render_template("actions.html", updateAvailable=updateAvailable, updateRelease=updateRelease, docker=docker, customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley)
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")

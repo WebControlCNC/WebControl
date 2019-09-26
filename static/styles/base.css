@@ -76,3 +76,11 @@
     font-size: 8px;
     text-align: center;
 }
+
+.dot {
+    height: 15px;
+    width: 15px;
+    background-color: red;
+    border-radius: 50%;
+    display: inline-block;
+  }

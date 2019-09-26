@@ -186,6 +186,9 @@
             case 'clearAlarm':
                 clearAlarm(data);
                 break;
+            case 'pyinstallUpdate':
+                pyInstallUpdateBadge(data);
+                break;
             default:
                 console.log("!!!!!!");
                 console.log("uncaught action:"+msg.command);

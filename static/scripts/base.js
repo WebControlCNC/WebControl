@@ -200,3 +200,9 @@ function setupStatusButtons(){
   }
 }
 
+function pyInstallUpdateBadge(data){
+    console.log("---##-")
+    console.log(data);
+    $('#actionsBadge').html("1");
+    console.log("---##-")
+}

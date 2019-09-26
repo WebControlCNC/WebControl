@@ -1,5 +1,7 @@
 import sys
+import distro
 import os
+import platform
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Connection.serialPort import SerialPort
 from File.gcodeFile import GCodeFile
@@ -71,6 +73,36 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         if hasattr(sys, '_MEIPASS'):
             data.platform = "PYINSTALLER"
             data.platformHome = sys._MEIPASS
+
+        data.pyInstallPlatform = platform.system().lower()
+
+        if data.pyInstallPlatform == "linux":
+            _platform = distro.linux_distribution()[0].lower()
+            if _platform == 'debian':
+                try:
+                    with open('/proc/cpuinfo') as f:
+                        for line in f:
+                            line = line.strip()
+                            if line.startswith('Hardware') and line.endswith('BCM2708'):
+                                data.pyInstallPlatform = 'rpi'
+                                break
+                except:
+                    pass
+        print("----")
+        print(data.pyInstallPlatform)
+
+
+        if getattr(sys, 'frozen', False):
+            if hasattr(sys, '_MEIPASS'):
+                if sys._MEIPASS.find("_MEI") == -1:
+                    data.pyInstallType = "singledirectory"
+                else:
+                    data.pyInstallType = "singlefile"
+        else:
+            data.pyInstallType = "live"
+
+        print(data.pyInstallType)
+        print("----")
 
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)

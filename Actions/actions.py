@@ -14,6 +14,8 @@ from zipfile import ZipFile
 import datetime
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
+from github import Github
+import wget
 
 class Actions(MakesmithInitFuncs):
 
@@ -1427,5 +1429,36 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+
+    def checkForLatestPyRelease(self):
+        print("check for pyrelease")
+        g = Github()
+        repo = g.get_repo("madgrizzle/WebControl")
+        releases = repo.get_releases()
+        latest = 0
+        latestRelease = None
+        type = "singlefile"
+        platform = "win"
+        for release in releases:
+            try:
+                if float(release.tag_name) > latest:
+                    latest = float(release.tag_name)
+                    latestRelease = release
+            except:
+                print("error parsing tagname")
+        print(latest)
+        if latest>self.data.pyInstallCurrentVersion:
+            if latestRelease is not None:
+                print(latestRelease.tag_name)
+                assets = latestRelease.get_assets()
+                for asset in assets:
+                    if asset.name.find(type) != -1 and asset.name.find(platform) != -1:
+                        print(asset.name)
+                        print(asset.url)
+                        self.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
+                        self.data.pyInstallUpdateAvailable = True
+                        self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
+                        self.data.pyInstallUpdateVersion = latest
+
 
 
