@@ -78,16 +78,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
 
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
-            if _platform == 'debian':
-                try:
-                    with open('/proc/cpuinfo') as f:
-                        for line in f:
-                            line = line.strip()
-                            if line.startswith('Hardware') and line.endswith('BCM2708'):
-                                data.pyInstallPlatform = 'rpi'
-                                break
-                except:
-                    pass
+            if _platform.find("raspian"):
+                data.pyInstallPlatform = 'raspian'
         print("----")
         print(data.pyInstallPlatform)
 

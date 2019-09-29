@@ -4,6 +4,7 @@ from gevent import monkey
 import webbrowser
 import socket
 import math
+import os
 
 monkey.patch_all()
 
@@ -24,11 +25,6 @@ from WebPageProcessor.webPageProcessor import WebPageProcessor
 
 from os import listdir
 from os.path import isfile, join
-
-
-
-
-
 
 
 app.data = Data()
@@ -640,6 +636,11 @@ if __name__ == "__main__":
     except Exception as e:
         app.data.console_queue.put(e)
         app.data.console_queue.put("Invalid port assignment found in webcontrol.json")
+
+    print("-$$$$$-")
+    print(os.path.abspath(__file__))
+    print("-$$$$$-")
+
 
     print("opening browser")
     webPortStr = str(webPortInt)
