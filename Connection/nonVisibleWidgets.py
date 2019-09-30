@@ -79,7 +79,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
             if _platform.find("raspian"):
-                data.pyInstallPlatform = 'raspian'
+                data.pyInstallPlatform = 'rpi'
         print("----")
         print(data.pyInstallPlatform)
 
@@ -91,7 +91,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
                 else:
                     data.pyInstallType = "singlefile"
         else:
-            data.pyInstallType = "live"
+            data.pyInstallType = "singledirectory"
 
         print(data.pyInstallType)
         print("----")

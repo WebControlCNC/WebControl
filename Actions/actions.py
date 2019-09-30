@@ -10,12 +10,15 @@ import serial.tools.list_ports
 import glob
 import json
 import time
+import re
 from zipfile import ZipFile
 import datetime
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
 from github import Github
 import wget
+import subprocess
+from shutil import copyfile
 
 class Actions(MakesmithInitFuncs):
 
@@ -228,6 +231,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "boardClearBoard":
                 if not self.data.boardManager.clearBoard():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with clearing board")
+            elif msg["data"]["command"] == "updatePyInstaller":
+                if not self.updatePyInstaller():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with updating WebControl")
 
             else:
                 self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
@@ -979,7 +985,7 @@ class Actions(MakesmithInitFuncs):
                 home = os.path.join(self.data.platformHome)
                 #print(home)
             else:
-                home = ""
+                home = "."
             if version == 0:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/madgrizzle/*.hex"
@@ -1437,12 +1443,14 @@ class Actions(MakesmithInitFuncs):
         releases = repo.get_releases()
         latest = 0
         latestRelease = None
-        type = "singlefile"
-        platform = "win"
+        type = self.data.pyInstallType
+        platform = self.data.pyInstallPlatform
         for release in releases:
             try:
-                if float(release.tag_name) > latest:
-                    latest = float(release.tag_name)
+                tag_name = re.sub(r'[v]',r'',release.tag_name)
+                #print(tag_name)
+                if float(tag_name) > latest:
+                    latest = float(tag_name)
                     latestRelease = release
             except:
                 print("error parsing tagname")
@@ -1460,5 +1468,45 @@ class Actions(MakesmithInitFuncs):
                         self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                         self.data.pyInstallUpdateVersion = latest
 
+    def processAbsolutePath(self, path):
+        index = path.find("main.py")
+        self.data.pyInstallInstalledPath = path[0:index-1]
+        print(self.data.pyInstallInstalledPath)
+    
+    def updatePyInstaller(self):
+        home = self.data.config.getHome()
+        if self.data.pyInstallUpdateAvailable == True:
+            if not os.path.exists(home+"/.WebControl/downloads"):
+                print("creating downloads directory")
+                os.mkdir(home+"/.WebControl/downloads")
+            filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"/.WebControl/downloads")
+            print(filename)
+            
+            if self.data.platform == "PYINSTALLER":
+                lhome = os.path.join(self.data.platformHome)
+            else:
+                lhome = "."
+            path = lhome+"/tools/upgrade_webcontrol.sh"
+            print("0-1")
+            copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol.sh")
+            print("0-2")
+            self.make_executable(home+"/.WebControl/downloads/upgrade_webcontrol.sh")
+            print("0-3")
+            program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
+            arguments = [filename, self.data.pyInstallInstalledPath]
+            command = [program_name]
+            command.extend(arguments)
+            print("popening")
+            output = subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
+            print(output)
+            sys.exit()
 
+    def make_executable(self, path):
+        print("1")
+        mode = os.stat(path).st_mode
+        print("2")
+        mode |= (mode & 0o444) >> 2    # copy R bits to X
+        print("3")
+        os.chmod(path, mode)
+        print("4")
 

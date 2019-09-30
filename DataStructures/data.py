@@ -44,6 +44,7 @@ class Data:
     pyInstallUpdateVersion = 0
     pyInstallPlatform = "win"
     pyInstallType = "singlefile"
+    pyInstallInstalledPath = ""
 
 
     # all of the available COM ports

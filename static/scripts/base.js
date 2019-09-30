@@ -8,7 +8,7 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 
 function processHealthMessage(data){
     //console.log(data.cpuUsage);
-    $("#cpuUsage").text(Math.round(data.cpuUsage).toString()+"%");
+    $("#cpuUsage").text("CPU: "+Math.round(data.cpuUsage).toString()+"%");
     $("#mobileCPUUsage").text(Math.round(data.cpuUsage).toString()+"%");
 }
 

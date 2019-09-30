@@ -639,6 +639,7 @@ if __name__ == "__main__":
 
     print("-$$$$$-")
     print(os.path.abspath(__file__))
+    app.data.actions.processAbsolutePath(os.path.abspath(__file__))
     print("-$$$$$-")
 
 
