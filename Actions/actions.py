@@ -234,6 +234,8 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "updatePyInstaller":
                 if not self.updatePyInstaller():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating WebControl")
+                print("here1")
+                return "Shutdown"
 
             else:
                 self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
@@ -1479,6 +1481,13 @@ class Actions(MakesmithInitFuncs):
             if not os.path.exists(home+"/.WebControl/downloads"):
                 print("creating downloads directory")
                 os.mkdir(home+"/.WebControl/downloads")
+            fileList=glob.glob(home+"/.WebControl/downloads/*.gz")
+            for filePath in fileList:
+                try:
+                    os.remove(filePath)
+                except:
+                    print("error cleaning download directory: ",filePath)
+                    print("---")
             filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"/.WebControl/downloads")
             print(filename)
             
@@ -1497,9 +1506,9 @@ class Actions(MakesmithInitFuncs):
             command = [program_name]
             command.extend(arguments)
             print("popening")
-            output = subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
-            print(output)
-            sys.exit()
+            subprocess.Popen(command)
+            return True
+        return False
 
     def make_executable(self, path):
         print("1")

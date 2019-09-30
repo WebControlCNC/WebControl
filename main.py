@@ -574,7 +574,11 @@ def test_disconnect():
 @socketio.on("action", namespace="/MaslowCNC")
 def command(msg):
     app.data.logger.resetIdler()
-    app.data.actions.processAction(msg)
+    retval = app.data.actions.processAction(msg)
+    if retval == "Shutdown":
+        print("Shutting Down")
+        socketio.stop()
+        print("Shutdown")
 
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
@@ -608,12 +612,6 @@ def checkForBoardUpdate(msg):
     app.data.ui_queue1.put("Action", "boardUpdate", "")
 
 
-@socketio.on_error_default
-def default_error_handler(e):
-    app.data.console_queue.put(request.event["message"])  # "my error event"
-    app.data.console_queue.put(request.event["args"])  # (data,)1
-
-
 @app.template_filter('isnumber')
 def isnumber(s):
     try:
@@ -621,6 +619,10 @@ def isnumber(s):
         return True
     except ValueError:
         return False
+        
+#def shutdown():
+#    print("Shutdown")
+
 
 if __name__ == "__main__":
     app.debug = False
@@ -649,7 +651,8 @@ if __name__ == "__main__":
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
-
+    
+    #app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
     # socketio.run(app, host='0.0.0.0')
 
