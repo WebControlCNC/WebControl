@@ -1510,7 +1510,7 @@ class Actions(MakesmithInitFuncs):
             command = [program_name]
             command.extend(arguments)
             print("popening")
-            print(command
+            print(command)
             subprocess.Popen(command)
             return True
         return False
