@@ -1502,7 +1502,8 @@ class Actions(MakesmithInitFuncs):
             self.make_executable(home+"/.WebControl/downloads/upgrade_webcontrol.sh")
             print("0-3")
             program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
-            arguments = [filename, self.data.pyInstallInstalledPath]
+            tool_path = home+"/.WebControl/downloads/7z.exe"
+            arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
             command.extend(arguments)
             print("popening")
