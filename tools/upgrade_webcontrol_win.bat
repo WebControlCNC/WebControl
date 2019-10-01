@@ -1,4 +1,4 @@
-sleep 3
+PING localhost -n 4 >NUL
 echo %1
 echo %2
 echo %3
