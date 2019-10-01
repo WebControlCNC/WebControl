@@ -1502,14 +1502,15 @@ class Actions(MakesmithInitFuncs):
             self.make_executable(home+"/.WebControl/downloads/upgrade_webcontrol.sh")
             print("0-3")
             if self.data.pyInstallPlatform == "win":
-                program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
-            else:
                 program_name = home+"/.WebControl/downloads/upgrade_webcontrol_win.bat"
+            else:
+                program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
             tool_path = home+"/.WebControl/downloads/7z.exe"
             arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
             command.extend(arguments)
             print("popening")
+            print(command
             subprocess.Popen(command)
             return True
         return False
