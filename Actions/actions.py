@@ -1488,7 +1488,10 @@ class Actions(MakesmithInitFuncs):
                 except:
                     print("error cleaning download directory: ",filePath)
                     print("---")
-            filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"/.WebControl/downloads")
+            if self.data.pyInstallPlatform == "win":
+                filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"\\.WebControl\\downloads")
+            else:
+                filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"/.WebControl/downloads")
             print(filename)
             
             if self.data.platform == "PYINSTALLER":
@@ -1498,13 +1501,16 @@ class Actions(MakesmithInitFuncs):
             if self.data.pyInstallPlatform == "win":
                 path = lhome+"/tools/upgrade_webcontrol_win.bat"
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol_win.bat")
-                program_name = home+"/.WebControl/downloads/upgrade_webcontrol_win.bat"
+                path = lhome+"/tools/7z.exe"
+                copyfile(path, home+"/.WebControl/downloads/7z.exe")
+                program_name = home+"\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
+                
             else:
                 path = lhome+"/tools/upgrade_webcontrol.sh"
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol.sh")
                 program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
                 self.make_executable(home+"/.WebControl/downloads/upgrade_webcontrol.sh")
-            tool_path = home+"/.WebControl/downloads/7z.exe"
+            tool_path = home+"\\.WebControl\\downloads\\7z.exe"
             arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
             command.extend(arguments)
