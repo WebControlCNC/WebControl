@@ -1473,6 +1473,7 @@ class Actions(MakesmithInitFuncs):
     def processAbsolutePath(self, path):
         index = path.find("main.py")
         self.data.pyInstallInstalledPath = path[0:index-1]
+        self.data.pyInstallInstalledPath.replace('/','\\')
         print(self.data.pyInstallInstalledPath)
     
     def updatePyInstaller(self):
