@@ -1473,7 +1473,6 @@ class Actions(MakesmithInitFuncs):
     def processAbsolutePath(self, path):
         index = path.find("main.py")
         self.data.pyInstallInstalledPath = path[0:index-1]
-        self.data.pyInstallInstalledPath.replace('/','\\')
         print(self.data.pyInstallInstalledPath)
     
     def updatePyInstaller(self):
@@ -1504,6 +1503,7 @@ class Actions(MakesmithInitFuncs):
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol_win.bat")
                 path = lhome+"/tools/7z.exe"
                 copyfile(path, home+"/.WebControl/downloads/7z.exe")
+                self.data.pyInstallInstalledPath = self.data.pyInstallInstalledPath.replace('/','\\')
                 program_name = home+"\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
                 
             else:
