@@ -1501,7 +1501,10 @@ class Actions(MakesmithInitFuncs):
             print("0-2")
             self.make_executable(home+"/.WebControl/downloads/upgrade_webcontrol.sh")
             print("0-3")
-            program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
+            if self.data.pyInstallPlatform == "win":
+                program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
+            else:
+                program_name = home+"/.WebControl/downloads/upgrade_webcontrol_win.bat"
             tool_path = home+"/.WebControl/downloads/7z.exe"
             arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
