@@ -75,6 +75,9 @@ class NonVisibleWidgets(MakesmithInitFuncs):
             data.platformHome = sys._MEIPASS
 
         data.pyInstallPlatform = platform.system().lower()
+        
+        if data.pyInstallPlatform == "windows":
+            data.pyInstallPlatform = "win"
 
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
