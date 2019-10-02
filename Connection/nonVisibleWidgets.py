@@ -81,7 +81,10 @@ class NonVisibleWidgets(MakesmithInitFuncs):
 
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
-            if _platform.find("raspian") != -1:
+            print("##")
+            print(_platform)
+            print("##")
+            if _platform.find("raspbian") != -1:
                 data.pyInstallPlatform = 'rpi'
         print("----")
         print(data.pyInstallPlatform)
