@@ -1502,7 +1502,7 @@ class Actions(MakesmithInitFuncs):
                 path = lhome+"/tools/upgrade_webcontrol_win.bat"
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol_win.bat")
                 path = lhome+"/tools/7z.exe"
-                copyfile(path, home+"/.WebControl/downloads/7z.exe")
+                copyfile(path, home+"/.WebControl/downloads/7za.exe")
                 self.data.pyInstallInstalledPath = self.data.pyInstallInstalledPath.replace('/','\\')
                 program_name = home+"\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
                 
@@ -1511,7 +1511,7 @@ class Actions(MakesmithInitFuncs):
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol.sh")
                 program_name = home+"/.WebControl/downloads/upgrade_webcontrol.sh"
                 self.make_executable(home+"/.WebControl/downloads/upgrade_webcontrol.sh")
-            tool_path = home+"\\.WebControl\\downloads\\7z.exe"
+            tool_path = home+"\\.WebControl\\downloads\\7za.exe"
             arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
             command.extend(arguments)
