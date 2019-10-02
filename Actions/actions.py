@@ -1488,7 +1488,7 @@ class Actions(MakesmithInitFuncs):
                 except:
                     print("error cleaning download directory: ",filePath)
                     print("---")
-            if self.data.pyInstallPlatform == "win":
+            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
                 filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"\\.WebControl\\downloads")
             else:
                 filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home+"/.WebControl/downloads")
@@ -1498,7 +1498,7 @@ class Actions(MakesmithInitFuncs):
                 lhome = os.path.join(self.data.platformHome)
             else:
                 lhome = "."
-            if self.data.pyInstallPlatform == "win":
+            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
                 path = lhome+"/tools/upgrade_webcontrol_win.bat"
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol_win.bat")
                 path = lhome+"/tools/7z.exe"
