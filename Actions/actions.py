@@ -1501,7 +1501,7 @@ class Actions(MakesmithInitFuncs):
             if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
                 path = lhome+"/tools/upgrade_webcontrol_win.bat"
                 copyfile(path, home+"/.WebControl/downloads/upgrade_webcontrol_win.bat")
-                path = lhome+"/tools/7z.exe"
+                path = lhome+"/tools/7za.exe"
                 copyfile(path, home+"/.WebControl/downloads/7za.exe")
                 self.data.pyInstallInstalledPath = self.data.pyInstallInstalledPath.replace('/','\\')
                 program_name = home+"\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
