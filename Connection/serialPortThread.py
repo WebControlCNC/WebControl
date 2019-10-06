@@ -4,6 +4,7 @@ import serial
 import time
 from collections import deque
 import json
+import re
 
 
 class SerialPortThread(MakesmithInitFuncs):

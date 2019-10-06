@@ -18,6 +18,7 @@ from gpiozero import Device
 from github import Github
 import wget
 import subprocess
+import re
 from shutil import copyfile
 
 class Actions(MakesmithInitFuncs):
