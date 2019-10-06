@@ -1226,8 +1226,10 @@ class Actions(MakesmithInitFuncs):
         ypos = 0
         zpos = 0
         for x in range(index):
-            if self.data.gcode[x][0] != "(":
-                listOfLines = filter(None, re.split("(G)", self.data.gcode[x]))  # self.data.gcode[x].split("G")
+            filtersparsed = re.sub(r'\(([^)]*)\)','\n',self.data.gcode[x]) #replace mach3 style gcode comments with newline
+            filtersparsed = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+            if True: #self.data.gcode[x][0] != "(":
+                listOfLines = filter(None, re.split("(G)", filtersparsed)) # self.data.gcode[x]))  # self.data.gcode[x].split("G")
                 # it is necessary to split the lines along G and M commands so that commands concatenated on one line
                 # are processed correctly
                 for line in listOfLines:

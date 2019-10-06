@@ -34,7 +34,10 @@ class SerialPortThread(MakesmithInitFuncs):
 
     def _write(self, message, isQuickCommand=False):
         # message = message + 'L' + str(len(message) + 1 + 2 + len(str(len(message))) )
-
+        if isQuickCommand == False:
+            filtersparsed = re.sub(r'\(([^)]*)\)','\n',message) #replace mach3 style gcode comments with newline
+            message = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+            
         taken = time.time() - self.lastWriteTime
         if taken < self.MINTimePerLine:  # wait between sends
             # self.data.logger.writeToLog("Sleeping: " + str( taken ) + "\n")
