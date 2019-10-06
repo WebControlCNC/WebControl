@@ -18,7 +18,6 @@ from gpiozero import Device
 from github import Github
 import wget
 import subprocess
-import re
 from shutil import copyfile
 
 class Actions(MakesmithInitFuncs):
@@ -1142,8 +1141,11 @@ class Actions(MakesmithInitFuncs):
         laser = None
         dwell = None
         for x in range(self.data.gcodeIndex):
-            if self.data.gcode[x][0] != "(":
-                lines = self.data.gcode[x].split(" ")
+            filtersparsed = re.sub(r'\(([^)]*)\)','\n',self.data.gcode[x]) #replace mach3 style gcode comments with newline
+            filtersparsed = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+            if True:#self.data.gcode[x][0] != "(":
+                #lines = self.data.gcode[x].split(" ")
+                lines = filtersparsed.split(" ")
                 if lines:
                     finalLines = []
                     for line in lines:
