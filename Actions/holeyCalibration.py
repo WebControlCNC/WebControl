@@ -184,12 +184,13 @@ class HoleyCalibration(MakesmithInitFuncs):
         self.kin.leftChainTolerance = self.Opt_leftChainTolerance
         self.kin.rightChainTolerance = self.Opt_rightChainTolerance
         self.kin.recomputeGeometry()
-        self.ReportCalibration()
-        return self.Opt_motorOffsetY, self.Opt_D, self.Opt_leftChainTolerance, self.Opt_rightChainTolerance, 1
+        totalError = self.ReportCalibration()
+        return self.Opt_motorOffsetY, self.Opt_D, self.Opt_leftChainTolerance, self.Opt_rightChainTolerance, totalError
 
 
     def ReportCalibration(self):
         self.data.console_queue.put('Optimized Errors')
+        totalError = 0
         for idx, pts, ms, cal, er in zip(
                 range(self.MeasuredLengthArray.size),
                 self.MeasurementMap,
@@ -202,6 +203,9 @@ class HoleyCalibration(MakesmithInitFuncs):
                    '\n\t\tCalibrated Distance: {}' +
                    '\n\t\tDistance Error     : {}').format(
                 idx, pts[0], pts[1], ms, cal, er))
+            totalError = totalError + er*er
+
+        totalError = math.sqrt(totalError)
         self.data.console_queue.put("")
         self.data.console_queue.put("Distance Between Motors:")
         self.data.console_queue.put(self.Opt_D)
@@ -214,6 +218,7 @@ class HoleyCalibration(MakesmithInitFuncs):
         self.data.console_queue.put("")
         self.data.console_queue.put("Right Chain Tolerance:")
         self.data.console_queue.put(self.Opt_rightChainTolerance)
+        return totalError
 
     def CalibratedLengths(self):
         return self.MeasuredLengthArray - self.OptimizationOutput.fun

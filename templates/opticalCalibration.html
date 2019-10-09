@@ -16,14 +16,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="markerX">Horizontal Size of Marker</label>
-                  <input class="form-control" type="number" name="markerX" id="markerX" value="{{markerX}}">
+                  <input class="form-control" type="number" step="any" name="markerX" id="markerX" value="{{markerX}}">
                   <small class="form-text text-muted">Enter value in inches only</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="markerY">Vertical Size of Marker</label>
-                  <input class="form-control" type="number" name="markerY" id="markerY" value="{{markerY}}">
+                  <input class="form-control" type="number" step="any" name="markerY" id="markerY" value="{{markerY}}">
                   <small class="form-text text-muted">Enter value in inches only</small>
                 </div>
               </div>
@@ -32,14 +32,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="scaleX">Horizontal Scale Factor</label>
-                  <input class="form-control" type="number" name="scaleX" id="scaleX" value="{{scaleX}}">
+                  <input class="form-control" type="number" step="any" name="scaleX" id="scaleX" value="{{scaleX}}">
                   <small class="form-text text-muted">Enter something like 1.0028</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="scaleY">Vertical Scale Factor</label>
-                  <input class="form-control" type="number" name="scaleY" id="scaleY" value="{{scaleY}}">
+                  <input class="form-control" type="number" step="any" name="scaleY" id="scaleY" value="{{scaleY}}">
                   <small class="form-text text-muted">Enter something like 1.0028</small>
                 </div>
               </div>
@@ -48,14 +48,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="opticalCenterX">X Coordinate of Center</label>
-                  <input class="form-control" type="number" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
+                  <input class="form-control" type="number" step="any" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
                   <small class="form-text text-muted">Enter something like 300</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="opticalCenterY">Y Coordinate of Center</label>
-                  <input class="form-control" type="number" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
+                  <input class="form-control" type="number" step="any" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
                   <small class="form-text text-muted">Enter something like 200</small>
                 </div>
              </div>
@@ -64,7 +64,7 @@
               <div class="col">
                 <div class="form-group">
                   <label for="positionTolerance">Position Tolerance</label>
-                  <input class="form-control" type="number" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
+                  <input class="form-control" type="number" step="any" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
                   <small class="form-text text-muted">Enter something like 0.125 (mm)</small>
                 </div>
               </div>
@@ -94,14 +94,14 @@
             <div class="col">
               <div class="form-group">
                 <label for="tlX">X Coordinate of Top Left</label>
-                <input class="form-control" type="number" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
+                <input class="form-control" type="number" step="any" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
                 <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
               </div>
             </div>
             <div class="col">
               <div class="form-group">
                 <label for="tlY">Y Coordinate of Top Left</label>
-                <input class="form-control" type="number" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
+                <input class="form-control" type="number" step="any" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
                 <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
               </div>
             </div>
@@ -110,14 +110,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="brX">X Coordinate of Bottom Right</label>
-                  <input class="form-control" type="number" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
+                  <input class="form-control" type="number" step="any" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
                   <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="brY">Y Coordinate of Bottom Right</label>
-                  <input class="form-control" type="number" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
+                  <input class="form-control" type="number" step="any" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
                   <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
                 </div>
               </div>
@@ -156,14 +156,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="markerX">Horizontal Size of Marker</label>
-                      <input class="form-control" type="number" name="markerX" id="markerX" value="{{markerX}}">
+                      <input class="form-control" type="number" step="any" name="markerX" id="markerX" value="{{markerX}}">
                       <small class="form-text text-muted">Enter value in inches only</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="markerY">Vertical Size of Marker</label>
-                      <input class="form-control" type="number" name="markerY" id="markerY" value="{{markerY}}">
+                      <input class="form-control" type="number" step="any" name="markerY" id="markerY" value="{{markerY}}">
                       <small class="form-text text-muted">Enter value in inches only</small>
                     </div>
                   </div>
@@ -172,14 +172,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="scaleX">Horizontal Scale Factor</label>
-                      <input class="form-control" type="number" name="scaleX" id="scaleX" value="{{scaleX}}">
+                      <input class="form-control" type="number" step="any" name="scaleX" id="scaleX" value="{{scaleX}}">
                       <small class="form-text text-muted">Enter something like 1.0028</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="scaleY">Vertical Scale Factor</label>
-                      <input class="form-control" type="number" name="scaleY" id="scaleY" value="{{scaleY}}">
+                      <input class="form-control" type="number" step="any" name="scaleY" id="scaleY" value="{{scaleY}}">
                       <small class="form-text text-muted">Enter something like 1.0028</small>
                     </div>
                   </div>
@@ -188,14 +188,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="opticalCenterX">X Coordinate of Center</label>
-                      <input class="form-control" type="number" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
+                      <input class="form-control" type="number" step="any" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
                       <small class="form-text text-muted">Enter something like 300</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="opticalCenterY">Y Coordinate of Center</label>
-                      <input class="form-control" type="number" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
+                      <input class="form-control" type="number" step="any" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
                       <small class="form-text text-muted">Enter something like 200</small>
                     </div>
                    </div>
@@ -204,7 +204,7 @@
                   <div class="col-6">
                     <div class="form-group">
                       <label for="positionTolerance">Position Tolerance</label>
-                      <input class="form-control" type="number" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
+                      <input class="form-control" type="number" step="any" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
                       <small class="form-text text-muted">Enter something like 0.125 (mm)</small>
                     </div>
                   </div>
@@ -228,14 +228,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="tlX">X Coordinate of Top Left</label>
-                      <input class="form-control" type="number" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
+                      <input class="form-control" type="number" step="any" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
                       <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="tlY">Y Coordinate of Top Left</label>
-                      <input class="form-control" type="number" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
+                      <input class="form-control" type="number" step="any" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
                       <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
                     </div>
                   </div>
@@ -244,14 +244,14 @@
                     <div class="col">
                       <div class="form-group">
                         <label for="brX">X Coordinate of Bottom Right</label>
-                        <input class="form-control" type="number" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
+                        <input class="form-control" type="number" step="any" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
                         <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
                       </div>
                     </div>
                     <div class="col">
                       <div class="form-group">
                         <label for="brY">Y Coordinate of Bottom Right</label>
-                        <input class="form-control" type="number" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
+                        <input class="form-control" type="number" step="any" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
                         <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
                       </div>
                     </div>
@@ -292,14 +292,14 @@
                 <div class="col">
                   <div class="form-group">
                     <label for="cannyLowValue">Canny Low Value</label>
-                    <input class="form-control" type="number" name="cannyLowValue" id="cannyLowValue" value="{{cannyLowValue}}">
+                    <input class="form-control" type="number" step="any" name="cannyLowValue" id="cannyLowValue" value="{{cannyLowValue}}">
                     <small class="form-text text-muted">0-255</small>
                   </div>
                 </div>
                 <div class="col">
                   <div class="form-group">
                     <label for="cannyHighValue">Canny High Value</label>
-                    <input class="form-control" type="number" name="cannyHighValue" id="cannyHighValue" value="{{cannyHighValue}}">
+                    <input class="form-control" type="number" step="any" name="cannyHighValue" id="cannyHighValue" value="{{cannyHighValue}}">
                     <small class="form-text text-muted">0-255</small>
                   </div>
                 </div>
