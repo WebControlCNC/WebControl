@@ -73,7 +73,7 @@ class GCodeFile(MakesmithInitFuncs):
 
 
     def loadUpdateFile(self, gcode=""):
-        print(gcode)
+        #print(gcode)
         if self.data.units == "MM":
             self.canvasScaleFactor = self.MILLIMETERS
         else:
@@ -105,9 +105,11 @@ class GCodeFile(MakesmithInitFuncs):
 
         try:
             filtersparsed = rawfilters #get rid of this if above is uncommented)
+            '''
             filtersparsed = re.sub(
                 r";([^\n]*)\n", "\n", filtersparsed
             )  # replace standard ; initiated gcode comments with newline
+            '''
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
                 r"([0-9])([GXYZIJFTM]) *", "\\1 \\2", filtersparsed
@@ -393,7 +395,32 @@ class GCodeFile(MakesmithInitFuncs):
             shiftX = self.data.gcodeShift[0]
             shiftY = self.data.gcodeShift[1]
 
-        if gCodeLine.find("(") == -1:
+        #print("original:"+gCodeLine)
+        #first check for full comment lines
+        if len(gCodeLine) > 0:
+            if gCodeLine[0] == '(' or gCodeLine[0] == ';':
+                #comment lines
+                #print("comment:"+originalLine)
+                return originalLine
+        #next check for comment after line and if exist, split on first occurrence and retain the comment portion
+        findexA = gCodeLine.find('(')
+        findexB = gCodeLine.find(';')
+        #check to see which came first.. who knows, maybe someone used a ; within a (
+        if findexA != -1 and findexA < findexB:
+            findex = findexA
+        else:
+            findex = findexB
+        comment = ""
+        if findex != -1:
+            #found comment at findex
+            comment = gCodeLine[findex:]
+            #print("comment:"+comment)
+            gCodeLine = gCodeLine[:findex]
+
+
+        #This test should always pass so taking it out
+        #if gCodeLine.find("(") == -1 and gCodeLine.find(";") == -1:
+        if True:
             try:
                 gCodeLine = gCodeLine.upper() + " "
                 x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
@@ -443,6 +470,8 @@ class GCodeFile(MakesmithInitFuncs):
                         + (fmtY % (float(y.groups()[0]) + shiftY))
                         + gCodeLine[y.end() :]
                     )
+                #now, put any comment back.
+                gCodeLine = gCodeLine+comment
                 return gCodeLine
             except ValueError:
                 self.data.console_queue.put("line could not be moved:")
@@ -465,6 +494,10 @@ class GCodeFile(MakesmithInitFuncs):
         except:
             return  # we have reached the end of the file
 
+        filtersparsed = re.sub(r'\(([^)]*)\)', '\n', fullString)  # replace mach3 style gcode comments with newline
+        #fullString = re.sub(r';([^\n]*)\n', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+        fullString = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+        #print("fullString:"+fullString)
         # if the line contains multiple gcode commands split them and execute them individually
         listOfLines = fullString.split("G")
         if len(listOfLines) > 1:  # if the line contains at least one 'G'
@@ -498,7 +531,6 @@ class GCodeFile(MakesmithInitFuncs):
         fullString = (
             fullString + " "
         )  # ensures that there is a space at the end of the line
-
         # find 'G' anywhere in string
         self.prependString = ""
         gString = fullString[fullString.find("G") : fullString.find("G") + 3]
@@ -533,12 +565,14 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.console_queue.put("G18 not supported")
 
         if gString == "G20":
+            #print(fullString)
             if self.data.units != "INCHES":
                 self.data.actions.updateSetting("toInches", 0, True) # value = doesn't matter
             self.canvasScaleFactor = self.INCHES
             self.data.gcodeFileUnits = "INCHES"
 
         if gString == "G21":
+           # print(fullString)
             if self.data.units != "MM":
                 self.data.actions.updateSetting("toMM", 0, True) #value = doesn't matter
             self.data.gcodeFileUnits = "MM"

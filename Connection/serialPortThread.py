@@ -37,8 +37,9 @@ class SerialPortThread(MakesmithInitFuncs):
         # message = message + 'L' + str(len(message) + 1 + 2 + len(str(len(message))) )
         if isQuickCommand == False:
             filtersparsed = re.sub(r'\(([^)]*)\)','\n',message) #replace mach3 style gcode comments with newline
-            message = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
-            
+            #message = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+            message = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+
         taken = time.time() - self.lastWriteTime
         if taken < self.MINTimePerLine:  # wait between sends
             # self.data.logger.writeToLog("Sleeping: " + str( taken ) + "\n")
@@ -47,7 +48,7 @@ class SerialPortThread(MakesmithInitFuncs):
         message = message + "\n"
         # message = message.encode()
         #print("Sending: " + str(message).rstrip('\n'))
-        if message[0]!='(':
+        if True: #message[0]!='(':
             self.data.console_queue.put("Sending: " + str(message).rstrip('\n'))
         
             self.bufferSpace = self.bufferSpace - len(
@@ -103,7 +104,9 @@ class SerialPortThread(MakesmithInitFuncs):
         if self.data.gcodeIndex < len(self.data.gcode):
             if self.data.uploadFlag:
                 line = self.data.gcode[self.data.gcodeIndex]
-                self._write(self.data.gcode[self.data.gcodeIndex])
+                filtersparsed = re.sub(r'\(([^)]*)\)', '\n', line)  # replace mach3 style gcode comments with newline
+                line = re.sub(r';([^.]*)?', '\n',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                self._write(line)
                 if line.find("G20") != -1:
                     if self.data.units != "INCHES":
                         self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
@@ -236,7 +239,8 @@ class SerialPortThread(MakesmithInitFuncs):
                     if self.data.gcode_queue.empty() != True:
                         command = self.data.gcode_queue.get_nowait() + " "
                         filtersparsed = re.sub(r'\(([^)]*)\)','\n',command) #replace mach3 style gcode comments with newline
-                        command = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+                        #command = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+                        command = re.sub(r';([^.]*)?', '\n',filtersparsed)  # replace standard ; initiated gcode comments with newline
                         self._write(command)
                         if command.find("G20") != -1:
                             if self.data.units != "INCHES":
@@ -250,9 +254,12 @@ class SerialPortThread(MakesmithInitFuncs):
                 # and the feature is turned on
                 if weAreBufferingLines:
                     try:
-                        if self.bufferSpace > len(
-                            self.data.gcode[self.data.gcodeIndex]
-                        ):  # if there is space in the buffer keep sending lines
+                        line = self.data.gcode[self.data.gcodeIndex]
+                        filtersparsed = re.sub(r'\(([^)]*)\)', '\n', line)  # replace mach3 style gcode comments with newline
+                        line = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+
+                        #if self.bufferSpace > len(self.data.gcode[self.data.gcodeIndex]):  # if there is space in the buffer keep sending lines
+                        if self.bufferSpace > len(line):  # if there is space in the buffer keep sending lines
                             self.sendNextLine()
                     except IndexError:
                         self.data.console_queue.put("index error when reading gcode")
