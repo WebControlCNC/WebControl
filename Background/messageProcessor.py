@@ -91,10 +91,12 @@ class MessageProcessor(MakesmithInitFuncs):
                                     self.data.ui_queue1.put("Alert", "Alert",
                                                             "<p>Warning, you are running a stock firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
                                                             + "</p><p>Please, click Actions->Upgrade Stock Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                            +"<p>WebControl:"+str(float(self.data.stockFirmwareVersion))+", Controller:"+str(tmpVersion)+"</p>"
                                                             )
                                 elif tmpVersion > float(self.data.stockFirmwareVersion):
                                     self.data.ui_queue1.put("Alert", "Alert",
                                                             "<p>Warning, you are running a stock firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                            +"<p>WebControl:"+str(float(self.data.stockFirmwareVersion))+", Controller:"+str(tmpVersion)+"</p>"
                                                             )
 
                         if tmpVersion >= 50 and tmpVersion < 100:
@@ -103,10 +105,12 @@ class MessageProcessor(MakesmithInitFuncs):
                                     self.data.ui_queue1.put("Alert", "Alert",
                                                                 "<p>Warning, you are running a Holey Calibration firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
                                                                 + "</p><p>Please, click Actions->Upgrade Holey Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                                +"<p>WebControl:"+str(float(self.data.holeyFirmwareVersion))+", Controller:"+str(tmpVersion)+"</p>"
                                                                 )
                                 elif tmpVersion > float(self.data.holeyFirmwareVersion):
                                     self.data.ui_queue1.put("Alert", "Alert",
                                                             "<p>Warning, you are running a Holey Calibration firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                            "<p>WebControl:"+str(float(self.data.holeyFirmwareVersion))+", Controller:"+str(tmpVersion)+"</p>"
                                                             )
                         if tmpVersion >= 100:
                             if self.data.customFirmwareVersion is not None:
@@ -114,10 +118,12 @@ class MessageProcessor(MakesmithInitFuncs):
                                     self.data.ui_queue1.put("Alert", "Alert",
                                                             "<p>Warning, you are running a custom firmware that is not up to date.  This version may not work correctly with this version of WebControl.</p>"
                                                             + "</p><p>Please, click Actions->Upgrade Custom Firmware to update the controller to the latest WebControl-compatible code.</p>"
+                                                            +"<p>WebControl:"+str(float(self.data.customFirmwareVersion))+", Controller:"+str(tmpVersion)+"</p>"
                                                            )
                                 elif tmpVersion > float(self.data.customFirmwareVersion):
                                     self.data.ui_queue1.put("Alert", "Alert",
                                                         "<p>Warning, you are running a custom firmware that is newer than what is included in WebControl.  This version may not work correctly with this version of WebControl.</p>"
+                                                        +"<p>WebControl:"+str(float(self.data.customFirmwareVersion))+", Controller:"+str(tmpVersion)+"</p>"
                                                         )
 
                         '''
