@@ -35,20 +35,24 @@ class SerialPortThread(MakesmithInitFuncs):
 
     def _write(self, message, isQuickCommand=False):
         # message = message + 'L' + str(len(message) + 1 + 2 + len(str(len(message))) )
-        if isQuickCommand == False:
-            filtersparsed = re.sub(r'\(([^)]*)\)','\n',message) #replace mach3 style gcode comments with newline
-            #message = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
-            message = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+        #if isQuickCommand == False:
+        #    filtersparsed = re.sub(r'\(([^)]*)\)','\n',message) #replace mach3 style gcode comments with newline
+        #    #message = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+        #    message = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
 
         taken = time.time() - self.lastWriteTime
         if taken < self.MINTimePerLine:  # wait between sends
             # self.data.logger.writeToLog("Sleeping: " + str( taken ) + "\n")
             time.sleep(self.MINTimePerLine)  # could use (taken - MINTimePerLine)
-
+        '''
+        enc = ""
+        for x in range(len(message)):
+            enc = enc + str(ord(message[x]))+" "
+        print("#"+enc+"#"+str(len(message)))
+        '''
         message = message + "\n"
-        # message = message.encode()
-        #print("Sending: " + str(message).rstrip('\n'))
-        if True: #message[0]!='(':
+
+        if len(message)>1: #True: #message[0]!='(':
             self.data.console_queue.put("Sending: " + str(message).rstrip('\n'))
         
             self.bufferSpace = self.bufferSpace - len(
@@ -104,16 +108,17 @@ class SerialPortThread(MakesmithInitFuncs):
         if self.data.gcodeIndex < len(self.data.gcode):
             if self.data.uploadFlag:
                 line = self.data.gcode[self.data.gcodeIndex]
-                filtersparsed = re.sub(r'\(([^)]*)\)', '\n', line)  # replace mach3 style gcode comments with newline
-                line = re.sub(r';([^.]*)?', '\n',filtersparsed)  # replace standard ; initiated gcode comments with newline
-                self._write(line)
-                if line.find("G20") != -1:
-                    if self.data.units != "INCHES":
-                        self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
-                if line.find("G21") != -1:
-                    if self.data.units != "MM":
-                        self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
-                self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
+                filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
+                line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                if not line.isspace(): # if all spaces, don't send.  likely a comment.
+                    self._write(line)
+                    if line.find("G20") != -1:
+                        if self.data.units != "INCHES":
+                            self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+                    if line.find("G21") != -1:
+                        if self.data.units != "MM":
+                            self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+                    self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
 
                 # increment gcode index
                 if self.data.gcodeIndex + 1 < len(self.data.gcode):
@@ -237,26 +242,28 @@ class SerialPortThread(MakesmithInitFuncs):
                 #print("bSpace="+str(self.bufferSpace)+", bSize="+str(self.bufferSize)+", ready="+str(self.machineIsReadyForData))
                 if self.bufferSpace == self.bufferSize and self.machineIsReadyForData:
                     if self.data.gcode_queue.empty() != True:
-                        command = self.data.gcode_queue.get_nowait() + " "
-                        filtersparsed = re.sub(r'\(([^)]*)\)','\n',command) #replace mach3 style gcode comments with newline
+                        command = self.data.gcode_queue.get_nowait()# + " "
+                        filtersparsed = re.sub(r'\(([^)]*)\)','',command) #replace mach3 style gcode comments with newline
                         #command = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
-                        command = re.sub(r';([^.]*)?', '\n',filtersparsed)  # replace standard ; initiated gcode comments with newline
-                        self._write(command)
-                        if command.find("G20") != -1:
-                            if self.data.units != "INCHES":
-                                self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
-                        if command.find("G21") != -1:
-                            if self.data.units != "MM":
-                                self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
-                        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
+                        command = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                        if len(command) != 0:
+                            command = command + " "
+                            self._write(command)
+                            if command.find("G20") != -1:
+                                if self.data.units != "INCHES":
+                                    self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+                            if command.find("G21") != -1:
+                                if self.data.units != "MM":
+                                    self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+                            self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
 
                 # Send the next line of gcode to the machine if we're running a program. Will send lines to buffer if there is space
                 # and the feature is turned on
                 if weAreBufferingLines:
                     try:
                         line = self.data.gcode[self.data.gcodeIndex]
-                        filtersparsed = re.sub(r'\(([^)]*)\)', '\n', line)  # replace mach3 style gcode comments with newline
-                        line = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+                        filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
+                        line = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
 
                         #if self.bufferSpace > len(self.data.gcode[self.data.gcodeIndex]):  # if there is space in the buffer keep sending lines
                         if self.bufferSpace > len(line):  # if there is space in the buffer keep sending lines
