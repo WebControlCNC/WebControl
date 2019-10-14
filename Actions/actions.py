@@ -11,7 +11,8 @@ import glob
 import json
 import time
 import re
-from zipfile import ZipFile
+import zipfile
+#from zipfile import ZipFile
 import datetime
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
@@ -236,7 +237,6 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating WebControl")
                 print("here1")
                 return "Shutdown"
-
             else:
                 self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
         except Exception as e:
@@ -1422,7 +1422,7 @@ class Actions(MakesmithInitFuncs):
         try:
             timestr = time.strftime("%Y%m%d-%H%M%S")
             filename = self.data.config.home+"/.WebControl"+"wc_diagnostics_"+timestr+".zip"
-            zipObj = ZipFile(filename, 'w')
+            zipObj = zipfile.ZipFile(filename, 'w')
             path1 = self.data.config.home+"/.WebControl/webcontrol.json"
             zipObj.write(path1, os.path.basename(path1))
             path1 = self.data.config.home + "/.WebControl/alog.txt"
@@ -1535,3 +1535,52 @@ class Actions(MakesmithInitFuncs):
         os.chmod(path, mode)
         print("4")
 
+    def addDirToZip(self, zipHandle, path, basePath=""):
+        basePath = basePath.rstrip("\\/") + ""
+        basePath = basePath.rstrip("\\/")
+        for root, dirs, files in os.walk(path):
+            # add dir itself (needed for empty dirs
+            zipHandle.write(os.path.join(root, "."))
+            # add files
+            for file in files:
+                filePath = os.path.join(root, file)
+                inZipPath = filePath.replace(basePath, "", 1).lstrip("\\/")
+                # print filePath + " , " + inZipPath
+                zipHandle.write(filePath, inZipPath)
+
+    def zipfolder(self, filename, target_dir):
+        zipobj = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
+        rootlen = len(target_dir) + 1
+        for base, dirs, files in os.walk(target_dir):
+            for file in files:
+                fn = os.path.join(base, file)
+                zipobj.write(fn, fn[rootlen:])
+        zipobj.close()
+
+    def backupWebControl(self):
+        try:
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            home = self.data.config.getHome()
+            filename = home+"/wc_backup_"+timestr+".zip"
+            print(filename)
+            self.zipfolder(filename, self.data.config.home+'/.Webcontrol')
+            #self.addDirToZip(zipObj, self.data.config.home+'/.Webcontrol')
+            #zipObj.close()
+            return filename
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+
+    def restoreWebControl(self, fileName):
+        try:
+            with zipfile.ZipFile(fileName, 'r') as zipObj:
+                # Extract all the contents of zip file in different directory
+                zipObj.extractall(self.data.config.home+'/.Webcontrol')
+                retval = self.data.config.reloadWebControlJSON()
+                if retval is True:
+                    self.data.gcode_queue.put("$$")
+            return retval
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False

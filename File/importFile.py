@@ -105,3 +105,4 @@ class ImportFile(MakesmithInitFuncs):
             self.data.message_queue.put("Message: Cannot open import file.")
             return False
         return True
+

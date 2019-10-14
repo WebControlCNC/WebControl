@@ -634,3 +634,12 @@ class Config(MakesmithInitFuncs):
         except:
             print('firmwareKeyString Exception: value = ' + str(value))
             return str(value)
+
+    def reloadWebControlJSON(self):
+        try:
+            with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
+                self.settings = json.load(infile)
+            return True
+        except:
+            print("error reloading WebControlJSON")
+            return False

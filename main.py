@@ -320,6 +320,26 @@ def importFileJSON():
             resp.status_code = 500
             return resp
 
+@app.route("/importRestoreWebControl", methods=["POST"])
+def importRestoreWebControl():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        f = request.files["file"]
+        home = app.data.config.getHome()
+        secureFilename = home + "/" + secure_filename(f.filename)
+        f.save(secureFilename)
+        returnVal = app.data.actions.restoreWebControl(secureFilename)
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+
 @app.route("/sendGCode", methods=["POST"])
 def sendGcode():
     app.data.logger.resetIdler()
@@ -451,6 +471,20 @@ def downloadDiagnostics():
             resp = jsonify("failed")
             resp.status_code = 500
             return resp
+
+@app.route("/backupWebControl", methods=["GET"])
+def backupWebControl():
+    app.data.logger.resetIdler()
+    if request.method == "GET":
+        returnVal = app.data.actions.backupWebControl()
+        if returnVal != False:
+            print(returnVal)
+            return send_file(returnVal)
+        else:
+            resp = jsonify("failed")
+            resp.status_code = 500
+            return resp
+
 
 @app.route("/editBoard", methods=["POST"])
 def editBoard():

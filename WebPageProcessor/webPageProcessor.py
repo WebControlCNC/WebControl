@@ -227,6 +227,10 @@ class WebPageProcessor:
             url = "importFileWCJSON"
             page = render_template("importFile.html", url=url)
             return page, "Import webcontrol.json", False, "medium", "content", False
+        elif pageID == "restoreWebControl":
+            url = "importRestoreWebControl"
+            page = render_template("importFile.html", url=url)
+            return page, "Restore WebControl", False, "medium", "content", False
         elif pageID == "actions":
             if self.data.controllerFirmwareVersion < 100:
                 enableCustom = False
