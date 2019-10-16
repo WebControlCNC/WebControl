@@ -261,13 +261,14 @@ class SerialPortThread(MakesmithInitFuncs):
                 # and the feature is turned on
                 if weAreBufferingLines:
                     try:
-                        line = self.data.gcode[self.data.gcodeIndex]
-                        filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
-                        line = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
+                        if len(self.data.gcode) > 0:
+                            line = self.data.gcode[self.data.gcodeIndex]
+                            filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
+                            line = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
 
-                        #if self.bufferSpace > len(self.data.gcode[self.data.gcodeIndex]):  # if there is space in the buffer keep sending lines
-                        if self.bufferSpace > len(line):  # if there is space in the buffer keep sending lines
-                            self.sendNextLine()
+                            #if self.bufferSpace > len(self.data.gcode[self.data.gcodeIndex]):  # if there is space in the buffer keep sending lines
+                            if self.bufferSpace > len(line):  # if there is space in the buffer keep sending lines
+                                self.sendNextLine()
                     except IndexError:
                         self.data.console_queue.put("index error when reading gcode")
                         #print("index error when reading gcode")
