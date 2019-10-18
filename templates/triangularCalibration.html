@@ -5,36 +5,33 @@
   <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutTriangularCalibrationPattern');">Cut Calibration Pattern</button>
   <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopCut');">Stop</button>
   <h5>Measurements</h5>
-  <div class="card">
-    <div class="card-body">
-      <form id="calibrateForm">
-        <input id="pageID" type="hidden" value="{{pageID}}">
-        <div class="form-group">
-          <div class="form-group">
-            <label for="cut12">Distance Between Cuts 1 and 2</label>
-            <input id="cut12" type="number" step="any" class="form-control" name="cut12" value="1930">
-            <small class="form-text text-muted">Enter value in mm only</small>
-          </div>
-          <div class="form-group">
-            <label for="cut34">Distance Between Cuts 3 and 4</label>
-            <input id="cut34" type="number" step="any" lass="form-control" name="cut34" value="1930">
-            <small class="form-text text-muted">Enter value in mm only</small>
-          </div>
-          <div class="form-group">
-            <label for="cut5">Distance Between Top of Work Area and Cut 5</label>
-            <input id="cut5" type="number" step="any" class="form-control" name="cut5" value="300">
-            <small class="form-text text-muted">Enter value in mm only</small>
-          </div>
-          <div class="form-group">
-            <label for="bitDiameter">Router Bit Diameter</label>
-            <input id="bitDiameter" type="number" step="any" class="form-control" name="bitDiameter" value="6.35">
-            <small class="form-text text-muted">Enter value in mm only</small>
-          </div>
-          <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
-        </div>
-      </form>
+  <form id="calibrateForm">
+    <input id="pageID" type="hidden" value="{{pageID}}">
+    <img class = "img-fluid" src="{{ url_for('static',filename='images/triangularCalibration/triangularCalibration.png' , version='11102019o') }}" >
+    <div class="form-group">
+      <div class="form-group">
+        <label for="cut12">Distance Between Cuts 1 and 2</label>
+        <input id="cut12" type="number" step="any" class="form-control" name="cut12" value="1930">
+        <small class="form-text text-muted">Enter value in mm only</small>
+      </div>
+      <div class="form-group">
+        <label for="cut34">Distance Between Cuts 3 and 4</label>
+        <input id="cut34" type="number" step="any" class="form-control" name="cut34" value="1930">
+        <small class="form-text text-muted">Enter value in mm only</small>
+      </div>
+      <div class="form-group">
+        <label for="cut5">Distance Between Top of Work Area and Cut 5</label>
+        <input id="cut5" type="number" step="any" class="form-control" name="cut5" value="300">
+        <small class="form-text text-muted">Enter value in mm only</small>
+      </div>
+      <div class="form-group">
+        <label for="bitDiameter">Router Bit Diameter</label>
+        <input id="bitDiameter" type="number" step="any" class="form-control" name="bitDiameter" value="6.35">
+        <small class="form-text text-muted">Enter value in mm only</small>
+      </div>
+      <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
     </div>
-  </div>
+  </form>
   <h5>Parameters</h5>
   <p><label id="motorYoffset">Height of Motors: {{motorYoffset}}</label></p>
   <p><label id="rotationRadius">Rotational Radius: {{rotationRadius}}</label></p>
