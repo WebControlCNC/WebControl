@@ -597,18 +597,30 @@ class Config(MakesmithInitFuncs):
         path = home+"/firmware/madgrizzle/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
-            version = version[1].split(".hex")
-            self.data.customFirmwareVersion = version[0]
+            maxIndex = len(version)-1
+            if maxIndex >= 0:
+                version = version[maxIndex].split(".hex")
+                self.data.customFirmwareVersion = version[0]
+            else:
+                self.data.customFirmwareVersion = "n/a"
         path = home+"/firmware/maslowcnc/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
-            version = version[1].split(".hex")
-            self.data.stockFirmwareVersion = version[0]
+            maxIndex = len(version)-1
+            if maxIndex >= 0:
+                version = version[maxIndex].split(".hex")
+                self.data.stockFirmwareVersion = version[0]
+            else:
+                self.data.stockFirmwareVersion = "n/a"
         path = home+"/firmware/holey/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
-            version = version[1].split(".hex")
-            self.data.holeyFirmwareVersion = version[0]
+            maxIndex = len(version)-1
+            if maxIndex >= 0:
+                version = version[maxIndex].split(".hex")
+                self.data.holeyFirmwareVersion = version[0]
+            else:
+                self.data.holeyFirmwareVersion = "n/a"
 
     def processChange(self, key, value):
         ### TODO: This does not currently fire on bools ##

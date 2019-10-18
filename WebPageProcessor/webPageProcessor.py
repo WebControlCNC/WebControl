@@ -484,11 +484,12 @@ class WebPageProcessor:
             )
             return page, "Open Board", False, "medium", "content", "footerSubmit"
         elif pageID == "about":
+            version = self.data.pyInstallCurrentVersion
             if isMobile:
                 pageName = "about.html"
             else:
                 pageName = "about.html"
-            page = render_template(pageName, pageID="about")
+            page = render_template(pageName, pageID="about", version=version)
             return page, "About", False, "medium", "content", False
         elif pageID == "gettingStarted":
             if isMobile:

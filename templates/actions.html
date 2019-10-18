@@ -15,9 +15,6 @@
 		<div class="card">
 			<div class="card-body">
 				<h4 class="card-title">Diagnostics/Maintenance</h4>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');$('#contentModal').modal('hide');">Return to Center</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('resetChainLengths');$('#contentModal').modal('hide');">Reset Chain Lengths</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Move to Default Location</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('testMotors');$('#contentModal').modal('hide');">Test Motors/Encoders</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('queryCamera');$('#contentModal').modal('hide');">Query Camera</button>
 				<a class="btn btn-lg btn-block btn-secondary" href="downloadDiagnostics?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Download Diagnostics File</a>
@@ -26,8 +23,6 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
 				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
 				<button type="button" class="btn btn-lg btn-block {{'btn-primary' if updateAvailable else 'btn-secondary'}}" onclick="action('updatePyInstaller');$('#contentModal').modal('hide');" {{'' if updateAvailable else 'disabled'}}>Update WebControl: {{updateRelease}}</button>
-
-
 			</div>
 		</div>
 	</div>
@@ -42,7 +37,9 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');">Triangular Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('pidTuning');$('#contentModal').modal('hide');">PID Tuning</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');$('#contentModal').modal('hide');">Return to Center</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('resetChainLengths');$('#contentModal').modal('hide');">Reset Chain Lengths</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Move to Default Location</button>
 			</div>
 		</div>
 	</div>
@@ -57,6 +54,7 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Settings');$('#contentModal').modal('hide');">Wipe Controller Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Maslow');$('#contentModal').modal('hide');">Wipe Controller Positional Data</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','All');$('#contentModal').modal('hide');">Wipe Controller EEPROM</button>
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('pidTuning');$('#contentModal').modal('hide');">PID Tuning (Advanced)</button>
  			</div>
 		</div>
 	</div>
