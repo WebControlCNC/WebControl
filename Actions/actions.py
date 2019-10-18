@@ -1563,7 +1563,9 @@ class Actions(MakesmithInitFuncs):
             home = self.data.config.getHome()
             filename = home+"/wc_backup_"+timestr+".zip"
             print(filename)
-            self.zipfolder(filename, self.data.config.home+'/.Webcontrol')
+            folder = self.data.config.home+'/.WebControl'
+            print(folder)
+            self.zipfolder(filename, folder)
             #self.addDirToZip(zipObj, self.data.config.home+'/.Webcontrol')
             #zipObj.close()
             return filename
