@@ -338,6 +338,8 @@ class UIProcessor:
         msg = json.loads(_message)
         if msg["command"] == "WebMCP":
             self.sendWebMCPMessage(msg["message"])
+        if msg["command"] == "SendAlarm":
+            self.sendAlarm(msg["message"])
         if msg["command"] == "Action":
             if msg["message"] == "gcodeUpdate":
                 self.sendGcodeUpdate()
