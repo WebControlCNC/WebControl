@@ -719,6 +719,7 @@ function clearAlarm(data){
     console.log("clearing alarm");
     $("#alarms").text("Alarm cleared.");
     $("#alarms").removeClass('alert-danger').addClass('alert-success');
+    $("#stopButton").removeClass('stopbutton');
 }
 
 document.onmousemove = function(event){

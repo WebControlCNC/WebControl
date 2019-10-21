@@ -59,6 +59,12 @@ class MessageProcessor(MakesmithInitFuncs):
                         self.data.uploadFlag = 0
                         self.data.ui_controller_queue.put(message)
                     elif message[0:8] == "Firmware":
+                        '''
+                        send this alarm clear if Firmware is received.  The thought is that if there is an alarm and
+                        this message appears, then the connection to the arduino has been reset.
+                        '''
+                        self.data.ui_queue1.put("Action", "clearAlarm", "")
+
                         self.data.logger.writeToLog(
                             "Ground Control Version " + str(self.data.version) + "\n"
                         )
