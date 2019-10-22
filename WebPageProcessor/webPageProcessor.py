@@ -264,12 +264,16 @@ class WebPageProcessor:
                 page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
+            if self.data.controllerFirmwareVersion < 100:
+                fourMotor = False
+            else:
+                fourMotor = True
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             if isMobile:
-                page = render_template("setSprockets_mobile.html", chainExtendLength=chainExtendLength)
+                page = render_template("setSprockets_mobile.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
             else:
-                page = render_template("setSprockets.html", chainExtendLength=chainExtendLength)
+                page = render_template("setSprockets.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
             return page, "Set Sprockets", False, "medium", "content", False
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
@@ -368,6 +372,10 @@ class WebPageProcessor:
             page = render_template("editGCode.html", gcode=text, pageID="sendGCode", )
             return page, "Edit GCode", True, "medium", "content", "footerSubmit"
         elif pageID == "pidTuning":
+            if self.data.controllerFirmwareVersion < 100:
+                fourMotor = False
+            else:
+                fourMotor = True
             KpP = self.data.config.getValue("Advanced Settings", "KpPos")
             KiP = self.data.config.getValue("Advanced Settings", "KiPos")
             KdP = self.data.config.getValue("Advanced Settings", "KdPos")
@@ -384,7 +392,8 @@ class WebPageProcessor:
                                    KiV=KiV,
                                    KdV=KdV,
                                    vVersion=vVersion,
-                                   pVersion=pVersion)
+                                   pVersion=pVersion,
+                                   fourMotor=fourMotor)
             return page, "PID Tuning", False, "large", "content", False
         elif pageID == "editBoard":
             board = self.data.boardManager.getCurrentBoard()

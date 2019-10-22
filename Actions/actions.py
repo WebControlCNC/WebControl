@@ -1141,9 +1141,9 @@ class Actions(MakesmithInitFuncs):
         laser = None
         dwell = None
         for x in range(self.data.gcodeIndex):
-            filtersparsed = re.sub(r'\(([^)]*)\)','\n',self.data.gcode[x]) #replace mach3 style gcode comments with newline
-            filtersparsed = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
-            if True:#self.data.gcode[x][0] != "(":
+            filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
+            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
+            if not filtersparsed.isspace():  # if all spaces, don't send.  likely a comment. #self.data.gcode[x][0] != "(":
                 #lines = self.data.gcode[x].split(" ")
                 lines = filtersparsed.split(" ")
                 if lines:
@@ -1229,9 +1229,9 @@ class Actions(MakesmithInitFuncs):
         ypos = 0
         zpos = 0
         for x in range(index):
-            filtersparsed = re.sub(r'\(([^)]*)\)','\n',self.data.gcode[x]) #replace mach3 style gcode comments with newline
-            filtersparsed = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
-            if True: #self.data.gcode[x][0] != "(":
+            filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
+            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
+            if not filtersparsed.isspace():  # if all spaces, don't send.  likely a comment.  #self.data.gcode[x][0] != "(":
                 listOfLines = filter(None, re.split("(G)", filtersparsed)) # self.data.gcode[x]))  # self.data.gcode[x].split("G")
                 # it is necessary to split the lines along G and M commands so that commands concatenated on one line
                 # are processed correctly

@@ -147,7 +147,15 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.zMoves = [0]
             zList = []
             for index, line in enumerate(self.data.gcode):
-                if line.find("(") == -1:
+                filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
+                line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                if not line.isspace(): # if all spaces, don't send.  likely a comment. #if line.find("(") == -1:
+                    if line.find("G20") != -1:
+                        self.data.tolerance = 0.020
+                        self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
+                    if line.find("G21") != -1:
+                        self.data.tolerance = 0.50
+                        self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
                     z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
                     if z:
                         zList.append(z)

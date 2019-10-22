@@ -107,6 +107,120 @@
       </button>
     </div>
   </div>
+  <!--Bottom Left -->
+  {% if fourMotor == true %}
+  <h3>Bottom Left Motor</h3>
+  <div class="row">
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',360.0)">
+        <i data-feather="refresh-cw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',10.0)">
+        <i data-feather="rotate-cw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',1)">
+        <i data-feather="rotate-cw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',0.1)">
+        <i data-feather="rotate-cw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-360.0)">
+        <i data-feather="refresh-ccw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-10.0)">
+        <i data-feather="rotate-ccw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-1)">
+        <i data-feather="rotate-ccw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-0.1)">
+        <i data-feather="rotate-ccw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <h3>Bottom Right Motor</h3>
+  <div class="row">
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-360.0)">
+        <i data-feather="refresh-cw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-10.0)">
+        <i data-feather="rotate-cw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-1)">
+        <i data-feather="rotate-cw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-0.1)">
+        <i data-feather="rotate-cw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3 mb-3">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',360.0)">
+        <i data-feather="refresh-ccw"></i>
+        360
+      </button>
+    </div>
+    <div class="col-3 mb-3">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',10.0)">
+        <i data-feather="rotate-ccw"></i>
+        10
+      </button>
+    </div>
+    <div class="col-3 mb-3">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',1)">
+        <i data-feather="rotate-ccw"></i>
+        1
+      </button>
+    </div>
+    <div class="col-3 mb-3">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',0.1)">
+        <i data-feather="rotate-ccw"></i>
+        0.1
+      </button>
+    </div>
+  </div>
+  {% endif %}
+  <!-- -->
+
+
+
+
   <div class="row mb-3">
     <div class="col mb-1">
       <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprocketAutomatic')">Automatic</button>
