@@ -565,6 +565,12 @@ def actionModalClosed(msg):
     socketio.emit("message", {"command": "closeActionModals", "data": data, "dataFormat": "json"},
                   namespace="/MaslowCNC", )
 
+@socketio.on("alertModalClosed", namespace="/MaslowCNC")
+def alertModalClosed(msg):
+    app.data.logger.resetIdler()
+    data = json.dumps({"title": msg["data"]})
+    socketio.emit("message", {"command": "closeAlertModals", "data": data, "dataFormat": "json"},
+                  namespace="/MaslowCNC", )
 
 
 @socketio.on("requestPage", namespace="/MaslowCNC")

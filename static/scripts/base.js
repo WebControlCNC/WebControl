@@ -124,6 +124,13 @@ function closeActionModals(data){
     }
 }
 
+function closeAlertModals(data){
+    if ($('#alertModal').data('name') == data.title)
+    {
+      $('#alertModal').modal('hide');
+    }
+}
+
 function closeContentModals(data){
     if ($('#contentModal').data('name') == data.title)
     {

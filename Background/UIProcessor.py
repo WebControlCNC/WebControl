@@ -177,7 +177,7 @@ class UIProcessor:
                     rightErrorValueAsString = message[startpt:endpt]
                     self.app.data.rightError = float(rightErrorValueAsString)/limit
 
-                    if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 100 and computedEnabled > 0:
+                    if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 150 and computedEnabled > 0:
 
                         startpt = endpt + 1
                         endpt = message.find(',', startpt)
@@ -198,6 +198,11 @@ class UIProcessor:
                         #print("leftChain=" + str(self.app.data.leftChain) + ", rightChain=" + str(self.app.data.rightChain)+", x= "+str(self.app.data.computedX)+", y= "+str(self.app.data.computedY))
                         computedEnabled = 1
                     else:
+                        startpt = endpt + 1
+                        endpt = message.find(',', startpt)
+                        bufferSizeValueAsString = message[startpt:endpt]
+                        self.app.data.bufferSize = int(bufferSizeValueAsString)
+
                         self.app.data.computedX = -999999
                         self.app.data.computedY = -999999
                         computedEnabled = 0

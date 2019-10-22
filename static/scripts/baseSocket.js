@@ -41,12 +41,20 @@
 
       $("#notificationModal").on('hidden.bs.modal', function(e){
           var name = $('#notificationModal').data('name');
+          console.log("closing modal:"+name);
           socket.emit('modalClosed', {data:name});
       });
 
       $("#actionModal").on('hidden.bs.modal', function(e){
           var name = $('#actionModal').data('name');
+          console.log("closing modal:"+name);
           socket.emit('actionModalClosed', {data:name});
+      });
+
+      $("#alertModal").on('hidden.bs.modal', function(e){
+          var name = $('#alertModal').data('name');
+          console.log("closing modal:"+name);
+          socket.emit('alertModalClosed', {data:name});
       });
 
       $("#contentModal").on('hidden.bs.modal', function(e){
@@ -155,6 +163,10 @@
             case 'closeActionModals':
                 //completed
                 closeActionModals(data);
+                break;
+            case 'closeAlertModals':
+                //completed
+                closeAlertModals(data);
                 break;
             case 'closeContentModals':
                 //completed
