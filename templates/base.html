@@ -8,8 +8,8 @@
   <script src="{{ url_for('static',filename='scripts/socket.io-2.1.1.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/jquery-3.3.1.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/bootstrap.bundle.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018o') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018o') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018r') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018r') }}" crossorigin="anonymous"></script>
 
   <script type="text/javascript" charset="utf-8">
   </script>
@@ -20,6 +20,7 @@
     <button id="mobileClientStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>
     <!--<div id="mobileClientActivity" class="alert alert-dark alert-circle alert-sm"></div>-->
     <div id="mobileCPUUsage" class="alert alert-success alert-sm">0%</div>
+    <div id="mobileBufferSize" class="alert alert-success alert-sm" style="display:none">-</div>
     <button id="mobileControllerStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -82,6 +83,7 @@
       <div id="clientStatus" class="alert alert-danger">Not Connect</div>
       <!--<div id="activity" class="alert alert-success alert-circle alert-sm"></div>-->
       <div id="cpuUsage" class="alert alert-success">CPU: 0%</div>
+      <div id="bufferSize" class="alert alert-success" style="display:none">Buffer: 127</div>
       <div id="controllerStatus" class="alert alert-danger">Not Connect</div>
     </div>
 </nav>

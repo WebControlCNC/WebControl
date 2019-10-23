@@ -24,8 +24,14 @@ class UIProcessor:
                 if currentTime-self.lastHealthCheck > 5:
                     self.lastHealthCheck = currentTime
                     load = max(psutil.cpu_percent(interval=None, percpu=True))
+                    weAreBufferingLines = bool(int(self.app.data.config.getValue("Maslow Settings", "bufferOn")))
+                    if weAreBufferingLines:
+                        bufferSize = self.app.data.bufferSize
+                    else:
+                        bufferSize = -1
                     healthData = {
-                        "cpuUsage": load
+                        "cpuUsage": load,
+                        "bufferSize": bufferSize
                     }
                     self.sendHealthMessage(healthData)
                 time.sleep(0.001)
@@ -177,7 +183,7 @@ class UIProcessor:
                     rightErrorValueAsString = message[startpt:endpt]
                     self.app.data.rightError = float(rightErrorValueAsString)/limit
 
-                    if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 150 and computedEnabled > 0:
+                    if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 150:
 
                         startpt = endpt + 1
                         endpt = message.find(',', startpt)
@@ -194,23 +200,25 @@ class UIProcessor:
                         rightChainLengthAsString = message[startpt:endpt]
                         self.app.data.rightChain = float(rightChainLengthAsString)
 
-                        self.app.data.computedX, self.app.data.computedY = self.app.data.holeyKinematics.forward(self.app.data.leftChain, self.app.data.rightChain, self.app.data.xval, self.app.data.yval )
-                        #print("leftChain=" + str(self.app.data.leftChain) + ", rightChain=" + str(self.app.data.rightChain)+", x= "+str(self.app.data.computedX)+", y= "+str(self.app.data.computedY))
-                        computedEnabled = 1
                     else:
                         startpt = endpt + 1
-                        endpt = message.find(',', startpt)
+                        endpt = message.find(']', startpt)
                         bufferSizeValueAsString = message[startpt:endpt]
                         self.app.data.bufferSize = int(bufferSizeValueAsString)
 
+                        computedEnabled = 0
+
+                    if computedEnabled > 0:
+                        self.app.data.computedX, self.app.data.computedY = self.app.data.holeyKinematics.forward(self.app.data.leftChain, self.app.data.rightChain, self.app.data.xval, self.app.data.yval )
+                    else:
                         self.app.data.computedX = -999999
                         self.app.data.computedY = -999999
-                        computedEnabled = 0
 
                     if math.isnan(self.app.data.leftError):
                         self.app.data.leftErrorValue = 0
                     if math.isnan(self.app.data.rightError):
                         self.app.data.rightErrorValue = 0
+
             except:
                 self.app.data.console_queue.put("One Error Report Command Misread")
                 return

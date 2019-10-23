@@ -72,7 +72,7 @@
             $("#cpuUsage").removeClass('alert-warning').addClass('alert-success');
             $("#mobileCPUUsage").removeClass('alert-warning').addClass('alert-success');
           },125);
-          console.log(msg.command);
+          //console.log(msg.command);
           if (msg.dataFormat=='json')
             data = JSON.parse(msg.data);
           else

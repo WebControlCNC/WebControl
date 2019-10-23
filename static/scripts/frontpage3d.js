@@ -355,7 +355,7 @@ function processErrorValueMessage(data){
  $('#leftError').css('width', data.leftError*100+'%').attr('aria-valuenow', data.leftError*100);
  $('#rightError').css('width', data.rightError*100+'%').attr('aria-valuenow', data.rightError*100);
  //check to see if data is valid (i.e., not -999999)
- console.log(data.computedEnabled);
+ //console.log(data.computedEnabled);
  if ( !data.computedEnabled )
  {
     if (isComputedEnabled){
