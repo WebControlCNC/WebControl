@@ -160,57 +160,6 @@ function closeContentModals(data){
 };
 
 
-function action(command, arg, arg1){
-    if (arg==null)
-      arg = "";
-    if (arg1==null)
-      arg1 = "";
-    console.log("action="+command);
-    socket.emit('action',{data:{command:command,arg:arg, arg1:arg1}});
-}
-
-function move(direction){
-  distToMove = $("#distToMove").val();
-  console.log(distToMove)
-  socket.emit('move',{data:{direction:direction,distToMove:distToMove}});
-}
-function moveZ(direction){
-  distToMoveZ = $("#distToMoveZ").val();
-  console.log(distToMoveZ)
-  socket.emit('moveZ',{data:{direction:direction,distToMoveZ:distToMoveZ}});
-}
-
-function settingRequest(section,setting){
-  console.log("requesting..")
-  socket.emit('settingRequest',{data:{section:section,setting:setting}});
-}
-
-function statusRequest(status){
-  console.log("requesting status..")
-  socket.emit('statusRequest',{data:{status:status}});
-}
-
-function requestPage(page, args=""){
-  console.log("requesting page..")
-  socket.emit('requestPage',{data:{page:page, isMobile:isMobile, args:args}});
-}
-
-function updateSetting(setting, value){
-    socket.emit('updateSetting',{data:{setting:setting,value:value}});
-}
-
-function checkForGCodeUpdate(){
-    socket.emit('checkForGCodeUpdate',{data:"Please"});
-}
-
-function checkForBoardUpdate(){
-    socket.emit('checkForBoardUpdate',{data:"Please"});
-}
-
-function checkForHostAddress(){
-    socket.emit('checkForHostAddress',{data:"Please"});
-}
-
 $.fn.scrollBottom = function() {
     return $(this).scrollTop($(this)[0].scrollHeight);
 };

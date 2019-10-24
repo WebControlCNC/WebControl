@@ -40,11 +40,10 @@ html, body{
   flex:1;
 }
 
-#workarea {
+.fullWorkArea {
     height: calc(100vh - 85px);
     cursor: none;
 }
-
 
 /*#button3D, #buttonReset {*/
 #button3DResetGroup{

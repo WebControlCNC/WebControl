@@ -16,7 +16,6 @@ var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-20;
 var h = $("#workarea").height()-20;
 renderer.setSize( w, h );
-//console.log(w)
 
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
