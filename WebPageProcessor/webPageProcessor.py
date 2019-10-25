@@ -244,7 +244,6 @@ class WebPageProcessor:
                 docker = True
             else:
                 docker = False
-            docker=False
             if self.data.pyInstallUpdateAvailable:
                 updateAvailable = True
                 updateRelease = self.data.pyInstallUpdateVersion
