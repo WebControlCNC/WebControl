@@ -265,6 +265,8 @@ function homePositionUpdate(x,y){
         y /= 25.4
     }
     home.position.set(x,y,0);
+    //shift any gcode
+    gcode.position.set(x,y,0);
 }
 
 function gcodePositionUpdate(x,y,z){
@@ -433,7 +435,7 @@ function gcodeUpdateCompressed(data){
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
-    //console.log(data)
+    console.log(data)
     var pX, pY, pZ = -99999.9
     var gcodeDashed;
     var gcodeUndashed;

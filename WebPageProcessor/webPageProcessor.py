@@ -357,12 +357,9 @@ class WebPageProcessor:
             page = render_template("viewGcode.html", gcode=self.data.gcode)
             return page, "View GCode", False, "medium", "content", False
         elif pageID == "editGCode":
-            homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
-            homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
             text = ""
             for line in self.data.gcode:
-                newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
-                text = text + newLine + "\n"
+                text = text + line + "\n"
             #text = self.gcodePreProcessor()
             page = render_template("editGCode.html", gcode=text, pageID="editGCode",)
             return page, "Edit GCode", True, "medium", "content", "footerSubmit"

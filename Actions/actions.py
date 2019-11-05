@@ -256,42 +256,24 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def defineHome(self, posX, posY):
-        print("posx = "+str(posX)+", posy="+str(posY)+", units="+ str(self.data.units))
-        print("xval = "+str(self.data.xval) + ", yval=" + str(self.data.yval))
         try:
-            #oldHomeX = self.data.xval
-            #oldHomeY = self.data.yval
-            oldHomeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
-            oldHomeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
-
             if self.data.units == "MM":
                 scaleFactor = 25.4
             else:
                 scaleFactor = 1.0
-            if posX!="" and posY!="":
-                homeX=posX*scaleFactor
-                homeY=posY*scaleFactor
+            if posX != "" and posY != "":
+                homeX = posX * scaleFactor
+                homeY = posY * scaleFactor
             else:
-                homeX=round(self.data.xval,4)
-                homeY=round(self.data.yval,4)
-            #self.data.gcodeShift = [
-            #    homeX,
-            #    homeY
-            #]
-            print("homeX= "+str(homeX) + ", homeY= " + str(homeY))
-            print("oldHomeX= "+str(oldHomeX) + ", oldHomeY= " + str(oldHomeY))
-            self.data.gcodeShift = [ homeX-oldHomeX, homeY-oldHomeY ]
+                homeX = round(self.data.xval, 4)
+                homeY = round(self.data.yval, 4)
 
             self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
             self.data.config.setValue("Advanced Settings", "homeY", str(homeY))
+
+            self.data.gcodeShift = [ homeX, homeY ]
             position = {"xval": homeX, "yval": homeY}
             self.data.ui_queue1.put("Action", "homePositionMessage", position)
-            self.data.console_queue.put("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
-            self.data.console_queue.put(self.data.gcode)
-            text=""
-            for line in self.data.gcode:
-                text = text + line + "\n"
-            self.data.gcodeFile.loadUpdateFile(text)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))

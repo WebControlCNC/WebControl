@@ -110,7 +110,11 @@ class SerialPortThread(MakesmithInitFuncs):
                 line = self.data.gcode[self.data.gcodeIndex]
                 filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
                 line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                # put gcode home shift here
+
+
                 if not line.isspace(): # if all spaces, don't send.  likely a comment.
+                    line = self.data.gcodeFile.moveLine(line)
                     self._write(line)
                     if line.find("G20") != -1:
                         if self.data.units != "INCHES":
