@@ -31,7 +31,8 @@ class UIProcessor:
                         bufferSize = -1
                     healthData = {
                         "cpuUsage": load,
-                        "bufferSize": bufferSize
+                        "bufferSize": bufferSize,
+                        "uploadFlag": self.app.data.uploadFlag,
                     }
                     self.sendHealthMessage(healthData)
                 time.sleep(0.001)
@@ -82,6 +83,7 @@ class UIProcessor:
                                 self.app.data.manualZAxisAdjust = True
                                 self.app.data.previousUploadStatus = self.app.data.uploadFlag
                                 self.app.data.pausedzval = self.app.data.zval
+                                self.app.data.pausedUnits = self.app.data.units
                                 self.app.data.console_queue.put("found tool change in message")
                                 self.activateModal("Notification:", message[13:], "notification", resume="resume")
                             elif message[0:8] == "Message:":
@@ -347,6 +349,22 @@ class UIProcessor:
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                       namespace="/MaslowCNC", )
 
+    def unitsUpdateZ(self):
+        unitsZ = self.app.data.config.getValue(
+            "Computed Settings", "unitsZ"
+        )
+        data = json.dumps({"setting": "unitsZ", "value": unitsZ})
+        socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
+                      namespace="/MaslowCNC", )
+    def distToMoveUpdateZ(self):
+        distToMoveZ = self.app.data.config.getValue(
+            "Computed Settings", "distToMoveZ"
+        )
+        data = json.dumps({"setting": "distToMoveZ", "value": distToMoveZ})
+        socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
+                      namespace="/MaslowCNC", )
+
+
     def processMessage(self, _message):
         msg = json.loads(_message)
         if msg["command"] == "WebMCP":
@@ -362,6 +380,10 @@ class UIProcessor:
                 self.unitsUpdate()
             elif msg["message"] == "distToMoveUpdate":
                 self.distToMoveUpdate()
+            elif msg["message"] == "unitsUpdateZ":
+                self.unitsUpdateZ()
+            elif msg["message"] == "distToMoveUpdateZ":
+                self.distToMoveUpdateZ()
             elif msg["message"] == "updateTimer":
                 #Todo: clean this up
                 self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))

@@ -2,7 +2,10 @@
        max-width: 90% !important;
       width: 90% !important;
  }
- 
+
+.disabler {
+}
+
 .alert {
   margin-bottom: 1px;
   height: 30px;

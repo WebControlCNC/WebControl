@@ -11,6 +11,8 @@ var boardID = "-"
 var boardMaterial = "-"
 var cutSquareGroup = new THREE.Group();
 var showBoard = true;
+var homeX = 0;
+var homeY = 0;
 
 var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-20;
@@ -266,7 +268,11 @@ function homePositionUpdate(x,y){
     }
     home.position.set(x,y,0);
     //shift any gcode
+    homeX = x;
+    homeY = y;
     gcode.position.set(x,y,0);
+
+
 }
 
 function gcodePositionUpdate(x,y,z){
@@ -275,7 +281,7 @@ function gcodePositionUpdate(x,y,z){
         y /= 25.4
         z /= 25.4
     }
-    gcodePos.position.set(x,y,z);
+    gcodePos.position.set(x+homeX,y+homeY,z);
     //console.log("x="+x+", y="+y)
 }
 
@@ -305,6 +311,14 @@ $(document).ready(function(){
         if (!view3D)
         {
             pos = cursorPosition();
+
+            x = pos.x;
+            x = x.toFixed(4);
+            pos.x = x;
+
+            y = pos.y;
+            y = y.toFixed(4);
+            pos.y = y;
             requestPage("screenAction",pos)
         }
     });
@@ -406,6 +420,7 @@ function processErrorValueMessage(data){
 
 
 function processHomePositionMessage(data){
+  console.log(data.xval)
   $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
   homePositionUpdate(data.xval,data.yval);
 }
