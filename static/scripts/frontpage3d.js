@@ -27,6 +27,7 @@ var gcode = new THREE.Group();
 //var cutTrailGroup = new THREE.Group();
 
 var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
+//var camera = new THREE.OrthographicCamera(w/-2, w/2, h/2, h/-2, 1, 500);
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.screenSpacePanning = true;
 

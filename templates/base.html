@@ -41,7 +41,6 @@
           </div>
         </li>
         <li class="nav-item" id="actionsNavItem">
-            <span id="actionsBadge" class="badge badge-pill badge-primary" style="float:right;margin-bottom:-10px;"></span>
             <a class="nav-link" href="#" onclick="requestPage('actions');">Actions</a>
         </li>
         <li class="nav-item dropdown">
@@ -70,6 +69,7 @@
           </div>
         </li>
         <li class="nav-item dropdown">
+          <span id="helpBadge" class="badge badge-pill badge-primary" style="float:left;margin-bottom:-10px;"></span>
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Help
           </a>
@@ -77,7 +77,9 @@
             <a class="dropdown-item" href="#" onclick="requestPage('gettingStarted');">Getting Started</a>
             <a class="dropdown-item" href="#" onclick="requestPage('help');">Help!</a>
             <a class="dropdown-item" href="#" onclick="requestPage('about');">About</a>
-          </div>
+            <span id="updateBadge" class="badge badge-pill badge-primary" style="float:left;margin-bottom:-10px;"></span>
+            <a class="dropdown-item" href="#" onclick="requestPage('releases');">Update</a>
+        </div>
         </li>
       </ul>
       <div id="clientStatus" class="alert alert-danger">Not Connect</div>

@@ -4,7 +4,6 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import os
 import sys
 import threading
-import re
 import math
 import serial.tools.list_ports
 import glob
@@ -66,6 +65,10 @@ class Actions(MakesmithInitFuncs):
             #Commands not allowed during sending gcode
             elif self.data.uploadFlag:
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
+            elif msg["data"]["command"] == "update":
+                if not self.data.releaseManager.update(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with updating webcontrol.")
+                return "Shutdown"
             elif msg["data"]["command"] == "cutTriangularCalibrationPattern":
                 if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with cutting triangular calibration pattern.")
@@ -237,7 +240,7 @@ class Actions(MakesmithInitFuncs):
                 if not self.data.boardManager.clearBoard():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with clearing board")
             elif msg["data"]["command"] == "updatePyInstaller":
-                if not self.updatePyInstaller():
+                if not self.data.releaseManager.updatePyInstaller():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating WebControl")
                 return "Shutdown"
             else:
@@ -1473,9 +1476,9 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def checkForLatestPyRelease(self):
-        if self.data.platform=="PYINSTALLER":
+        if True: #self.data.platform=="PYINSTALLER":
             print("check for pyrelease")
             g = Github()
             repo = g.get_repo("madgrizzle/WebControl")
@@ -1487,10 +1490,12 @@ class Actions(MakesmithInitFuncs):
             for release in releases:
                 try:
                     tag_name = re.sub(r'[v]',r'',release.tag_name)
+                    print(release.body)
                     #print(tag_name)
                     if float(tag_name) > latest:
                         latest = float(tag_name)
                         latestRelease = release
+
                 except:
                     print("error parsing tagname")
             print(latest)
@@ -1566,6 +1571,7 @@ class Actions(MakesmithInitFuncs):
         print("3")
         os.chmod(path, mode)
         print("4")
+    '''
 
     def addDirToZip(self, zipHandle, path, basePath=""):
         basePath = basePath.rstrip("\\/") + ""
@@ -1588,6 +1594,7 @@ class Actions(MakesmithInitFuncs):
                 fn = os.path.join(base, file)
                 zipobj.write(fn, fn[rootlen:])
         zipobj.close()
+
 
     def backupWebControl(self):
         try:

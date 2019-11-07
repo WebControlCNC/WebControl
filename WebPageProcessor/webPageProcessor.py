@@ -5,10 +5,12 @@ import math
 import json
 from os import listdir
 from os.path import isfile, join
+import re
 from flask import render_template
 import os
 import webbrowser
 import socket
+from github import Github
 
 class WebPageProcessor:
 
@@ -503,6 +505,31 @@ class WebPageProcessor:
                 pageName = "gettingStarted.html"
             page = render_template(pageName, pageID="gettingStarted")
             return page, "Getting Started", False, "medium", "content", False
+        elif pageID == "releases":
+            releases = self.data.releaseManager.getReleases()
+            latestRelease = self.data.releaseManager.getLatestRelease()
+            currentRelease = "v"+str(self.data.pyInstallCurrentVersion)
+            for release in releases:
+                tag_name = re.sub(r'[v]', r'', release.tag_name)
+            if isMobile:
+                page = render_template(
+                    "releases_mobile.html",
+                    title="Update Manager",
+                    releases=releases,
+                    latestRelease=latestRelease,
+                    currentRelease=currentRelease,
+                    pageID="releases",
+                )
+            else:
+                page = render_template(
+                    "releases.html",
+                    title="Update Manager",
+                    releases=releases,
+                    latestRelease=latestRelease,
+                    currentRelease=currentRelease,
+                    pageID="releases",
+                )
+            return page, "Update Manager", False, "medium", "content", False
 
         else:
             self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")

@@ -17,7 +17,7 @@ class MessageProcessor(MakesmithInitFuncs):
             # check for available update file
             if time.time()-self.data.lastChecked > 60*60:
                 self.data.lastChecked = time.time()
-                self.data.actions.checkForLatestPyRelease()
+                self.data.releaseManager.checkForLatestPyRelease()
             while (
                 not self.data.message_queue.empty()
             ):  # if there is new data to be read

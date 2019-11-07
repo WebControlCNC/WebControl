@@ -195,6 +195,7 @@ function setupStatusButtons(){
 function pyInstallUpdateBadge(data){
     console.log("---##-")
     console.log(data);
-    $('#actionsBadge').html("1");
+    $('#helpBadge').html("1");
+    $('#updateBadge').html("1");
     console.log("---##-")
 }
