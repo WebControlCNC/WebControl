@@ -5,10 +5,12 @@ import math
 import json
 from os import listdir
 from os.path import isfile, join
+import re
 from flask import render_template
 import os
 import webbrowser
 import socket
+from github import Github
 
 class WebPageProcessor:
 
@@ -357,12 +359,9 @@ class WebPageProcessor:
             page = render_template("viewGcode.html", gcode=self.data.gcode)
             return page, "View GCode", False, "medium", "content", False
         elif pageID == "editGCode":
-            homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
-            homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
             text = ""
             for line in self.data.gcode:
-                newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
-                text = text + newLine + "\n"
+                text = text + line + "\n"
             #text = self.gcodePreProcessor()
             page = render_template("editGCode.html", gcode=text, pageID="editGCode",)
             return page, "Edit GCode", True, "medium", "content", "footerSubmit"
@@ -506,6 +505,31 @@ class WebPageProcessor:
                 pageName = "gettingStarted.html"
             page = render_template(pageName, pageID="gettingStarted")
             return page, "Getting Started", False, "medium", "content", False
+        elif pageID == "releases":
+            releases = self.data.releaseManager.getReleases()
+            latestRelease = self.data.releaseManager.getLatestRelease()
+            currentRelease = "v"+str(self.data.pyInstallCurrentVersion)
+            for release in releases:
+                tag_name = re.sub(r'[v]', r'', release.tag_name)
+            if isMobile:
+                page = render_template(
+                    "releases_mobile.html",
+                    title="Update Manager",
+                    releases=releases,
+                    latestRelease=latestRelease,
+                    currentRelease=currentRelease,
+                    pageID="releases",
+                )
+            else:
+                page = render_template(
+                    "releases.html",
+                    title="Update Manager",
+                    releases=releases,
+                    latestRelease=latestRelease,
+                    currentRelease=currentRelease,
+                    pageID="releases",
+                )
+            return page, "Update Manager", False, "medium", "content", False
 
         else:
             self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")

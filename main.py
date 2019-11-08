@@ -18,6 +18,7 @@ from flask import Flask, jsonify, render_template, current_app, request, flash, 
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
+from Background.LogStreamer import LogStreamer  # do this after socketio is declared
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
 from DataStructures.data import Data
@@ -50,6 +51,7 @@ app.data.firstRun = False
 
 app.UIProcessor = UIProcessor()
 app.webPageProcessor = WebPageProcessor(app.data)
+app.LogStreamer = LogStreamer()
 
 ## this defines the schedule for running the serial port open connection
 def run_schedule():
@@ -78,6 +80,10 @@ app.uithread = None
 ## uithread set to None.. will be activated upon first websocket connection from webmcp
 app.mcpthread = None
 
+## logstreamerthread set to None.. will be activated upon first websocket connection from log streamer browser
+app.logstreamerthread = None
+
+
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
@@ -95,6 +101,17 @@ def controls(template):
         return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True)
     else:
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
+
+@app.route("/logs")
+@mobile_template("/logs/{mobile/}")
+def logs(template):
+    print("here")
+    app.data.logger.resetIdler()
+    if template == "/logs/mobile/":
+        return render_template("logs.html")
+    else:
+        return render_template("logs.html")
+
 
 @app.route("/maslowSettings", methods=["POST"])
 def maslowSettings():
@@ -652,6 +669,22 @@ def checkForBoardUpdate(msg):
     # this currently doesn't check for updated board, it just resends it..
     app.data.ui_queue1.put("Action", "boardUpdate", "")
 
+@socketio.on("connect", namespace="/MaslowCNCLogs")
+def log_connect():
+    app.data.console_queue.put("connected to log")
+    app.data.console_queue.put(request.sid)
+    if app.logstreamerthread == None:
+        app.logstreamerthread = socketio.start_background_task(
+            app.LogStreamer.start, current_app._get_current_object()
+        )
+        app.logstreamerthread.start()
+
+    socketio.emit("my response", {"data": "Connected", "count": 0}, namespace="/MaslowCNCLog")
+
+@socketio.on("disconnect", namespace="/MaslowCNCLogs")
+def log_disconnect():
+    app.data.console_queue.put("Client disconnected")
+
 
 @app.template_filter('isnumber')
 def isnumber(s):
@@ -682,7 +715,7 @@ if __name__ == "__main__":
 
     print("-$$$$$-")
     print(os.path.abspath(__file__))
-    app.data.actions.processAbsolutePath(os.path.abspath(__file__))
+    app.data.releaseManager.processAbsolutePath(os.path.abspath(__file__))
     print("-$$$$$-")
 
 

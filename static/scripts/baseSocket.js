@@ -25,6 +25,8 @@ function setListeners(){
       settingRequest("Computed Settings","units");
       settingRequest("Computed Settings","distToMove");
       settingRequest("Computed Settings","homePosition");
+      settingRequest("Computed Settings","unitsZ");
+      settingRequest("Computed Settings","distToMoveZ");
       checkForGCodeUpdate();
       checkForBoardUpdate();
   });

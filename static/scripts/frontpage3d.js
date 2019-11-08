@@ -11,6 +11,8 @@ var boardID = "-"
 var boardMaterial = "-"
 var cutSquareGroup = new THREE.Group();
 var showBoard = true;
+var homeX = 0;
+var homeY = 0;
 
 var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width()-20;
@@ -25,6 +27,7 @@ var gcode = new THREE.Group();
 //var cutTrailGroup = new THREE.Group();
 
 var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
+//var camera = new THREE.OrthographicCamera(w/-2, w/2, h/2, h/-2, 1, 500);
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.screenSpacePanning = true;
 
@@ -265,6 +268,12 @@ function homePositionUpdate(x,y){
         y /= 25.4
     }
     home.position.set(x,y,0);
+    //shift any gcode
+    homeX = x;
+    homeY = y;
+    gcode.position.set(x,y,0);
+
+
 }
 
 function gcodePositionUpdate(x,y,z){
@@ -273,7 +282,7 @@ function gcodePositionUpdate(x,y,z){
         y /= 25.4
         z /= 25.4
     }
-    gcodePos.position.set(x,y,z);
+    gcodePos.position.set(x+homeX,y+homeY,z);
     //console.log("x="+x+", y="+y)
 }
 
@@ -303,6 +312,14 @@ $(document).ready(function(){
         if (!view3D)
         {
             pos = cursorPosition();
+
+            x = pos.x;
+            x = x.toFixed(4);
+            pos.x = x;
+
+            y = pos.y;
+            y = y.toFixed(4);
+            pos.y = y;
             requestPage("screenAction",pos)
         }
     });
@@ -404,6 +421,7 @@ function processErrorValueMessage(data){
 
 
 function processHomePositionMessage(data){
+  console.log(data.xval)
   $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
   homePositionUpdate(data.xval,data.yval);
 }
@@ -433,7 +451,7 @@ function gcodeUpdateCompressed(data){
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
-    //console.log(data)
+    console.log(data)
     var pX, pY, pZ = -99999.9
     var gcodeDashed;
     var gcodeUndashed;

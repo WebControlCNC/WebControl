@@ -4,7 +4,6 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import os
 import sys
 import threading
-import re
 import math
 import serial.tools.list_ports
 import glob
@@ -27,14 +26,56 @@ class Actions(MakesmithInitFuncs):
 
     def processAction(self, msg):
         try:
-            #test
-            if msg["data"]["command"] == "cutTriangularCalibrationPattern":
+            #Commands allowed during sending gcode
+            if msg["data"]["command"] == "createDirectory":
+                if not self.createDirectory(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with creating directory.")
+            elif msg["data"]["command"] == "stopZ":
+                if not self.stopZ():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping Z-Axis movement")
+            elif msg["data"]["command"] == "startRun":
+                if not self.startRun():
+                    if len(self.data.gcode) > 0:
+                        self.data.ui_queue1.put("Alert", "Alert", "Error with starting run.")
+                    else:
+                        self.data.ui_queue1.put("Alert", "Alert", "No GCode file loaded.")
+            elif msg["data"]["command"] == "stopRun":
+                if not self.stopRun():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping run")
+            elif msg["data"]["command"] == "pauseRun":
+                if not self.pauseRun():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with pausing run")
+            elif msg["data"]["command"] == "resumeRun":
+                if not self.resumeRun():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with resuming run")
+            elif msg["data"]["command"] == "toggleCamera":
+                if not self.toggleCamera():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            elif msg["data"]["command"] == "statusRequest":
+                if msg["data"]["arg"] == "cameraStatus":
+                    if not self.cameraStatus():
+                        self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            elif msg["data"]["command"] == "queryCamera":
+                if not self.queryCamera():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            elif msg["data"]["command"] == "shutdown":
+                if not self.shutdown():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
+
+            #Commands not allowed during sending gcode
+            elif self.data.uploadFlag:
+                self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
+            elif msg["data"]["command"] == "update":
+                if not self.data.releaseManager.update(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with updating webcontrol.")
+                return "Shutdown"
+            elif msg["data"]["command"] == "cutTriangularCalibrationPattern":
                 if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with cutting triangular calibration pattern.")
             elif msg["data"]["command"] == "acceptTriangularCalibrationResults":
                 if not self.data.triangularCalibration.acceptTriangularCalibrationResults():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with accepting triangular calibration results.")
-            if msg["data"]["command"] == "cutHoleyCalibrationPattern":
+            elif msg["data"]["command"] == "cutHoleyCalibrationPattern":
                 if not self.data.holeyCalibration.CutTestPattern():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with cutting holey calibration pattern.")
             elif msg["data"]["command"] == "acceptHoleyCalibrationResults":
@@ -43,9 +84,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "resetChainLengths":
                 if not self.resetChainLengths():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting chain lengths.")
-            elif msg["data"]["command"] == "createDirectory":
-                if not self.createDirectory(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with creating directory.")
             elif msg["data"]["command"] == "move":
                 if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
@@ -72,18 +110,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "defineZ0":
                 if not self.data.actions.defineZ0():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with defining Z-Axis zero.")
-            elif msg["data"]["command"] == "stopZ":
-                if not self.stopZ():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping Z-Axis movement")
-            elif msg["data"]["command"] == "startRun":
-                if not self.startRun():
-                    if len(self.data.gcode) > 0:
-                        self.data.ui_queue1.put("Alert", "Alert", "Error with starting run.")
-                    else:
-                        self.data.ui_queue1.put("Alert", "Alert", "No GCode file loaded.")
-            elif msg["data"]["command"] == "stopRun":
-                if not self.stopRun():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping run")
             elif msg["data"]["command"] == "moveToDefault":
                 if not self.moveToDefault():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with moving to default chain lengths")
@@ -93,12 +119,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "wipeEEPROM":
                 if not self.wipeEEPROM(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with wiping EEPROM")
-            elif msg["data"]["command"] == "pauseRun":
-                if not self.pauseRun():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with pausing run")
-            elif msg["data"]["command"] == "resumeRun":
-                if not self.resumeRun():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with resuming run")
             elif msg["data"]["command"] == "returnToCenter":
                 if not self.returnToCenter():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with returning to center")
@@ -204,19 +224,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "adjustChain":
                 if not self.adjustChain(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting chain.")
-            elif msg["data"]["command"] == "toggleCamera":
-                if not self.toggleCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "statusRequest":
-                if msg["data"]["arg"] == "cameraStatus":
-                    if not self.cameraStatus():
-                        self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "queryCamera":
-                if not self.queryCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "shutdown":
-                if not self.shutdown():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
             elif msg["data"]["command"] == "executeVelocityPIDTest":
                 if not self.velocityPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
@@ -233,15 +240,17 @@ class Actions(MakesmithInitFuncs):
                 if not self.data.boardManager.clearBoard():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with clearing board")
             elif msg["data"]["command"] == "updatePyInstaller":
-                if not self.updatePyInstaller():
+                if not self.data.releaseManager.updatePyInstaller():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating WebControl")
-                print("here1")
                 return "Shutdown"
             else:
-                self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
+                response = "Function not currently implemented.. Sorry."
+                response = response + "["+msg["data"]["command"]+"]"
+                self.data.ui_queue1.put("Alert", "Alert", response)
+                print(msg["data"])
         except Exception as e:
             print(str(e))
-            
+
 
     def shutdown(self):
         try:
@@ -256,42 +265,24 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def defineHome(self, posX, posY):
-        print("posx = "+str(posX)+", posy="+str(posY)+", units="+ str(self.data.units))
-        print("xval = "+str(self.data.xval) + ", yval=" + str(self.data.yval))
         try:
-            #oldHomeX = self.data.xval
-            #oldHomeY = self.data.yval
-            oldHomeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
-            oldHomeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
-
             if self.data.units == "MM":
                 scaleFactor = 25.4
             else:
                 scaleFactor = 1.0
-            if posX!="" and posY!="":
-                homeX=posX*scaleFactor
-                homeY=posY*scaleFactor
+            if posX != "" and posY != "":
+                homeX = posX * scaleFactor
+                homeY = posY * scaleFactor
             else:
-                homeX=round(self.data.xval,4)
-                homeY=round(self.data.yval,4)
-            #self.data.gcodeShift = [
-            #    homeX,
-            #    homeY
-            #]
-            print("homeX= "+str(homeX) + ", homeY= " + str(homeY))
-            print("oldHomeX= "+str(oldHomeX) + ", oldHomeY= " + str(oldHomeY))
-            self.data.gcodeShift = [ homeX-oldHomeX, homeY-oldHomeY ]
+                homeX = round(self.data.xval, 4)
+                homeY = round(self.data.yval, 4)
 
             self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
             self.data.config.setValue("Advanced Settings", "homeY", str(homeY))
+
+            self.data.gcodeShift = [ homeX, homeY ]
             position = {"xval": homeX, "yval": homeY}
             self.data.ui_queue1.put("Action", "homePositionMessage", position)
-            self.data.console_queue.put("gcodeShift="+str(self.data.gcodeShift[0])+", "+str(self.data.gcodeShift[1]))
-            self.data.console_queue.put(self.data.gcode)
-            text=""
-            for line in self.data.gcode:
-                text = text + line + "\n"
-            self.data.gcodeFile.loadUpdateFile(text)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -360,6 +351,7 @@ class Actions(MakesmithInitFuncs):
                 if self.data.gcodeIndex >0:
                     self.processGCode()
                     self.sendGCodePositionUpdate(recalculate=True)
+                    self.data.uploadFlag = 1
                     #self.data.console_queue.put("Run Paused")
                     #self.data.ui_queue1.put("Action", "setAsResume", "")
                     #self.data.pausedzval = self.data.zval
@@ -367,7 +359,6 @@ class Actions(MakesmithInitFuncs):
                     #self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
                     self.data.uploadFlag = 1
                     #self.data.gcodeIndex += 1
-
                 return True
             else:
                 return False
@@ -457,6 +448,11 @@ class Actions(MakesmithInitFuncs):
         try:
             if self.data.manualZAxisAdjust:
                 self.data.uploadFlag = self.data.previousUploadStatus
+                if self.data.pausedUnits != self.data.units:
+                    if self.data.pausedUnits == "INCHES":
+                        self.data.gcode_queue.put("G20 ")
+                    else:
+                        self.data.gcode_queue.put("G21 ")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
             else:
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
@@ -645,6 +641,9 @@ class Actions(MakesmithInitFuncs):
         try:
             self.data.console_queue.put("at update setting from gcode("+str(fromGcode)+"): "+setting+" with value: "+str(value))
             if setting == "toInches" or setting == "toMM":
+                if self.data.uploadFlag == 1 and fromGcode == False:
+                    self.data.ui_queue1.put("Alert", "Alert", "Cannot change units while sending gcode.")
+                    return True
                 scaleFactor = 0
                 if fromGcode:
                     value = float(self.data.config.getValue("Computed Settings", "distToMove"))
@@ -697,17 +696,28 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "homePositionMessage", position)
                 self.sendGCodePositionUpdate(recalculate=True)
             elif setting == "toInchesZ":
+                if self.data.uploadFlag == 1:
+                    self.data.ui_queue1.put("Alert", "Alert", "Cannot change units while sending gcode.")
+                    return True
                 self.data.units = "INCHES"
                 self.data.config.setValue(
                     "Computed Settings", "unitsZ", self.data.units
                 )
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
+                self.data.ui_queue1.put("Action", "unitsUpdateZ", "")
+                self.data.ui_queue1.put("Action", "distToMoveUpdateZ", "")
+
             elif setting == "toMMZ":
+                if self.data.uploadFlag == 1:
+                    self.data.ui_queue1.put("Alert", "Alert", "Cannot change units while sending gcode.")
+                    return True
                 self.data.units = "MM"
                 self.data.config.setValue(
                     "Computed Settings", "unitsZ", self.data.units
                 )
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
+                self.data.ui_queue1.put("Action", "unitsUpdateZ", "")
+                self.data.ui_queue1.put("Action", "distToMoveUpdateZ", "")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -1132,9 +1142,15 @@ class Actions(MakesmithInitFuncs):
         zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings","zAxisSafeHeight"))
         positioning = "G90 "
         units = "G20 "
-
-        xpos = 0
-        ypos = 0
+        homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
+        homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+        previousUnits = self.data.config.getValue("Computed Settings", "units")
+        if previousUnits == "INCHES":
+            previousUnits = "G20 "
+        else:
+            previousUnits = "G21 "
+        xpos = homeX
+        ypos = homeY
         zpos = 0
         tool = None
         spindle = None
@@ -1150,7 +1166,7 @@ class Actions(MakesmithInitFuncs):
                     finalLines = []
                     for line in lines:
                         if len(line)>0:
-                            if line[0] == "M" or line[0] == "G" or line[0] == "T":
+                            if line[0] == "M" or line[0] == "G" or line[0] == "T" or len(finalLines) == 0:
                                 finalLines.append(line)
                             else:
                                 finalLines[-1] = finalLines[-1] + " " + line
@@ -1162,20 +1178,32 @@ class Actions(MakesmithInitFuncs):
                                 positioning = "G91 "
                             if line.find("G20")!=-1:
                                 units = "G20 "
+                                if previousUnits!=units: #previous metrics now imperial
+                                    homeX = xpos / 25.4
+                                    homeY = ypos / 25.4
+                                    xpos = xpos / 25.4
+                                    ypos = ypos / 25.4
+                                    previousUnits = units
                             if line.find("G21")!=-1:
                                 units = "G21 "
+                                if previousUnits!=units: #previous imperial now metrics
+                                    homeX = xpos * 25.4
+                                    homeY = ypos * 25.4
+                                    xpos = xpos * 25.4
+                                    ypos = ypos * 25.4
+                                    previousUnits = units
                             if line.find("X")!=-1:
                                 _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                                 if positioning == "G91 ":
                                     xpos = xpos+float(_xpos.groups()[0])
                                 else:
-                                    xpos = float(_xpos.groups()[0])
+                                    xpos = float(_xpos.groups()[0])+homeX
                             if line.find("Y")!=-1:
                                 _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                                 if positioning == "G91 ":
                                     ypos = ypos+float(_ypos.groups()[0])
                                 else:
-                                    ypos = float(_ypos.groups()[0])
+                                    ypos = float(_ypos.groups()[0])+homeY
                             if line.find("Z")!=-1:
                                 _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                                 if positioning == "G91 ":
@@ -1204,12 +1232,18 @@ class Actions(MakesmithInitFuncs):
                         if line[0]=='T':
                             tool = line[1:] #slice off the T
 
-        self.data.gcode_queue.put(positioning)
+        self.data.gcode_queue.put(units)
         if units == "G20 ":
+            zAxisSafeHeight = zAxisSafeHeight / 25.4
+        '''
+        if units == "G20 ":
+            print("is G20")
             self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
-            zAxisSafeHeight = zAxisSafeHeight/25.4
+            
         else:
+            print("is G21")
             self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+        '''
         self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight,4))+" ")
         self.data.gcode_queue.put("G0 X"+str(round(xpos,4))+" Y"+str(round(ypos,4))+" ")
         if tool is not None:
@@ -1221,7 +1255,7 @@ class Actions(MakesmithInitFuncs):
         if dwell is not None:
             self.data.gcode_queue.put("G4 "+dwell)
         self.data.gcode_queue.put("G0 Z" + str(round(zpos, 4)) + " ")
-
+        self.data.gcode_queue.put(positioning)
 
     def findPositionAt(self, index):
         #This function is necessary to update the gcode position indicators on z-index moves
@@ -1442,9 +1476,9 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def checkForLatestPyRelease(self):
-        if self.data.platform=="PYINSTALLER":
+        if True: #self.data.platform=="PYINSTALLER":
             print("check for pyrelease")
             g = Github()
             repo = g.get_repo("madgrizzle/WebControl")
@@ -1456,10 +1490,12 @@ class Actions(MakesmithInitFuncs):
             for release in releases:
                 try:
                     tag_name = re.sub(r'[v]',r'',release.tag_name)
+                    print(release.body)
                     #print(tag_name)
                     if float(tag_name) > latest:
                         latest = float(tag_name)
                         latestRelease = release
+
                 except:
                     print("error parsing tagname")
             print(latest)
@@ -1535,6 +1571,7 @@ class Actions(MakesmithInitFuncs):
         print("3")
         os.chmod(path, mode)
         print("4")
+    '''
 
     def addDirToZip(self, zipHandle, path, basePath=""):
         basePath = basePath.rstrip("\\/") + ""
@@ -1557,6 +1594,7 @@ class Actions(MakesmithInitFuncs):
                 fn = os.path.join(base, file)
                 zipobj.write(fn, fn[rootlen:])
         zipobj.close()
+
 
     def backupWebControl(self):
         try:

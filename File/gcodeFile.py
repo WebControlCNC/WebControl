@@ -56,8 +56,7 @@ class GCodeFile(MakesmithInitFuncs):
             gfile = open(fileToWrite, "w+")
             print(fileToWrite)
             for line in self.data.gcode:
-                newLine = self.data.gcodeFile.moveLine(line, True, homeX, homeY)
-                gfile.write(newLine+'\n')
+                gfile.write(line+'\n')
             #gfile = open(directory+fileName, "w+")
             #gfile.writelines(map(lambda s: s+ '\n', self.data.gcode))
             print("Closing File")
@@ -73,7 +72,9 @@ class GCodeFile(MakesmithInitFuncs):
 
 
     def loadUpdateFile(self, gcode=""):
-        #print(gcode)
+        gcodeLoad = False
+        if gcode=="":
+            gcodeLoad = True
         if self.data.units == "MM":
             self.canvasScaleFactor = self.MILLIMETERS
         else:
@@ -174,6 +175,7 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
+        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
         return True
 
     def isClose(self, a, b):
@@ -248,12 +250,7 @@ class GCodeFile(MakesmithInitFuncs):
                     self.addPoint3D(xTarget, yTarget, zTarget)
 
                 else:
-                    if (
-                        len(self.line3D) == 0
-                        or self.line3D[-1].dashed
-                        or self.line3D[-1].type != "line"
-                    ):
-
+                    if (len(self.line3D) == 0 or self.line3D[-1].dashed or self.line3D[-1].type != "line"):  #test123
                         self.line3D.append( Line() )
                         self.line3D[-1].type = "line"
                         self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
@@ -393,22 +390,13 @@ class GCodeFile(MakesmithInitFuncs):
 
 
 
-    def moveLine(self, gCodeLine, dehome = False, homeX=0, homeY=0):
+    def moveLine(self, gCodeLine):
 
         originalLine = gCodeLine
-        if dehome:
-            shiftX = -homeX
-            shiftY = -homeY
-        else:
-            shiftX = self.data.gcodeShift[0]
-            shiftY = self.data.gcodeShift[1]
-
-        #print("original:"+gCodeLine)
-        #first check for full comment lines
+        shiftX = self.data.gcodeShift[0]
+        shiftY = self.data.gcodeShift[1]
         if len(gCodeLine) > 0:
             if gCodeLine[0] == '(' or gCodeLine[0] == ';':
-                #comment lines
-                #print("comment:"+originalLine)
                 return originalLine
         #next check for comment after line and if exist, split on first occurrence and retain the comment portion
         findexA = gCodeLine.find('(')
@@ -424,7 +412,6 @@ class GCodeFile(MakesmithInitFuncs):
             comment = gCodeLine[findex:]
             #print("comment:"+comment)
             gCodeLine = gCodeLine[:findex]
-
 
         #This test should always pass so taking it out
         #if gCodeLine.find("(") == -1 and gCodeLine.find(";") == -1:
@@ -495,9 +482,6 @@ class GCodeFile(MakesmithInitFuncs):
         """
 
         try:
-            self.data.gcode[self.lineNumber] = self.moveLine(
-                self.data.gcode[self.lineNumber]
-            )  # move the line if the gcode has been moved
             fullString = self.data.gcode[self.lineNumber]
         except:
             return  # we have reached the end of the file
@@ -622,10 +606,12 @@ class GCodeFile(MakesmithInitFuncs):
         else:
             scaleFactor = 1/25.4;
         #before, gcode shift = home X
-        #self.xPosition = self.data.gcodeShift[0] * scaleFactor
-        #self.yPosition = self.data.gcodeShift[1] * scaleFactor
-        self.xPosition = float(self.data.config.getValue("Advanced Settings", "homeX")) * scaleFactor
-        self.yPosition = float(self.data.config.getValue("Advanced Settings", "homeY")) * scaleFactor
+        #old #self.xPosition = self.data.gcodeShift[0] * scaleFactor
+        #old #self.yPosition = self.data.gcodeShift[1] * scaleFactor
+        #self.xPosition = float(self.data.config.getValue("Advanced Settings", "homeX")) * scaleFactor #test123
+        #self.yPosition = float(self.data.config.getValue("Advanced Settings", "homeY")) * scaleFactor #test123
+        self.xPosition = 0
+        self.yPosition = 0
         self.zPosition = 0
 
         self.prependString = "G00 "

@@ -58,6 +58,14 @@ class Logger(MakesmithInitFuncs):
     def setLoggingTimeout(self, timeOut):
         self.loggingTimeout = timeOut
 
+    def addToMessageBuffer(self,message):
+        self.messageBuffer += message
+        self.data.log_streamer_queue.put(message)
+
+    def addToaMessageBuffer(self,message):
+        self.amessageBuffer += message
+        self.data.alog_streamer_queue.put(message)
+
     def writeToLog(self, message):
 
         """
@@ -75,26 +83,26 @@ class Logger(MakesmithInitFuncs):
         dateTime = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
         if self.loggingTimeout > 0 and self.data.uploadFlag == 0 and currentTime-self.idler > self.loggingTimeout:
             if not self.suspendLogging:
-                self.messageBuffer += logTime + ": " + "Logging suspended due to user idle time > "+str(self.loggingTimeout)+" seconds\n"
+                self.addToMessageBuffer(logTime + ": " + "Logging suspended due to user idle time > "+str(self.loggingTimeout)+" seconds\n")
                 self.suspendLogging = True
         else:
             if self.suspendLogging:
-                self.messageBuffer += logTime + ": " + "Logging resumed due to user activity\n"
+                self.addToMessageBuffer(logTime + ": " + "Logging resumed due to user activity\n")
                 self.suspendLogging = False
 
         if message[0] != "<" and message[0] != "[":
             try:
                 tmessage = message.rstrip('\r\n')
-                self.amessageBuffer += logTime+": " + tmessage+"\n"
+                self.addToaMessageBuffer(logTime+": " + tmessage+"\n")
                 if not self.suspendLogging:
-                    self.messageBuffer += logTime+": " + tmessage+"\n"
+                    self.addToMessageBuffer(logTime+": " + tmessage+"\n")
             except:
                 pass
         else:
             try:
                 if not self.suspendLogging:
                     tmessage = message.rstrip('\r\n')
-                    self.messageBuffer += logTime+": "+ tmessage+"\n"
+                    self.addToMessageBuffer(logTime+": "+ tmessage+"\n")
             except:
                 pass
 

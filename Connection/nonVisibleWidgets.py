@@ -17,6 +17,7 @@ from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
 from Background.webcamVideoStream import WebcamVideoStream
 from Boards.boardManager import BoardManager
+from ReleaseManager.releaseManager import ReleaseManager
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -40,6 +41,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     camera = WebcamVideoStream()
     gpioActions = GPIOActions()
     boardManager = BoardManager()
+    releaseManager = ReleaseManager()
 
     def setUpData(self, data):
         """
@@ -69,6 +71,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.camera = self.camera
         data.gpioActions = self.gpioActions
         data.boardManager = self.boardManager
+        data.releaseManager = self.releaseManager
 
         if hasattr(sys, '_MEIPASS'):
             data.platform = "PYINSTALLER"
@@ -122,6 +125,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.gpioActions.setup()
         self.boardManager.setUpData(data)
         self.boardManager.initializeNewBoard()
+        self.releaseManager.setUpData(data)
 
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()
