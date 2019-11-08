@@ -7,21 +7,21 @@ import psutil
 import webbrowser
 from flask import render_template
 
-class UIProcessor:
 
+class UIProcessor:
     app = None
     lastCameraTime = 0
     lastHealthCheck = 0
-    
+
     def start(self, _app):
-        
+
         self.app = _app
         self.app.data.console_queue.put("starting UI")
 
         with self.app.app_context():
             while True:
                 currentTime = time.time()
-                if currentTime-self.lastHealthCheck > 5:
+                if currentTime - self.lastHealthCheck > 5:
                     self.lastHealthCheck = currentTime
                     load = max(psutil.cpu_percent(interval=None, percpu=True))
                     weAreBufferingLines = bool(int(self.app.data.config.getValue("Maslow Settings", "bufferOn")))
@@ -42,7 +42,8 @@ class UIProcessor:
                     self.app.data.config.firstRun = False
                     time.sleep(2)
                     self.activateModal("Notification:",
-                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.","notification")
+                                       "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.",
+                                       "notification")
                 if self.app.data.opticalCalibrationImageUpdated is True:
                     self.sendCalibrationImage(
                         "OpticalCalibrationImageUpdated",
@@ -50,7 +51,7 @@ class UIProcessor:
                     )
                     self.app.data.opticalCalibrationImageUpdated = False
                 if self.app.data.cameraImageUpdated is True:
-                    if time.time()-self.lastCameraTime > .25:
+                    if time.time() - self.lastCameraTime > .25:
                         self.sendCameraMessage(
                             "cameraImageUpdated",
                             self.app.data.cameraImage,
@@ -63,7 +64,8 @@ class UIProcessor:
                         self.app.data.opticalCalibrationTestImage,
                     )
                     self.app.data.opticalCalibrationTestImageUpdated = False
-                while ( not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
+                while (
+                        not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
                     if not self.app.data.ui_controller_queue.empty():
                         message = self.app.data.ui_controller_queue.get()
                         if message != "":
@@ -77,7 +79,8 @@ class UIProcessor:
                                 self.app.data.uploadFlag = 0
                                 self.app.data.quick_queue.put("~")
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
-                                socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
+                                socketio.emit("message",
+                                              {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                                               namespace="/MaslowCNC", )
                             elif message[0:12] == "Tool Change:":
                                 self.app.data.manualZAxisAdjust = True
@@ -106,7 +109,7 @@ class UIProcessor:
                                     pass
                                 self.sendAlarm("Alarm: Sled Not Keeping Up")
 
-                                #self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
+                                # self.activateModal("Alarm:", message[7:], "alarm", resume="clear")
                             elif message == "ok\r\n":
                                 pass  # displaying all the 'ok' messages clutters up the display
                             else:
@@ -123,11 +126,11 @@ class UIProcessor:
                 numz = message[startpt:endpt]
                 valz = numz.split(",")
                 state = ""
-                if message.find("Stop")!=-1:
+                if message.find("Stop") != -1:
                     state = "Stopped"
-                elif message.find("Pause")!=-1:
+                elif message.find("Pause") != -1:
                     state = "Paused"
-                elif message.find("Idle")!=-1:
+                elif message.find("Idle") != -1:
                     state = "Idle"
 
                 self.app.data.xval = float(valz[0])
@@ -166,8 +169,7 @@ class UIProcessor:
             self.app.data.xval_prev = self.app.data.xval
             self.app.data.yval_prev = self.app.data.yval
             self.app.data.zval_prev = self.app.data.zval
-            #self.app.data.console_queue.put("Update position")
-
+            # self.app.data.console_queue.put("Update position")
 
     def setErrorOnScreen(self, message):
         limit = float(self.app.data.config.getValue("Advanced Settings", "positionErrorLimit"))
@@ -178,12 +180,12 @@ class UIProcessor:
                     startpt = message.find(':') + 1
                     endpt = message.find(',', startpt)
                     leftErrorValueAsString = message[startpt:endpt]
-                    self.app.data.leftError = float(leftErrorValueAsString)/limit
+                    self.app.data.leftError = float(leftErrorValueAsString) / limit
 
                     startpt = endpt + 1
                     endpt = message.find(',', startpt)
                     rightErrorValueAsString = message[startpt:endpt]
-                    self.app.data.rightError = float(rightErrorValueAsString)/limit
+                    self.app.data.rightError = float(rightErrorValueAsString) / limit
 
                     if self.app.data.controllerFirmwareVersion > 50 and self.app.data.controllerFirmwareVersion < 150:
 
@@ -211,7 +213,8 @@ class UIProcessor:
                         computedEnabled = 0
 
                     if computedEnabled > 0:
-                        self.app.data.computedX, self.app.data.computedY = self.app.data.holeyKinematics.forward(self.app.data.leftChain, self.app.data.rightChain, self.app.data.xval, self.app.data.yval )
+                        self.app.data.computedX, self.app.data.computedY = self.app.data.holeyKinematics.forward(
+                            self.app.data.leftChain, self.app.data.rightChain, self.app.data.xval, self.app.data.yval)
                     else:
                         self.app.data.computedX = -999999
                         self.app.data.computedY = -999999
@@ -228,7 +231,7 @@ class UIProcessor:
             leftDiff = abs(self.app.data.leftError - self.app.data.leftError_prev)
             rightDiff = abs(self.app.data.rightError - self.app.data.rightError_prev)
 
-            if (leftDiff + rightDiff ) >= 0.001:
+            if (leftDiff + rightDiff) >= 0.001:
                 errorValues = {
                     "leftError": abs(self.app.data.leftError),
                     "rightError": abs(self.app.data.rightError),
@@ -239,33 +242,33 @@ class UIProcessor:
                 self.sendErrorValueMessage(errorValues)
                 self.app.data.leftError_prev = self.app.data.leftError
                 self.app.data.rightError_prev = self.app.data.rightError
-                #self.app.data.console_queue.put("Update error values")
-
-
+                # self.app.data.console_queue.put("Update error values")
 
     def activateModal(self, title, message, modalType, resume="false", progress="false"):
-        data = json.dumps({"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small", "modalType": modalType})
+        data = json.dumps(
+            {"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small",
+             "modalType": modalType})
         socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
-            namespace="/MaslowCNC",
-        )
+                      namespace="/MaslowCNC",
+                      )
 
     def sendAlarm(self, message):
-        data = json.dumps({"message":message})
+        data = json.dumps({"message": message})
         socketio.emit("message", {"command": "alarm", "data": data, "dataFormat": "json"},
-            namespace="/MaslowCNC",
-        )
+                      namespace="/MaslowCNC",
+                      )
 
     def sendControllerMessage(self, message):
         socketio.emit("message", {"command": "controllerMessage", "data": json.dumps(message), "dataFormat": "json"},
                       namespace="/MaslowCNC")
-        #socketio.emit(
+        # socketio.emit(
         #    "controllerMessage", {"data": message}, namespace="/MaslowCNC"
-        #)
+        # )
 
     def sendWebMCPMessage(self, message):
-        #print(message)
-        #socketio.emit("message", {"command": json.dumps(message), "dataFormat": "json"},namespace="/WebMCP")
-        socketio.emit("shutdown",namespace="/WebMCP")
+        # print(message)
+        # socketio.emit("message", {"command": json.dumps(message), "dataFormat": "json"},namespace="/WebMCP")
+        socketio.emit("shutdown", namespace="/WebMCP")
 
     def sendPositionMessage(self, position):
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
@@ -284,7 +287,7 @@ class UIProcessor:
         data = json.dumps({"command": message, "data": _data})
 
         socketio.emit(
-            "message", {"command":"cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+            "message", {"command": "cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
         )
 
     def updatePIDData(self, message, _data=""):
@@ -292,9 +295,8 @@ class UIProcessor:
         data = json.dumps({"command": message, "data": _data})
         print(data)
         socketio.emit(
-            "message", {"command":"updatePIDData", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+            "message", {"command": "updatePIDData", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
         )
-
 
     def sendGcodeUpdate(self):
         if self.app.data.compressedGCode3D is not None:
@@ -312,7 +314,6 @@ class UIProcessor:
                                       "data": "", "dataFormat": "base64"},
                           namespace="/MaslowCNC", )
 
-
     def sendBoardUpdate(self):
         boardData = self.app.data.boardManager.getCurrentBoard().getBoardInfoJSON()
         if boardData is not None:
@@ -323,7 +324,7 @@ class UIProcessor:
             self.app.data.console_queue.put("Sent Board Data")
 
         cutData = self.app.data.boardManager.getCurrentBoard().getCompressedCutData()
-        if True: #cutData is not None:
+        if True:  # cutData is not None:
             self.app.data.console_queue.put("Sending Board Cut Data compressed")
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": 1, "dataFormat": "int"},
@@ -341,6 +342,7 @@ class UIProcessor:
         data = json.dumps({"setting": "units", "value": units})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                       namespace="/MaslowCNC", )
+
     def distToMoveUpdate(self):
         distToMove = self.app.data.config.getValue(
             "Computed Settings", "distToMove"
@@ -356,6 +358,7 @@ class UIProcessor:
         data = json.dumps({"setting": "unitsZ", "value": unitsZ})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                       namespace="/MaslowCNC", )
+
     def distToMoveUpdateZ(self):
         distToMoveZ = self.app.data.config.getValue(
             "Computed Settings", "distToMoveZ"
@@ -363,7 +366,6 @@ class UIProcessor:
         data = json.dumps({"setting": "distToMoveZ", "value": distToMoveZ})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
                       namespace="/MaslowCNC", )
-
 
     def processMessage(self, _message):
         msg = json.loads(_message)
@@ -385,14 +387,14 @@ class UIProcessor:
             elif msg["message"] == "distToMoveUpdateZ":
                 self.distToMoveUpdateZ()
             elif msg["message"] == "updateTimer":
-                #Todo: clean this up
+                # Todo: clean this up
                 self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
             elif msg["message"] == "updateCamera":
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
             elif msg["message"] == "updatePIDData":
                 self.updatePIDData("updatePIDData", json.loads(msg["data"]))
             elif msg["message"] == "clearAlarm":
-                msg["data"] = json.dumps({"data":""})
+                msg["data"] = json.dumps({"data": ""})
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
                               namespace="/MaslowCNC")
             else:
@@ -406,16 +408,17 @@ class UIProcessor:
                     msg["data"] = json.dumps(self.app.data.comPorts)
                 elif msg["message"] == "closeModals":
                     title = json.loads(msg["data"])
-                    msg["data"] = json.dumps({"title": title}) #msg["data"]})
-                socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"}, namespace="/MaslowCNC")
+                    msg["data"] = json.dumps({"title": title})  # msg["data"]})
+                socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
+                              namespace="/MaslowCNC")
         elif msg["command"] == "TextMessage":
             socketio.emit("message", {"command": "controllerMessage", "data": msg["data"], "dataFormat": "json"},
                           namespace="/MaslowCNC")
         elif msg["command"] == "Alert":
-            #if message.find("adjust Z-Axis") != -1:
+            # if message.find("adjust Z-Axis") != -1:
             #    self.app.data.console_queue.put("found adjust Z-Axis in message")
             #    self.activateModal("Notification:", message[9:], "notification", resume="resume")
-            #else:
+            # else:
             self.activateModal(msg["message"], msg["data"], "alert")
         elif msg["command"] == "SpinnerMessage":
             self.activateModal("Notification:", msg["data"], "notification", progress="spinner")

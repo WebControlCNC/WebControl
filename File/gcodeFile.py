@@ -72,7 +72,9 @@ class GCodeFile(MakesmithInitFuncs):
 
 
     def loadUpdateFile(self, gcode=""):
-        #print(gcode)
+        gcodeLoad = False
+        if gcode=="":
+            gcodeLoad = True
         if self.data.units == "MM":
             self.canvasScaleFactor = self.MILLIMETERS
         else:
@@ -173,6 +175,7 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
+        self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
         return True
 
     def isClose(self, a, b):

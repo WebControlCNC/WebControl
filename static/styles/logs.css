@@ -1,0 +1,20 @@
+body, html {
+  margin: 0;
+  overflow: hidden;
+  height:100%;
+}
+
+#logMessages {
+position: absolute;
+width: 95%;
+height: 80vh;
+overflow-y: scroll;
+}
+
+#alogMessages {
+position: absolute;
+width: 95%;
+height: 80vh;
+overflow-y: scroll;
+}
+

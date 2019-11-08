@@ -139,6 +139,8 @@ class Data:
     message_queue = LoggingQueue(logger)
     ui_controller_queue = queue.Queue()
     ui_queue1 = UIQueue()
+    alog_streamer_queue = queue.Queue(1000)  # used for sending log to client screen.. limit to 1000 "items"
+    log_streamer_queue = queue.Queue(1000) # used for sending log to client screen.. limit to 1000 "items"
     console_queue = queue.Queue() # used for printing to terminal
     mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
     webMCPActive = False  # start false until WebMCP connects
