@@ -68,7 +68,7 @@ function setListeners(){
   socket.on('message', function(msg){
       //console.log(msg);
       //blink activity indicator
-      $("#cpuUsage").removeClass('alert-success').addClass('alert-warning');
+      $("#cpuUsage").removeClass('alert-success').addClass('alertalert-warning');
       $("#mobileCPUUsage").removeClass('alert-success').addClass('alert-warning');
       setTimeout(function(){
         $("#cpuUsage").removeClass('alert-warning').addClass('alert-success');

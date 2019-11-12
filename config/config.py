@@ -26,10 +26,20 @@ class Config(MakesmithInitFuncs):
     firstRun = False
 
     def __init__(self):
+        '''
+        This function determines if a pyinstaller version is being run and if so,
+        sets the home directory of the pyinstaller files.  This facilitates updates
+        to the pyinstaller releases.
+        '''
         self.home = str(Path.home())
         if hasattr(sys, '_MEIPASS'):
             self.home1 = os.path.join(sys._MEIPASS)
             print(self.home1)
+
+        '''
+        This portion creates directories that are missing and creates a new webcontrol.json
+        file if this is the first run (copies defaultwebcontrol.json)
+        '''
         print("Initializing Configuration")
         if not os.path.isdir(self.home+"/.WebControl"):
             print("creating "+self.home+"/.WebControl directory")
@@ -50,6 +60,13 @@ class Config(MakesmithInitFuncs):
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it
+        '''
+        This portion scans the webcontrol.json file and sees if anything is missing in comparison to
+        the defaultwebcontrol.json file.  Changes to the defaultwebcontrol.json file are automatically
+        ADDED to the webcontrol.json file.  This function does not DELETE entries in the webcontrol.json
+        file if they do not appear in the defaultwebcontrol.json file.
+        '''
+        # TODO: add DELETE function to this to clean up unneeded entries
         with open(self.home1+"/defaultwebcontrol.json", "r") as infile:
             self.defaults = json.load(infile)
         updated = False
@@ -95,6 +112,10 @@ class Config(MakesmithInitFuncs):
                     print("added "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
                     updated = True
 
+        '''
+        If there was a change to webcontrol.json file due to differences with
+        defaultwebcontrol.json, then the config is reloaded.
+        '''
         if updated:
             with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
                 # print ("writing file")
@@ -103,6 +124,11 @@ class Config(MakesmithInitFuncs):
                 )
 
     def checkForTouchedPort(self):
+        '''
+        this function looks for a file that has a port number embedded
+        in the filename.  If found, it parses the port number and uses it
+        to start the flask engine.
+        '''
         home = self.home
         path = home+"/.WebControl/webcontrol-*.port"
         print(path)
@@ -126,6 +152,11 @@ class Config(MakesmithInitFuncs):
         return self.settings
 
     def updateQuickConfigure(self, result):
+        '''
+        Updates settings based upon the form results.
+        :param result: submitted form
+        :return: always returns true.
+        '''
         if result["kinematicsType"] == "Quadrilateral":
             self.setValue("Advanced Settings", "kinematicsType", "Quadrilateral")
         else:
@@ -139,21 +170,40 @@ class Config(MakesmithInitFuncs):
         return True
 
     def setValue(self, section, key, value, recursionBreaker=False, isImporting = False):
+        '''
+        This function is intended to update a setting and call the necessary recomputes and syncs with the controller.
+        :param section: The section of the setting.. Advanced Settings, etc.
+        :param key:  The key of the setting.. motorSpacingX, etc.
+        :param value: The value to set the setting to.
+        :param recursionBreaker: Prevents loops due to computed settings.. not sure is needed in reality.
+        :param isImporting: intended to delay sending settings and recomputing settings until import is done.
+        :return:
+
+        Re: recursionBreaker.  IIRC, I was having a heck of time getting settings to work, particularly when compute
+        settings was being called.  computeSettings calls this function after computing a new value, but this function
+        calls computeSetting if a value is updated.  To avoid testing on whether a setting is a computed setting or not,
+        computeSetting just sets recursionBreaker to true and this function doesn't call computeSetting.
+        '''
         updated = False
         found = False
-        t0=time.time()
         changedValue = None
         changedKey = None
+        # Probably an easier way to do this than to iterate through all keys in a section to find the one you want to
+        # update.  TODO: Find a pythonic way to find the key.
         for x in range(len(self.settings[section])):
             if self.settings[section][x]["key"].lower() == key.lower():
                 found = True
+                # each type (float, string, bool, etc.) is handled separately.  This is approach is legacy, and could
+                # be cleaned up.  TODO: cleanup this so it's handled with less redundancy.
                 if self.settings[section][x]["type"] == "float":
                     try:
                         storedValue = self.settings[section][x]["value"]
                         self.settings[section][x]["value"] = float(value)
                         updated = True
+                        # This test updates certain settings in webcontrol.  Might be a bit hackis.
                         if storedValue != float(value):
                             self.processChange(self.settings[section][x]["key"],float(value))
+                        # If setting is a controller setting, then sync with controller if needed.
                         if "firmwareKey" in self.settings[section][x]:
                             self.syncFirmwareKey(
                                 self.settings[section][x]["firmwareKey"], storedValue, isImporting,
@@ -165,21 +215,28 @@ class Config(MakesmithInitFuncs):
                     try:
                         storedValue = self.settings[section][x]["value"]
                         self.settings[section][x]["value"] = int(value)
+                        updated = True
+                        # This test updates certain settings in webcontrol.  Might be a bit hackis.
                         if storedValue != int(value):
                             self.processChange(self.settings[section][x]["key"], int(value))
-                        updated = True
+                        # If setting is a controller setting, then sync with controller if needed.
                         if "firmwareKey" in self.settings[section][x]:
+                            #not sure why this test is here, probably legacy as the setting type for 85 is string.
                             if self.settings[section][x]["firmwareKey"] != 85:
                                 self.syncFirmwareKey(
                                     self.settings[section][x]["firmwareKey"],
                                     storedValue,
                                     isImporting,
                                 )
+                        #added this because it appears to be missing.
+                        break
                     except:
                         break
                 elif self.settings[section][x]["type"] == "bool":
                     try:
-                        #print(str(self.settings[section][x]["key"])+" found")
+                        # change true/false to on/off if that's how it comes in to this function.  I think this was
+                        # done because forms come in as checkbox results (on/off) and webcontrol somewhere might want
+                        # to set the value as true/false.
                         if isinstance(value, bool):
                             if value:
                                 value = "on"
@@ -209,8 +266,10 @@ class Config(MakesmithInitFuncs):
                     except:
                         break
                 else:
+                    # If not float, int, bool, then must be string.
                     storedValue = self.settings[section][x]["value"]
                     self.settings[section][x]["value"] = value
+                    # This test updates certain settings in webcontrol.  Might be a bit hackis.
                     if storedValue != value:
                         self.processChange(self.settings[section][x]["key"], value)
                     updated = True
@@ -220,22 +279,22 @@ class Config(MakesmithInitFuncs):
                         )
                     break
         if not found:
-            # must be a turned off checkbox.. what a pain to figure out
-            #print(str(self.settings[section][x]["key"])+" not found")
+            # I think SHOULDN'T be called any more.  It was here previously because of how checkboxes were returned
+            # from forms (they aren't part of the form result if they aren't enabled).
             if self.settings[section][x]["type"] == "bool":
                 self.data.console_queue.put(self.settings[section][x]["key"])
                 storedValue = self.settings[section][x]["value"]
                 self.settings[section][x]["value"] = 0
-
                 if "firmwareKey" in self.settings[section][x]:
-                    # print "syncing3 false bool at:"+str(self.settings[section][x]['firmwareKey'])
                     self.syncFirmwareKey(
                         self.settings[section][x]["firmwareKey"], storedValue
                     )
                 updated = True
         if updated:
+            # if not being updated from the computSettings, then call computeSettings to update if needed.
             if not recursionBreaker:
                 self.computeSettings(None, None, None, True)
+            # and now save the settings to storage
             with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
                 # print ("writing file")
                 json.dump(
@@ -243,14 +302,23 @@ class Config(MakesmithInitFuncs):
                 )
 
     def updateSettings(self, section, result):
+        '''
+        Take the form result, iterate through it and update the settings
+        :param section: The form's section (i.e., Advanced Settings)
+        :param result: the form's returned results.  NOTE: disabled checkboxes are NOT returned in the results.
+        :return:
+        '''
+        # Iterate through all the settings that SHOULD be in the form.
         for x in range(len(self.settings[section])):
             setting = self.settings[section][x]["key"]
+            # I think I put this here so that a disabled checkbox gets called as well.
+            # If the setting is not found in the results, then it must be a disabled checkbox and its value gets set
+            # to a zero.  This probably should be cleaned up and resultValue set to "off" to make it jive with the
+            # tests in updateSetting.
             if setting in result:
                 resultValue = result[setting]
             else:
                 resultValue = 0
-            strValue = setting+" = "+str(resultValue)
-            self.data.console_queue.put(strValue)
             #do a special check for comport because if its open, we need to close existing connection
             if setting == "COMport":
                 currentSetting = self.data.config.getValue(section, setting)
@@ -325,13 +393,21 @@ class Config(MakesmithInitFuncs):
         return ret
 
     def syncFirmwareKey(self, firmwareKey, value, isImporting=False, useStored=False, data=None):
-        # print "firmwareKey from sync:"+str(firmwareKey)
-        # print "value from sync:"+str(value)
+        '''
+        :param firmwareKey: the firmwareKey value
+        :param value: the PREVIOUS value prior to updating.
+        :param isImporting: indicates to bypass syncing until all the importing of values is done.
+        :param useStored: indicates to use the value that's currently stored to update controller (holeyKinematics)
+        :param data: used by optical calibration to send function the error array to send to controller. (optical)
+        :return:
+        '''
         for section in self.settings:
             for option in self.settings[section]:
                 if "firmwareKey" in option and option["firmwareKey"] == firmwareKey:
+                    # if this is custom firmware OR if the setting is not custom, then do this.
                     if self.data.controllerFirmwareVersion > 100 or ("custom" not in option or option["custom"] != 1):
                         storedValue = option["value"]
+                        # update storedValue based upon saved values.. TODO: fix this for comparison to value if broken.
                         if option["key"] == "spindleAutomate":
                             if storedValue == "Servo":
                                 storedValue = 1
@@ -349,39 +425,55 @@ class Config(MakesmithInitFuncs):
                                 value = 3
                             else:
                                 value = 0
-
+                        # if error array, send by special function (optical)
                         if firmwareKey == 85:
                             if self.data.controllerFirmwareVersion >= 100:
-                                print(self.data.controllerFirmwareVersion)
-                                self.data.console_queue.put("firmwareKey = 85")
+                                self.data.console_queue.put("Sending error array")
                                 if storedValue != "":
                                     self.sendErrorArray(firmwareKey, storedValue, data)
+                                # Can't recall why this is a pass and not a break.. might be legacy or related to
+                                # the !="" check above.
                                 pass
                         elif useStored is True:
-                            strValue = self.firmwareKeyString(firmwareKey,storedValue)
+                            # This probably could be moved to the last elif statement.  Think this was here for
+                            # troubleshooting purposes initially.  TODO: verify and add 'or useStored' to last elif
+                            strValue = self.firmwareKeyString(firmwareKey, storedValue)
                             app.data.gcode_queue.put(strValue)
-                            #app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
+                            # updates holeKinematics simulator model with new value.
                             self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
                         elif firmwareKey >= 87 and firmwareKey <= 98:
+                            # Special test for sending curve fit coefficients (optical)
                             if self.data.controllerFirmwareVersion >= 100:
+                                # Attempt at testing whether or not really small values are close by comparing % diff.
                                 if not self.isPercentClose(float(storedValue), float(value)):
                                     if not isImporting:
                                         strValue = self.firmwareKeyString(firmwareKey, storedValue)
                                         app.data.gcode_queue.put(strValue)
+                                        #not really needed since this is optical calibration section, but no harm.
                                         self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
-                                        # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                                 else:
                                     break
                         elif not self.isClose(float(storedValue), float(value)) and not isImporting:
+                            # Update the controller value if its different enough from previous value and
+                            # we are not importing the groundcontrol.ini file.
                             strValue = self.firmwareKeyString(firmwareKey, storedValue)
                             app.data.gcode_queue.put(strValue)
+                            # updates holeKinematics simulator model with new value.
                             self.data.holeyKinematics.updateSetting(firmwareKey, storedValue)
-                            # app.data.gcode_queue.put("$" + str(firmwareKey) + "=" + str(storedValue))
                         else:
                             break
         return
 
     def isPercentClose(self, a, b, rel_tol = 0.0001):
+        '''
+        Compares two numbers (really small or really large) and returns true if they are either really close
+        percent-wise (based on rel_tol) or, in the event b is zero, if is close by really small absolute difference.
+        If b=0, then there's a divide by zero error otherwise.
+        :param a:
+        :param b:
+        :param rel_tol:
+        :return:
+        '''
         if b != 0:
             c = abs( abs(a/b) - 1.0)
             if c < rel_tol:
@@ -402,7 +494,13 @@ class Config(MakesmithInitFuncs):
         return c
 
     def parseErrorArray(self, value, asFloat):
-
+        '''
+        Parses the error array that is stored in webcontrol.json and returns an array of either floats or integers.
+        Values are stored as integers that are equal to their original float value x 1000.
+        :param value: the error array
+        :param asFloat: iirc, used in optical calibration to get the numbers in float format rather than integers.
+        :return:
+        '''
         # not the best programming, but I think it'll work
         xErrors = [[0 for x in range(15)] for y in range(31)]
         yErrors = [[0 for x in range(15)] for y in range(32)]
@@ -453,9 +551,16 @@ class Config(MakesmithInitFuncs):
             return xFloatErrors, yFloatErrors
 
     def sendErrorArray(self, firmwareKey, value, data):
-        # parse out the array from string and then send them using the $O command
+        '''
+        :param firmwareKey: firmware key of controller's error array.
+        :param value: the value from settings
+        :param data: doesn't appear to be used, probably legacy.
+        :return:
+        '''
+        # Get values in integer format
         xErrors, yErrors = self.parseErrorArray(value, False)
         # now send the array:
+        # The '$O' triggers the firmware that this is an array coming in and to parse the values appropriately
         for x in range(0, 31):  # 31
             for y in range(0, 15):  # 15
                 app.data.gcode_queue.put(
@@ -469,7 +574,7 @@ class Config(MakesmithInitFuncs):
                     + str(yErrors[x][y])
                     + " "
                 )
-        # if you send a 31,15 , it will trigger a save to EEPROM
+        # if you send a 31,15 , it will trigger a save to EEPROM.
         app.data.gcode_queue.put(
             "$O=" + str(31) + "," + str(15) + "," + str(42) + "," + str(42) + " "
         )
@@ -500,11 +605,19 @@ class Config(MakesmithInitFuncs):
             return (None, position)
 
     def computeSettings(self, section, key, value, doAll=False):
+        '''
+        Function was initially intended to recompute settings when needed, but currently all calls to this function
+        have doAll set to true, which causes all settings to be recomputed.
+        :param section:
+        :param key:
+        :param value:
+        :param doAll: Forces all settings to be recomputed.
+        :return:
+        '''
         # Update Computed settings
         if key == "loggingTimeout" or doAll is True:
             loggingTimeout = self.getValue("WebControl Settings", "loggingTimeout")
-            #self.data.console_queue.put(str(value))
-            #self.data.console_queue.put(str(loggingTimeout))
+
             self.data.logger.setLoggingTimeout(loggingTimeout)
         if key == "kinematicsType" or doAll is True:
             if doAll is True:
@@ -590,6 +703,14 @@ class Config(MakesmithInitFuncs):
                     self.setValue("Computed Settings", "fPWMComputed", 3, True)
 
     def parseFirmwareVersions(self):
+        '''
+        Parses the files located in the installation's firmware directory for certain arduino firmwares (.hex files)
+        /madgrizzle is the optical calibration firmware
+        /holey is the holey calibration firmware
+        /maslowcnc is the stock firmware.
+        This function determines the version number.
+        :return:
+        '''
         home = "."
         if hasattr(sys, '_MEIPASS'):
             home = os.path.join(sys._MEIPASS)
@@ -624,17 +745,28 @@ class Config(MakesmithInitFuncs):
 
     def processChange(self, key, value):
         ### TODO: This does not currently fire on bools ##
-        if key == "fps" or key == "videoSize" or key=="cameraSleep":
+        # Not really sure why I don't have it firing on bools.. must of had a reason
+        if key == "fps" or key == "videoSize" or key == "cameraSleep":
             self.data.camera.changeSetting(key, value)
 
 
     def firmwareKeyString(self, firmwareKey, value):
+        '''
+        Processes firmwareKey and value into a gcode string to be sent to controller
+        :param firmwareKey:
+        :param value:
+        :return:
+        '''
         strValue = self.firmwareKeyValue(value)
         gc = "$" + str(firmwareKey) + "=" + strValue
         return gc
 
-
     def firmwareKeyValue(self, value):
+        '''
+        Pulled in from holey calibration fork.  Haven't really worked with it.
+        :param value:
+        :return:
+        '''
         try:
             de = math.log(abs(value), 10)
             ru = math.ceil(de)
@@ -648,6 +780,10 @@ class Config(MakesmithInitFuncs):
             return str(value)
 
     def reloadWebControlJSON(self):
+        '''
+        Reloads the webcontrol.json file.  This would be called after a restoral of the file.
+        :return:
+        '''
         try:
             with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
                 self.settings = json.load(infile)

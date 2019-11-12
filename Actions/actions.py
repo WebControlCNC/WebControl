@@ -3,7 +3,6 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import os
 import sys
-import threading
 import math
 import serial.tools.list_ports
 import glob
@@ -11,22 +10,24 @@ import json
 import time
 import re
 import zipfile
-#from zipfile import ZipFile
-import datetime
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
-from github import Github
-import wget
-import subprocess
-from shutil import copyfile
 
+'''
+This class does most of the heavy lifting in processing messages from the UI client.
+'''
 class Actions(MakesmithInitFuncs):
 
     Device.pin_factory = MockFactory()
 
     def processAction(self, msg):
+        '''
+        When a message comes in via the UI client it gets parsed and processed here.
+        :param msg: json of message from UI client
+        :return:
+        '''
         try:
-            #Commands allowed during sending gcode
+            # Commands allowed during sending gcode.  These commands won't screw something up.
             if msg["data"]["command"] == "createDirectory":
                 if not self.createDirectory(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with creating directory.")
@@ -61,10 +62,10 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
-
-            #Commands not allowed during sending gcode
             elif self.data.uploadFlag:
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
+            # Commands not allowed during sending gcode.. if you did these commands, something could screw up.
+            # If uploadFlag was enabled (see above) then this would never be reached.
             elif msg["data"]["command"] == "update":
                 if not self.data.releaseManager.update(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating webcontrol.")
@@ -143,8 +144,8 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "rotateSprocket":
                 if not self.rotateSprocket(msg["data"]["arg"], msg["data"]["arg1"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")                    
-            elif msg["data"]["command"] == "setSprocketsAutomatic":
-                if not self.setSprocketsAutomatic():
+            elif msg["data"]["command"] == "setSprocketAutomatic":
+                if not self.setSprocketAutomatic():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprockets automatically")
             elif msg["data"]["command"] == "setSprocketsZero":
                 if not self.setSprocketsZero():
@@ -763,7 +764,7 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def setVerticalAutomatic(self):
+    def setSprocketAutomatic(self):
         # set the call back for the measurement
         try:
             self.data.measureRequest = self.getLeftChainLength
@@ -786,8 +787,8 @@ class Actions(MakesmithInitFuncs):
         self.moveToVertical()
 
     def moveToVertical(self):
-        chainPitch = float(self.data.config.get("Advanced Settings", "chainPitch"))
-        gearTeeth = float(self.data.config.get("Advanced Settings", "gearTeeth"))
+        chainPitch = float(self.data.config.getValue("Advanced Settings", "chainPitch"))
+        gearTeeth = float(self.data.config.getValue("Advanced Settings", "gearTeeth"))
         distPerRotation = chainPitch * gearTeeth
 
         distL = -1 * (self.leftChainLength % distPerRotation)
