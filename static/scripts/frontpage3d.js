@@ -334,6 +334,10 @@ function pauseRun(){
   }
 }
 
+function resumeRun(){
+    action('resumeRun')
+}
+
 
 function processRequestedSetting(data){
   //console.log(msg);

@@ -254,6 +254,12 @@ class Actions(MakesmithInitFuncs):
 
 
     def shutdown(self):
+        '''
+        If running docker, sends message to WebMCP to shutdown webcontrol.
+        If running as pyinstaller, calls an exit function.
+        TODO: Add option to shutdown RPI completely.
+        :return:
+        '''
         try:
             print(self.data.platform)
             if self.data.platform == "PYINSTALLER":
@@ -266,11 +272,22 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def defineHome(self, posX, posY):
+        '''
+        Redefines the home location and sends message to update the UI client.  In a break from ground control, this
+        does not alter the gcode.  Gcode is altered by the home location only when sent to the controller.
+        posX and posY define the coordinates of home.  The are populated via the right-click context menu if the user
+        uses the mouse to define home.  They are empty if the user presses the define home button on the frontpage
+        menu, in which case the coordinates of the sled are used.
+        :param posX:
+        :param posY:
+        :return:
+        '''
         try:
             if self.data.units == "MM":
                 scaleFactor = 25.4
             else:
                 scaleFactor = 1.0
+            # if posX and posY have values, use them, else use the sled's position.
             if posX != "" and posY != "":
                 homeX = posX * scaleFactor
                 homeY = posY * scaleFactor
@@ -281,7 +298,10 @@ class Actions(MakesmithInitFuncs):
             self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
             self.data.config.setValue("Advanced Settings", "homeY", str(homeY))
 
+            # the moveLine function of gcodeFile is still used (though its called directly by serialThread) so I still
+            # track the home coordinates in gcodeShift.
             self.data.gcodeShift = [ homeX, homeY ]
+            # send update to UI client with new home position
             position = {"xval": homeX, "yval": homeY}
             self.data.ui_queue1.put("Action", "homePositionMessage", position)
             return True
@@ -290,13 +310,16 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def home(self):
+        '''
+        Directs controller to move to home location
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("G90  ")
-            # todo:self.gcodeVel = "[MAN]"
             safeHeightMM = float(
                 self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
             )
-            safeHeightInches = safeHeightMM / 25.5
+            safeHeightInches = safeHeightMM / 25.4
             if self.data.units == "INCHES":
                 self.data.gcode_queue.put("G00 Z" + "%.3f" % (safeHeightInches))
             else:
@@ -317,8 +340,14 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def resetChainLengths(self):
+        '''
+        Sends B08 command to controller to tell controller chains are at their 'extendChainLengths' distance.
+        (equivalent to ground control's manualCalibrateChainLengths function)
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("B08 ")
+            # not sure why this was added here.  Probably not needed.  Todo: cleanup if not needed.
             if self.data.units == "INCHES":
                 self.data.gcode_queue.put("G20 ")
             else:
@@ -329,6 +358,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def defineZ0(self):
+        '''
+        Sends G10 Z0 to controller to set current Z height as zero.
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("G10 Z0 ")
             return True
@@ -337,6 +370,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def stopZ(self):
+        '''
+        Sends a stop signal to the controller and clears the gcode queue.  This is called from the Z-Axis popup, not
+        the frontpage.  This is equivalent to ground control's stopZMove.
+        :return:
+        '''
         try:
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
@@ -347,40 +385,59 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def startRun(self):
+        '''
+        Starts the process of sending the gcode to the controller.
+        :return:
+        '''
+        print("h1")
         try:
-            if len(self.data.gcode)>0:
-                if self.data.gcodeIndex >0:
+            if len(self.data.gcode) > 0:
+                print("h2")
+                # if the gcode index is not 0, then make sure the machine is in the proper state before starting to send
+                # the gcode.
+                if self.data.gcodeIndex > 0:
+                    print("h3")
+                    # get machine into proper state by sending appropriate commands
                     self.processGCode()
+                    print("h4")
+                    # update the gcode position on the UI client.. Have to recalculate it from the gcode because
+                    # starting at some place other than 0
                     self.sendGCodePositionUpdate(recalculate=True)
+                    print("h5")
                     self.data.uploadFlag = 1
-                    #self.data.console_queue.put("Run Paused")
-                    #self.data.ui_queue1.put("Action", "setAsResume", "")
-                    #self.data.pausedzval = self.data.zval
                 else:
-                    #self.data.gcode_queue.put(self.data.gcode[self.data.gcodeIndex])
+                    print("h6")
                     self.data.uploadFlag = 1
-                    #self.data.gcodeIndex += 1
                 return True
             else:
                 return False
         except Exception as e:
+            # something goes wrong, stop uploading.
             self.data.console_queue.put(str(e))
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             return False
 
     def stopRun(self):
+        '''
+        Stops the uploading of gcode.
+        :return:
+        '''
         try:
             self.data.console_queue.put("stopping run")
+            # this is necessary because of the way PID data is being processed.  Otherwise could potentially get stuck
+            # in PID test
             self.data.inPIDPositionTest = False
             self.data.inPIDVelocityTest = False
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
+            self.data.manualZAxisAdjust = False
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
-            # TODO: app.onUploadFlagChange(self.stopRun, 0)
+            # TODO: app.onUploadFlagChange(self.stopRun, 0) edit: not sure this is needed anymore
             self.data.console_queue.put("Gcode stopped")
+            # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
             return True
         except Exception as e:
@@ -388,6 +445,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def moveToDefault(self):
+        '''
+        Moves the sled to the spot where the chains are extended to the extendChainLength.  Not regularly used, but
+        more for testing.  Uses B09 commands (single axis moves).
+        :return:
+        '''
         try:
             chainLength = self.data.config.getValue(
                 "Advanced Settings", "chainExtendLength"
@@ -400,7 +462,7 @@ class Actions(MakesmithInitFuncs):
 
             # the firmware doesn't update sys.xPosition or sys.yPosition during a singleAxisMove
             # therefore, the machine doesn't know where it is.
-            # so let tell the machine where it's at by sending a reset chain length
+            # so tell the machine where it's at by sending a reset chain length
             self.data.gcode_queue.put("B08 ")
 
             return True
@@ -409,6 +471,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def testMotors(self):
+        '''
+        Sends the test motors/encoder command, B04
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("B04 ")
             return True
@@ -417,6 +483,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def wipeEEPROM(self, extent):
+        '''
+        Sends the wipe EEPROM commands
+        :param extent:
+        :return:
+        '''
         try:
             if extent == "All":
                 self.data.gcode_queue.put("$RST=* ")
@@ -426,6 +497,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("$RST=# ")
             else:
                 return False
+            # these two lines were commented out and aren't used (and may not even work).  The thought was that after
+            # the EEPROM got wiped, you need to sync settings.
             #timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
             #timer.start()
             return True
@@ -434,11 +507,20 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def pauseRun(self):
+        '''
+        Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
+        :return:
+        '''
         try:
             if self.data.uploadFlag == 1:
                 self.data.uploadFlag = 0
                 self.data.console_queue.put("Run Paused")
                 self.data.ui_queue1.put("Action", "setAsResume", "")
+                # I don't think this is actually used, but the idea was to be able to make sure the machine returns to
+                # the correct z-height after a pause in the event the user raised/lowered the bit.
+                # However, in the resumeRun function, that doesn't occur unless manualZAxisAdjust is set, which only
+                # occurs when a tool change in issued.  So, perhaps we need to add self.data.manualZAxisAdjust enabled
+                # here as well if that's what we want it to do.
                 self.data.pausedzval = self.data.zval
             return True
         except Exception as e:
@@ -446,7 +528,15 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def resumeRun(self):
+        '''
+        Resumes sending the gcode.  If a tool change command was received, then the manualZAxisAdjust is enabled and
+        the machine will be returned to the z-axis height it was when the tool change command was processed.  It also
+        makes sure the units are what they were prior to the tool change (user might have switched them up while
+        setting z-axis to zero).
+        :return:
+        '''
         try:
+            print("at resume run")
             if self.data.manualZAxisAdjust:
                 self.data.uploadFlag = self.data.previousUploadStatus
                 if self.data.pausedUnits != self.data.units:
@@ -455,11 +545,15 @@ class Actions(MakesmithInitFuncs):
                     else:
                         self.data.gcode_queue.put("G21 ")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
+                # clear the flag since resume
+                self.data.manualZAxisAdjust = False
             else:
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
-            #self.data.quick_queue.put("~")
+            print("uploadFlag = "+str(self.data.uploadFlag))
+            print("putting ~ in quick_queue")
+            self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
             return True
         except Exception as e:
@@ -596,6 +690,7 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def moveZ(self, direction, distToMoveZ):
+        print("here at moveZ")
         try:
             self.data.config.setValue("Computed Settings", "distToMoveZ", distToMoveZ)
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
@@ -608,6 +703,7 @@ class Actions(MakesmithInitFuncs):
                     "G91 G00 Z" + str(float(distToMoveZ)) + " G90 "
                 )
             elif direction == "lower":
+                print("putting lower into gcode_queue")
                 self.data.gcode_queue.put(
                     "G91 G00 Z" + str(-1.0 * float(distToMoveZ)) + " G90 "
                 )

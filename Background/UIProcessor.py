@@ -80,6 +80,10 @@ class UIProcessor:
                                 # Maslow has been paused.  set uploadFlag to 0 and update the pause button on the
                                 # UI clients
                                 self.app.data.uploadFlag = 0
+                                # todo: this needs to be fixed.  only way i can move z axis after a tool change
+                                # operation is to issue this 'un-pause' command which then lets two ok's to come back
+                                # (one for the tool change and one for the ~)  Without this, serialThread won't see
+                                # that the bufferSize = bufferSpace and therefore won't issue any commands.
                                 self.app.data.quick_queue.put("~")
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message",

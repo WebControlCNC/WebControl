@@ -58,13 +58,18 @@ class Logger(MakesmithInitFuncs):
     def setLoggingTimeout(self, timeOut):
         self.loggingTimeout = timeOut
 
-    def addToMessageBuffer(self,message):
+    def addToMessageBuffer(self, message):
         self.messageBuffer += message
-        self.data.log_streamer_queue.put(message)
+        if self.data.log_streamer_queue.full():
+            self.data.log_streamer_queue.get_nowait()
+        self.data.log_streamer_queue.put_nowait(message)
 
-    def addToaMessageBuffer(self,message):
+    def addToaMessageBuffer(self, message):
         self.amessageBuffer += message
-        self.data.alog_streamer_queue.put(message)
+
+        if self.data.alog_streamer_queue.full():
+            self.data.alog_streamer_queue.get_nowait()
+        self.data.alog_streamer_queue.put_nowait(message)
 
     def writeToLog(self, message):
 

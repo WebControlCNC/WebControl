@@ -154,9 +154,9 @@ class SerialPortThread(MakesmithInitFuncs):
                 + " is installed"
             )
 
-        weAreBufferingLines = bool(
-            int(self.data.config.getValue("Maslow Settings", "bufferOn"))
-        )
+        weAreBufferingLines = False
+        # todo: re-enable after figuring out what's wrong with pauses/tool changes/buffering
+        # bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
 
         try:
             self.data.console_queue.put("connecting")
@@ -206,9 +206,11 @@ class SerialPortThread(MakesmithInitFuncs):
 
                 # Read serial line from machine if available
                 # -------------------------------------------------------------------------------------
+                #print("h1")
                 lineFromMachine = ""
 
                 if self.data.serialPort.serialPortRequest == "requestToClose":
+                    print("processing request to close")
                     self.closeConnection()
                     # do not change status yet...
                     return
@@ -222,6 +224,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 except:
                     pass
 
+                #print("h2")
                 # Check if a line has been completed
                 if lineFromMachine == "ok\r\n" or (
                     len(lineFromMachine) >= 6 and lineFromMachine[0:6] == "error:"
@@ -240,27 +243,28 @@ class SerialPortThread(MakesmithInitFuncs):
                 # send any emergency instructions to the machine if there are any
                 if self.data.quick_queue.empty() != True:
                     command = self.data.quick_queue.get_nowait()
+                    print("found "+command+" in quick_queue")
                     self._write(command, True)
 
                 # send regular instructions to the machine if there are any
                 #print("bSpace="+str(self.bufferSpace)+", bSize="+str(self.bufferSize)+", ready="+str(self.machineIsReadyForData))
-                if self.bufferSpace == self.bufferSize and self.machineIsReadyForData:
+                if self.bufferSpace == self.bufferSize:
                     if self.data.gcode_queue.empty() != True:
-                        command = self.data.gcode_queue.get_nowait()# + " "
-                        filtersparsed = re.sub(r'\(([^)]*)\)','',command) #replace mach3 style gcode comments with newline
-                        #command = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
-                        command = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
-                        if len(command) != 0:
-                            command = command + " "
-                            self._write(command)
-                            if command.find("G20") != -1:
-                                if self.data.units != "INCHES":
-                                    self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
-                            if command.find("G21") != -1:
-                                if self.data.units != "MM":
-                                    self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
-                            self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
-
+                        if self.machineIsReadyForData:
+                            command = self.data.gcode_queue.get_nowait()# + " "
+                            filtersparsed = re.sub(r'\(([^)]*)\)','',command) #replace mach3 style gcode comments with newline
+                            #command = re.sub(r';([^\n]*)\n','\n',filtersparsed) #replace standard ; initiated gcode comments with newline
+                            command = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                            if len(command) != 0:
+                                command = command + " "
+                                self._write(command)
+                                if command.find("G20") != -1:
+                                    if self.data.units != "INCHES":
+                                        self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
+                                if command.find("G21") != -1:
+                                    if self.data.units != "MM":
+                                        self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
+                                self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 # Send the next line of gcode to the machine if we're running a program. Will send lines to buffer if there is space
                 # and the feature is turned on
                 if weAreBufferingLines:
@@ -284,7 +288,7 @@ class SerialPortThread(MakesmithInitFuncs):
                     ):  # if the receive buffer is empty and the machine has acked the last line complete
                         self.sendNextLine()
 
-                        # Check for serial connection loss
+                # Check for serial connection loss
                 # -------------------------------------------------------------------------------------
                 if time.time() - self.lastMessageTime > 5:
                     self.data.console_queue.put("Connection Timed Out")
@@ -305,6 +309,6 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.data.requestSerialClose = False
                     self.data.connectionStatus = 0
                     self.serialInstance.close()
-
+                #print("h8")
                 # Sleep between passes to save CPU
-                time.sleep(0.001)
+                time.sleep(0.01)
