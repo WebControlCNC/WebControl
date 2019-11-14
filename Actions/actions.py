@@ -58,7 +58,7 @@ class Actions(MakesmithInitFuncs):
                         self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
             elif msg["data"]["command"] == "queryCamera":
                 if not self.queryCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with querying camera.")
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
@@ -536,23 +536,27 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
-            print("at resume run")
+            # if a tool change, then...
             if self.data.manualZAxisAdjust:
-                self.data.uploadFlag = self.data.previousUploadStatus
+                # make sure the units match what they were
                 if self.data.pausedUnits != self.data.units:
                     if self.data.pausedUnits == "INCHES":
                         self.data.gcode_queue.put("G20 ")
                     else:
                         self.data.gcode_queue.put("G21 ")
+                # move the z-axis back to where it was.
+                # note: this does not work correctly in relative mode.
+                # Todo: somehow manke this work when controller is in relative mode (G91)
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
+                # reenable the uploadFlag if it was previous set.
+                self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
-            print("uploadFlag = "+str(self.data.uploadFlag))
-            print("putting ~ in quick_queue")
+            # todo: delete this if not needed.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
             return True
@@ -561,6 +565,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def returnToCenter(self):
+        '''
+        Instructs controller to move sled to 0,0 at safe height.
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("G90  ")
             safeHeightMM = float(
@@ -578,6 +586,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def clearGCode(self):
+        '''
+        Calls function to clear the gcode file.  Probably could have just been called directly from processAction
+        :return:
+        '''
         try:
             self.data.gcodeFile.clearGcodeFile()
             return True
@@ -586,8 +598,14 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def moveGcodeZ(self, moves):
+        '''
+        Moves the gcode index to the next z-axis move.
+        :param moves:
+        :return:
+        '''
         try:
             dist = 0
+            #determine the number of lines to move to reach the next Z-axis move.
             for index, zMove in enumerate(self.data.zMoves):
                 if moves > 0 and zMove > self.data.gcodeIndex:
                     dist = self.data.zMoves[index + moves - 1] - self.data.gcodeIndex
@@ -604,6 +622,12 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def moveGcodeIndex(self, dist, index=False):
+        '''
+        Moves the gcodeIndex by either the distance or, in index is True, uses the dist as the index.
+        :param dist:
+        :param index:
+        :return:
+        '''
         try:
             maxIndex = len(self.data.gcode) - 1
             if index is True:
@@ -624,6 +648,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcodeIndex = targetIndex
 
             try:
+                # send gcode position update to UI client
                 retval = self.sendGCodePositionUpdate(recalculate=True)
                 return retval
             except Exception as e:
@@ -636,6 +661,16 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def move(self, direction, distToMove):
+        '''
+        Issues commands to move the sled
+        :param direction: direction to move
+        :param distToMove: distance to move
+        :return:
+        '''
+        # if enabled, for diagonal movements, the x and y move distance will be calculated such that the total distance
+        # moved equals what was specified.  For example, if enabled and command is issued to move one foot to top right,
+        # then the x and y coordinates will be calculated as the 0.707 feet so that a total of 1 foot is moved.  If
+        # disabled, then the sled will move 1 foot left and 1 foot up, for a total distance of 1.414 feet.
         if self.data.config.getValue("WebControl Settings","diagonalMove") == 1:
             diagMove = round(math.sqrt(distToMove*distToMove/2.0), 4)
         else:
@@ -683,17 +718,29 @@ class Actions(MakesmithInitFuncs):
                 )
             else:
                 return False
-            self.data.config.setValue("Computed Settings","distToMove",distToMove)
+            # keep track of the distToMove value
+            self.data.config.setValue("Computed Settings", "distToMove", distToMove)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
 
     def moveZ(self, direction, distToMoveZ):
-        print("here at moveZ")
+        '''
+        Moves the Z-Axis a distance and direction
+        :param direction:
+        :param distToMoveZ:
+        :return:
+        '''
+
         try:
+            #keep track of distToMoveZ value
             self.data.config.setValue("Computed Settings", "distToMoveZ", distToMoveZ)
+            # It's possible the front page is set for one units and when you go to z-axis control, you might switch
+            # to a different unit.  Webcontrol keeps these units separate, so we need to make sure the machine is in
+            # the correct units when the z-axis move is sent
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
+            previousUnits = self.data.config.getValue("Computed Settings", "units")
             if unitsZ == "MM":
                 self.data.gcode_queue.put("G21 ")
             else:
@@ -703,15 +750,17 @@ class Actions(MakesmithInitFuncs):
                     "G91 G00 Z" + str(float(distToMoveZ)) + " G90 "
                 )
             elif direction == "lower":
-                print("putting lower into gcode_queue")
                 self.data.gcode_queue.put(
                     "G91 G00 Z" + str(-1.0 * float(distToMoveZ)) + " G90 "
                 )
-            units = self.data.config.getValue("Computed Settings", "units")
-            if units == "MM":
-                self.data.gcode_queue.put("G21 ")
-            else:
-                self.data.gcode_queue.put("G20 ")
+            # now, since we might have changed the units of the machine, make sure they are set back to what it was
+            # originally.
+            #units = self.data.config.getValue("Computed Settings", "units")
+            if previousUnits != unitsZ:
+                if previousUnits == "MM":
+                    self.data.gcode_queue.put("G21 ")
+                else:
+                    self.data.gcode_queue.put("G20 ")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -719,6 +768,10 @@ class Actions(MakesmithInitFuncs):
 
 
     def touchZ(self):
+        '''
+        Sends a gcode line to set z axis depth using touch plate.  I've not personally tested this.
+        :return:
+        '''
         try:
             plungeDepth = self.data.config.getValue("Advanced Settings", "maxTouchProbePlungeDistance")
             revertToInches = False
@@ -728,6 +781,8 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 G38.2 Z-" + plungeDepth + " F1 M02")
             if revertToInches:
                 self.data.gcode_queue.put("G20")
+            # don't think this line is needed
+            # todo: remove if not needed.
             self.data.measureRequest = self.defineZ0()
             return True
         except Exception as e:
@@ -735,14 +790,26 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
+        '''
+        update settings that come from frontpage or from the gcode file.
+        :param setting:
+        :param value:
+        :param fromGcode:
+        :return:
+        '''
         try:
             self.data.console_queue.put("at update setting from gcode("+str(fromGcode)+"): "+setting+" with value: "+str(value))
+            # if front page button has been pressed or serialPortThread is going to send gcode with a G21 or G20..
             if setting == "toInches" or setting == "toMM":
+                # this shouldn't be reached any more after I reordered the processActions function
+                # todo: remove this if if not needed.
                 if self.data.uploadFlag == 1 and fromGcode == False:
                     self.data.ui_queue1.put("Alert", "Alert", "Cannot change units while sending gcode.")
                     return True
                 scaleFactor = 0
                 if fromGcode:
+                    # if from a gcode line, then update the get the distToMove value from storage and figure out the
+                    # scaleFactor
                     value = float(self.data.config.getValue("Computed Settings", "distToMove"))
                     if self.data.units == "INCHES":
                         if setting == "toMM":
@@ -758,59 +825,74 @@ class Actions(MakesmithInitFuncs):
                             scaleFactor = 1.0
 
                 if setting == "toInches":
+                    # was metric, now going to imperial
                     self.data.units = "INCHES"
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
+                    # if scaleFactor == 0, then it wasn't previously set by the if fromGcode.
                     if scaleFactor == 0:
                         scaleFactor = 1.0/25.4
                     self.data.tolerance = 0.020
                     self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
+                    # only send G20 to the controller if not already sending G20
                     if not fromGcode:
                         self.data.gcode_queue.put("G20 ")
                 else:
+                    # was imperial, now going to metric
                     self.data.units = "MM"
                     self.data.config.setValue("Computed Settings", "units", self.data.units)
+                    # if scaleFactor == 0, then it wasn't previously set by the if fromGcode.
                     if scaleFactor == 0:
                         scaleFactor = 25.4
                     self.data.tolerance = 0.5
                     self.data.config.setValue("Computed Settings", "tolerance", self.data.tolerance)
+                    # only send G21 to the controller if not already sending G21
                     if not fromGcode:
                         self.data.gcode_queue.put("G21 ")
+                # update the gcodeShift coordinates to match units
                 self.data.gcodeShift = [
                   self.data.gcodeShift[0] * scaleFactor,
                   self.data.gcodeShift[1] * scaleFactor,
                 ]
+                # The UI client sending this has already converted the distToMove to the correct value for the units
                 self.data.config.setValue("Computed Settings", "distToMove", value)
+                # get the current homeX and homeY coordinates
                 oldHomeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
                 oldHomeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
+                # convert homeX and homeY to the correct units and save
                 self.data.config.setValue("Advanced Settings", "homeX", oldHomeX * scaleFactor)
                 self.data.config.setValue("Advanced Settings", "homeY", oldHomeY * scaleFactor)
-                #self.data.config.setValue("Advanced Settings", "homeX", self.data.gcodeShift[0])
-                #self.data.config.setValue("Advanced Settings", "homeY", self.data.gcodeShift[1])
+                # notify all UI clients that units have been changed and distToMove has been changed
                 self.data.ui_queue1.put("Action", "unitsUpdate", "")
                 self.data.ui_queue1.put("Action", "distToMoveUpdate", "")
-                #position = {"xval": self.data.gcodeShift[0], "yval": self.data.gcodeShift[1]}
+                # update the home position..
                 position = {"xval": oldHomeX * scaleFactor, "yval": oldHomeY * scaleFactor}
                 self.data.ui_queue1.put("Action", "homePositionMessage", position)
+                # update the gcode position
                 self.sendGCodePositionUpdate(recalculate=True)
             elif setting == "toInchesZ":
+                # this shouldn't be reached any more after I reordered the processActions function
+                # todo: remove this if if not needed.
                 if self.data.uploadFlag == 1:
                     self.data.ui_queue1.put("Alert", "Alert", "Cannot change units while sending gcode.")
                     return True
-                self.data.units = "INCHES"
+
+                #self.data.units = "INCHES" ### commented this out and added the unitZ
                 self.data.config.setValue(
-                    "Computed Settings", "unitsZ", self.data.units
+                    "Computed Settings", "unitsZ", "INCHES"
                 )
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
                 self.data.ui_queue1.put("Action", "unitsUpdateZ", "")
                 self.data.ui_queue1.put("Action", "distToMoveUpdateZ", "")
 
             elif setting == "toMMZ":
+                # this shouldn't be reached any more after I reordered the processActions function
+                # todo: remove this if if not needed.
                 if self.data.uploadFlag == 1:
                     self.data.ui_queue1.put("Alert", "Alert", "Cannot change units while sending gcode.")
                     return True
-                self.data.units = "MM"
+                #self.data.units = "MM" ### commented this out
                 self.data.config.setValue(
-                    "Computed Settings", "unitsZ", self.data.units
+                    "Computed Settings", "unitsZ", "MM"
                 )
                 self.data.config.setValue("Computed Settings", "distToMoveZ", value)
                 self.data.ui_queue1.put("Action", "unitsUpdateZ", "")
@@ -821,6 +903,13 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def rotateSprocket(self, sprocket, time):
+        '''
+        Turns sprocket at 100 speed for given amount of time using B11 command
+        This command is used in PID tuning to try to get sprockets in a position without using encoder.
+        :param sprocket:
+        :param time:
+        :return:
+        '''
         try:
             if  time > 0:
                 self.data.gcode_queue.put("B11 "+sprocket+" S100 T"+str(time))
@@ -833,7 +922,14 @@ class Actions(MakesmithInitFuncs):
 
             
     def setSprockets(self, sprocket, degrees):
+        '''
+        Moves sprocket a specified number of degrees.
+        :param sprocket:
+        :param degrees:
+        :return:
+        '''
         try:
+            # calculate the amoount of chain to be fed out/in based upon sprocket circumference and degree
             degValue = round(
                 float(self.data.config.getValue("Advanced Settings", "gearTeeth"))
                 * float(self.data.config.getValue("Advanced Settings", "chainPitch"))
@@ -841,18 +937,20 @@ class Actions(MakesmithInitFuncs):
                 * degrees,
                 4,
             )
+            # Adjust distance based upon chainOverSprocket value
             self.data.gcode_queue.put("G91 ")
             if (
                 self.data.config.getValue("Advanced Settings", "chainOverSprocket")
                 == "Bottom"
             ):
                 degValue *= -1.0
-            if self.data.config.getValue("Advanced Settings", "chainOverSprocket")=="Bottom":
+            if self.data.config.getValue("Advanced Settings", "chainOverSprocket") == "Bottom":
                 if self.data.config.getValue("Computed Settings", "chainOverSprocketComputed") != 2:
                    self.data.ui_queue1.put("Alert", "Alert", "mismatch between setting and computed setting. set for bottom feed, but computed !=2. report as issue on github please")
-            if self.data.config.getValue("Advanced Settings", "chainOverSprocket")=="Top":
+            if self.data.config.getValue("Advanced Settings", "chainOverSprocket") == "Top":
                 if self.data.config.getValue("Computed Settings", "chainOverSprocketComputed") != 1:
                    self.data.ui_queue1.put("Alert", "Alert", "mismatch between setting and computed setting. set for top feed, but computed != 1. report as issue on github please")
+            # send command
             self.data.gcode_queue.put("B09 " + sprocket + str(degValue) + " ")
             self.data.gcode_queue.put("G90 ")
             return True
@@ -861,7 +959,9 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def setSprocketAutomatic(self):
-        # set the call back for the measurement
+        '''
+        Sets the call back for the automatic sprocket alignment and requests the measurement.
+        '''
         try:
             self.data.measureRequest = self.getLeftChainLength
             # request a measurement
@@ -872,6 +972,12 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def getLeftChainLength(self, dist):
+        '''
+        Part of setSprocketAutomatic.  Is called after the measurement is received.  Left chain measurement is logged
+        and then callback is set to get the right chain measurement.
+        :param dist:
+        :return:
+        '''
         self.leftChainLength = dist
         # set the call back for the measurement
         self.data.measureRequest = self.getRightChainLength
@@ -879,10 +985,21 @@ class Actions(MakesmithInitFuncs):
         self.data.gcode_queue.put("B10 R")
 
     def getRightChainLength(self, dist):
+        '''
+        Part of setSprocketAutomatic.  Is called after the measurement is received.  Right chain measurement is logged
+        and then moveToVertical is called.
+        :param dist:
+        :return:
+        '''
         self.rightChainLength = dist
         self.moveToVertical()
 
     def moveToVertical(self):
+        '''
+        Using distances logged from previous calls, calculates how much to move the sprockets so that one tooth is
+        vertical.
+        :return:
+        '''
         chainPitch = float(self.data.config.getValue("Advanced Settings", "chainPitch"))
         gearTeeth = float(self.data.config.getValue("Advanced Settings", "gearTeeth"))
         distPerRotation = chainPitch * gearTeeth
@@ -890,13 +1007,18 @@ class Actions(MakesmithInitFuncs):
         distL = -1 * (self.leftChainLength % distPerRotation)
         distR = -1 * (self.rightChainLength % distPerRotation)
 
+        # Issue required move commands..
         self.data.gcode_queue.put("G91 ")
         self.data.gcode_queue.put("B09 L" + str(distL) + " ")
         self.data.gcode_queue.put("B09 R" + str(distR) + " ")
         self.data.gcode_queue.put("G90 ")
 
     def setSprocketsZero(self):
-        # mark that the sprockets are straight up
+        '''
+        Notify controller that the chain length is zero.  This is called by the user after the sprockets are set to
+        vertical.
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("B06 L0 R0 ")
             return True
@@ -905,6 +1027,12 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def setSprocketsDefault(self):
+        '''
+        Notify controller that the chain length is equal to the extendChainLength distance.  This is called by the user
+        after setting both sprockets to vertical and reapplying the appropriate chain links to the top teeth.
+        https://forums.maslowcnc.com/t/how-to-manually-reset-chains-the-easy-way/
+        :return:
+        '''
         try:
             self.data.gcode_queue.put("B08 ")
             return True
@@ -913,7 +1041,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def updatePorts(self):
-        # refresh the list of available comports
+        '''
+        Updates the list of ports found on the computer.
+        :return:
+        '''
         self.data.console_queue.put("at Update Ports")
         portsList = []
         try:
@@ -933,6 +1064,7 @@ class Actions(MakesmithInitFuncs):
             if len(portsList) == 0:
                 portsList.append("None")
             self.data.comPorts = portsList
+            # send updated list to UI client
             self.data.ui_queue1.put("Action", "updatePorts", "")
             return True
         except Exception as e:
@@ -940,6 +1072,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def acceptTriangularKinematicsResults(self):
+        '''
+        Calls function to accept the results of the triangular calibration.
+        Todo: call directly from processActions.
+        :return:
+        '''
         try:
             self.data.triangularCalibration.acceptTriangularKinematicsResults()
             return True
@@ -949,11 +1086,18 @@ class Actions(MakesmithInitFuncs):
 
             
     def calibrate(self, result):
+        '''
+        Sends form data for triangular calibration to the triangular calibration routine to calculate and then return
+        results to the UI client
+        :param result:
+        :return:
+        '''
         try:
             motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
                 result
             )
             if not motorYoffsetEst:
+                # if something didn't go correctly, motorYoffsetEst would have been returned as none
                 return False
             return (
                 motorYoffsetEst,
@@ -966,11 +1110,18 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def holeyCalibrate(self, result):
+        '''
+        Sends form data for holey calibration to the triangular calibration routine to calculate and then return
+        results to the UI client
+        :param result:
+        :return:
+        '''
         try:
             motorYoffsetEst, distanceBetweenMotors, leftChainTolerance, rightChainTolerance, calibrationError = self.data.holeyCalibration.Calibrate(
                 result
             )
             if not motorYoffsetEst:
+                # if something didn't go correctly, motorYoffsetEst would have been returned as none
                 return False
             return (
                 motorYoffsetEst,
@@ -985,6 +1136,11 @@ class Actions(MakesmithInitFuncs):
 
 
     def sendGCode(self, gcode):
+        '''
+        Sends gcode entered to controller.  Comes from the Gcode->Send GCode function
+        :param gcode:
+        :return:
+        '''
         try:
             self.data.sentCustomGCode = gcode
             gcodeLines = gcode.splitlines()
@@ -997,6 +1153,12 @@ class Actions(MakesmithInitFuncs):
     
     def macro(self, number):
         '''
+        Sends gcode associated with macro buttons
+        :param number:
+        :return:
+        '''
+        '''
+        Ignore this stuff in this comment block.. used for testing gpio
         try:
             if number == 1:
                 print("here")
@@ -1025,6 +1187,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def testImage(self):
+        '''
+        Calls function to send the test image from optical calibration
+        Todo: move to processAction
+        :return:
+        '''
         try:
             self.data.opticalCalibration.testImage()
             return True
@@ -1033,6 +1200,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def adjustCenter(self, dist):
+        '''
+        Used in optical calibration to allow user to raise/lower the center point and then move there.
+        :param dist:
+        :return:
+        '''
         try:
             motorOffsetY = float(self.data.config.getValue("Maslow Settings","motorOffsetY"))+dist
             self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorOffsetY))
@@ -1044,14 +1216,22 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def processSettingRequest(self, section, setting):
+        '''
+        Returns requested settings to the UI clients.  Needed when a client connects or reconnects to get in sync
+        :param section:
+        :param setting:
+        :return:
+        '''
         try:
             if setting == "homePosition":
+                # send home position
                 homeX = self.data.config.getValue("Advanced Settings", "homeX")
                 homeY = self.data.config.getValue("Advanced Settings", "homeY")
                 position = {"xval": homeX, "yval": homeY}
                 self.data.ui_queue1.put("Action", "homePositionMessage", position)
                 return None, None
             elif setting == "calibrationCurve":
+                # send optical calibration curve values
                 try:
                     xCurve = [0,0,0,0,0,0]
                     yCurve = [0,0,0,0,0,0]
@@ -1072,27 +1252,40 @@ class Actions(MakesmithInitFuncs):
                 except Exception as e:
                     self.data.console_queue.put(str(e))
             elif setting == "calibrationError":
+                # send calibration error matrix
                 try:
                     xyErrorArray = self.data.config.getValue("Optical Calibration Settings","xyErrorArray")
+                    # parse the error array because its stored as a long string
                     errorX, errorY = self.data.config.parseErrorArray(xyErrorArray, True)
                     data = {"errorX": errorX, "errorY": errorY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
                 except Exception as e:
                     self.data.console_queue.put(str(e))
             else:
+                # send whatever is being request
                 if setting == "units":
-                    self.data.xval_prev = -99999.0 #force a new position send
+                    # sled position messages from controller aren't sent unless there's a change, so we set the
+                    # xval_prev to some silly number and when the next position message comes in from the controller,
+                    # it will be processed and passed on to the UI clients.
+                    self.data.xval_prev = -99999.0
                 retval = self.data.config.getValue(section, setting)
+                # return the setting requested and its value.
                 return setting, retval
         except Exception as e:
             pass
         return None, None
 
     def upgradeFirmware(self, version):
+        '''
+        Upgrades the firmware in the controller
+        :param version:
+        :return:
+        '''
         try:
+            # if this is a pyinstaller release, find out where the root is... it could be a temp directory if single
+            # file
             if self.data.platform == "PYINSTALLER":
                 home = os.path.join(self.data.platformHome)
-                #print(home)
             else:
                 home = "."
             if version == 0:
@@ -1104,32 +1297,36 @@ class Actions(MakesmithInitFuncs):
             if version == 2:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Holey Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/holey/*.hex"
+            # wait half second.. not sure why..
             time.sleep(.5)
-            print(path)
             t0 = time.time()*1000
             portClosed = False
+            # request the the serial port is closed
             self.data.serialPort.closeConnection()
+            # give it five seconds to close
             while (time.time()*1000 - t0) < 5000:
                 if self.data.serialPort.getConnectionStatus():
                     portClosed = True
-                    print("portClosed0")
                     break
+            # wait 1.5 seconds.. not sure why...
             time.sleep(1.5)
+            # if port is closed, then upgrade firmware..
             if portClosed:
+                # works if there is only only valid hex file in the directory
                 for filename in glob.glob(path):
                     port = self.data.comport
-                    print(port)
-                    print(home)
-                    print(filename)
+                    # this was commented out below. probably not needed.  Todo: cleanup
                     #if home != "":
                     #    cmd = "\"C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\avrdude\" -Cavr/avrdude.conf -v -patmega2560 -cwiring -P" + port + " -b115200 -D -Uflash:w:" + filename + ":i"
                     #else:
                     cmd = home+"/tools/avrdude -C"+home+"/tools/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
-                    print(cmd)
+                    #print(cmd)
+                    # I think this is blocking..
                     x = os.system(cmd)
                     self.data.connectionStatus = 0
-                    print(x)
-                    print("closing modals")
+                    #print(x)
+                    #print("closing modals")
+                    # close off the modals and put away the spinner.
                     self.data.ui_queue1.put("Action", "closeModals", "Notification:")
                     return True
             else:
@@ -1142,8 +1339,12 @@ class Actions(MakesmithInitFuncs):
 
 
     def createDirectory(self, _directory):
+        '''
+        Called to create a directory when saving gcode
+        :param _directory:
+        :return:
+        '''
         try:
-
             home = self.data.config.getHome()
             directory = home + "/.WebControl/gcode/" + _directory
             if not os.path.isdir(directory):
@@ -1155,20 +1356,25 @@ class Actions(MakesmithInitFuncs):
         return True
 
     def sendGCodePositionUpdate(self, gCodeLineIndex=None, recalculate=False):
+        '''
+        Send the updated gcode position.
+        :param gCodeLineIndex: Specific gcode index to send position based upon
+        :param recalculate: recalculate position by parsing through the gcode file.
+        :return:
+        '''
         if self.data.gcode:
             if gCodeLineIndex is None:
                 gCodeLineIndex = self.data.gcodeIndex
             gCodeLine = self.data.gcode[gCodeLineIndex]
-            #print("Gcode index"+str(gCodeLineIndex)+" : "+ gCodeLine )
-            if not recalculate and gCodeLine.find("(") == -1:
-                #print("not recalculating.. uploadFlag ="+str(self.data.uploadFlag))
 
+            if not recalculate and gCodeLine.find("(") == -1 and gCodeLine.find(";") == -1:
+                # parse the position from the gcode line or use previous x, y, or z position if not present.  Works only
+                # if in absolute mode
                 x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if x:
                     xTarget = float(x.groups()[0])
                     self.data.previousPosX = xTarget
                 else:
-                    #xTarget = None
                     xTarget = self.data.previousPosX
 
                 y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
@@ -1177,7 +1383,6 @@ class Actions(MakesmithInitFuncs):
                     yTarget = float(y.groups()[0])
                     self.data.previousPosY = yTarget
                 else:
-                    #yTarget = None
                     yTarget = self.data.previousPosY
 
                 z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
@@ -1186,25 +1391,33 @@ class Actions(MakesmithInitFuncs):
                     zTarget = float(z.groups()[0])
                     self.data.previousPosZ = zTarget
                 else:
-                    #zTarget = None
                     zTarget = self.data.previousPosZ
             else:
-                #if xTarget is None or yTarget is None:
+                # if directed to recalculate or there's a comment in the line, then use more time consuming method.
                 xTarget, yTarget, zTarget = self.findPositionAt(self.data.gcodeIndex)
 
+            # correct for scaling.  If the gcode line is in one units but machine is in different units, then need
+            # to make adjustment.  This might occur if a gcode is loaded that's metric and then the user switches
+            # the front page to imperial and then changes the gcode index.
             scaleFactor = 1.0
-            if self.data.gcodeFileUnits == "MM" and self.data.units=="INCHES":
+            if self.data.gcodeFileUnits == "MM" and self.data.units == "INCHES":
                 scaleFactor = 1/25.4
-            if self.data.gcodeFileUnits == "INCHES" and self.data.units=="MM":
+            if self.data.gcodeFileUnits == "INCHES" and self.data.units == "MM":
                 scaleFactor = 25.4
 
-            #position = {"xval": xTarget*scaleFactor, "yval": yTarget*scaleFactor, "zval": self.data.zval*scaleFactor, "gcodeLine":gCodeLine, "gcodeLineIndex":gCodeLineIndex}
+            # send the position to the UI client
             position = {"xval": xTarget * scaleFactor, "yval": yTarget * scaleFactor,"zval": zTarget * scaleFactor, "gcodeLine": gCodeLine, "gcodeLineIndex": gCodeLineIndex}
-
             self.data.ui_queue1.put("Action", "gcodePositionMessage", position)
             return True
 
     def moveTo(self, posX, posY):
+        '''
+        Commands controller to move sled to specified coordinates from the contextmenu moveto command(always in inches)
+        :param posX:
+        :param posY:
+        :return:
+        '''
+        # make sure not out of range.
         bedHeight = float(self.data.config.getValue("Maslow Settings","bedHeight"))/25.4
         bedWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4
         try:
@@ -1213,6 +1426,7 @@ class Actions(MakesmithInitFuncs):
                     posX=round(posX,4)
                     posY=round(posY,4)
                 else:
+                    # convert to mm
                     posX=round(posX*25.4,4)
                     posY=round(posY*25.4,4)
                 self.data.gcode_queue.put(
@@ -1236,7 +1450,7 @@ class Actions(MakesmithInitFuncs):
         state prior to starting the current gcode move.  Currently processed are relative/absolute
         positioning (G90/G91), imperial/metric units (G20/G21) and x, y and z positions
         '''
-        zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings","zAxisSafeHeight"))
+        zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings", "zAxisSafeHeight"))
         positioning = "G90 "
         units = "G20 "
         homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
@@ -1253,67 +1467,69 @@ class Actions(MakesmithInitFuncs):
         spindle = None
         laser = None
         dwell = None
+        # start parsing through gcode file up to the index
         for x in range(self.data.gcodeIndex):
             filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
-            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
+            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with nothing
             if not filtersparsed.isspace():  # if all spaces, don't send.  likely a comment. #self.data.gcode[x][0] != "(":
                 #lines = self.data.gcode[x].split(" ")
                 lines = filtersparsed.split(" ")
                 if lines:
                     finalLines = []
+                    # I think this splits everything up and reassembles them so that each line starts with a M, G or T
+                    # I must of had a reason to do so
                     for line in lines:
-                        if len(line)>0:
+                        if len(line) > 0:
                             if line[0] == "M" or line[0] == "G" or line[0] == "T" or len(finalLines) == 0:
                                 finalLines.append(line)
                             else:
                                 finalLines[-1] = finalLines[-1] + " " + line
+                    # start processing the lines, keeping track of the state variables.
                     for line in finalLines:
                         if line[0]=='G':
-                            if line.find("G90")!=-1:
+                            if line.find("G90") != -1:
                                 positioning = "G90 "
-                            if line.find("G91")!=-1:
+                            if line.find("G91") != -1:
                                 positioning = "G91 "
-                            if line.find("G20")!=-1:
+                            if line.find("G20") != -1:
                                 units = "G20 "
-                                if previousUnits!=units: #previous metrics now imperial
+                                if previousUnits != units: #previous metrics now imperial
                                     homeX = xpos / 25.4
                                     homeY = ypos / 25.4
                                     xpos = xpos / 25.4
                                     ypos = ypos / 25.4
                                     previousUnits = units
-                            if line.find("G21")!=-1:
+                            if line.find("G21") != -1:
                                 units = "G21 "
-                                if previousUnits!=units: #previous imperial now metrics
+                                if previousUnits != units: #previous imperial now metrics
                                     homeX = xpos * 25.4
                                     homeY = ypos * 25.4
                                     xpos = xpos * 25.4
                                     ypos = ypos * 25.4
                                     previousUnits = units
-                            if line.find("X")!=-1:
+                            if line.find("X") != -1:
                                 _xpos = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                                 if positioning == "G91 ":
                                     xpos = xpos+float(_xpos.groups()[0])
                                 else:
                                     xpos = float(_xpos.groups()[0])+homeX
-                            if line.find("Y")!=-1:
+                            if line.find("Y") != -1:
                                 _ypos = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                                 if positioning == "G91 ":
                                     ypos = ypos+float(_ypos.groups()[0])
                                 else:
                                     ypos = float(_ypos.groups()[0])+homeY
-                            if line.find("Z")!=-1:
+                            if line.find("Z") != -1:
                                 _zpos = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                                 if positioning == "G91 ":
                                     zpos = zpos+float(_zpos.groups()[0])
                                 else:
                                     zpos = float(_zpos.groups()[0])
-                            if line.find("G4")!=-1:
+                            if line.find("G4") != -1:
                                 dwell = line[3:]
                             if line.find("G04") != -1:
                                 dwell = line[4:]
-
-
-                        if line[0]=='M':
+                        if line[0] == 'M':
                             if line.find("M3") != -1 or line.find("M03") != -1:
                                 spindle = "M3 "
                             if line.find("M4") != -1 or line.find("M05") != -1:
@@ -1326,13 +1542,16 @@ class Actions(MakesmithInitFuncs):
                                 laser = "M107 "
                             if line.find("M16") != -1:
                                 laser = "M107 "
-                        if line[0]=='T':
+                        if line[0] == 'T':
                             tool = line[1:] #slice off the T
-
+        # now, after all that processing has been done, put machine in the correct state
+        # first, send the units command.
         self.data.gcode_queue.put(units)
+        # if units is imperial, then change the zAxisSafeHeight
         if units == "G20 ":
             zAxisSafeHeight = zAxisSafeHeight / 25.4
         '''
+        I had commented this out.. don't think it should be done since the units above will do it.
         if units == "G20 ":
             print("is G20")
             self.data.actions.updateSetting("toInches", 0, True)  # value = doesn't matter
@@ -1341,34 +1560,46 @@ class Actions(MakesmithInitFuncs):
             print("is G21")
             self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
         '''
-        self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight,4))+" ")
-        self.data.gcode_queue.put("G0 X"+str(round(xpos,4))+" Y"+str(round(ypos,4))+" ")
+        # move the Z-axis to the safe height
+        self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight, 4))+" ")
+        # move the sled to the x, y coordinate it is supposed to be.
+        self.data.gcode_queue.put("G0 X"+str(round(xpos, 4))+" Y"+str(round(ypos, 4))+" ")
+        # if there is a tool, then send tool change command.
         if tool is not None:
             self.data.gcode_queue.put("T"+tool+" M6 ")
+        # if there is a spindle command, then send it.
         if spindle is not None:
             self.data.gcode_queue.put(spindle)
+        # if there is a laser command, then send it.
         if laser is not None:
             self.data.gcode_queue.put(laser)
+        # if there is a dwell command, then send it.
         if dwell is not None:
             self.data.gcode_queue.put("G4 "+dwell)
+        # move the z-axis to where it is supposed to be.
         self.data.gcode_queue.put("G0 Z" + str(round(zpos, 4)) + " ")
+        # finally, put the machine in the appropriate positioning
+        # I have no idea if this really works for G91 gcode files..
         self.data.gcode_queue.put(positioning)
 
     def findPositionAt(self, index):
-        #This function is necessary to update the gcode position indicators on z-index moves
+        '''
+        Find the x,y,z gcode position at a given index when simple calcs don't work.  Parse through the file.
+        :param index:
+        :return:
+        '''
         xpos = 0
         ypos = 0
         zpos = 0
         for x in range(index):
             filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
-            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with newline
+            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with ""
             if not filtersparsed.isspace():  # if all spaces, don't send.  likely a comment.  #self.data.gcode[x][0] != "(":
                 listOfLines = filter(None, re.split("(G)", filtersparsed)) # self.data.gcode[x]))  # self.data.gcode[x].split("G")
-                # it is necessary to split the lines along G and M commands so that commands concatenated on one line
+                # it is necessary to split the lines along G commands so that commands concatenated on one line
                 # are processed correctly
                 for line in listOfLines:
                     line = 'G'+line
-                    #print(line)
                     if line[0] == 'G':
                         if line.find("G90") != -1:
                             positioning = "G90 "
@@ -1392,10 +1623,15 @@ class Actions(MakesmithInitFuncs):
                                 zpos = zpos + float(_zpos.groups()[0])
                             else:
                                 zpos = float(_zpos.groups()[0])
-        print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpoz="+str(zpos)+" for index="+str(index))
+        #print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpoz="+str(zpos)+" for index="+str(index))
         return xpos, ypos, zpos
 
     def adjustChain(self, chain):
+        '''
+        Called during the chain extend routine
+        :param chain:
+        :return:
+        '''
         try:
             for x in range(6):
                 self.data.ui_queue1.put("Action", "updateTimer", chain+":"+str(5-x))
@@ -1411,6 +1647,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def toggleCamera(self):
+        '''
+        Turns camera on or off.  If its suspended, it's read (though I can't explain why at this moment).
+        :return:
+        '''
         try:
             status = self.data.camera.status()
             if status == "stopped":
@@ -1425,6 +1665,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def cameraStatus(self):
+        '''
+        Sends the status of the camera to the UI client.  Not sure why its not called requestCameraStatus
+        Todo: update name to request cameraStatus
+        :return:
+        '''
         try:
             status = self.data.camera.status()
             if status == "stopped":
@@ -1439,6 +1684,11 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def queryCamera(self):
+        '''
+        Query the camera's settings.  Probably could be called directly by processAction
+        Todo: move to processAction
+        :return:
+        '''
         try:
             self.data.camera.getSettings()
             return True
@@ -1447,6 +1697,12 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def velocityPIDTest(self, parameters):
+        '''
+        Send commands to start the veloctiy pid test
+        Todo: further explain this
+        :param parameters:
+        :return:
+        '''
         try:
             print(parameters)
             print(parameters["KpV"])
@@ -1463,6 +1719,13 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def positionPIDTest(self, parameters):
+        '''
+        Send commands to start the position pid test
+        Todo: further explain this
+        :param parameters:
+        :return:
+        '''
+
         try:
             print(parameters)
             print(parameters["KpP"])
@@ -1480,6 +1743,12 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def velocityPIDTestRun(self, command, msg):
+        '''
+
+        :param command:
+        :param msg:
+        :return: 
+        '''
         try:
             if command == 'stop':
                 self.data.inPIDVelocityTest = False
