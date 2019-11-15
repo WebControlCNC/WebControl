@@ -56,7 +56,7 @@ function setListeners(){
 }
 
 function processalog(data){
-    if (alogMessages.length >100){
+    if (alogMessages.length >1000){
         alogMessages.shift();
         $('#alogMessages').get(0).firstChild.remove();
         $('#alogMessages').get(0).firstChild.remove();
@@ -70,7 +70,7 @@ function processalog(data){
 
 function processlog(data){
 
-    if (logMessages.length >100){
+    if (logMessages.length >1000){
         logMessages.shift();
         $('#logMessages').get(0).firstChild.remove();
         $('#logMessages').get(0).firstChild.remove();

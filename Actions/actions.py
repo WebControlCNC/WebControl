@@ -62,7 +62,7 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
-            elif self.data.uploadFlag:
+            elif self.data.uploadFlag > 0:
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
             # Commands not allowed during sending gcode.. if you did these commands, something could screw up.
             # If uploadFlag was enabled (see above) then this would never be reached.
@@ -516,11 +516,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.uploadFlag = 0
                 self.data.console_queue.put("Run Paused")
                 self.data.ui_queue1.put("Action", "setAsResume", "")
-                # I don't think this is actually used, but the idea was to be able to make sure the machine returns to
+                # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
-                # However, in the resumeRun function, that doesn't occur unless manualZAxisAdjust is set, which only
-                # occurs when a tool change in issued.  So, perhaps we need to add self.data.manualZAxisAdjust enabled
-                # here as well if that's what we want it to do.
                 self.data.pausedzval = self.data.zval
             return True
         except Exception as e:
@@ -537,6 +534,7 @@ class Actions(MakesmithInitFuncs):
         '''
         try:
             # if a tool change, then...
+            print("at resume run with manualzaxisadjust = "+str(self.data.manualZAxisAdjust))
             if self.data.manualZAxisAdjust:
                 # make sure the units match what they were
                 if self.data.pausedUnits != self.data.units:
@@ -547,16 +545,23 @@ class Actions(MakesmithInitFuncs):
                 # move the z-axis back to where it was.
                 # note: this does not work correctly in relative mode.
                 # Todo: somehow manke this work when controller is in relative mode (G91)
+                print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
                 # reenable the uploadFlag if it was previous set.
-                self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
+                if self.data.previousUploadStatus == -1:
+                    # if was M command pause, then set to 1
+                    self.data.uploadFlag = 1
+                else:
+                    self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
+                print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
+                self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
-            # todo: delete this if not needed.
+            # needed only if user initiated pause, but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
             return True
@@ -1561,6 +1566,7 @@ class Actions(MakesmithInitFuncs):
             self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
         '''
         # move the Z-axis to the safe height
+        print("moving to safe height as part of processgcode")
         self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight, 4))+" ")
         # move the sled to the x, y coordinate it is supposed to be.
         self.data.gcode_queue.put("G0 X"+str(round(xpos, 4))+" Y"+str(round(ypos, 4))+" ")
@@ -1577,6 +1583,7 @@ class Actions(MakesmithInitFuncs):
         if dwell is not None:
             self.data.gcode_queue.put("G4 "+dwell)
         # move the z-axis to where it is supposed to be.
+        print("moving to where it should be as part of processgcode")
         self.data.gcode_queue.put("G0 Z" + str(round(zpos, 4)) + " ")
         # finally, put the machine in the appropriate positioning
         # I have no idea if this really works for G91 gcode files..
@@ -1747,7 +1754,7 @@ class Actions(MakesmithInitFuncs):
 
         :param command:
         :param msg:
-        :return: 
+        :return:
         '''
         try:
             if command == 'stop':

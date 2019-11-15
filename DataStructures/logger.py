@@ -86,7 +86,7 @@ class Logger(MakesmithInitFuncs):
         currentTime = time.time()
         logTime = "{:0.2f}".format(currentTime-self.logStartTime)
         dateTime = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
-        if self.loggingTimeout > 0 and self.data.uploadFlag == 0 and currentTime-self.idler > self.loggingTimeout:
+        if self.loggingTimeout > 0 and self.data.uploadFlag <= 0 and currentTime-self.idler > self.loggingTimeout:
             if not self.suspendLogging:
                 self.addToMessageBuffer(logTime + ": " + "Logging suspended due to user idle time > "+str(self.loggingTimeout)+" seconds\n")
                 self.suspendLogging = True

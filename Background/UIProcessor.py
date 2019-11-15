@@ -78,9 +78,11 @@ class UIProcessor:
                                     self.setErrorOnScreen(message)
                             elif message[0:13] == "Maslow Paused":
                                 # Maslow has been paused.  set uploadFlag to 0 and update the pause button on the
-                                # UI clients
+                                # UI clients.  In reality, uploadFlag should already be set to 0 by serialPortThread
+                                # that is, the controller shouldn't be pausing without webcontrol already know it's
+                                # going to pause.
                                 self.app.data.uploadFlag = 0
-                                # todo: this needs to be fixed.  only way i can move z axis after a tool change
+                                # Send '~' upon receiveing the "Maslow Paused" notification.  This
                                 # operation is to issue this 'un-pause' command which then lets two ok's to come back
                                 # (one for the tool change and one for the ~)  Without this, serialThread won't see
                                 # that the bufferSize = bufferSpace and therefore won't issue any commands.
