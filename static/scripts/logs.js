@@ -3,6 +3,7 @@ var alogMessages = [];
 var logMessages = [];
 var alogEnabled = true;
 var logEnabled = true;
+var loggingState = false;
 
 $(document).ready(function(){
   namespace = '/MaslowCNCLogs'; // change to an empty string to use the global namespace
@@ -42,11 +43,19 @@ function setListeners(){
         case 'alog':
             if (alogEnabled)
                 processalog(msg.data);
+                processLoggingState(msg.state);
             break;
         case 'log':
             if (logEnabled)
                 processlog(msg.data);
+                processLoggingState(msg.state);
             break;
+        case 'state':
+            if (loggingState != msg.state){
+                processLoggingState(msg.state);
+                break;
+            }
+
         default:
             console.log("!!!!!!");
             console.log("uncaught action:"+msg.command);
@@ -66,6 +75,8 @@ function processalog(data){
     $('#alogMessages').append(document.createTextNode(data));
     $('#alogMessages').append("<br>");
     $('#alogMessages').scrollBottom();
+
+
 }
 
 function processlog(data){
@@ -81,6 +92,20 @@ function processlog(data){
     $('#logMessages').append("<br>");
     $('#logMessages').scrollBottom();
 }
+
+function processLoggingState(data){
+    if (data)
+    {
+        $("#loggingState").text("Logging Suspended");
+        $("#loggingState").removeClass('alert-success').addClass('alert-secondary');
+    }
+    else
+    {
+        $("#loggingState").text("Logging Active");
+        $("#loggingState").removeClass('alert-secondary').addClass('alert-success');
+    }
+}
+
 
 $.fn.scrollBottom = function() {
     return $(this).scrollTop($(this)[0].scrollHeight);

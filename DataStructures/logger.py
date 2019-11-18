@@ -55,6 +55,13 @@ class Logger(MakesmithInitFuncs):
     def resetIdler(self):
         self.idler = time.time()
 
+    def getLoggerState(self):
+        '''
+        Returns the state of the logger
+        :return:
+        '''
+        return self.suspendLogging
+
     def setLoggingTimeout(self, timeOut):
         self.loggingTimeout = timeOut
 
@@ -82,7 +89,7 @@ class Logger(MakesmithInitFuncs):
 
         """
         if self.loggingTimeout == -1: #get setting for suspend time
-            self.loggingTimeout = self.data.config.get("WebControl Settings","loggingTimeout")
+            self.loggingTimeout = self.data.config.get("WebControl Settings", "loggingTimeout")
         currentTime = time.time()
         logTime = "{:0.2f}".format(currentTime-self.logStartTime)
         dateTime = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
