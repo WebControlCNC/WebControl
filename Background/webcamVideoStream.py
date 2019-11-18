@@ -16,6 +16,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
     fps = 5
     videoSize = "640x480"
     cameraSleep = 0.01
+    debugCamera = False
     
     def __init__(self, src=0):
         # initialize the video camera stream and read the first frame
@@ -37,7 +38,8 @@ class WebcamVideoStream(MakesmithInitFuncs):
             self.setVideoSize()
             self.setFPS()
             cameraOff = True
-        if False:
+        # if debugging, print camera values
+        if self.debugCamera:
             self.data.console_queue.put("CAP_PROP_POS_MSEC=" + str(self.stream.get(cv2.CAP_PROP_POS_MSEC)))
             self.data.console_queue.put("CAP_PROP_POS_FRAMES=" + str(self.stream.get(cv2.CAP_PROP_POS_FRAMES)))
             self.data.console_queue.put("CAP_PROP_POS_AVI_RATIO=" + str(self.stream.get(cv2.CAP_PROP_POS_AVI_RATIO)))

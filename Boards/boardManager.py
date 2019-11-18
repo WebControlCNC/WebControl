@@ -6,6 +6,11 @@ import numpy as np
 from scipy.spatial import ConvexHull, convex_hull_plot_2d
 
 class BoardManager(MakesmithInitFuncs):
+    '''
+    This class implements the management of various boards (workpieces) that are tracked.
+    Each board is stored as a separate file containing both description, dimensions, makeup of board as well
+    as an array (1-inch resolution) of what parts of the board have been cut.
+    '''
     currentBoard = None
 
     def __init__(self):
@@ -13,31 +18,59 @@ class BoardManager(MakesmithInitFuncs):
         pass
 
     def initializeNewBoard(self):
+        '''
+        Create a new board and initialize it to the size of the bed.  Default to 0.75 inches thick
+        :return:
+        '''
         self.currentBoard = Board()
-        bedWidth = round(float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4,2);
-        bedHeight = round(float(self.data.config.getValue("Maslow Settings", "bedHeight"))/25.4,2);
+        bedWidth = round(float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4, 2)
+        bedHeight = round(float(self.data.config.getValue("Maslow Settings", "bedHeight"))/25.4, 2)
 
         self.currentBoard.updateBoardInfo("-", "-", bedHeight, bedWidth, 0.75, 0, 0, "inches")
+        # this creates the necessary compressed data files to avoid None errors.
         self.currentBoard.compressCutData()
 
     def getCurrentBoard(self):
+        '''
+        Returns current board
+        :return:
+        '''
         return self.currentBoard
 
     def getCurrentBoardFilename(self):
+        '''
+        Returns current board filename
+        :return:
+        '''
         return self.currentBoard.boardFilename
 
     def editBoard(self, result):
-        #try:
-        if self.currentBoard.updateBoardInfo(result["boardID"], result["material"], result["height"], result["width"], result["thickness"], result["centerX"], result["centerY"], result["units"]):
-            self.data.ui_queue1.put("Action", "boardUpdate", "")
-            return True
-        else:
+        '''
+        Updates the board information with data from the form.
+        :param result:
+        :return:
+        '''
+        try:
+            if self.currentBoard.updateBoardInfo(result["boardID"], result["material"], result["height"],
+                                                 result["width"], result["thickness"], result["centerX"],
+                                                 result["centerY"], result["units"]):
+                # send update to the UI clients
+                self.data.ui_queue1.put("Action", "boardUpdate", "")
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.data.console_queue.put(str(e))
             return False
-        #except Exception as e:
-        #    self.data.console_queue.put(str(e))
-        #    return False
 
     def saveBoard(self, fileName, directory):
+        '''
+        Saves the board data.  File format is one line of board data in json format and one line of cut data in
+        compressed and base64 encoded format.
+        :param fileName: filename to use
+        :param directory: directory to save file
+        :return:
+        '''
         if fileName is "":  # Blank the g-code if we're loading "nothing"
             return False
         if directory is "":
@@ -64,6 +97,13 @@ class BoardManager(MakesmithInitFuncs):
         return True
 
     def loadBoard(self, fileName):
+        '''
+        Load the board data.  File format is one line of board data in json format and one line of cut data in
+        compressed and base64 encoded format.
+        :param fileName: filename to load
+        :param directory: directory to load file from
+        :return:
+        '''
         if fileName is "":  # Blank the g-code if we're loading "nothing"
             return False
         try:
@@ -71,7 +111,8 @@ class BoardManager(MakesmithInitFuncs):
             print(fileName)
             lines = file.readlines()
             self.currentBoard.updateBoardInfoJSON(lines[0])
-            if (len(lines)>1):
+            # make sure got at least 2 lines...
+            if len(lines) > 1:
                 loadedCutData = base64.b64decode(lines[1].encode('utf-8'))
                 self.currentBoard.updateCompressedCutData(loadedCutData)
             print("Closing File")
@@ -84,21 +125,11 @@ class BoardManager(MakesmithInitFuncs):
             return False
         return True
 
-    ''' 
-    def processGCode1(self):
-        board = self.currentBoard
-        points = self.data.gcodeFile.getLinePoints()
-        cutPoints = [False for i in range(48*96)]
-        for line in points:
-            if line[0]>=-48 and line[0]<=48 and line[1]>=-24 and line[1]<=24:
-
-                cutPoints[int(line[0])+48+(int(line[1])+24)*96] = True
-        print(cutPoints)
-        self.currentBoard.updateCutPoints2(cutPoints)
-        self.data.ui_queue1.put("Action", "boardUpdate", "")
-        return True
-    '''
     def processGCode(self):
+        '''
+        Using the gcode in memory, mark the areas in the array that the gcode passes through at a height less than 0.
+        :return:
+        '''
         boardWidth = self.currentBoard.width
         boardHeight = self.currentBoard.height
         boardLeftX = self.currentBoard.centerX - boardWidth/2
@@ -106,13 +137,16 @@ class BoardManager(MakesmithInitFuncs):
         boardTopY = self.currentBoard.centerY + boardWidth/2
         boardBottomY = self.currentBoard.centerY - boardWidth / 2
 
+        # calculate the extents of the array and its offset.
         pointsX = math.ceil(boardWidth)
         pointsY = math.ceil(boardHeight)
         offsetX = pointsX / 2 - self.currentBoard.centerX
         offsetY = pointsY / 2 - self.currentBoard.centerY
 
+        # initialize an array
         cutPoints = [False for i in range( pointsX * pointsY )]
 
+        # process gcode
         for line in self.data.gcodeFile.line3D:
             if line.type == "circle":
                 if line.points[0][0] >= boardLeftX and line.points[0][0] <= boardRightX and line.points[0][1] >= boardBottomY and line.points[0][1] <= boardTopY and line.points[0][2] < 0:
@@ -164,16 +198,30 @@ class BoardManager(MakesmithInitFuncs):
                                 pointy = self.constrain(round(line.points[x][1] + offsetY), 0, pointsY)
                                 cutPoints[pointx + pointy * pointsX] = True
 
+        # send this array to the current board for updating
         self.currentBoard.updateCutPoints(cutPoints)
+        # update the UI clients.
         self.data.ui_queue1.put("Action", "boardUpdate", "")
         return True
 
     def clearBoard(self):
+        '''
+        Clear the current board cut data
+        :return:
+        '''
         self.currentBoard.clearCutPoints()
+        # update the UI clients.
         self.data.ui_queue1.put("Action", "boardUpdate", "")
         return True
 
     def constrain(self, value, lower, upper):
+        '''
+        Helper routine to constrain values
+        :param value: value to be constrained
+        :param lower: lower limit
+        :param upper: upper limit
+        :return:
+        '''
         if value < lower:
             return lower
         if value > upper-1:
@@ -181,15 +229,23 @@ class BoardManager(MakesmithInitFuncs):
         return value
 
     def trimBoard(self, result):
-        trimTop = round(float(result["trimTop"]),3)
-        trimBottom = round(float(result["trimBottom"]),3)
-        trimLeft = round(float(result["trimLeft"]),3)
-        trimRight = round(float(result["trimRight"]),3)
-        retval = self.currentBoard.trimBoard(trimTop, trimBottom, trimLeft, trimRight)
+        '''
+        Processes message from form to trim the board cut data.
+        :param result:
+        :return:
+        '''
+        trimTop = round(float(result["trimTop"]), 3)
+        trimBottom = round(float(result["trimBottom"]), 3)
+        trimLeft = round(float(result["trimLeft"]), 3)
+        trimRight = round(float(result["trimRight"]), 3)
+        units = result["units"]
+        retval = self.currentBoard.trimBoard(trimTop, trimBottom, trimLeft, trimRight, units)
         self.data.ui_queue1.put("Action", "boardUpdate", "")
         return retval
 
     '''
+    old stuff not used anymore.. keeping it around for a bit
+    # Todo: delete when done with
     def processGCode(self):
         #points = np.random.rand(30,2)
         points = self.data.gcodeFile.getLinePoints()

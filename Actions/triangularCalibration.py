@@ -9,16 +9,18 @@ class TriangularCalibration(MakesmithInitFuncs):
     rotationRadiusEst = 0
     
     def cutTriangularCalibrationPattern(self):
+        '''
+        Sends command to controller to cut the calibration pattern.
+        :return:
+        '''
 
         workspaceHeight = float(
             self.data.config.getValue("Maslow Settings", "bedHeight")
         )
         workspaceWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))
-        oldUnits = self.data.units
 
-        #self.data.units = "MM"
-        if oldUnits != "MM":
-            self.data.actions.updateSetting("toMM", 0, True)
+        # keep track of the units the machine is currently using to revert back if needed.
+        oldUnits = self.data.units
 
         self.data.gcode_queue.put("G21 ")
         self.data.gcode_queue.put("G90 ")  # Switch to absolute mode
@@ -70,6 +72,11 @@ class TriangularCalibration(MakesmithInitFuncs):
 
         self.data.gcode_queue.put("G90 ")  # Switch back to absolute mode
         self.data.gcode_queue.put("G0 X0 Y0 ")  # Move to home location
+
+        if oldUnits == "INCHES":
+            # switch back to inches
+            self.data.gcode_queue.put("G20 ")  # Switch back to inches
+
         return True
 
 
@@ -121,26 +128,6 @@ class TriangularCalibration(MakesmithInitFuncs):
             )
             return False
 
-        """
-        if self.unitsBtnT.text == 'Units: inches':
-            if (((distBetweenCuts12*25.4) > workspaceWidth) or ((distBetweenCuts12*25.4) < (workspaceWidth / 2))):
-                self.data.message_queue.put('Message: The measurement between cut 1 and cut 2 of ' + str(distBetweenCuts12) + ' inches seems wrong.\n\nPlease check the number and enter it again.')
-                return
-            if (((distBetweenCuts34*25.4) > workspaceWidth) or ((distBetweenCuts34*25.4) < (workspaceWidth / 2))):
-                self.data.message_queue.put('Message: The measurement between cut 3 and cut 4 of ' + str(distBetweenCuts34) + ' inches seems wrong.\n\nPlease check the number and enter it again.')
-                return
-            if (((distWorkareaTopToCut5*25.4) > (workspaceHeight/2)) or (distWorkareaTopToCut5 < 0)):
-                self.data.message_queue.put('Message: The measurement between the top edge of the work area and cut 5 of ' + str(distWorkareaTopToCut5) + ' inches seems wrong.\n\nPlease check the number and enter it again.')
-                return
-            if ((bitDiameter > 1) or (bitDiameter < 0)):
-                self.data.message_queue.put('Message: The bit diameter value of ' + str(bitDiameter) + ' inches seems wrong.\n\nPlease check the number and enter it again.')
-                return
-            distBetweenCuts12 *= 25.4
-            distBetweenCuts34 *= 25.4
-            distWorkareaTopToCut5 *= 25.4
-            bitDiameter *= 25.4
-        else:
-        """
         if True:
             if (distBetweenCuts12 > workspaceWidth) or (
                 distBetweenCuts12 < (workspaceWidth / 2)
@@ -599,11 +586,6 @@ class TriangularCalibration(MakesmithInitFuncs):
 
             return False
 
-        # self.horzMeasureT1.disabled = True
-        # self.horzMeasureT2.disabled = True
-        # self.vertMeasureT1.disabled = True
-        # self.enterValuesT.disabled = True
-
         self.data.console_queue.put("Machine parameters found:")
 
         motorYoffsetEst = (
@@ -628,19 +610,7 @@ class TriangularCalibration(MakesmithInitFuncs):
         self.motorYoffsetEst = motorYoffsetEst
         self.rotationRadiusEst = rotationRadiusEst
         self.chainSagCorrectionEst = chainSagCorrectionEst
-        # Update machine parameters
-        """
-        self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(motorYoffsetEst))
-        self.data.config.setValue('Advanced Settings', 'rotationRadius', str(rotationRadiusEst))
-        self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(chainSagCorrectionEst))
 
-        # With new calibration parameters return sled to workspace center
-
-        self.data.gcode_queue.put("G21 ")
-        self.data.gcode_queue.put("G90 ")
-        self.data.gcode_queue.put("G40 ")
-        self.data.gcode_queue.put("G0 X0 Y0 ")
-        """
         return (
             motorYoffsetEst,
             rotationRadiusEst,
@@ -649,6 +619,10 @@ class TriangularCalibration(MakesmithInitFuncs):
         )
 
     def acceptTriangularCalibrationResults(self):
+        '''
+        Saves the values that were calculated.
+        :return:
+        '''
         self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(self.motorYoffsetEst))
         self.data.config.setValue('Advanced Settings', 'rotationRadius', str(self.rotationRadiusEst))
         self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(self.chainSagCorrectionEst))
@@ -658,11 +632,4 @@ class TriangularCalibration(MakesmithInitFuncs):
         self.data.gcode_queue.put("G40 ")
         self.data.gcode_queue.put("G0 X0 Y0 ")
         return True
-        
-"""
-    def switchUnitsT(self):
-        if self.unitsBtnT.text == 'Units: mm':
-            self.unitsBtnT.text = 'Units: inches'
-        else:
-            self.unitsBtnT.text = 'Units: mm'
-"""
+

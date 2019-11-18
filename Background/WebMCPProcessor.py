@@ -4,6 +4,9 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import time
 
 class WebMCPProcessor(MakesmithInitFuncs):
+    '''
+    This class is deprecated as shifting away from WebMCP.
+    '''
 
     app = None
 

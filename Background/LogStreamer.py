@@ -22,11 +22,13 @@ class LogStreamer:
                 time.sleep(0.001)
                 while (
                         not self.app.data.alog_streamer_queue.empty() or not self.app.data.log_streamer_queue.empty()):  # if there is new data to be read
+                    # process a line from the alog queue
                     if not self.app.data.alog_streamer_queue.empty():
                         message = self.app.data.alog_streamer_queue.get()
                         if message != "":
                             socketio.emit("message", {"log": "alog", "data": message, "dataFormat": "text"},
                                           namespace="/MaslowCNCLogs", )
+                    # process a line from the log queue
                     if not self.app.data.log_streamer_queue.empty():
                         message = self.app.data.log_streamer_queue.get()
                         if message != "":
