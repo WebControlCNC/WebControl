@@ -19,6 +19,7 @@ class MessageProcessor(MakesmithInitFuncs):
             if time.time()-self.data.lastChecked > 60*60:
                 self.data.lastChecked = time.time()
                 self.data.releaseManager.checkForLatestPyRelease()
+                self.data.helpManager.checkForUpdatedHelp()
             # process messages while queue is not empty.  Everything else is on hold until queue is cleared.
             while (  not self.data.message_queue.empty() ):  # if there is new data to be read
                 message = self.data.message_queue.get()
