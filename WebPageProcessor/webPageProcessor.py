@@ -530,7 +530,24 @@ class WebPageProcessor:
                     pageID="releases",
                 )
             return page, "Update Manager", False, "medium", "content", False
-
+        elif pageID == "help":
+            helpPages = self.data.helpManager.getHelpPages()
+            print(helpPages)
+            if isMobile:
+                page = render_template(
+                    "helpPages_mobile.html",
+                    title="Help",
+                    helpPages=helpPages,
+                    pageID="help",
+                )
+            else:
+                page = render_template(
+                    "helpPages.html",
+                    title="Help",
+                    helpPages=helpPages,
+                    pageID="help",
+                )
+            return page, "Help", False, "medium", "content", False
         else:
             self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 

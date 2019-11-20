@@ -1,0 +1,16 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+    <ul class="list-group">
+      {% for page in helpPages %}
+      <li class="list-group-item">
+        <a href="#" on-click="requestPage('help-{{page.download_url}}')">{{page.name}}</a>
+      </li>
+      {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<!--<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>-->
+{% endblock %}
