@@ -3,7 +3,9 @@ layout: default
 title: Getting Started
 nav_order: 2
 ---
-### If you are coming from using GroundControl:
+# Getting Started
+
+## If you are coming from using GroundControl:
 
 My recommendation is to import your groundcontrol.ini file before proceeding any further.
 
@@ -11,9 +13,9 @@ Go to Actions->Import groundcontrol.ini
 
 If all goes well and the comport assignment is still the same, you should be able to communicate with the controller.
 
-### If you are starting anew:
+## If you are starting anew:
 
-#### 1) Set ComPort
+### 1) Set ComPort
 
 Go to Settings->Maslow Settings->COMPort and select the comport for the arduino controller.  Press the 'refresh' symbol to populate the list of available comports (give it a couple of seconds if you have a bluetooth enabled on the computer running webcontrol).  Don't forget to press submit.  If all goes well, you should see messages coming from the controller in the lower right portion of the screen (Controller Messages)
 
@@ -21,7 +23,7 @@ Go to Settings->Maslow Settings->COMPort and select the comport for the arduino 
 
 _COMPort Setting_
 
-#### 2) Set Distance to Extend Chains
+### 2) Set Distance to Extend Chains
 
 If you are using a top beam that's longer than 10 feet, go to Settings->Advanced Settings->Extend Chain Distance.  If using a 12-foot beam, change to 2032.  This is the amount of chain that will be extended to allow you to connect up the sled.  Too little and they won't meet and too much, the sled may be on the floor.  You don't have to use a value that perfectly equates to the center of the board, just make sure it's a multiple of 6.35 mm.
 
@@ -29,11 +31,11 @@ If you are using a top beam that's longer than 10 feet, go to Settings->Advanced
 
 _Extend Chain Distance_
 
-#### 3) Quick Configure
+### 3) Quick Configure
 
 Go to Actions->Quick Configure and enter the requested information.  This lets the controller know enough about the setup to allow you to calibrate the machine.  Don't forget to press submit.
 
-#### 4) Set Sprockets Vertical
+### 4) Set Sprockets Vertical
 
 Go to Actions->Set Sprockets Vertical:
 
@@ -61,7 +63,7 @@ _Chains Off Top_
 
 4f) Mark chains.  Take a marker, nail polish, something, and mark the specific chain link that is on top of the top tooth.  If the 'Extend Chain Distance' is a multiple of 6.35 mm, there should be a tooth perfectly vertical after extending the chains.  Mark this because if you ever have to reset the chains, you need to know which link is this one.
 
-#### 5) Calibrate
+### 5) Calibrate
 
 5a) If using stock firwmare, go to 'Actions->Triangular Calibration.'  If using holey calibration firmware, go to 'Actions->Holey Calibration'
 
