@@ -530,9 +530,8 @@ class WebPageProcessor:
                     pageID="releases",
                 )
             return page, "Update Manager", False, "medium", "content", False
-        elif pageID == "help":
+        elif pageID == "helpPages":
             helpPages = self.data.helpManager.getHelpPages()
-            print(helpPages)
             if isMobile:
                 page = render_template(
                     "helpPages_mobile.html",
@@ -548,6 +547,24 @@ class WebPageProcessor:
                     pageID="help",
                 )
             return page, "Help", False, "medium", "content", False
+        elif pageID == "help":
+            page = self.getPage("\docs\index.md")
+            if isMobile:
+                page = render_template(
+                    "help_mobile.html",
+                    title="Help",
+                    helpIndex=page,
+                    pageID="help",
+                )
+            else:
+                page = render_template(
+                    "help.html",
+                    title="Help",
+                    helpIndex=page,
+                    pageID="help",
+                )
+            return page, "Help", False, "large", "content", False
+
         else:
             self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 
@@ -556,3 +573,15 @@ class WebPageProcessor:
         for line in self.data.gcode:
             text=text+line+"\n"
         return text
+
+    def getPage(self, pageName):
+        filename = self.data.pyInstallInstalledPath+pageName
+        try:
+            file = open(filename, "r")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            self.data.ui_queue1.put("Alert", "Alert", "Cannot read doc file.")
+            return False
+        page = file.read()
+        file.close()
+        return page

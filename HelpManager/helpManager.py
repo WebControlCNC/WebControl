@@ -2,6 +2,8 @@ from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import re
 import requests
 from github import Github
+import hashlib
+from base64 import b64decode
 import base64
 
 class HelpManager(MakesmithInitFuncs):
@@ -34,3 +36,4 @@ class HelpManager(MakesmithInitFuncs):
             else:
                 pages.append({"name": file_content.name, "download_url": file_content.download_url})
         return pages
+

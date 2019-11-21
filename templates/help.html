@@ -1,0 +1,10 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+    {{helpIndex|markdown}}
+</div>
+{% endblock %}
+
+{% block javascript %}
+<!--<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>-->
+{% endblock %}
