@@ -17,7 +17,7 @@ If all goes well and the comport assignment is still the same, you should be abl
 
 Go to Settings->Maslow Settings->COMPort and select the comport for the arduino controller.  Press the 'refresh' symbol to populate the list of available comports (give it a couple of seconds if you have a bluetooth enabled on the computer running webcontrol).  Don't forget to press submit.  If all goes well, you should see messages coming from the controller in the lower right portion of the screen (Controller Messages)
 
-![Test](/static/images/gettingStarted/comPort.png')
+![Test](/assets/gettingStarted/comPort.png')
 
 <figcaption class="figure-caption">COMPort Setting</figcaption>
 
