@@ -2,6 +2,7 @@
 layout: default
 title: Getting Started
 nav_order: 2
+WCVersion: 0.915
 ---
 # Getting Started
 
