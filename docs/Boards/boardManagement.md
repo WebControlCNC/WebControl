@@ -2,7 +2,7 @@
 layout: default
 title: Board Management
 nav_order: 3
-has_children: false
+parent: Boards
 ---
 
 # Board Management
