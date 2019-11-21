@@ -1,5 +1,5 @@
-### Help Topics ###
+## Help Topics
 
-## Boards
+### Boards
 [Board Management](Boards/boardManagement.md)
 
