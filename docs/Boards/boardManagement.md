@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Boards
+title: Board Management
 nav_order: 3
-has_children: true
+has_children: false
 ---
 
 # Board Management
