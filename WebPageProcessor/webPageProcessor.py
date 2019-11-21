@@ -8,6 +8,7 @@ from os.path import isfile, join
 import re
 from flask import render_template
 import os
+import frontmatter
 import webbrowser
 import socket
 from github import Github
@@ -576,6 +577,10 @@ class WebPageProcessor:
 
     def getPage(self, pageName):
         filename = self.data.pyInstallInstalledPath+pageName
+        with open(filename) as f:
+            page = frontmatter.loads(f.read())
+        return page.content
+
         try:
             file = open(filename, "r")
         except Exception as e:

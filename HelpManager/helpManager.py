@@ -25,6 +25,7 @@ class HelpManager(MakesmithInitFuncs):
         return True
 
     def getHelpPages(self):
+        return None
         g = Github()
         self.repo = g.get_repo("madgrizzle/WebControl")
         contents = self.repo.get_contents("docs")
