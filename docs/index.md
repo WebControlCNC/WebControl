@@ -24,7 +24,7 @@ For Windows 10 and Linux (Debian-based, such as Ubuntu) machines, users can down
 
 Check out the release page at:
 
-https://github.com/madgrizzle/WebControl/releases
+[https://github.com/madgrizzle/WebControl/releases](https://github.com/madgrizzle/WebControl/releases)
 
 ### Raspberry Pi (3B+ & Zero W)
 
@@ -32,7 +32,7 @@ For Raspberry Pi's, single-directory releases are your best option.  It can take
 
 Check out the release page at:
 
-https://github.com/madgrizzle/WebControl/releases
+[https://github.com/madgrizzle/WebControl/releases](https://github.com/madgrizzle/WebControl/releases)
 
 ## Built With
 
