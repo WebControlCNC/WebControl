@@ -12,7 +12,7 @@ wcversion: 0.915.001
 
 WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi, Windows 10, or linux (Debian) machines and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
 
-<img src="https://user-images.githubusercontent.com/218876/47197523-ac1d9e00-d31b-11e8-93c8-93a84a7eb0cf.png" width="100%">
+<img src="/assets/Screenshot.png" alt="Screenshot" width="100%">
 ## Notice
 
 Webcontrol will be moving all releases to a pyinstaller created executable, including for the Raspberry Pi.  I will try to create a pre-built image for the RPI, but until then you will need to install a copy of raspbian on an SD card, update it for SSH and network access, then download webcontrol and set it to run automatically (if you chose).
@@ -88,8 +88,6 @@ If you don't have python3.6+ locally (to be able to run `black`), you can run `b
 [Pycharm Community Edition](https://www.jetbrains.com/pycharm/download) is a free, well-featured Python IDE.
 
 With the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) and [BlackPycharm](https://plugins.jetbrains.com/plugin/10563-black-pycharm) plugins you can set up your editor to automatically format your code on save. Then you never have to think about code formatting again :tada:
-
-![PyCharm Screenshot](https://user-images.githubusercontent.com/218876/47197011-817e1600-d318-11e8-8172-eb2c1ffe2d21.png)
 
 ## Contributing
 

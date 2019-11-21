@@ -14,7 +14,7 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file
+from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
@@ -530,6 +530,11 @@ def trimBoard():
             resp = jsonify("failed")
             resp.status_code = 500
             return resp
+
+@app.route("/assets/<path:path>")
+def sendDocs(path):
+    print(path)
+    return send_from_directory('docs/assets/', path)
 
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
