@@ -550,26 +550,56 @@ class WebPageProcessor:
                 )
             return page, "Help", False, "medium", "content", False
         elif pageID == "help":
-            page = self.getPage("\docs\helpPages.md")
+            helpIndex = self.getPage("/docs/assets/helpPages.md")
+            helpPage = self.getPage("/docs/index.md")
             if isMobile:
                 page = render_template(
                     "help_mobile.html",
                     title="Help",
-                    helpIndex=page,
+                    helpIndex=helpIndex,
+                    helpPage=helpPage,
                     pageID="help",
                 )
             else:
                 page = render_template(
                     "help.html",
                     title="Help",
-                    helpIndex=page,
+                    helpIndex=helpIndex,
+                    helpPage=helpPage,
                     pageID="help",
                 )
             print(page)
             return page, "Help", False, "large", "content", False
-
         else:
-            self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
+            pageParts = pageID.split("/")
+            if len(pageParts) > 1:
+                # help page
+                helpIndex = self.getPage("/docs/assets/helpPages.md")
+                helpPage = self.getPage("/docs/"+pageID)
+                if isMobile:
+                    page = render_template(
+                        "help_mobile.html",
+                        title="Help",
+                        helpIndex=helpIndex,
+                        helpPage=helpPage,
+                        pageID="help",
+                    )
+                else:
+                    page = render_template(
+                        "help.html",
+                        title="Help",
+                        helpIndex=helpIndex,
+                        helpPage=helpPage,
+                        pageID="help",
+                    )
+                print(page)
+                return page, "Help", False, "large", "content", False
+
+
+
+
+            else:
+                self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 
     def gcodePreProcessor(self):
         text = ""
@@ -582,13 +612,9 @@ class WebPageProcessor:
         with open(filename) as f:
             page = frontmatter.loads(f.read())
         pageContent = page.content
+        filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
+        filteredPage = markdown.markdown(filteredPage)
+        filteredPage = filteredPage.replace("Â", "")
 
-        #filteredPage = re.sub('\[(.+)\]\((.+)\)', r"<a href='#' onclick=requestPage('\2');>\1</a>", pageContent)
-
-        filteredPage = re.sub('\[(.+)\]\((.+)\)', r"<a href='#' onclick=\"requestPage('\2');\">\1</a>", pageContent)
-
-        filteredPage = markdown.markdown(pageContent, extensions=["attr_list"])
-
-        print(filteredPage)
         return filteredPage
 

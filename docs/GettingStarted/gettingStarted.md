@@ -20,7 +20,7 @@ If all goes well and the comport assignment is still the same, you should be abl
 
 Go to Settings->Maslow Settings->COMPort and select the comport for the arduino controller.  Press the 'refresh' symbol to populate the list of available comports (give it a couple of seconds if you have a bluetooth enabled on the computer running webcontrol).  Don't forget to press submit.  If all goes well, you should see messages coming from the controller in the lower right portion of the screen (Controller Messages)
 
-![COMPort Setting](assets/gettingStarted/comPort.png) 
+![COMPort Setting](../assets/gettingStarted/comPort.png) 
 
 _COMPort Setting_
 
@@ -28,7 +28,7 @@ _COMPort Setting_
 
 If you are using a top beam that's longer than 10 feet, go to Settings->Advanced Settings->Extend Chain Distance.  If using a 12-foot beam, change to 2032.  This is the amount of chain that will be extended to allow you to connect up the sled.  Too little and they won't meet and too much, the sled may be on the floor.  You don't have to use a value that perfectly equates to the center of the board, just make sure it's a multiple of 6.35 mm.
 
-![Extemd Chain Distance](assets/gettingStarted/extendChainDistance.png)
+![Extemd Chain Distance](../assets/gettingStarted/extendChainDistance.png)
 
 _Extend Chain Distance_
 
@@ -42,17 +42,17 @@ Go to Actions->Set Sprockets Vertical:
 
 4a) Get one tooth of each sprocket as precisely vertical as you can using the buttons.  When done, press 'Define Zero'.  This tells the controllers that the chain length is 0. 
 
-![Sprocket with Vertical Tooth](assets/gettingStarted/Sprocket at 12-00.png)
+![Sprocket with Vertical Tooth](../assets/gettingStarted/Sprocket%20at%2012-00.png)
 
 _Sprocket with Vertical Tooth_
 
 4b) Install the chains on the sprocket such that the first link is resting on the top sprocket tooth. The placement depends on if you built the frame for "Chains Off Top" or "Chains Off Bottom" 
 
-![Chains Off Bottom](assets/gettingStarted/chainOffSprocketsBottom.png)
+![Chains Off Bottom](../assets/gettingStarted/chainOffSprocketsBottom.png)
 
 _Chains Off Bottom_
 
-![Chains Off Top](assets/gettingStarted/chainOffSprocketsTop.png)
+![Chains Off Top](../assets/gettingStarted/chainOffSprocketsTop.png)
 
 _Chains Off Top_
 

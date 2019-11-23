@@ -1,6 +1,13 @@
 {% block content %}
 <div class="container-fluid">
   <input id="pageID" type="hidden" value="{{pageID}}">
-    {{helpIndex|markdown}}
+  <div class="row">
+    <div class="col-3">
+      {{helpIndex|markdown}}
+    </div>
+    <div class="col-9">
+      {{helpPage|markdown}}
+    </div>
+  </div>
 </div>
 {% endblock %}
