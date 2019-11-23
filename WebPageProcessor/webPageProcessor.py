@@ -12,6 +12,7 @@ import frontmatter
 import webbrowser
 import socket
 from github import Github
+import markdown
 
 class WebPageProcessor:
 
@@ -549,7 +550,7 @@ class WebPageProcessor:
                 )
             return page, "Help", False, "medium", "content", False
         elif pageID == "help":
-            page = self.getPage("\docs\index.md")
+            page = self.getPage("\docs\helpPages.md")
             if isMobile:
                 page = render_template(
                     "help_mobile.html",
@@ -564,6 +565,7 @@ class WebPageProcessor:
                     helpIndex=page,
                     pageID="help",
                 )
+            print(page)
             return page, "Help", False, "large", "content", False
 
         else:
@@ -579,14 +581,14 @@ class WebPageProcessor:
         filename = self.data.pyInstallInstalledPath+pageName
         with open(filename) as f:
             page = frontmatter.loads(f.read())
-        return page.content
+        pageContent = page.content
 
-        try:
-            file = open(filename, "r")
-        except Exception as e:
-            self.data.console_queue.put(str(e))
-            self.data.ui_queue1.put("Alert", "Alert", "Cannot read doc file.")
-            return False
-        page = file.read()
-        file.close()
-        return page
+        #filteredPage = re.sub('\[(.+)\]\((.+)\)', r"<a href='#' onclick=requestPage('\2');>\1</a>", pageContent)
+
+        filteredPage = re.sub('\[(.+)\]\((.+)\)', r"<a href='#' onclick=\"requestPage('\2');\">\1</a>", pageContent)
+
+        filteredPage = markdown.markdown(pageContent, extensions=["attr_list"])
+
+        print(filteredPage)
+        return filteredPage
+

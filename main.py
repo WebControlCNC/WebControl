@@ -598,6 +598,7 @@ def alertModalClosed(msg):
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
     app.data.logger.resetIdler()
+    print(msg)
     try:
         page, title, isStatic, modalSize, modalType, resume = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"], msg["data"]["args"])
         data = json.dumps({"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType, "resume":resume})
