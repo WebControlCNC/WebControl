@@ -4,4 +4,4 @@
 [Getting Started](gettingStarted.md)
 
 ## Boards
-[Board Management](Boards/boardManagement.md)
+[Board Management](Boards/boardManagement.md){: onclick='requestPage("Boards/boardManagement.md");' }
