@@ -5,7 +5,7 @@ nav_order: 2
 parent: Getting Started
 WCVersion: 0.915
 ---
-# Getting Started
+# First Steps
 
 ## If you are coming from using GroundControl:
 
