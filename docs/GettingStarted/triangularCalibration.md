@@ -17,5 +17,4 @@ If you are using stock firmware, use 'Actions->Triangular Calibration' to calibr
 |![Enter Measurements](../assets/triangularCalibration/calculate.png)   |   3) Enter the measurements and double and triple check you entered them correctly and in the correct units.  If so, press 'Calculate'|
 |![Enter Measurements](../assets/triangularCalibration/acceptResults.png)   |   4) If all looks good, press 'Accept Results' (you may have to scroll down the screen to see it)|
 
-
 5) Dance a jig.  You're calibrated.
