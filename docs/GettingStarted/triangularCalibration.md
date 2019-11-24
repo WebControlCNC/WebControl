@@ -13,9 +13,9 @@ If you are using stock firmware, use 'Actions->Triangular Calibration' to calibr
 | | |
 |---|---|
 |![Cut Pattern](../assets/triangularCalibration/cutPattern.png)   |   1) Press 'Cut Calibration Pattern' and wait for the sled to complete the cutting.|
-|![Enter Measurements](../assets/triangularCalibration/measurements.png)   |   2) Enter the measurements as requested |
-|![Enter Measurements](../assets/triangularCalibration/enterMeasurements.png)   |   3) Press 'Calculate'|
+|![Enter Measurements](../assets/triangularCalibration/measurements.png)   |   2) Make and record your measurements as requested.  Double check and triple check them.. seriously.. do it. |
+|![Enter Measurements](../assets/triangularCalibration/calculate.png)   |   3) Enter the measurements and double and triple check you entered them correctly and in the correct units.  If so, press 'Calculate'|
+|![Enter Measurements](../assets/triangularCalibration/acceptResults.png)   |   4) If all looks good, press 'Accept Results' (you may have to scroll down the screen to see it)|
 
-4) If all looks good, press 'Accept Results' (you may have to scroll down the screen to see it)
 
 5) Dance a jig.  You're calibrated.
