@@ -1,7 +1,7 @@
 ---
 layout: default
 title: First Steps
-nav_order: 2
+nav_order: 1
 parent: Getting Started
 WCVersion: 0.915
 ---
