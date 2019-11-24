@@ -1,14 +1,13 @@
 ---
 layout: default
-title: Getting Started
+title: Triangular Calibration
 nav_order: 2
+parent: Getting Started
 WCVersion: 0.915
 ---
 # Triangular Calibration
 
 If you are using stock firmware, use 'Actions->Triangular Calibration' to calibrate.  If using holey calibration firmware, go here(add link)
-
-
 
 | | |
 |---|---|
