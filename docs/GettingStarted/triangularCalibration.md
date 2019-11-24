@@ -10,7 +10,7 @@ If you are using stock firmware, use 'Actions->Triangular Calibration' to calibr
 
 
 
-|test|test|
+| | |
 |---|---|
 |![Cut Pattern](../assets/triangularCalibration/cutPattern.png)   |   1) Press 'Cut Calibration Pattern' and wait for the sled to complete the cutting.|
 |![Enter Measurements](../assets/triangularCalibration/measurements.png)   |   2) Enter the measurements as requested |

@@ -591,7 +591,7 @@ class WebPageProcessor:
                         helpPage=helpPage,
                         pageID="help",
                     )
-                print(page)
+                #print(page)
                 return page, "Help", False, "large", "content", False
 
 
@@ -612,7 +612,7 @@ class WebPageProcessor:
             page = frontmatter.loads(f.read())
         pageContent = page.content
         filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
-        filteredPage = markdown.markdown(filteredPage)
+        filteredPage = markdown.markdown(filteredPage, extensions=["tables"])
         filteredPage = filteredPage.replace("Â", "")
         print(filteredPage)
 
