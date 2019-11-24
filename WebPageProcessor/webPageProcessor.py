@@ -568,7 +568,6 @@ class WebPageProcessor:
                     helpPage=helpPage,
                     pageID="help",
                 )
-            print(page)
             return page, "Help", False, "large", "content", False
         else:
             pageParts = pageID.split("/")
@@ -615,6 +614,7 @@ class WebPageProcessor:
         filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
         filteredPage = markdown.markdown(filteredPage)
         filteredPage = filteredPage.replace("Â", "")
+        print(filteredPage)
 
         return filteredPage
 
