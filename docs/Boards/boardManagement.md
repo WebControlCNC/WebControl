@@ -7,6 +7,9 @@ parent: Boards
 
 # Board Management
 
+Release: >0.906
+{: .label .label-blue }
+
 ![Board](../assets/boards/boardCut.png)
 
 ## Concept

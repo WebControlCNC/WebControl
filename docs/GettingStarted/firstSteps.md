@@ -7,6 +7,9 @@ WCVersion: 0.915
 ---
 # First Steps
 
+Release: >0.906
+{: .label .label-blue }
+
 ## If you are coming from using GroundControl:
 
 If you are coming from using GroundControl, my recommendation is to import your groundcontrol.ini file before proceeding any further.

@@ -614,6 +614,7 @@ class WebPageProcessor:
         filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
         filteredPage = markdown.markdown(filteredPage, extensions=["tables"])
         filteredPage = filteredPage.replace("Â", "")
+        filteredPage = filteredPage.replace("{: .label .label-blue }", "")
         print(filteredPage)
 
         return filteredPage

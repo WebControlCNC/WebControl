@@ -7,6 +7,9 @@ WCVersion: 0.915
 ---
 # Triangular Calibration
 
+Release: >0.906
+{: .label .label-blue }
+
 If you are using stock firmware, use 'Actions->Triangular Calibration' to calibrate.  If using holey calibration firmware, go here(add link)
 
 | | |
