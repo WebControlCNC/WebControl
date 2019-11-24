@@ -6,7 +6,7 @@
 
 ###### Getting Started
 
-[Getting Started](GettingStarted/gettingStarted.md)  
+[Getting Started](GettingStarted/firstSteps.md)  
 [Triangular Calibration](GettingStarted/triangularCalibration.md)
 
 ###### Boards
