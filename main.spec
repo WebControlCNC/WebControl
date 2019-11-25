@@ -2,7 +2,7 @@
 
 block_cipher = None
 
-a = Analysis(['main.py'],
+a = Analysis(['main.py', 'PyinstallerHiddenImports.py'],
              pathex=['C:\\Windows\\System32\\downlevel', 'C:\\Users\\john\\PycharmProjects\\WebControl', 'C:\\Users\\jhoga\\Documents\\GitHub\\WebControl'],
              binaries=[],
              datas=[('templates', 'templates'), ('firmware','firmware'), ('static', 'static'), ('tools', 'tools'), ('docs', 'docs'), ('defaultwebcontrol.json', '.')],
