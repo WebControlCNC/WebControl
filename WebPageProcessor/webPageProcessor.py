@@ -607,7 +607,11 @@ class WebPageProcessor:
         return text
 
     def getPage(self, pageName):
-        filename = self.data.pyInstallInstalledPath+pageName
+        if self.data.platform == "PYINSTALLER":
+            lhome = os.path.join(self.data.platformHome)
+        else:
+            lhome = "."
+        filename = lhome+pageName
         with open(filename) as f:
             page = frontmatter.loads(f.read())
         pageContent = page.content
