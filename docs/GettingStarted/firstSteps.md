@@ -70,14 +70,10 @@ _Chains Off Top_
 
 ### 5) Calibrate
 
-5a) If using stock firwmare, go to 'Actions->Triangular Calibration.'  If using holey calibration firmware, go to 'Actions->Holey Calibration'
+If using stock firwmare, go to:
+ 
+ [Triangular Calibration](GettingStarted/triangularCalibration.md)
+ 
+If using holey calibration firmware, go to:
 
-5a) Press 'Cut Calibration Pattern' and wait for the sled to complete the cutting.
-
-5b) Enter measurements as requested.
-
-5c) Press 'Calculate'
-
-5d) If all looks good, press 'Accept Results' (you may have to scroll down the screen to see it)
-
-5e) Dance a jig.  You're calibrated.
+ [Holey Calibration](gettingStarted/holeyCalibration.md)
