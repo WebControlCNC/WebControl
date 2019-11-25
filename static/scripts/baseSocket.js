@@ -1,4 +1,5 @@
-var socket
+var socket;
+var socketClientID;
 var controllerMessages = [];
 var hostAddress = "..."
 $(document).ready(function(){
@@ -6,6 +7,7 @@ $(document).ready(function(){
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
   socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {'forceNew':true});
+
   setListeners();
   setupStatusButtons();
 });
@@ -18,6 +20,8 @@ function processHostAddress(data){
 function setListeners(){
   console.log("setting Listeners");
   socket.on('connect', function(msg) {
+      socketClientID = socket.io.engine.id;
+      console.log("id="+socketClientID);
       socket.emit('my event', {data: 'I\'m connected!'});
       $("#clientStatus").text("Connected: "+hostAddress);
       $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
@@ -79,134 +83,144 @@ function setListeners(){
         data = JSON.parse(msg.data);
       else
         data = msg.data;
-      //console.log(msg.command);
-      switch(msg.command) {
-        case 'healthMessage':
-            //completed
-            processHealthMessage(data);
-            break;
-        case 'hostAddress':
-            //completed
-            processHostAddress(data);
-            break;
-        case 'controllerMessage':
-            //completed
-            processControllerMessage(data);
-            break;
-        case 'connectionStatus':
-            //completed
-            processControllerStatus(data);
-            break;
-        case 'calibrationMessage':
-            processCalibrationMessage(data);
-            break;
-        case 'cameraMessage':
-            //completed
-            processCameraMessage(data);
-            break;
-        case 'positionMessage':
-            //completed
-            processPositionMessage(data)
-            if (typeof processPositionMessageOptical === "function") {
-                 processPositionMessageOptical(data)
-            }
-            break;
-        case 'errorValueMessage':
-            processErrorValueMessage(data)
-            break;
-        case 'homePositionMessage':
-            //completed
-            processHomePositionMessage(data);
-            break;
-        case 'gcodePositionMessage':
-            //completed
-            processGCodePositionMessage(data);
-            break;
-        case 'activateModal':
-            //completed
-            console.log(msg)
-            processActivateModal(data);
-            break;
-        case 'requestedSetting':
-            //completed
-            processRequestedSetting(data);
-            break;
-        case 'updateDirectories':
-            //completed
-            updateDirectories(data);
-            break;
-        case 'gcodeUpdate':
-            console.log("---gcodeUpdate received via socket---");
-            gcodeUpdate(msg.message);
-            break;
-        case 'showFPSpinner':
-            //completed
-            showFPSpinner(msg.message);
-            break;
-        case 'gcodeUpdateCompressed':
-            gcodeUpdateCompressed(data);
-            break;
-        case 'boardDataUpdate':
-            boardDataUpdate(data);
-            break;
-        case 'boardCutDataUpdateCompressed':
-            boardCutDataUpdateCompressed(data);
-            break;
-        case 'updatePorts':
-            //completed
-            if (typeof updatePorts === "function") {
-                updatePorts(data);
-            }
-            break;
-        case 'closeModals':
-            //completed
-            closeModals(data);
-            break;
-        case 'closeActionModals':
-            //completed
-            closeActionModals(data);
-            break;
-        case 'closeAlertModals':
-            //completed
-            closeAlertModals(data);
-            break;
-        case 'closeContentModals':
-            //completed
-            closeContentModals(data);
-            break;
-        case 'updateOpticalCalibrationCurve':
-            //completed
-            updateOpticalCalibrationCurve(data);
-            break;
-        case 'updateOpticalCalibrationError':
-            //completed
-            updateOpticalCalibrationError(data);
-            break;
-        case 'updateOpticalCalibrationFindCenter':
-            //completed
-            updateOpticalCalibrationFindCenter(data);
-            break;
-        case 'updateCalibrationImage':
-            //completed
-            updateCalibrationImage(data);
-            break;
-        case 'updatePIDData':
-            //completed
-            updatePIDData(data);
-            break;
-        case 'alarm':
-            processAlarm(data);
-            break;
-        case 'clearAlarm':
-            clearAlarm(data);
-            break;
-        case 'pyinstallUpdate':
-            pyInstallUpdateBadge(data);
-            break;
-        default:
-            console.log("!!!!!!");
-            console.log("uncaught action:"+msg.command);
-            console.log("!!!!!!");
+      passValue = true
+      if (data.hasOwnProperty('client'))
+      {
+            console.log(data.client);
+            if ((data.client != socketClientID) && (data.client!="all"))
+                passValue = false;
+      }
+
+      if (passValue)
+      {
+          switch(msg.command) {
+            case 'healthMessage':
+                //completed
+                processHealthMessage(data);
+                break;
+            case 'hostAddress':
+                //completed
+                processHostAddress(data);
+                break;
+            case 'controllerMessage':
+                //completed
+                processControllerMessage(data);
+                break;
+            case 'connectionStatus':
+                //completed
+                processControllerStatus(data);
+                break;
+            case 'calibrationMessage':
+                processCalibrationMessage(data);
+                break;
+            case 'cameraMessage':
+                //completed
+                processCameraMessage(data);
+                break;
+            case 'positionMessage':
+                //completed
+                processPositionMessage(data)
+                if (typeof processPositionMessageOptical === "function") {
+                     processPositionMessageOptical(data)
+                }
+                break;
+            case 'errorValueMessage':
+                processErrorValueMessage(data)
+                break;
+            case 'homePositionMessage':
+                //completed
+                processHomePositionMessage(data);
+                break;
+            case 'gcodePositionMessage':
+                //completed
+                processGCodePositionMessage(data);
+                break;
+            case 'activateModal':
+                //completed
+                //console.log(msg)
+                processActivateModal(data);
+                break;
+            case 'requestedSetting':
+                //completed
+                processRequestedSetting(data);
+                break;
+            case 'updateDirectories':
+                //completed
+                updateDirectories(data);
+                break;
+            case 'gcodeUpdate':
+                console.log("---gcodeUpdate received via socket---");
+                gcodeUpdate(msg.message);
+                break;
+            case 'showFPSpinner':
+                //completed
+                showFPSpinner(msg.message);
+                break;
+            case 'gcodeUpdateCompressed':
+                gcodeUpdateCompressed(data);
+                break;
+            case 'boardDataUpdate':
+                boardDataUpdate(data);
+                break;
+            case 'boardCutDataUpdateCompressed':
+                boardCutDataUpdateCompressed(data);
+                break;
+            case 'updatePorts':
+                //completed
+                if (typeof updatePorts === "function") {
+                    updatePorts(data);
+                }
+                break;
+            case 'closeModals':
+                //completed
+                closeModals(data);
+                break;
+            case 'closeActionModals':
+                //completed
+                closeActionModals(data);
+                break;
+            case 'closeAlertModals':
+                //completed
+                closeAlertModals(data);
+                break;
+            case 'closeContentModals':
+                //completed
+                closeContentModals(data);
+                break;
+            case 'updateOpticalCalibrationCurve':
+                //completed
+                updateOpticalCalibrationCurve(data);
+                break;
+            case 'updateOpticalCalibrationError':
+                //completed
+                updateOpticalCalibrationError(data);
+                break;
+            case 'updateOpticalCalibrationFindCenter':
+                //completed
+                updateOpticalCalibrationFindCenter(data);
+                break;
+            case 'updateCalibrationImage':
+                //completed
+                updateCalibrationImage(data);
+                break;
+            case 'updatePIDData':
+                //completed
+                updatePIDData(data);
+                break;
+            case 'alarm':
+                processAlarm(data);
+                break;
+            case 'clearAlarm':
+                clearAlarm(data);
+                break;
+            case 'pyinstallUpdate':
+                pyInstallUpdateBadge(data);
+                break;
+            default:
+                console.log("!!!!!!");
+                console.log("uncaught action:"+msg.command);
+                console.log("!!!!!!");
+        }
       }
   });
 

@@ -615,7 +615,7 @@ class WebPageProcessor:
         filteredPage = markdown.markdown(filteredPage, extensions=["tables"])
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")
-        print(filteredPage)
+        #print(filteredPage)
 
         return filteredPage
 

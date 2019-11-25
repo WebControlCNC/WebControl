@@ -142,6 +142,7 @@ function processActivateModal(data){
     $modalText.scrollTop(0);
 }
 
+
 function closeModals(data){
     console.log(data)
     if ($('#notificationModal').data('name') == data.title)

@@ -575,8 +575,8 @@ def contentModalClosed(msg):
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
     print(data)
-    socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
-                  namespace="/MaslowCNC", )
+    #socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
+    #              namespace="/MaslowCNC", )
 
 
 
@@ -598,10 +598,13 @@ def alertModalClosed(msg):
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
     app.data.logger.resetIdler()
-    print(msg)
+    app.data.console_queue.put(request.sid)
+    client = request.sid
     try:
         page, title, isStatic, modalSize, modalType, resume = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"], msg["data"]["args"])
-        data = json.dumps({"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType, "resume":resume})
+        #if msg["data"]["page"] != "help":
+        #    client = "all"
+        data = json.dumps({"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType, "resume":resume, "client":client})
         socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
             namespace="/MaslowCNC",
         )
