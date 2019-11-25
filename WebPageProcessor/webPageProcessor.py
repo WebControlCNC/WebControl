@@ -13,6 +13,15 @@ import webbrowser
 import socket
 from github import Github
 import markdown
+import markdown.extensions.extra
+import markdown.extensions.codehilite
+import markdown.extensions.abbr
+import markdown.extensions.attr_list
+import markdown.extensions.def_list
+import markdown.extensions.fenced_code
+import markdown.extensions.footnotes
+import markdown.extensions.tables
+
 
 class WebPageProcessor:
 
