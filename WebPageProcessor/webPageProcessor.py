@@ -627,7 +627,7 @@ class WebPageProcessor:
         #filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
         filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)',
                               r"""<a href='#' onclick='requestPage("\3");'>\2</a>""", pageContent)
-        filteredPage = markdown.markdown(filteredPage)
+        filteredPage = markdown.markdown(filteredPage, extensions=["markdown.extensions.extra"])
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")
         #print(filteredPage)
