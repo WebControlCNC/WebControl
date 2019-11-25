@@ -14,6 +14,7 @@ import schedule
 import time
 import threading
 import json
+import PyinstallerHiddenImports
 
 from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
 from flask_mobility.decorators import mobile_template
