@@ -613,16 +613,20 @@ class WebPageProcessor:
         else:
             lhome = "."
         filename = lhome+pageName
+        if filename.find("http") != -1:
+            print("external link")
+            return None
         with open(filename) as f:
             page = frontmatter.loads(f.read())
         pageContent = page.content
-        #filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
-        filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)',
-                              r"""<a href='#' onclick='requestPage("\3");'>\2</a>""", pageContent)
+        #filterString = '([^\!]|^)\[(.+)\]\((.+)\)'
+        filterString = '(?:[^\!]|^)\[([^\[\]]+)\]\((?!http)([^()]+)\)'
+        filteredPage = re.sub(filterString, r"""<a href='#' onclick='requestPage("\2");'>\1</a>""", pageContent)
         filteredPage = markdown.markdown(filteredPage, extensions=["markdown.extensions.tables"])
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")
-        #print(filteredPage)
+        filteredPage = filteredPage.replace("<a href=", "<a target='_blank' href=")
+
 
         return filteredPage
 
