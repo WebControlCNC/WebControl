@@ -13,14 +13,6 @@ import webbrowser
 import socket
 from github import Github
 import markdown
-import markdown.extensions.extra
-import markdown.extensions.codehilite
-import markdown.extensions.abbr
-import markdown.extensions.attr_list
-import markdown.extensions.def_list
-import markdown.extensions.fenced_code
-import markdown.extensions.footnotes
-import markdown.extensions.tables
 
 
 class WebPageProcessor:
@@ -627,7 +619,7 @@ class WebPageProcessor:
         #filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)', r"<a href='#' onclick=" r"'requestPage(" r'"' r"\3" r'");' r"'" r">\2</a>", pageContent)
         filteredPage = re.sub('([^\!]|^)\[(.+)\]\((.+)\)',
                               r"""<a href='#' onclick='requestPage("\3");'>\2</a>""", pageContent)
-        filteredPage = markdown.markdown(filteredPage, extensions=["markdown.extensions.extra"])
+        filteredPage = markdown.markdown(filteredPage, extensions=["markdown.extensions.tables"])
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")
         #print(filteredPage)
