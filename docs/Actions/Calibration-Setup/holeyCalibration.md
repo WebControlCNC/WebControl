@@ -12,6 +12,8 @@ Release: >0.906
 {: .label .label-blue }
 
 If you are using holey calibration firmware, use 'Actions->Holey Calibration' to calibrate.  If using stock firmware, go here:
+
+{{site.baseurl}} 
  
 [Triangular Calibration]({% link Actions/Calibration-Setup/triangularCalibration.md %})
 
