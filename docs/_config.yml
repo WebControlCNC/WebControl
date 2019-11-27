@@ -1,1 +1,6 @@
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
 remote_theme: pmarsceill/just-the-docs
