@@ -1,3 +1,8 @@
+---
+layout: default
+title: Actions
+nav_exclude: true
+---
 
 # Actions
 

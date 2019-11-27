@@ -1,3 +1,8 @@
+---
+layout: default
+title: Controller
+nav_exclude: true
+---
 
 # Controller
 

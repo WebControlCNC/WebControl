@@ -1,3 +1,9 @@
+---
+layout: default
+title: Help Pages
+nav_exclude: true
+---
+
 #### Index
 
 ###### Home

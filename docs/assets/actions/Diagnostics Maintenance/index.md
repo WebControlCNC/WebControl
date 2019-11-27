@@ -1,5 +1,10 @@
+---
+layout: default
+title: Diagnostics / Maintenance
+nav_exclude: true
+---
 
-# Diagnostics/Maintenance
+# Diagnostics / Maintenance
 
 Release: >0.906
 {: .label .label-blue }
