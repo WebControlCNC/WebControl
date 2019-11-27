@@ -13,6 +13,14 @@
 [Holey Calibration](GettingStarted/holeyCalibration.md)
 
 
+###### Actions
+
+[Diagnostics/Maintenance](Actions/DiagnosticsMaintenance/index.md)  
+  
+[Calibration/Setup](Actions/CalibrationSetup/index.md)  
+  
+[Controller](Actions/Controller/index.md)  
+
 ###### Boards
 
 [Board Management](Boards/boardManagement.md)
