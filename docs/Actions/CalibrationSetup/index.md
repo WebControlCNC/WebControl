@@ -3,6 +3,7 @@ layout: default
 title: Calibration/Setup
 nav_order: 2
 has_children: true
+parent: Actions
 ---
 # Calibration/Setup
 
