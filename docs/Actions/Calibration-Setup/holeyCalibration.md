@@ -19,7 +19,7 @@ If you are using holey calibration firmware, use 'Actions->Holey Calibration' to
 
 Press 'Cut Calibration Pattern' and wait for the sled to complete the cutting.
 
-![Cut Pattern](../../assets/holeyCalibration/cutPattern.png)
+![Cut Pattern](holeyCalibration/cutPattern.png)
 
 
 ### Step 2: Measure
