@@ -621,6 +621,8 @@ class WebPageProcessor:
         #filterString = '([^\!]|^)\[(.+)\]\((.+)\)'
         filterString = '(?:[^\!]|^)\[([^\[\]]+)\]\((?!http)([^()]+)\)'
         filteredPage = re.sub(filterString, r"""<a href='#' onclick='requestPage("\2");'>\1</a>""", pageContent)
+        filteredPage = filteredPage.replace("{{ site.baseurl }}{% link ","")
+        filteredPage = filteredPage.replace(".md %}", ".md")
         filteredPage = markdown.markdown(filteredPage, extensions=["markdown.extensions.tables"])
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")

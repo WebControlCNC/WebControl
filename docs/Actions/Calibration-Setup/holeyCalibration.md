@@ -13,9 +13,7 @@ Release: >0.906
 
 If you are using holey calibration firmware, use 'Actions->Holey Calibration' to calibrate.  If using stock firmware, go here:
 
-{{site.baseurl}} 
- 
-[Triangular Calibration1]({{ site.baseurl }}{% link Actions/Calibration-Setup/triangularCalibration.md %})
+[Triangular Calibration]({{ site.baseurl }}{% link Actions/Calibration-Setup/triangularCalibration.md %})
 
 ### Step 1: Cut Pattern 
 

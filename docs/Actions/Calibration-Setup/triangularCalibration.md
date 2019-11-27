@@ -13,7 +13,7 @@ Release: >0.906
 
 If you are using stock firmware, use 'Actions->Holey Calibration' to calibrate.  If using holey calibration firmware, go here:
  
- [Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)
+[Holey Calibration]({{ site.baseurl }}{% link Actions/Calibration-Setup/holeyCalibration.md %})
 
 ### Step 1: Cut Pattern 
 
