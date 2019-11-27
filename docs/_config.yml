@@ -1,6 +1,2 @@
-plugins:
-  - jekyll-relative-links
-relative_links:
-  enabled: true
-  collections: true
+baseurl: /WebControl
 remote_theme: pmarsceill/just-the-docs
