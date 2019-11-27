@@ -19,28 +19,28 @@ If you are using holey calibration firmware, use 'Actions->Holey Calibration' to
 
 Press 'Cut Calibration Pattern' and wait for the sled to complete the cutting.
 
-![Cut Pattern](../assets/Actions/Calibration-Setup/holeyCalibration/cutPattern.png)
+![Cut Pattern](../assets/holeyCalibration/cutPattern.png)
 
 
 ### Step 2: Measure
  
 Make and record your measurements as requested.  Double check and triple check them.. seriously.. do it.
 
-![Enter Measurements](../assets/Actions/Calibration-Setup/holeyCalibration/measurements.png)
+![Enter Measurements](../assets/holeyCalibration/measurements.png)
 
 
 ### Step 3: Enter Measurements
 
 Enter the measurements and double and triple check you entered them correctly and in the correct units.  If so, press 'Calculate'
 
-![Enter Measurements](../assets/Actions/Calibration-Setup/holeyCalibration/calculate.png)
+![Enter Measurements](../assets/holeyCalibration/calculate.png)
 
 
 ### Step 4: Accept Results
 
 If all looks good, press 'Accept Results' (you may have to scroll down the screen to see it)|
 
-![Enter Measurements](../assets/Actions/Calibration-Setup/holeyCalibration/acceptResults.png)
+![Enter Measurements](../assets/holeyCalibration/acceptResults.png)
 
 ### Step 5: Dance a Jig
 

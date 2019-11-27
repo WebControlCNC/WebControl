@@ -551,8 +551,8 @@ class WebPageProcessor:
                 )
             return page, "Help", False, "medium", "content", False
         elif pageID == "help":
-            helpIndex = self.getPage("/docs/assets/helpPages.md")
-            helpPage = self.getPage("/docs/index.md")
+            helpIndex = self.getPage("/docs/assets/helpPages.md", isMobile)
+            helpPage = self.getPage("/docs/index.md", isMobile)
             if isMobile:
                 page = render_template(
                     "help_mobile.html",
@@ -575,8 +575,8 @@ class WebPageProcessor:
             if len(pageParts) > 1:
                 # help page
                 print(pageParts)
-                helpIndex = self.getPage("/docs/assets/helpPages.md")
-                helpPage = self.getPage("/docs/"+pageID)
+                helpIndex = self.getPage("/docs/assets/helpPages.md", isMobile)
+                helpPage = self.getPage("/docs/"+pageID, isMobile)
                 if isMobile:
                     helpIndex = self.createLinks(pageParts)
                     page = render_template(
@@ -597,9 +597,6 @@ class WebPageProcessor:
                 #print(page)
                 return page, "Help", False, "large", "content", False
 
-
-
-
             else:
                 self.data.ui_queue1.put("Alert", "Alert", "Function not currently implemented.. Sorry.")
 
@@ -609,7 +606,7 @@ class WebPageProcessor:
             text=text+line+"\n"
         return text
 
-    def getPage(self, pageName):
+    def getPage(self, pageName, isMobile):
         if self.data.platform == "PYINSTALLER":
             lhome = os.path.join(self.data.platformHome)
         else:
