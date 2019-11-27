@@ -19,7 +19,7 @@ If you are using stock firmware, use 'Actions->Holey Calibration' to calibrate. 
 
 Press 'Cut Calibration Pattern' and wait for the sled to complete the cutting.
 
-![Cut Pattern](../assets/triangularCalibration/cutPattern.png)
+![Cut Pattern](../../../assets/triangularCalibration/cutPattern.png)
 
 
 ### Step 2: Measure
