@@ -6,7 +6,7 @@ Release: >0.906
 
 ###### TABLE OF CONTENTS
 
-[Test Motors/Encoders](Actions/DiagnosticsMaintenance/testMotorsEncoders.md)  
+[Test Motors/Encoders](Actions/Diagnostics Maintenance/testMotorsEncoders.md)  
 
   
 

@@ -15,7 +15,7 @@
 
 ###### Actions
 
-[Diagnostics/Maintenance](assets/actions/diagnosticsMaintenance/index.md)  
+[Diagnostics/Maintenance](assets/actions/Diagnostics Maintenance/index.md)  
   
 [Calibration/Setup](assets/actions/calibrationSetup/index.md)  
   

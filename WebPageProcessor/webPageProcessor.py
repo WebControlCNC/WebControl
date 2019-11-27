@@ -574,9 +574,11 @@ class WebPageProcessor:
             pageParts = pageID.split("/")
             if len(pageParts) > 1:
                 # help page
+                print(pageParts)
                 helpIndex = self.getPage("/docs/assets/helpPages.md")
                 helpPage = self.getPage("/docs/"+pageID)
                 if isMobile:
+                    helpIndex = self.createLinks(pageParts)
                     page = render_template(
                         "help_mobile.html",
                         title="Help",
@@ -626,6 +628,30 @@ class WebPageProcessor:
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")
         filteredPage = filteredPage.replace("<a href=\"http", "<a target='_blank' href=\"http")
+        filteredPage = filteredPage.replace("<table>", "<table class='table'>")
 
         return filteredPage
 
+    def createLinks(self, pageParts):
+        link = "<a href='#' onclick='requestPage(\"help\");'>Home</a>"
+        #assets/actions/Diagnostics Maintenance/index.md
+        if len(pageParts) == 4 and pageParts[3]=='index.md':
+            # third level index with form like:
+            # ['assets', 'actions', 'Diagnostics Maintenance', 'index.md']
+            forward = "assets/" + pageParts[1] + "/"
+            pageLink = " / <a href='#' onclick='requestPage(\""+forward+pageParts[3]+"\");'>"+pageParts[1]+"</a>"
+            link = link + pageLink
+            return link
+        if len(pageParts) == 3 and pageParts[2].endswith(".md") and pageParts[2] != "index.md":
+            # fourth level index with form like:
+            # ['Actions', 'Diagnostics Maintenance', 'testMotorsEncoders.md']
+            forward = "assets/"+pageParts[0]+"/"+pageParts[1] + "/index.md"
+            pageLink = " / <a href='#' onclick='requestPage(\""+forward+"\");'>"+pageParts[1]+"</a>"
+            link = link + pageLink
+            return link
+        if len(pageParts) == 3 and pageParts[2].endswith(".md") and pageParts[2] == "index.md":
+            # second level index with form like:
+            # ['assets', 'actions', 'index.md']
+            return link
+
+        return link

@@ -6,7 +6,11 @@ parent: Diagnostics/Maintenance
 grand_parent: Actions
 ---
 # Test Motors/Encoders
+  
+Release: >0.906
+{: .label .label-blue }  
 
+  
 ### Description
 This function sends a test command to the controller to exercise the motors and read values from the encoders.
 
@@ -40,5 +44,3 @@ For each motor, the following actions are taken (based upon current stock firmwa
 |One or More Motors Fail One Direction   	|Possible hardware issue with motor or encoder   	|
 
 
-Release: >0.906
-{: .label .label-blue }
