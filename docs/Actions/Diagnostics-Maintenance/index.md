@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Diagnostics/Maintenance
+title: Diagnostics / Maintenance
 nav_order: 3
 has_children: true
 parent: Actions

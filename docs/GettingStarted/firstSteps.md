@@ -72,8 +72,8 @@ _Chains Off Top_
 
 If using stock firwmare, go to:
  
- [Triangular Calibration](GettingStarted/triangularCalibration.md)
+ [Triangular Calibration](Actions/Calibration-Setup/triangularCalibration.md)
  
 If using holey calibration firmware, go to:
 
- [Holey Calibration](gettingStarted/holeyCalibration.md)
+ [Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)

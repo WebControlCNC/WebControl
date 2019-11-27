@@ -14,18 +14,13 @@ nav_exclude: true
 
 [First Steps](GettingStarted/firstSteps.md)  
 
-[Triangular Calibration](GettingStarted/triangularCalibration.md)  
+###### [Actions](assets/Actions/index.md)
 
-[Holey Calibration](GettingStarted/holeyCalibration.md)
-
-
-###### Actions
-
-[Diagnostics/Maintenance](assets/actions/Diagnostics Maintenance/index.md)  
+[Diagnostics/Maintenance](assets/Actions/Diagnostics-Maintenance/index.md)  
   
-[Calibration/Setup](assets/actions/calibrationSetup/index.md)  
+[Calibration/Setup](assets/Actions/Calibration-Setup/index.md)  
   
-[Controller](assets/actions/controller/index.md)  
+[Controller](assets/Actions/Controller/index.md)  
 
 ###### Boards
 

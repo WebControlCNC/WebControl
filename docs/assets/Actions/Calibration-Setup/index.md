@@ -11,7 +11,10 @@ Release: >0.906
 
 ###### TABLE OF CONTENTS
 
-[Test Motors/Encoders](Actions/DiagnosticsMaintenance/testMotorsEncoders.md)  
+[Triangular Calibration](Actions/Calibration-Setup/triangularCalibration.md)  
+
+[Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)
+  
 
   
 
