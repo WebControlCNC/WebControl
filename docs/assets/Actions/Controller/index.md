@@ -11,7 +11,7 @@ Release: >0.906
 
 ###### TABLE OF CONTENTS
 
-[Test Motors/Encoders](Actions/DiagnosticsMaintenance/testMotorsEncoders.md)  
+[Sync Settings](Actions/Controller/syncSettings.md)  
 
   
 
