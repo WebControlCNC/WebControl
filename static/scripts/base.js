@@ -127,18 +127,27 @@ function processActivateModal(data){
       $modalDialog.addClass('modal-lg');
     if (data.modalSize=="small")
       $modalDialog.addClass('modal-sm');
-    $modal.data('bs.modal',null);
+    //$modal.data('bs.modal',null);
     $modal.data('name',data.title);
 
     $modalTitle.html("<h3>"+data.title+"</h3");
     $modalText.html(message);
 
-    if (data.isStatic==true){
-        console.log("Static Modal")
-        $modal.modal({backdrop: 'static', keyboard: false})
-    } else {
+    if (!($modal.data('bs.modal') || {})._isShown){
+        console.log("showing modal")
         $modal.modal();
     }
+    if (data.isStatic==true){
+        console.log("Static Modal")
+        $modal.data('bs.modal')._config.backdrop = 'static';
+        $modal.data('bs.modal')._config.keyboard = false;
+    } else {
+        console.log("showing non static modal")
+        $modal.data('bs.modal')._config.backdrop = true;
+        $modal.data('bs.modal')._config.keyboard = true;
+    }
+    console.log($modal.data('bs.modal')._config.backdrop)
+    console.log($modal.data('bs.modal')._config.keyboard)
     $modalText.scrollTop(0);
 }
 
@@ -153,12 +162,16 @@ function closeModals(data){
     }
 }
 
+/*
+todo: cleanup
+Not used
 function closeActionModals(data){
     if ($('#actionModal').data('name') == data.title)
     {
       $('#actionModal').modal('hide');
     }
 }
+*/
 
 function closeAlertModals(data){
     if ($('#alertModal').data('name') == data.title)

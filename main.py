@@ -572,20 +572,24 @@ def modalClosed(msg):
 
 @socketio.on("contentModalClosed", namespace="/MaslowCNC")
 def contentModalClosed(msg):
+    #Note, this shouldn't be called anymore
+    #todo: cleanup
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
     print(data)
     #socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
     #              namespace="/MaslowCNC", )
 
-
-
+'''
+todo: cleanup
+not used
 @socketio.on("actionModalClosed", namespace="/MaslowCNC")
 def actionModalClosed(msg):
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
     socketio.emit("message", {"command": "closeActionModals", "data": data, "dataFormat": "json"},
                   namespace="/MaslowCNC", )
+'''
 
 @socketio.on("alertModalClosed", namespace="/MaslowCNC")
 def alertModalClosed(msg):

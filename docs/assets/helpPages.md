@@ -8,7 +8,10 @@
 
 [First Steps](GettingStarted/firstSteps.md)  
 
-[Triangular Calibration](GettingStarted/triangularCalibration.md)
+[Triangular Calibration](GettingStarted/triangularCalibration.md)  
+
+[Holey Calibration](GettingStarted/holeyCalibration.md)
+
 
 ###### Boards
 

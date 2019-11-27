@@ -625,8 +625,7 @@ class WebPageProcessor:
         filteredPage = markdown.markdown(filteredPage, extensions=["markdown.extensions.tables"])
         filteredPage = filteredPage.replace("Â", "")
         filteredPage = filteredPage.replace("{: .label .label-blue }", "")
-        filteredPage = filteredPage.replace("<a href=", "<a target='_blank' href=")
-
+        filteredPage = filteredPage.replace("<a href=\"http", "<a target='_blank' href=\"http")
 
         return filteredPage
 

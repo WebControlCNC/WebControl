@@ -6,9 +6,11 @@ description: Help pages for WebControl
 wcversion: 0.915.001
 ---
 
-# WebControl Help Pages
-
 # WebControl
+
+On Github: [madgrizzle/WebControl](https://github.com/madgrizzle/WebControl)
+
+Report Issues: [madgrizzle/WebControl/issues](https://github.com/madgrizzle/WebControl/issues)
 
 WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi, Windows 10, or linux (Debian) machines and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
 

@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Boards
-nav_order: 4
+title: Calibration/Setup
+nav_order: 2
 has_children: true
 ---
-# Boards Help Pages
+# Calibration/Setup
 
 Release: >0.906
 {: .label .label-blue }

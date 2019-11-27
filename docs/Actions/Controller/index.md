@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Boards
-nav_order: 4
+title: Controller
+nav_order: 1
 has_children: true
 ---
-# Boards Help Pages
+# Controller
 
 Release: >0.906
 {: .label .label-blue }

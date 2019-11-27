@@ -51,12 +51,16 @@ function setListeners(){
       socket.emit('modalClosed', {data:name});
   });
 
+  /*
+  todo: cleanup
+  Not used
+
   $("#actionModal").on('hidden.bs.modal', function(e){
       var name = $('#actionModal').data('name');
       console.log("closing modal:"+name);
       socket.emit('actionModalClosed', {data:name});
   });
-
+*/
   $("#alertModal").on('hidden.bs.modal', function(e){
       var name = $('#alertModal').data('name');
       console.log("closing modal:"+name);
@@ -66,7 +70,7 @@ function setListeners(){
   $("#contentModal").on('hidden.bs.modal', function(e){
       var name = $('#contentModal').data('name');
       console.log("closing modal:"+name);
-      socket.emit('contentModalClosed', {data:name});
+      //socket.emit('contentModalClosed', {data:name});
   });
 
   socket.on('message', function(msg){
@@ -175,10 +179,14 @@ function setListeners(){
                 //completed
                 closeModals(data);
                 break;
+            /*
+            todo: cleanup
+            Not used
             case 'closeActionModals':
                 //completed
                 closeActionModals(data);
                 break;
+            */
             case 'closeAlertModals':
                 //completed
                 closeAlertModals(data);
