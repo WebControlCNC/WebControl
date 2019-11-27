@@ -15,7 +15,7 @@ If you are using holey calibration firmware, use 'Actions->Holey Calibration' to
 
 {{site.baseurl}} 
  
-[Triangular Calibration]({% link Actions/Calibration-Setup/triangularCalibration.md %})
+[Triangular Calibration1]({{ site.baseurl }}{% link Actions/Calibration-Setup/triangularCalibration.md %})
 
 ### Step 1: Cut Pattern 
 
