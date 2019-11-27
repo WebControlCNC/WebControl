@@ -629,6 +629,10 @@ class WebPageProcessor:
         filteredPage = filteredPage.replace("<a href=\"http", "<a target='_blank' href=\"http")
         filteredPage = filteredPage.replace("<table>", "<table class='table'>")
 
+        if isMobile:
+            # make all images 100%
+            filteredPage = filteredPage.replace("img alt=", "img width='100%' alt=")
+
         return filteredPage
 
     def createLinks(self, pageParts):
@@ -644,6 +648,9 @@ class WebPageProcessor:
         if len(pageParts) == 3 and pageParts[2].endswith(".md") and pageParts[2] != "index.md":
             # fourth level index with form like:
             # ['Actions', 'Diagnostics Maintenance', 'testMotorsEncoders.md']
+            forward = "assets/"+pageParts[0]+ "/index.md"
+            pageLink = " / <a href='#' onclick='requestPage(\""+forward+"\");'>"+pageParts[0]+"</a>"
+            link = link + pageLink
             forward = "assets/"+pageParts[0]+"/"+pageParts[1] + "/index.md"
             pageLink = " / <a href='#' onclick='requestPage(\""+forward+"\");'>"+pageParts[1]+"</a>"
             link = link + pageLink
