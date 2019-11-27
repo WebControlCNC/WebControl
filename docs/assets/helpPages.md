@@ -15,11 +15,11 @@
 
 ###### Actions
 
-[Diagnostics/Maintenance](Actions/DiagnosticsMaintenance/index.md)  
+[Diagnostics/Maintenance](assets/actions/diagnosticsMaintenance/index.md)  
   
-[Calibration/Setup](Actions/CalibrationSetup/index.md)  
+[Calibration/Setup](assets/actions/calibrationSetup/index.md)  
   
-[Controller](Actions/Controller/index.md)  
+[Controller](assets/actions/controller/index.md)  
 
 ###### Boards
 
