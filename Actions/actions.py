@@ -1657,7 +1657,7 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def issueStopCommand(self):
+    def issueStopCommand(self, distance):
         try:
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
