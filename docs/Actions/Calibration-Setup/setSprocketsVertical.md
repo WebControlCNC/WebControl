@@ -71,6 +71,11 @@ Step 5) Press 'Manually Set Chains At xxxx mm' (Button 8).  This tells the contr
 
 Your chains are now reset!  **Note: To repeat the note above, it is unlikely that your sled is in the center of the board.  It should be centered horizontally, but likely is not centered vertically.  That's ok.  The machine knows where its at and if you look at the main screen, the red reticle should show the sled to be where it is actually located.  If not, then something went wrong.**
 
+### Automatic ###
+
+So, what's up with the 'Automatic' button (Button 3*)?  THis button is intended to return one of the sprockets teeth to vertical.  This function was available in ground control, but the odd thing is that normally when you are trying to set your sprockets vertical, it's because the controller doesn't know the chain lengths and therefore doesn't know the sprockets position.  So pushing this button will NOT likely result in a tooth vertical.
+
+However, in during testing and development of Maslow, this capability did prove handy, so it's here as well.  It will probably will go away or be moved elsewhere. 
  
 ### Troubleshooting
 
