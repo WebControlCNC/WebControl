@@ -73,7 +73,7 @@ Your chains are now reset!  **Note: To repeat the note above, it is unlikely tha
 
 ### Automatic ###
 
-So, what's up with the 'Automatic' button (Button 3*)?  Tis button is intended to return one of the sprockets teeth to vertical.  This function was available in ground control, but the odd thing is that normally when you are trying to set your sprockets vertical, it's because the controller doesn't know the chain lengths and therefore doesn't know the sprockets position.  So pushing this button will NOT likely result in a tooth vertical.
+So, what's up with the 'Automatic' button (Button 3*)?  This button is intended to return one of the sprockets teeth to vertical.  This function was available in ground control, but the odd thing is that normally when you are trying to set your sprockets vertical, it's because the controller doesn't know the chain lengths and therefore doesn't know the sprockets position.  So pushing this button will NOT likely result in a tooth vertical.
 
 However, during testing and development of Maslow, this capability did prove handy, so it's here as well.  It will probably will go away or be moved elsewhere. 
  
