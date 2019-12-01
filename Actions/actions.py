@@ -1646,11 +1646,11 @@ class Actions(MakesmithInitFuncs):
                 time.sleep(1)
             if chain == "left":
                 self.data.gcode_queue.put("B02 L1 R0 ")
-                self.data.measureRequest = self.issueStopCommand()
+                self.data.measureRequest = self.issueStopCommand
                 self.data.gcode_queue.put("B10 L")
             if chain == "right":
                 self.data.gcode_queue.put("B02 L0 R1 ")
-                self.data.measureRequest = self.issueStopCommand()
+                self.data.measureRequest = self.issueStopCommand
                 self.data.gcode_queue.put("B10 R")
             return True
         except Exception as e:
