@@ -112,7 +112,10 @@ class UIProcessor:
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 elif message.find("Unable to find valid") != -1:
                                     # position alarm detected.. chain lengths do not allow for forward kinematic.
-                                    self.sendAlarm(message);
+                                    # This could occur during the set sprockets to zero process.. so ignore alarm
+                                    # if either sprocket distance is zero.
+                                    if not self.isChainLengthZero(message):
+                                        self.sendAlarm(message);
                                 else:
                                     # something other than above..
                                     self.activateModal("Notification:", message[9:], "notification")
@@ -515,8 +518,9 @@ class UIProcessor:
             elif msg["message"] == "distToMoveUpdateZ":
                 self.distToMoveUpdateZ()
             elif msg["message"] == "updateTimer":
-                # Todo: clean this up .. edit: I'm not sure what needs to be cleaned up..
-                self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
+                # Todo: clean this up .. edit: sendCalibrationMessage got deleted somewhere.
+                #self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
+                pass
             elif msg["message"] == "updateCamera":
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
             elif msg["message"] == "updatePIDData":
@@ -587,3 +591,12 @@ class UIProcessor:
                 "uploadFlag": self.app.data.uploadFlag,
             }
             self.sendHealthMessage(healthData)
+
+    def isChainLengthZero(self, msg):
+        #Message: Unable to find valid machine position for chain lengths 0.00, 0.00 Left Chain Length
+        # If one chain length is zero, it will report as above.
+        if msg.find("lengths 0.00") != -1:
+            return True
+        if msg.find(", 0.00") != -1:
+            return True
+        return False
