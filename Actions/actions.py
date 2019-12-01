@@ -1646,8 +1646,22 @@ class Actions(MakesmithInitFuncs):
                 time.sleep(1)
             if chain == "left":
                 self.data.gcode_queue.put("B02 L1 R0 ")
+                self.data.measureRequest = self.issueStopCommand()
+                self.data.gcode_queue.put("B10 L")
             if chain == "right":
                 self.data.gcode_queue.put("B02 L0 R1 ")
+                self.data.measureRequest = self.issueStopCommand()
+                self.data.gcode_queue.put("B10 R")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def issueStopCommand(self):
+        try:
+            self.data.quick_queue.put("!")
+            with self.data.gcode_queue.mutex:
+                self.data.gcode_queue.queue.clear()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
