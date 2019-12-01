@@ -21,7 +21,7 @@ The process of resetting the chains involves two steps; first, each sprocket has
 
 If the user follows these directions the first time they set the chain lengths, future chain lengths can be done quicker using the optional Quick Way.
 
-##### The Long Way #####
+#### The Long Way ####
 
 If this the the first time setting the chains, then you will need to do it the long way.
 
@@ -55,7 +55,7 @@ Step 8) Mark chains. This step is to allow you to use the Quick Way of resetting
 
 Your chains are now reset!  **Note: It is unlikely that your sled is in the center of the board.  It should be centered horizontally, but likely is not centered vertically.  That's ok.  The machine knows where its at and if you look at the main screen, the red reticle should show the sled to be where it is actually located.  If not, then something went wrong.**
 
-##### The Quick Way #####
+#### The Quick Way ####
 
 If you perfomed Step 8 above when you first set your chains, you know which link was on the vertical tooth of each motor when the chains were extended to a specific distance.  Because of this, all you need to do to reset the chain lengths is to set a tooth of each sprocket vertical, reapply the marked link back onto that tooth, and tell the machine the chains are reset...
 
