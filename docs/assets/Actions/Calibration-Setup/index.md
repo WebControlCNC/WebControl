@@ -11,6 +11,8 @@ Release: >0.906
 
 ###### TABLE OF CONTENTS
 
+[Set Sprockets Vertical / Reset Chains](Actions/Calibration-Setup/setSprocketsVertical.md)  
+
 [Triangular Calibration](Actions/Calibration-Setup/triangularCalibration.md)  
 
 [Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)
