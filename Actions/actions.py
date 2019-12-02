@@ -1842,7 +1842,7 @@ class Actions(MakesmithInitFuncs):
     def downloadDiagnostics(self):
         try:
             timestr = time.strftime("%Y%m%d-%H%M%S")
-            filename = self.data.config.home+"/.WebControl"+"wc_diagnostics_"+timestr+".zip"
+            filename = self.data.config.home+"/.WebControl/"+"wc_diagnostics_"+timestr+".zip"
             zipObj = zipfile.ZipFile(filename, 'w')
             path1 = self.data.config.home+"/.WebControl/webcontrol.json"
             zipObj.write(path1, os.path.basename(path1))

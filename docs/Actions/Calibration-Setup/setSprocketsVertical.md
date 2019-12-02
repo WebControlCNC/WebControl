@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Set Sprockets Vertical / Reset Chains
+title: Check for Chain Skip
 nav_order: 4
 parent: Calibration / Setup
 grand_parent: Actions
 WCVersion: 0.916
 ---
-# Set Sprockets Vertical / Reset Chains
+# Check for Chain Skip
 
 Release: >0.906
 {: .label .label-blue }
@@ -14,7 +14,6 @@ Release: >0.906
 ### Description
 This function allows the user to reset chain chains by setting a tooth on each sprocket vertical, installing the chains on the teeth, and extending the chains a specific distance to allow the chains to be attached to the sled.
 
-![Sprocket with Vertical Tooth](../../assets/Actions/Calibration-Setup/setSprocketsVertical.png)
 
 ### Process
 The process of resetting the chains involves two steps; first, each sprocket has one tooth placed as perfectly vertical as possible and then, second, the chains are extended by a specific length.
@@ -78,6 +77,8 @@ So, what's up with the 'Automatic' button (Button 3*)?  This button is intended 
 However, during testing and development of Maslow, this capability did prove handy, so it's here as well.  It will probably will go away or be moved elsewhere. 
  
 ### Troubleshooting
+
+**TBD**
 
 |Result   	|Possible Cause/Solution   	|
 |---	|---	|

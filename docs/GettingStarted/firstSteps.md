@@ -42,7 +42,7 @@ Go to Actions->Quick Configure and enter the requested information.  This lets t
 
 ### 4) Set Sprockets Vertical
 
-Go to Actions->Set Sprockets Vertical:
+Go to Actions->Set Sprockets & Reset Chains:
 
 4a) Get one tooth of each sprocket as precisely vertical as you can using the buttons.  When done, press 'Define Zero'.  This tells the controllers that the chain length is 0. 
 

@@ -482,7 +482,7 @@ def downloadDiagnostics():
         returnVal = app.data.actions.downloadDiagnostics()
         if  returnVal != False:
             print(returnVal)
-            return send_file(returnVal)
+            return send_file(returnVal, as_attachment=True)
         else:
             resp = jsonify("failed")
             resp.status_code = 500

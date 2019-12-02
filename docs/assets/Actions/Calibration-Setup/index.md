@@ -15,7 +15,9 @@ Release: >0.906
 
 [Triangular Calibration](Actions/Calibration-Setup/triangularCalibration.md)  
 
-[Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)
+[Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)  
+
+[Check for Chain Skip](Actions/Calibration-Setup/checkForChainSkip.md)
   
 
   

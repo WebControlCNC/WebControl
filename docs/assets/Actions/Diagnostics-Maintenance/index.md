@@ -13,7 +13,13 @@ Release: >0.906
 
 [Test Motors/Encoders](Actions/Diagnostics-Maintenance/testMotorsEncoders.md)  
 
-  
+[Download Diagnostics File](Actions/Diagnostics-Maintenance/downloadDiagnostics.md)  
+
+[Backup WebControl](Actions/Diagnostics-Maintenance/backupWebControl.md)  
+
+[Restore WebControl](Actions/Diagnostics-Maintenance/restoreWebControl.md)  
+
+[Clear Log Files](Actions/Diagnostics-Maintenance/clearLogFiles.md)  
 
 
 
