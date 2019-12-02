@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Restore WebControl
-nav_order: 3
+nav_order: 5
 parent: Diagnostics / Maintenance
 grand_parent: Actions
 WCVersion: 0.917

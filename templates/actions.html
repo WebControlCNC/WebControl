@@ -37,7 +37,7 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');$('#contentModal').modal('hide');">Return to Center</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Check for Skipped Chain</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Check for Chain Skip</button>
 			</div>
 		</div>
 	</div>

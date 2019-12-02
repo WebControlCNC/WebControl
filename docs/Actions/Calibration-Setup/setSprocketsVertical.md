@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Check for Chain Skip
+title: Set Sprockets & Reset Chains
 nav_order: 4
 parent: Calibration / Setup
 grand_parent: Actions
 WCVersion: 0.916
 ---
-# Check for Chain Skip
+# Set Sprockets & Reset Chains
 
 Release: >0.906
 {: .label .label-blue }

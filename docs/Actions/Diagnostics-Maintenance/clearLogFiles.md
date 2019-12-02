@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Clear Log Files
-nav_order: 3
+nav_order: 6
 parent: Diagnostics / Maintenance
 grand_parent: Actions
 WCVersion: 0.917
