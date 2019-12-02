@@ -17,7 +17,9 @@ Release: >0.906
 
 [Holey Calibration](Actions/Calibration-Setup/holeyCalibration.md)  
 
-[Check for Chain Skip](Actions/Calibration-Setup/checkForChainSkip.md)
+[Return to Center](Actions/Calibration-Setup/returnToCenter.md)  
+
+[Check for Chain Skip](Actions/Calibration-Setup/checkForChainSkip.md)  
   
 
   
