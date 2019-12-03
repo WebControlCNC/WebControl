@@ -11,7 +11,13 @@ Release: >0.906
 
 ###### TABLE OF CONTENTS
 
-[Set Sprockets Vertical / Reset Chains](Actions/Calibration-Setup/setSprocketsVertical.md)  
+[Import groundcontrol.ini File](Actions/Calibration-Setup/importGroundControlini.md)  
+
+[Import webcontrol.json File](Actions/Calibration-Setup/importWebcontroljson.md)  
+
+[Quick Configure](Actions/Calibration-Setup/quickConfigure.md)  
+
+[Set Sprockets & Reset Chains](Actions/Calibration-Setup/setSprocketsVertical.md)  
 
 [Triangular Calibration](Actions/Calibration-Setup/triangularCalibration.md)  
 
