@@ -10,6 +10,7 @@ import json
 import time
 import re
 import zipfile
+import threading
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
 
@@ -497,10 +498,19 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("$RST=# ")
             else:
                 return False
+
+            #sync settings after 2 seconds (give time form controller to reset)
+            time.sleep(2)
+            self.data.gcode_queue.put("$$")
+
+            #reset chain lengths so they aren't zero
+            if extent == "All" or extent == "Maslow":
+                self.resetChainLengths()
+
             # these two lines were commented out and aren't used (and may not even work).  The thought was that after
             # the EEPROM got wiped, you need to sync settings.
-            #timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
-            #timer.start()
+            #self.timer = threading.Timer(6.0, self.data.gcode_queue.put("$$"))
+            #self.timer.start()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))

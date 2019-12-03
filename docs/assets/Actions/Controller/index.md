@@ -13,6 +13,12 @@ Release: >0.906
 
 [Sync Settings](Actions/Controller/syncSettings.md)  
 
+[Wipe Controller Settings](Actions/Controller/wipeControllerSettings.md)  
+
+[Wipe Controller Position & Settings](Actions/Controller/wipeControllerPositionAndSettings.md)  
+
+[Wipe Controller EEPROM](Actions/Controller/wipeControllerEEPROM.md)    
+
   
 
 
