@@ -11,6 +11,12 @@ Release: >0.906
 
 ###### TABLE OF CONTENTS
 
+[Upgrade Stock Firmware](Actions/Controller/upgradeStockFirmware.md)  
+
+[Upgrade Holey Firmware](Actions/Controller/upgradeHoleyFirmware.md)  
+
+[Upgrade Custom Firmware](Actions/Controller/upgradeCustomFirmware.md)  
+
 [Sync Settings](Actions/Controller/syncSettings.md)  
 
 [Wipe Controller Settings](Actions/Controller/wipeControllerSettings.md)  
