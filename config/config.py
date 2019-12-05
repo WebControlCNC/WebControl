@@ -123,6 +123,19 @@ class Config(MakesmithInitFuncs):
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )
 
+        '''
+        Delete any copies of webcontrol in the downloads directory to cleanup the file system
+        '''
+        home = self.home
+        dirName = home + "/.WebControl/downloads"
+        if os.path.exists(dirName):
+            dir = os.listdir(dirName)
+            for item in dir:
+                if item.startswith("webcontrol"):
+                    if item.endswith("gz") or item.endswith("zip") or item.endswith("dmg"):
+                        print("Removing file:"+item)
+                        os.remove(os.path.join(dirName, item))
+
     def checkForTouchedPort(self):
         '''
         this function looks for a file that has a port number embedded
