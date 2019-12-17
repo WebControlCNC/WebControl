@@ -88,7 +88,8 @@
       <!--<div id="activity" class="alert alert-success alert-circle alert-sm"></div>-->
       <div id="cpuUsage" class="alert alert-success">CPU: 0%</div>
       <div id="bufferSize" class="alert alert-success" style="display:none">Buffer: 127</div>
-      <div id="controllerStatus" class="alert alert-danger">Not Connect</div>
+      <div id="controllerStatusAlert" class="alert alert-danger">Not Connected</div>
+      <button id="controllerStatusButton" style="display:none" type="button" class="btn btn-sm btn-danger" onclick="requestPage('fakeServo');">Not Connected</button>
     </div>
 </nav>
 
@@ -129,6 +130,7 @@
         </div>
         <div class="modal-footer">
           <button id="resumeButton" type="button" class="btn btn-info" onclick="resumeRun()" data-dismiss="modal">Resume</button>
+          <button id="fakeServoButton" type="button" class="btn btn-info" onclick="disableFakeServo()" data-dismiss="modal">Disable Fake Servo</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

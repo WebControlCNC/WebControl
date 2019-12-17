@@ -245,6 +245,9 @@ class Actions(MakesmithInitFuncs):
                 if not self.data.releaseManager.updatePyInstaller():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating WebControl")
                 return "Shutdown"
+            elif msg["data"]["command"] == "setFakeServo":
+                if not self.setFakeServo(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with changing Fake Servo")
             else:
                 response = "Function not currently implemented.. Sorry."
                 response = response + "["+msg["data"]["command"]+"]"
@@ -2019,6 +2022,17 @@ class Actions(MakesmithInitFuncs):
                 if retval is True:
                     self.data.gcode_queue.put("$$")
             return retval
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def setFakeServo(self, value):
+        try:
+            if value:
+                self.data.gcode_queue.put("B99 ON")
+            else:
+                self.data.gcode_queue.put("B99 OFF")
+            return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False

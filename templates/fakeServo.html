@@ -1,0 +1,23 @@
+
+{% block content %}
+<div class="container-fluid">
+  <p>If you find yourself here because Fake Servo is being reported as being enabled and you want to disable it, press the disable button.</p>
+  <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setFakeServo',false);$('#contentModal').modal('hide');">Disable Fake Servo</button>
+  <p>If you are here because you want to enable Fake Servo, enter the secret code and press the enable button.  If you don't know the secret code, then you likely don't want to enable Fake Servo.</p>
+  <input class="form-control" type="number" step="any" id="fakeServo" value="">
+  <button type="button" class="btn btn-lg btn-block btn-danger" onclick="enableFakeServo();">Enable Fake Servo</button>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+function enableFakeServo(){
+    console.log($("#fakeServo").val())
+    if ($("#fakeServo").val()==42){
+      action('setFakeServo',true);
+      $('#contentModal').modal('hide');
+  }
+}
+</script>
+{% endblock %}

@@ -550,6 +550,20 @@ class WebPageProcessor:
                     pageID="help",
                 )
             return page, "Help", False, "medium", "content", False
+        elif pageID == "fakeServo":
+            if isMobile:
+                page = render_template(
+                    "fakeServo.html",
+                    title="Fake Servo",
+                    pageID="fakeServo",
+                )
+            else:
+                page = render_template(
+                    "fakeServo.html",
+                    title="Fake Servo",
+                    pageID="fakeServo",
+                )
+            return page, "Fake Servo", False, "small", "content", False
         elif pageID == "help":
             helpIndex = self.getPage("/docs/assets/helpPages.md", isMobile)
             helpPage = self.getPage("/docs/index.md", isMobile)

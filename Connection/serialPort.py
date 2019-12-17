@@ -63,7 +63,7 @@ class SerialPort(MakesmithInitFuncs):
             #    "Action: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
             #)  # the "_" facilitates the parse
             self.data.ui_queue1.put("Action", "connectionStatus",
-                                    {'status': 'disconnected', 'port': 'none'})
+                                    {'status': 'disconnected', 'port': 'none', 'fakeServoStatus': self.data.fakeServoStatus})
             x = SerialPortThread()
             x.data = self.data
             self.th = threading.Thread(target=x.getmessage)
@@ -71,7 +71,7 @@ class SerialPort(MakesmithInitFuncs):
             self.th.start()
         else:
             self.data.ui_queue1.put("Action", "connectionStatus",
-                                    {'status': 'connected', 'port': self.data.comport})
+                                    {'status': 'connected', 'port': self.data.comport, 'fakeServoStatus': self.data.fakeServoStatus})
             #self.data.ui_queue.put(
             #    "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
             #)  # the "_" facilitates the parse

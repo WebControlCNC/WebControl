@@ -49,15 +49,28 @@ function processHealthMessage(data){
 
 function processControllerStatus(data){
     if (data.status=="disconnected"){
-      $("#controllerStatus").text("Not Connected");
-      $("#controllerStatus").removeClass('alert-success').removeClass('alert-secondary').addClass('alert-danger');
-      $("#mobileControllerStatus").removeClass('alert-success').removeClass('alert-secondary').addClass('alert-danger');
+      $("#controllerStatusAlert").text("Not Connected");
+      $("#controllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
+      $("#mobileControllerStatus").removeClass('alert-success').addClass('alert-danger');
     }
     else
     {
-      $("#controllerStatus").text(data.port);
-      $("#controllerStatus").removeClass('alert-danger').addClass('alert-success');
-      $("#mobileControllerStatus").removeClass('alert-danger').addClass('alert-success');
+      if (data.fakeServoStatus){
+        text = data.port+" / Fake Servo ON";
+        $("#controllerStatusAlert").hide();
+        $("#controllerStatusButton").show();
+        $("#controllerStatusButton").html(text);
+        $("#mobileControllerStatus").removeClass('alert-success').addClass('alert-danger');
+
+      }
+      else{
+        text = data.port;
+        $("#controllerStatusAlert").show();
+        $("#controllerStatusButton").hide();
+        $("#controllerStatusAlert").text(text);
+        $("#controllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
+        $("#mobileControllerStatus").removeClass('alert-danger').addClass('alert-success');
+      }
     }
 }
 
@@ -101,6 +114,11 @@ function processActivateModal(data){
         $('#resumeButton').show();
       } else {
         $('#resumeButton').hide();
+      }
+      if (data.fakeServo=="fakeServo"){
+        $('#fakeServoButton').show();
+      } else {
+        $('#fakeServoButton').hide();
       }
       if (data.progress=="true"){
         $('#progressBarDiv').show();
@@ -213,3 +231,4 @@ function pyInstallUpdateBadge(data){
     $('#updateBadge').html("1");
     console.log("---##-")
 }
+

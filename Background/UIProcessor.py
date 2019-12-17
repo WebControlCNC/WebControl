@@ -600,3 +600,4 @@ class UIProcessor:
         if msg.find(", 0.00") != -1:
             return True
         return False
+

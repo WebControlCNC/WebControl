@@ -51,6 +51,8 @@ class Data:
     comPorts = []
     # This defines which COM port is used
     comport = ""
+    # stores value to indicate whether or not fake_servo is enabled
+    fakeServoStatus = False
     # The index of the next unread line of Gcode
     gcodeIndex = 0
     # Index of changes in z

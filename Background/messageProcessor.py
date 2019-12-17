@@ -43,6 +43,12 @@ class MessageProcessor(MakesmithInitFuncs):
                             except Exception as e:
                                 self.data.console_queue.put(str(e))
                                 self.data.console_queue.put("No function has requested a measurement")
+                    elif message[0:14] == "FAKE_SERVO off":
+                        self.data.fakeServoStatus = False
+                        self.data.console_queue.put(message)
+                    elif message[0:13] == "FAKE_SERVO on":
+                        self.data.fakeServoStatus = True
+                        self.data.console_queue.put(message)
                     elif message[0:13] == "Maslow Paused":
                         # received controller-initiated pause message.  Free controller to accept moves and send
                         # message to UIProcessor to process.

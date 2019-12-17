@@ -184,7 +184,7 @@ class SerialPortThread(MakesmithInitFuncs):
             pass
         else:
             self.data.console_queue.put("\r\nConnected on port " + self.data.comport + "\r\n")
-            self.data.ui_queue1.put("Action", "connectionStatus", {'status': 'connected', 'port': self.data.comport})
+            self.data.ui_queue1.put("Action", "connectionStatus", {'status': 'connected', 'port': self.data.comport, 'fakeServoStatus': self.data.fakeServoStatus})
             self.data.ui_queue1.put("TextMessage", "", "Connected on port " + self.data.comport)
 
             self.serialInstance.parity = (
