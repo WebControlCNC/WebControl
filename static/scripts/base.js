@@ -51,25 +51,37 @@ function processControllerStatus(data){
     if (data.status=="disconnected"){
       $("#controllerStatusAlert").text("Not Connected");
       $("#controllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
-      $("#mobileControllerStatus").removeClass('alert-success').addClass('alert-danger');
+      $("#mobileControllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
+      $("#mobileControllerStatusAlert").show();
+      $("#mobileControllerStatusButton").hide();
+      $("#mobileControllerStatusAlert svg.feather.feather-check-circle").replaceWith(feather.icons["alert-circle"].toSvg());
+      //feather.replace();
     }
     else
     {
       if (data.fakeServoStatus){
         text = data.port+" / Fake Servo ON";
         $("#controllerStatusAlert").hide();
+        $("#mobileControllerStatusAlert").hide();
+        $("#mobileControllerStatusButton").show();
+        $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
         $("#controllerStatusButton").show();
         $("#controllerStatusButton").html(text);
-        $("#mobileControllerStatus").removeClass('alert-success').addClass('alert-danger');
+        //feather.replace();
+        //$("#mobileControllerStatus").removeClass('alert-success').addClass('alert-danger');
 
       }
       else{
         text = data.port;
         $("#controllerStatusAlert").show();
+        $("#mobileControllerStatusAlert").show();
         $("#controllerStatusButton").hide();
+        $("#mobileControllerStatusButton").hide();
         $("#controllerStatusAlert").text(text);
+        $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
         $("#controllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
-        $("#mobileControllerStatus").removeClass('alert-danger').addClass('alert-success');
+        $("#mobileControllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
+        //feather.replace();
       }
     }
 }
@@ -215,12 +227,13 @@ function setupStatusButtons(){
   if (isMobile){
       $('#mobileClientStatus').show();
       $('#mobileCPUUsage').show();
-      $('#mobileControllerStatus').show();
+      $('#mobileControllerStatusAlert').show();
   } else {
     $('#mobileClientStatus').hide();
     $('#mobileCPUUsage').hide();
     $('#mobileBufferSize').hide();
-    $('#mobileControllerStatus').hide();
+    $('#mobileControllerStatusAlert').hide();
+    $('#mobileControllerStatusButton').hide();
   }
 }
 

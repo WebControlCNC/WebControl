@@ -26,6 +26,7 @@ function setListeners(){
       $("#clientStatus").text("Connected: "+hostAddress);
       $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
       $("#mobileClientStatus").removeClass('alert-danger').addClass('alert-success');
+      $("#mobileClientStatus svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
       settingRequest("Computed Settings","units");
       settingRequest("Computed Settings","distToMove");
       settingRequest("Computed Settings","homePosition");
@@ -40,6 +41,7 @@ function setListeners(){
       hostAddress = "Not Connected"
       $("#clientStatus").removeClass('alert-success').addClass('alert-outline-danger');
       $("#mobileClientStatus").removeClass('alert-success').addClass('alert-danger');
+      $("#mobileClientStatus svg.feather.feather-check-circle").replaceWith(feather.icons["alert-circle"].toSvg());
       $("#controllerStatus").removeClass('alert-success').removeClass('alert-danger').addClass('alert-secondary');
       $("#mobileControllerStatus").removeClass('alert-success').removeClass('alert-danger').addClass('alert-secondary');
 
