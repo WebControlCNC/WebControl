@@ -36,6 +36,7 @@ ADD requirements.txt /requirements.txt
 RUN sed -i '/opencv-python.*/d' /requirements.txt && sed -i '/scipy.*/d' /requirements.txt && sed -i '/numpy.*/d' /requirements.txt
 # TODO: Maybe we can cache wheel files outside this container, for more granular reuse when requiremnts.txt changes
 RUN pwd
+RUN apt-get update && apt-get install -y --no-install-recommends python-dev libffi-dev
 RUN pip install -r /requirements.txt
 
 # Download and compile the Arduino firmware
@@ -45,7 +46,7 @@ RUN pip install -r /requirements.txt
 RUN apt-get update \
     && apt-get install -y --no-install-recommends python2.7 python-pip python-setuptools python-wheel git \
     && pip2 install -U platformio \
-    && pio platform install --with-package framework-arduinoavr atmelavr \
+    && pio platform install --with-package framework-arduino atmelavr \
     && pio lib -g install "Servo"
 
 
