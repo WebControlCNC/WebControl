@@ -50,10 +50,11 @@ class GPIOActions(MakesmithInitFuncs):
             self.Buttons.append(button)
 
 
-    def getAction(self,action):
+    def getAction(self, action):
         if action == "Stop":
             return "button", self.data.actions.stopRun
         if action == "Pause":
             return "button", self.data.actions.pauseRun
         if action == "Play":
             return "button", self.data.actions.startRun
+

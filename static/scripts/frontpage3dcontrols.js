@@ -67,7 +67,7 @@ function processHomePositionMessage(data){
 function processGCodePositionMessage(data){
   $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
   $('#gcodeLine').html(data.gcodeLine);
-  $('#gcodeLineIndex').val(data.gcodeLineIndex)
+  $('#gcodeLineIndex').val(data.gcodeLineIndex+1)
 }
 
 function gcodeUpdate(msg){
