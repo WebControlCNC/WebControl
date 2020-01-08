@@ -38,7 +38,7 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.919
+    pyInstallCurrentVersion = 0.920
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
