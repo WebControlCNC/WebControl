@@ -52,7 +52,8 @@ function processControllerStatus(data){
       $("#controllerStatusAlert").text("Not Connected");
       $("#controllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
       $("#mobileControllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
-      $("#mobileControllerStatusAlert").show();
+      if (isMobile)
+        $("#mobileControllerStatusAlert").show();
       $("#mobileControllerStatusButton").hide();
       $("#mobileControllerStatusAlert svg.feather.feather-check-circle").replaceWith(feather.icons["alert-circle"].toSvg());
       //feather.replace();
@@ -63,7 +64,8 @@ function processControllerStatus(data){
         text = data.port+" / Fake Servo ON";
         $("#controllerStatusAlert").hide();
         $("#mobileControllerStatusAlert").hide();
-        $("#mobileControllerStatusButton").show();
+        if(isMobile)
+            $("#mobileControllerStatusButton").show();
         $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
         $("#controllerStatusButton").show();
         $("#controllerStatusButton").html(text);
