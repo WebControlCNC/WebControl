@@ -86,7 +86,9 @@ class UIProcessor:
                                 # operation is to issue this 'un-pause' command which then lets two ok's to come back
                                 # (one for the tool change and one for the ~)  Without this, serialThread won't see
                                 # that the bufferSize = bufferSpace and therefore won't issue any commands.
-                                self.app.data.quick_queue.put("~")
+                                ## new stuff
+                                # self.app.data.quick_queue.put("~")
+                                ## end new stuff
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message",
                                               {"command": "requestedSetting", "data": data, "dataFormat": "json"},
