@@ -337,7 +337,7 @@ class SerialPortThread(MakesmithInitFuncs):
         end = self.findEndOfNumber(readString, begin + 1)
         numberAsString = readString[begin + 1: end]
 
-        numberAsFloat = float(numberAsString.toFloat)
+        numberAsFloat = float(numberAsString)
 
         if begin == -1:
             return defaultReturn
