@@ -118,7 +118,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 # if this is a different tool, the controller will respond with a 'Tool Change:' and pause.
                 # if this is a the same tool as the controller is currently tracking, it will continue on.
                 # first, determine the tool being called for...
-                toolNumber = self.extractGcodeValue(line,'T', 0)
+                toolNumber = int(self.extractGcodeValue(line,'T', 0))
                 # so, in the first case...
                 if toolNumber != self.data.currentTool:
                     # set uploadFlag to -1 to turn off sending more lines (after this one)
@@ -335,9 +335,9 @@ class SerialPortThread(MakesmithInitFuncs):
 
         begin = readString.find(target)
         end = self.findEndOfNumber(readString, begin + 1)
-        numberAsString = readString.substring(begin + 1, end)
+        numberAsString = readString[begin + 1, end]
 
-        numberAsFloat = numberAsString.toFloat()
+        numberAsFloat = float(numberAsString.toFloat)
 
         if begin == -1:
             return defaultReturn
