@@ -119,6 +119,8 @@ class SerialPortThread(MakesmithInitFuncs):
                 # if this is a the same tool as the controller is currently tracking, it will continue on.
                 # first, determine the tool being called for...
                 toolNumber = int(self.extractGcodeValue(line,'T', 0))
+                print(toolNumber)
+                print(self.data.currentTool)
                 # so, in the first case...
                 if toolNumber != self.data.currentTool:
                     # set uploadFlag to -1 to turn off sending more lines (after this one)
