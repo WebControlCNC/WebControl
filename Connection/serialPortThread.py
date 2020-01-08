@@ -333,7 +333,7 @@ class SerialPortThread(MakesmithInitFuncs):
         # Reads a string and returns the value of number following the target character.
         # if no number is found, defaultReturn is returned
 
-        begin = readString.indexOf(target)
+        begin = readString.find(target)
         end = self.findEndOfNumber(readString, begin + 1)
         numberAsString = readString.substring(begin + 1, end)
 
