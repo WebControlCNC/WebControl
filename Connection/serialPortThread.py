@@ -121,7 +121,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.data.uploadFlag = -1
                 ## new stuff
                 self.data.quick_queue.put("~")
-                self.data.ui_queue1.put("Action", "setAsPause", "")
+                self.data.ui_queue1.put("Action", "setAsResume", "")
                 ## end new stuff
 
             # put gcode home shift here
