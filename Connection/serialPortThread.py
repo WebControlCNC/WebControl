@@ -348,7 +348,7 @@ class SerialPortThread(MakesmithInitFuncs):
         # Return the index of the last digit of the number beginning at the index passed in
 
         i = index
-        while i < textString.length():
+        while i < len(textString):
             if textString[i].isdigit() or textString[i] == '.':
                 i = i+1
             else:
