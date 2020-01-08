@@ -293,8 +293,8 @@ class Actions(MakesmithInitFuncs):
                 scaleFactor = 1.0
             # if posX and posY have values, use them, else use the sled's position.
             if posX != "" and posY != "":
-                homeX = posX * scaleFactor
-                homeY = posY * scaleFactor
+                homeX = round(posX * scaleFactor, 4)
+                homeY = round(posY * scaleFactor, 4)
             else:
                 homeX = round(self.data.xval, 4)
                 homeY = round(self.data.yval, 4)
