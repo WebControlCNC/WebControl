@@ -70,6 +70,7 @@ class Data:
     units = "MM"
     tolerance = 0.5
     gcodeShift = [0.0, 0.0]  # the amount that the gcode has been shifted
+    currentTool = 0  # current tool.. upon startup, 0 is the same value as what the controller would have.
     message = ""  # used to update the client
     logger = Logger()  # the module which records the machines behavior to review later
     config = Config()

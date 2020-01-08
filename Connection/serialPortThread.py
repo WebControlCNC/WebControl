@@ -115,13 +115,25 @@ class SerialPortThread(MakesmithInitFuncs):
             line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
             # check if command is going to be issued that pauses the controller.
             if line.find("M0") != -1 or line.find("M1") != -1 or line.find("M6") != -1:
-                # set uploadFlag to -1 to turn off sending more lines (after this one)
-                # -1 means it was set by an M command
-                print("found M command")
-                self.data.uploadFlag = -1
+                # if this is a different tool, the controller will respond with a 'Tool Change:' and pause.
+                # if this is a the same tool as the controller is currently tracking, it will continue on.
+                # first, determine the tool being called for...
+                toolNumber = self.extractGcodeValue(line,'T', 0)
+                # so, in the first case...
+                if toolNumber != self.data.currentTool:
+                    # set uploadFlag to -1 to turn off sending more lines (after this one)
+                    # -1 means it was set by an M command
+                    print("found M command")
+                    self.data.uploadFlag = -1
+                    self.data.currentTool = toolNumber
+                    # now, the issue is that if the controller gets reset, then the tool number will revert to 0.. so
+                    # on serial port connect/reconnect, reinitialize tool number to 0
+
+                # but in the second case, just continue on..
+
                 ## new stuff
-                self.data.quick_queue.put("~")
-                self.data.ui_queue1.put("Action", "setAsResume", "")
+                #self.data.quick_queue.put("~")
+                #self.data.ui_queue1.put("Action", "setAsResume", "")
                 ## end new stuff
 
             # put gcode home shift here
@@ -178,8 +190,9 @@ class SerialPortThread(MakesmithInitFuncs):
         weAreBufferingLines = bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
 
         try:
-            self.data.console_queue.put("connecting")
             self.data.comport = self.data.config.getValue("Maslow Settings", "COMport")
+            connectMessage = "Trying to connect to controller on " +self.data.comport
+            self.data.console_queue.put(connectMessage)
             self.serialInstance = serial.Serial(
                 self.data.comport, 57600, timeout=0.25
             )  # self.data.comport is the com port which is opened
@@ -205,6 +218,7 @@ class SerialPortThread(MakesmithInitFuncs):
             self._getFirmwareVersion()
             self._setupMachineUnits()
             self._requestSettingsUpdate()
+            self.data.currentTool = 0  # This is necessary since the controller will have reset tool to zero.
 
             while True:
 
@@ -314,3 +328,30 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.serialInstance.close()
 
                 time.sleep(0.01)
+
+    def extractGcodeValue(self, readString, target, defaultReturn):
+        # Reads a string and returns the value of number following the target character.
+        # if no number is found, defaultReturn is returned
+
+        begin = readString.indexOf(target)
+        end = self.findEndOfNumber(readString, begin + 1)
+        numberAsString = readString.substring(begin + 1, end)
+
+        numberAsFloat = numberAsString.toFloat()
+
+        if begin == -1:
+            return defaultReturn
+        else:
+            return numberAsFloat
+
+    def findEndOfNumber(self, textString, index):
+        # Return the index of the last digit of the number beginning at the index passed in
+
+        i = index
+        while i < textString.length():
+            if textString[i].isdigit() or textString[i] == '.':
+                i = i+1
+            else:
+                return i
+        return i
+
