@@ -335,7 +335,7 @@ class SerialPortThread(MakesmithInitFuncs):
 
         begin = readString.find(target)
         end = self.findEndOfNumber(readString, begin + 1)
-        numberAsString = readString[begin + 1, end]
+        numberAsString = readString[begin + 1: end]
 
         numberAsFloat = float(numberAsString.toFloat)
 
@@ -350,7 +350,7 @@ class SerialPortThread(MakesmithInitFuncs):
         i = index
         while i < len(textString):
             if textString[i].isdigit() or textString[i] == '.':
-                i = i+1
+                i = i + 1
             else:
                 return i
         return i
