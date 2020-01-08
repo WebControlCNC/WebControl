@@ -35,12 +35,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "stopZ":
                 if not self.stopZ():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with stopping Z-Axis movement")
-            elif msg["data"]["command"] == "startRun":
-                if not self.startRun():
-                    if len(self.data.gcode) > 0:
-                        self.data.ui_queue1.put("Alert", "Alert", "Error with starting run.")
-                    else:
-                        self.data.ui_queue1.put("Alert", "Alert", "No GCode file loaded.")
             elif msg["data"]["command"] == "stopRun":
                 if not self.stopRun():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with stopping run")
@@ -67,6 +61,12 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
             # Commands not allowed during sending gcode.. if you did these commands, something could screw up.
             # If uploadFlag was enabled (see above) then this would never be reached.
+            elif msg["data"]["command"] == "startRun":
+                if not self.startRun():
+                    if len(self.data.gcode) > 0:
+                        self.data.ui_queue1.put("Alert", "Alert", "Error with starting run.")
+                    else:
+                        self.data.ui_queue1.put("Alert", "Alert", "No GCode file loaded.")
             elif msg["data"]["command"] == "update":
                 if not self.data.releaseManager.update(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating webcontrol.")
