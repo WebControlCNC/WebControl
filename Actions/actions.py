@@ -441,6 +441,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             # TODO: app.onUploadFlagChange(self.stopRun, 0) edit: not sure this is needed anymore
             self.data.console_queue.put("Gcode stopped")
+            self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
             return True
