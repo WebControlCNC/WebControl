@@ -1552,9 +1552,11 @@ class Actions(MakesmithInitFuncs):
                                 dwell = line[4:]
                             if line.find("F") != -1:
                                 _feedRate = re.search("F(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
-                                zAxisFeedRate = float(_feedRate)
+                                _feedRateFloat = _feedRate.groups()[0]
                                 if line.find("X") != -1 or line.find("Y") == -1:
-                                    xyAxisFeedRate = float(_feedRate)
+                                    xyAxisFeedRate = _feedRateFloat
+                                if line.find("Z") != -1:
+                                    zAxisFeedRate = _feedRateFloat
                         if line[0] == 'M':
                             if line.find("M3") != -1 or line.find("M03") != -1:
                                 spindle = "M3 "
