@@ -1470,6 +1470,8 @@ class Actions(MakesmithInitFuncs):
         positioning (G90/G91), imperial/metric units (G20/G21) and x, y and z positions
         '''
         zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings", "zAxisSafeHeight"))
+        zAxisFeedRate = 12.8  # currently hardcoded, but Todo: Add setting
+        xyAxisFeedRate = float(self.data.config.getValue("Advanced Settings", "maxFeedrate"))
         positioning = "G90 "
         units = "G20 "
         homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
@@ -1548,6 +1550,11 @@ class Actions(MakesmithInitFuncs):
                                 dwell = line[3:]
                             if line.find("G04") != -1:
                                 dwell = line[4:]
+                            if line.find("F") != -1:
+                                _feedRate = re.search("F(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                                zAxisFeedRate = float(_feedRate)
+                                if line.find("X") != -1 or line.find("Y") == -1:
+                                    xyAxisFeedRate = float(_feedRate)
                         if line[0] == 'M':
                             if line.find("M3") != -1 or line.find("M03") != -1:
                                 spindle = "M3 "
@@ -1581,9 +1588,9 @@ class Actions(MakesmithInitFuncs):
         '''
         # move the Z-axis to the safe height
         print("moving to safe height as part of processgcode")
-        self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight, 4))+" ")
+        self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight, 4))+" F"+str(round(zAxisFeedRate, 4)))
         # move the sled to the x, y coordinate it is supposed to be.
-        self.data.gcode_queue.put("G0 X"+str(round(xpos, 4))+" Y"+str(round(ypos, 4))+" ")
+        self.data.gcode_queue.put("G0 X"+str(round(xpos, 4))+" Y"+str(round(ypos, 4))+" F"+str(round(xyAxisFeedRate, 4)))
         # if there is a tool, then send tool change command.
         if tool is not None:
             self.data.gcode_queue.put("T"+tool+" M6 ")
