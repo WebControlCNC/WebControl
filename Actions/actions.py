@@ -1552,7 +1552,7 @@ class Actions(MakesmithInitFuncs):
                                 dwell = line[4:]
                             if line.find("F") != -1:
                                 _feedRate = re.search("F(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
-                                _feedRateFloat = _feedRate.groups()[0]
+                                _feedRateFloat = float(_feedRate.groups()[0])
                                 if line.find("X") != -1 or line.find("Y") == -1:
                                     xyAxisFeedRate = _feedRateFloat
                                 if line.find("Z") != -1:
