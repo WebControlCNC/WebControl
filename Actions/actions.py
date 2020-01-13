@@ -164,40 +164,54 @@ class Actions(MakesmithInitFuncs):
                 if not self.macro(2):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
             elif msg["data"]["command"] == "optical_onStart":
-                if not self.data.opticalCalibration.on_Start():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
+                pass
+                #if not self.data.opticalCalibration.on_Start():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
             elif msg["data"]["command"] == "optical_Calibrate":
-                if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
+                pass
+                #if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
             elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
-                if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving optical calibration configuration")
+                pass
+                #if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving optical calibration configuration")
             elif msg["data"]["command"] == "stopOpticalCalibration":
-                if not self.data.opticalCalibration.stopOpticalCalibration():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping optical calibration.")
+                pass
+                #if not self.data.opticalCalibration.stopOpticalCalibration():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping optical calibration.")
             elif msg["data"]["command"] == "testOpticalCalibration":
-                if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with test image.")
+                pass
+                #if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with test image.")
             elif msg["data"]["command"] == "findCenterOpticalCalibration":
-                if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with find Center.")
+                pass
+                #if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with find Center.")
             elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
-                if not self.data.opticalCalibration.saveAndSend():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving and sending calibration matrix.")
+                pass
+                #if not self.data.opticalCalibration.saveAndSend():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving and sending calibration matrix.")
             elif msg["data"]["command"] == "reloadCalibration":
+                pass
+                '''
                 errorX, errorY, curveX, curveY = self.data.opticalCalibration.reloadCalibration()
                 if errorX is None or errorY is None or curveX is None or curveY is None:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with (re)loading calibration.")
                 else:
                     data = {"errorX": errorX, "errorY": errorY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
+                '''
             elif msg["data"]["command"] == "saveCalibrationToCSV":
-                if not self.data.opticalCalibration.saveCalibrationToCSV():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving calibration to CSV.")
+                pass
+                #if not self.data.opticalCalibration.saveCalibrationToCSV():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving calibration to CSV.")
             elif msg["data"]["command"] == "clearCalibration":
-                if not self.data.opticalCalibration.clearCalibration():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with clearing calibration.")
+                pass
+                #if not self.data.opticalCalibration.clearCalibration():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with clearing calibration.")
             elif msg["data"]["command"] == "curveFitOpticalCalibration":
+                pass
+                '''
                 curveX, curveY = self.data.opticalCalibration.surfaceFit()
                 #curveX, curveY = self.data.opticalCalibration.polySurfaceFit()
                 if curveX is None or curveY is None:
@@ -205,6 +219,7 @@ class Actions(MakesmithInitFuncs):
                 else:
                     data = {"curveX": curveX, "curveY": curveY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationCurve", data)
+                '''
             elif msg["data"]["command"] == "adjustCenter":
                 if not self.adjustCenter(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting center.")
@@ -1204,20 +1219,20 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def testImage(self):
-        '''
-        Calls function to send the test image from optical calibration
-        Todo: move to processAction
-        :return:
-        '''
+        #
+        #Calls function to send the test image from optical calibration
+        #Todo: move to processAction
+        #:return:
+        #
         try:
             self.data.opticalCalibration.testImage()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def adjustCenter(self, dist):
         '''
         Used in optical calibration to allow user to raise/lower the center point and then move there.

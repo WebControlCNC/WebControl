@@ -294,26 +294,6 @@ class WebPageProcessor:
                 chainSagCorrection=chainSagCorrection,
             )
             return page, "Triangular Calibration", True, "medium", "content", False
-        elif pageID == "opticalCalibration":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
-            opticalCenterY = self.data.config.getValue("Optical Calibration Settings", "opticalCenterY")
-            scaleX = self.data.config.getValue("Optical Calibration Settings", "scaleX")
-            scaleY = self.data.config.getValue("Optical Calibration Settings", "scaleY")
-            gaussianBlurValue = self.data.config.getValue("Optical Calibration Settings", "gaussianBlurValue")
-            cannyLowValue = self.data.config.getValue("Optical Calibration Settings", "cannyLowValue")
-            cannyHighValue = self.data.config.getValue("Optical Calibration Settings", "cannyHighValue")
-            autoScanDirection = self.data.config.getValue("Optical Calibration Settings", "autoScanDirection")
-            markerX = self.data.config.getValue("Optical Calibration Settings", "markerX")
-            markerY = self.data.config.getValue("Optical Calibration Settings", "markerY")
-            tlX = self.data.config.getValue("Optical Calibration Settings", "tlX")
-            tlY = self.data.config.getValue("Optical Calibration Settings", "tlY")
-            brX = self.data.config.getValue("Optical Calibration Settings", "brX")
-            brY = self.data.config.getValue("Optical Calibration Settings", "brY")
-            calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
-            positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
-            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
-            return page, "Optical Calibration", True, "large", "content", False
         elif pageID == "holeyCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -675,3 +655,27 @@ class WebPageProcessor:
             return link
 
         return link
+
+
+    '''
+    elif pageID == "opticalCalibration":
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
+            opticalCenterY = self.data.config.getValue("Optical Calibration Settings", "opticalCenterY")
+            scaleX = self.data.config.getValue("Optical Calibration Settings", "scaleX")
+            scaleY = self.data.config.getValue("Optical Calibration Settings", "scaleY")
+            gaussianBlurValue = self.data.config.getValue("Optical Calibration Settings", "gaussianBlurValue")
+            cannyLowValue = self.data.config.getValue("Optical Calibration Settings", "cannyLowValue")
+            cannyHighValue = self.data.config.getValue("Optical Calibration Settings", "cannyHighValue")
+            autoScanDirection = self.data.config.getValue("Optical Calibration Settings", "autoScanDirection")
+            markerX = self.data.config.getValue("Optical Calibration Settings", "markerX")
+            markerY = self.data.config.getValue("Optical Calibration Settings", "markerY")
+            tlX = self.data.config.getValue("Optical Calibration Settings", "tlX")
+            tlY = self.data.config.getValue("Optical Calibration Settings", "tlY")
+            brX = self.data.config.getValue("Optical Calibration Settings", "brX")
+            brY = self.data.config.getValue("Optical Calibration Settings", "brY")
+            calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
+            positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
+            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
+            return page, "Optical Calibration", True, "large", "content", False
+    '''
