@@ -116,6 +116,9 @@ class Data:
     continuousCamera = False
     gpioActions = None
     boardManager = None
+    wiiPendant = None
+    wiiPendantThread = None
+    wiiPendantConnected = False #just added these...
 
     """
 

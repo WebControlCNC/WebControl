@@ -37,25 +37,29 @@ class WiiPendant(MakesmithInitFuncs):
  '''
  wiiPendantRequest = ""
  wm = None
-
+ debug = True
+ 
  def setup(self):
     """
        try every 5 seconds to connect if the wiimote is an option
     """
     
     if self.data.wiiPendantPresent:
-      print("scheduling connection attempt every 10 seconds")
+      if debug:
+          print("scheduling connection attempt every 10 seconds")
       schedule.every(10).seconds.do(self.openConnection)
     else:
       #nothing to do
-      print("wii pendant not selected in maslow settings")
+      if debug:
+            print("wii pendant not selected in maslow settings")
       self.wiiPendantRequest = "Not Present"
 
  def connect(self, *args):
     """
         copied from serial port connect routing to being connecting  - may not be needed
     """
-    print("test connect ... need to open connection")
+    if debug:
+          print("test connect ... need to open connection")
     self.data.config.setValue("Makesmith Settings","wiiPendantPresent",str(self.data.wiiPendant))
 
  def openConnection(self):
@@ -63,17 +67,22 @@ class WiiPendant(MakesmithInitFuncs):
        if the wiiPendantFlag in the config is True, then check if the wiiPendant is already connected
        if not connected, then set t
     '''
-    print("is wii pendant selected?")
+    if self.debug:
+        print("is wii pendant selected?")
     if self.data.wiiPendantPresent:
-      print("yes, it is selected")
-      print("is the pendant actually connected?")
+      if self.debug:
+            print("yes, it is selected")
+            print("is the pendant actually connected?")
       if not self.data.wiiPendantConnected:
-            print("no it is not connected")
-            print("is the wiimote object instantiated")
+            if self.debug:
+                  print("no it is not connected")
+                  print("is the wiimote object instantiated")
             if self.wm == None:
-              print("no, it is not instantiated")
+              if self.debug:
+                    print("no, it is not instantiated")
               while not self.wm:
-               print("trying to connect")
+               if self.debug:
+                   print("trying to connect")
                try:
                  self.wm=cwiid.Wiimote()
                  self.wm.rumble=True
