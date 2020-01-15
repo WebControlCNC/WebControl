@@ -117,7 +117,7 @@ settings = {
             "title": "Wii Pendant Installed",
             "desc": "Wii controller connected via Bluetooth",
             "key": "wiiPendantPresent",
-            "default": False,
+            "default": 0,
         },
         {
             "type": "options",

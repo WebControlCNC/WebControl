@@ -46,7 +46,7 @@ class Data:
     pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
-
+ 
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used
