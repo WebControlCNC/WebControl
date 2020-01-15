@@ -113,6 +113,13 @@ settings = {
             "firmwareKey": 19,
         },
         {
+            "type": "bool",
+            "title": "Wii Pendant Installed",
+            "desc": "Wii controller connected via Bluetooth",
+            "key": "wiiPendantPresent",
+            "default": False,
+        },
+        {
             "type": "options",
             "title": "Color Scheme",
             "desc": "Switch between the light and dark color schemes. Restarting GC is needed for this change to take effect",
