@@ -38,21 +38,23 @@ class WiiPendant(MakesmithInitFuncs):
  wiiPendantRequest = ""
  wm = None
  debug = True
+ th = None
  
  def setup(self):
     """
        try every 5 seconds to connect if the wiimote is an option
     """
+    self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
     
-    if self.data.wiiPendantPresent:
+    #if self.data.wiiPendantPresent:
       if debug:
           print("scheduling connection attempt every 10 seconds")
       schedule.every(10).seconds.do(self.openConnection)
-    else:
+    #else:
       #nothing to do
       if debug:
             print("wii pendant not selected in maslow settings")
-      self.wiiPendantRequest = "Not Present"
+      #self.wiiPendantRequest = "Not Present"
 
  def connect(self, *args):
     """
@@ -98,7 +100,7 @@ class WiiPendant(MakesmithInitFuncs):
                  self.th.daemon = True
                  self.th.start()
 
-   #          self.wm.led.battery = 1  # this should show the battery power with the LED's when it connects...
+    #          self.wm.led.battery = 1  # this should show the battery power with the LED's when it connects...
         #  return(True)
                except RuntimeError:
                  '''
@@ -113,7 +115,10 @@ class WiiPendant(MakesmithInitFuncs):
             #self.data.ui_queue1.put("Action", "wiiPendantConnected",{'status': 'False'})
       else:
             self.data.ui_queue1.put("Action", "connectionStatus",{'status': 'True'})
-
+    else:
+        if self.th != None:
+                self.th.stop()
+          
  def closeConnection(self):
         '''
            tell wiiPendant to shut down
