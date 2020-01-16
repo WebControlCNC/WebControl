@@ -412,6 +412,7 @@ class Actions(MakesmithInitFuncs):
                 else:
                     print("h6")
                     self.data.uploadFlag = 1
+                self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
             else:
                 return False
@@ -444,6 +445,7 @@ class Actions(MakesmithInitFuncs):
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
+            self.data.gpioActions.causeAction("StopLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -533,6 +535,7 @@ class Actions(MakesmithInitFuncs):
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
                 self.data.pausedzval = self.data.zval
+                self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -578,6 +581,7 @@ class Actions(MakesmithInitFuncs):
             # needed only if user initiated pause, but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
+            self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))

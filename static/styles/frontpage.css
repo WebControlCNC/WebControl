@@ -161,3 +161,6 @@ html, body{
 #pauseButton {
 	color: #fff;
 }
+
+#controllerMessage { overflow-wrap: anywhere; }
+

@@ -6,11 +6,76 @@ WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https:
 
 ## Notice
 
-I will be moving all releases to a pyinstaller created executable, including for the Raspberry Pi.  I've got to sort out a way to manage upgrading/updating the software, so I will continue to build docker images for the Raspberry Pi's until I do.
+I'm having serious issues with building the docker files.  Unless I can overcome those issues, there won't be any more docker updates.  Therefore, I'm updating this section to put the pyinstall version usage up front...
 
-See details near the end of this page on using the pyinstaller version for Windows, linux, and Raspberry Pi
+## Getting Started for Raspberry PI (Recommended Pyinstaller Release Instructions)
 
-## Getting Started for Raspberry Pi
+For Windows 10 and Linux (Debian-based, such as Ubuntu) machines, users can download the latest single-file release, extract it, and run webcontrol.  As a single-file release, it is completely portable and does not require an installation.  The file unpacks itself into a temporary directory and runs.  If you have a very slow computer, it might take a while to unpack.  In that case, it is recommended to use the single-directory release which extracts into a single directory containing unpacked files.  Startup is much quicker using single-directory releases versus a single-file release.  For RPI, the single-file release is just way to slow, so I don't build it.
+
+**Note, for linux/RPI users, it will extract directly into the directory you are currently in.**  
+
+For Linux/RPI users, make a new subdirectory,and then issue the untar:
+
+>mkdir webcontrol</br>
+cd webcontrol</br>
+tar -zxvf ..\webcontrol-x.xxx-linux-singledirectory.tar.gz</br>
+
+where x.xxx is the release version.
+
+For Windows users, just extract the zip file as is.
+
+Check out the release page at:
+
+https://github.com/madgrizzle/WebControl/releases
+
+
+## Getting WebControl to Run Upon Startup on RPI (## NOT FULLY VETTED ##)
+
+Here's tentative instructions on how to get webcontrol to run on startup (from kayaker37 on forum).. This assumes you extracted webcontrol into a subdirectory called webcontrol:
+
+>cd ~</br>
+>mkdir webcontrol</br>
+>cd webcontrol</br>
+>wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz
+>tar -zxvf ..\webcontrol-0.920-linux-singledirectory.tar.gz</br>
+
+Change 0.920 to the lastest release if you want.
+
+>nano webcontrol.service
+
+type the following:
+
+>[Unit]</br>
+>Description=WebControl</br>
+>After=network.target</br>
+></br>
+>[Service]</br>
+>ExecStart=/home/pi/webcontrol/webcontrol</br>
+>WorkingDirectory=/home/pi/webcontrol</br>
+>StandardOutput=inherit</br>
+>StandardError=inherit</br>
+>Restart=always</br>
+>User=pi</br>
+></br>
+>[Install]</br>
+>WantedBy=multi-user.target</br>
+
+Save file using Ctrl-X/Yes
+
+>sudo cp webcontrol.service /etc/systemd/system
+
+Test with the following:
+
+>sudo systemctl start webcontrol.service
+
+Try to reach webcontrol using your browser and if it works, then type:
+
+>sudo systemctl enable webcontrol.service
+
+see for more details:
+https://www.raspberrypi.org/documentation/linux/usage/systemd.md 
+
+## Getting Started for Raspberry Pi  (Deprecated Docker.. Please do not use)
 
 These instructions are based upon using a Raspberry Pi (RPi) for running WebControl.  WebControl should be able to be run on any computer capable of running Python 3.  
 
@@ -80,31 +145,13 @@ docker pull madgrizzle/webcontrol
 docker run -it -v $HOME/.WebControl:/root/.WebControl -p 5000:5000 --privileged madgrizzle/webcontrol python main.py
 ```
 
-## Alternative Installations
-
-### Windows 10 and Linux Single-File Releases
-
-For Windows 10 and Linux (Debian-based, such as Ubuntu) machines, users can download the latest single-file release, extract it, and run webcontrol.  As a single-file release, it is completely portable and does not require an installation.  The file unpacks itself into a temporary directory and runs.  If you have a very slow computer, it might take a while to unpack.  In that case, it is recommended to use the single-directory release which extracts into a single directory containing unpacked files.  Startup is much quicker using single-directory releases versus a single-file release.
-
-Check out the release page at:
-
-https://github.com/madgrizzle/WebControl/releases
-
-### Raspberry Pi (3B+ & Zero W)
-
-For Raspberry Pi's, single-directory releases are your best option.  It can take up to a minute to unpack a single-file release on a Raspberry Pi 3B+.  Single-directory releases unpack the files into the directory so startup is much quicker.  Both the Raspberry Pi 3B+ and Zero W have been tested to work with webcontrol.  Other versions likely would also.  I recommend the 3B+ if you are trying to decide.
-
-Check out the release page at:
-
-https://github.com/madgrizzle/WebControl/releases
-
 ## Built With
 
 * [Flask](http://flask.pocoo.org/) - The web framework used
 * [Flask-Socketio](https://github.com/miguelgrinberg/Flask-SocketIO) - Websocket integration for communications with browser clients
 * [Bootstrap4](https://getbootstrap.com/) - Front-end component library
 * [Jinja2](http://jinja.pocoo.org/) - Template engine for web page generation
-* [Feather.js](https://feathersjs.com/) - Only icon library I could find that had diagonal arrows.. works well to boot.
+* [Feather.js](https://feathericons.com/) - Only icon library I could find that had diagonal arrows.. works well to boot.
 * [OpenCV](https://github.com/skvark/opencv-python) - Library for computer vision to implement optical calibration
 * [Numpy](http://www.numpy.org) - Library for math routines used with optical calibration
 * [Scipy](http://www.scipy.org) - Another library for math routines used with optical calibration
