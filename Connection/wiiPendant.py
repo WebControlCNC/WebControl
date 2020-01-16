@@ -74,7 +74,7 @@ class WiiPendant(MakesmithInitFuncs):
     if self.data.wiiPendantPresent:
       if self.debug:
             print("yes, it is selected")
-            print("is the pendant actually connected?")
+            print("is the pendant actually running?")
       if not self.data.wiiPendantConnected:
             if self.debug:
                   print("no it is not connected")
@@ -82,23 +82,25 @@ class WiiPendant(MakesmithInitFuncs):
             if self.wm == None:
               if self.debug:
                     print("no, it is not instantiated")
-              while not self.wm:
-               if self.debug:
-                   print("trying to connect")
-               try:
-                 self.wm=cwiid.Wiimote()
-                 self.wm.rumble=True
-                 time.sleep(.3)
-                 self.wm.rumble = False
-                 time.sleep(0.2)
-                 self.wm.rumble=True
-                 time.sleep(.3)
-                 self.wm.rumble = False
-                 x = wiiPendantThread()
-                 x.data = self.data
-                 self.th = threading.Thread(target=x.readbuttons)
+              #while not self.wm:
+               #if self.debug:
+              #     print("trying to connect")
+               #try:
+                 #self.wm=cwiid.Wiimote()
+                 #wm.rpt_mode = cwiiid.RPT_BTN
+                 #self.wm.rumble=True
+                 #time.sleep(.3)
+                 #self.wm.rumble = False
+                 #time.sleep(0.2)
+                 #self.wm.rumble=True
+                 #time.sleep(.3)
+                 #self.wm.rumble = False
+                 self.data.wiiPendantThread = self.WiiPendantThread()
+                 self.data.wiiPendantThread.data = self.data
+                 self.th = threading.Thread(target=self.data.wiiPendantThread.readbuttons)
                  self.th.daemon = True
                  self.th.start()
+                 self.data.wiiPendantConnected = True
 
     #          self.wm.led.battery = 1  # this should show the battery power with the LED's when it connects...
         #  return(True)

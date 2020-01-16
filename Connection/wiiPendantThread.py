@@ -68,21 +68,27 @@ class WiiPendantThread(MakesmithInitFuncs):
 #end rumble
 
  def read_buttons(self):
+  
   while True:
     time.sleep(0.01)
     if self.data.wiiPendantPresent == False:
+          self.data.wiiPendantConnected = False
           break
     if self.wm == None: 
         #i=2
       while not self.wm:
         try:
           self.wm=cwiid.Wiimote()
+          wm.rpt_mode = cwiiid.RPT_BTN
           #          self.wm.led.battery = 1  # this should show the battery power with the LED's when it connects...
           #  return(True)
         except RuntimeError:
           '''
             this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
           '''
+          self.data.wiiPendantConnected = False
+          self.wm = None
+          break
           #  if (i>10):
           #    return(false)
           #  print ("Error opening wiimote connection" )
