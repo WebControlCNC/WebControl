@@ -208,6 +208,6 @@ class WiiPendantThread(MakesmithInitFuncs):
           self.wm.led = self.L[self.LED_ON]
       else:
         self.PLUS = 0
-
+  thread.exit()
   #end button scan
 #END class
