@@ -104,7 +104,7 @@ https://github.com/madgrizzle/WebControl/releases
 * [Flask-Socketio](https://github.com/miguelgrinberg/Flask-SocketIO) - Websocket integration for communications with browser clients
 * [Bootstrap4](https://getbootstrap.com/) - Front-end component library
 * [Jinja2](http://jinja.pocoo.org/) - Template engine for web page generation
-* [Feather.js](https://github.com/feathericons/feather/) - Only icon library I could find that had diagonal arrows.. works well to boot.
+* [Feather.js](https://feathericons.com/) - Only icon library I could find that had diagonal arrows.. works well to boot.
 * [OpenCV](https://github.com/skvark/opencv-python) - Library for computer vision to implement optical calibration
 * [Numpy](http://www.numpy.org) - Library for math routines used with optical calibration
 * [Scipy](http://www.scipy.org) - Another library for math routines used with optical calibration
