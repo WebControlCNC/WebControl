@@ -70,9 +70,8 @@ class GPIOActions(MakesmithInitFuncs):
             return "led", None
 
     def causeAction(self, action, onoff):
-        foundLED = None
         for led in self.LEDs:
-            if led[0].action == action:
+            if led[0] == action:
                 if onoff == "on":
                     led[1].on()
                 else:
