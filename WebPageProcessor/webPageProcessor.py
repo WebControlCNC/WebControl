@@ -127,7 +127,7 @@ class WebPageProcessor:
                 enableCustom = False
             else:
                 enableCustom = True
-            options = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center"]
+            options = self.data.gpioActions.getActionList()
             if isMobile:
                 page = render_template(
                     "gpio_mobile.html",

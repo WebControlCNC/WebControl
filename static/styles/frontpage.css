@@ -143,3 +143,4 @@ html, body{
   100% { background-color: #B20000; box-shadow: 0 0 3px #B20000; }
 }
 
+#controllerMessage { overflow-wrap: anywhere; }
