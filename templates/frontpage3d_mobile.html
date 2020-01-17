@@ -11,90 +11,89 @@
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018r') }}" crossorigin="anonymous"></script>
-<script> feather.replace() </script>
+  <script>feather.replace()</script>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-  <h3>Controls</h3>
-  <div class="row">
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','upLeft',$('#distToMove').val())">
-        <i data-feather="arrow-up-left"></i>
-      </button>
+  <div class="controls">
+    <h3>Controls</h3>
+    <div class="row">
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','upLeft',$('#distToMove').val())">
+          <i data-feather="arrow-up-left"></i>
+        </button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','up',$('#distToMove').val())">
+          <i data-feather="arrow-up"></i>
+        </button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','upRight',$('#distToMove').val())">
+          <i data-feather="arrow-up-right"></i>
+        </button>
+      </div>
     </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','up',$('#distToMove').val())";>
-        <i data-feather="arrow-up"></i>
-      </button>
+    <div class="row">
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','left',$('#distToMove').val())">
+          <i data-feather="arrow-left"></i>
+        </button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('home')">
+          <i data-feather="home"></i>
+        </button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','right',$('#distToMove').val())">
+          <i data-feather="arrow-right"></i>
+        </button>
+      </div>
     </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','upRight',$('#distToMove').val())">
-        <i data-feather="arrow-up-right"></i>
-      </button>
+    <div class="row">
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())">
+          <i data-feather="arrow-down-left"></i>
+        </button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())">
+          <i data-feather="arrow-down"></i>
+        </button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','downRight',$('#distToMove').val())">
+          <i data-feather="arrow-down-right"></i>
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','left',$('#distToMove').val())">
-        <i data-feather="arrow-left"></i>
-      </button>
+    <div class="row">
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro1')" >Macro1</button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro2')" >Macro2</button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="requestPage('zAxis')">ZAxis</button>
+      </div>
     </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('home')">
-        <i data-feather="home"></i>
-      </button>
-    </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','right',$('#distToMove').val())">
-        <i data-feather="arrow-right"></i>
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())">
-        <i data-feather="arrow-down-left"></i>
-      </button>
-    </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())">
-        <i data-feather="arrow-down"></i>
-      </button>
-    </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','downRight',$('#distToMove').val())">
-        <i data-feather="arrow-down-right"></i>
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro1')" >Macro1</button>
-    </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro2')" >Macro2</button>
-    </div>
-    <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-5  mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('defineHome')" >Def. Home</button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-3  mb-1">
-      <label>Dist To Move</label>
-    </div>
-    <div class="col-4  mb-1">
-      <input class="form-control" type="number" id="distToMove" value="0.01">
-    </div>
-    <div class="col-4  mb-1">
-      <button id="units" type="button" class="btn btn-lg btn-secondary" onclick="unitSwitch();">--</button>
+    <div class="row">
+      <div class="col-4  mb-1">
+        <input class="form-control" type="number" id="distToMove" value="0.01">
+      </div>
+      <div class="col-4  mb-1">
+        <button id="units" type="button" class="btn btn-lg btn-secondary" onclick="unitSwitch()">--</button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('defineHome')" >
+        <i data-feather="save">Def.</i> <i data-feather="home">Home</i></button>
+      </div>
     </div>
   </div>
+
   <div class="row">
     <div class="col mb-1">
       <div id="alerts" class="alert alert-success alert-dismissible col-md-12">No alerts</div>
@@ -112,29 +111,29 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-2  mb-1">
+    <div class="col-3  mb-1">
       <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeZ',-1);">&lt;Z</button>
     </div>
-    <div class="col-2  mb-1">
+    <div class="col-3  mb-1">
       <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeIndex',-1);">&lt;1</button>
     </div>
-    <div class="col-2  mb-1">
+    <div class="col-3  mb-1">
       <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeIndex',1);">1&gt;</button>
     </div>
-    <div class="col-2  mb-1">
+    <div class="col-3  mb-1">
       <button type="button" class="btn btn-md btn-block btn-secondary" onclick="action('moveGcodeZ',1);">Z&gt;</button>
     </div>
   </div>
   
   <div class="row align-items-center">
-      <div class="col-3 mb-1">
+      <div class="col-4 mb-1">
         <h5>Line #:</h5>
       </div>
       <div class="col-4 mb-1">
         <input class="form-control" type="number" step="any"  id="gcodeLineIndex" value="1">
       </div>
-      <div class="col-3 mb-1">
-        <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeGoto',$('#gcodeLineIndex').val()-1);")>Goto</button>
+      <div class="col-4 mb-1">
+        <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeGoto',$('#gcodeLineIndex').val()-1)">Goto</button>
       </div>
   </div>
   <div class="row">
@@ -147,7 +146,7 @@
   </div>  
   <div class="row">
     <div class="col-3  mb-1">
-      <h5>Position</h5>
+      <h5>Position:</h5>
     </div>
     <div class="col-9  mb-1">
       <div id='positionMessage'></div>
@@ -205,7 +204,7 @@
   <div id="workarea" class="row" style="height:400px">
   </div>
   <div class="col-3 mb-1">
-    <button id="videoStatus" type="button" class="btn btn-block btn-secondary" onclick="action('toggleCamera');")><i data-feather="video-off"></i></button>
+    <button id="videoStatus" type="button" class="btn btn-block btn-secondary" onclick="action('toggleCamera')"><i data-feather="video-off"></i></button>
   </div>
   <div id="mobileCameraArea" class="row" style="height:200px" style="display:none">
     <div class="col">
@@ -224,14 +223,13 @@
     </div>
   </div>
   <div class="row">
-      <div class="col mb-1">
-        <h3>Controller Messages</h3>
-      </div>
+    <div class="col mb-1">
+      <h3>Controller Messages</h3>
     </div>
-    <div class="row">
-      <div class="col mb-1">
-        <div class="scrollTextMobile" id='controllerMessage'></div>
-      </div>
+  </div>
+  <div class="row">
+    <div class="col mb-1">
+      <div class="scrollTextMobile" id='controllerMessage'></div>
     </div>
   </div>
 </div>

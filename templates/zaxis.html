@@ -11,7 +11,7 @@
           <button id="unitsZ" type="button" class="btn  btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">{{unitsZ}}</button>
         </div>
         <div class="col-4 mb-1">
-          <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('moveZ','raise',$('#distToMoveZ').val())">Raise</button>
+          <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('moveZ','raise',$('#distToMoveZ').val())"><i data-feather="arrow-up">Raise</i></button>
         </div>
       </div>
       <div class="row">
@@ -19,15 +19,15 @@
           <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('touchZ')" {{'' if touchPlate else 'disabled'}} >Touch</button>
         </div>
         <div class="col-4 mb-1">
-          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('defineZ0');">Define Zero</button>
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('defineZ0');"><i data-feather="save">Def.</i> Zero</button>
         </div>
         <div class="col-4 mb-1">
-          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('moveZ','lower',$('#distToMoveZ').val())">Lower</button>
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('moveZ','lower',$('#distToMoveZ').val())"><i data-feather="arrow-down">Lower</i></button>
         </div>
       </div>
     </div>
     <div class="col-3 mb-1">
-      <button type="button" class="btn  btn-lg btn-block btn-danger" style="height:100%" onclick="action('stopZ');">Stop</button>
+      <button type="button" class="btn  btn-lg btn-block btn-danger" style="height:100%" onclick="action('stopZ');"><i data-feather="alert-octagon"></i> Stop</button>
     </div>
   </div>
 </div>
@@ -35,4 +35,6 @@
 
 {% block javascript %}
   <script src="{{ url_for('static',filename='scripts/zAxis.js', version='10262018a') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+  <script> feather.replace() </script>
 {% endblock %}
