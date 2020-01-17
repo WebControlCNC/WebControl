@@ -87,7 +87,6 @@ class Data:
     uploadFlag = 0
     previousUploadStatus = 0
     manualZAxisAdjust = False
-    wiiPendantPresent = False
     # this is used to determine the first time the position is received from the machine
     firstTimePosFlag = 0
     # report if the serial connection is open
@@ -98,6 +97,8 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
+    wiiPendantPresent = False # has user set wiimote as active?
+    wiiPendantConnected = False # is the wiimote BT connected?
 
     """
     Pointers to Objects
@@ -116,10 +117,8 @@ class Data:
     continuousCamera = False
     gpioActions = None
     boardManager = None
-    wiiPendant = None
-    wiiPendantThread = None
-    wiiPendantConnected = False #just added these...
-
+    #wiiPendant = None  #wiiPendantThread = None
+    
     """
 
     Colors

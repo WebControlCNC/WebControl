@@ -27,6 +27,7 @@ class WiiPendantThread(MakesmithInitFuncs):
     self.StartTiime = time.time()
     self.HOME = 0
     self.A = 0
+    self.setUpData
 
  def rumble(self,mode=0):
   '''
@@ -67,7 +68,7 @@ class WiiPendantThread(MakesmithInitFuncs):
 
 #end rumble
 
- def read_buttons(self):
+ def read_buttons(self, data):
   
   while True:
     time.sleep(0.01)
@@ -215,5 +216,12 @@ class WiiPendantThread(MakesmithInitFuncs):
       else:
         self.PLUS = 0
   thread.exit()
+  
+  #def main():
+  #    self.read_buttons()  
+  
+  #if__name__== "__main__":
+  #      main() 
+  
   #end button scan
 #END class

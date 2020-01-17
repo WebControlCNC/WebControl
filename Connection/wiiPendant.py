@@ -1,5 +1,6 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Connection.wiiPendantThread import WiiPendantThread
+#from DataStructures import data
 import schedule
 import threading
 import cwiid
@@ -47,12 +48,12 @@ class WiiPendant(MakesmithInitFuncs):
     self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
     
     #if self.data.wiiPendantPresent:
-      if debug:
+    if self.debug:
           print("scheduling connection attempt every 10 seconds")
-      schedule.every(10).seconds.do(self.openConnection)
+    schedule.every(10).seconds.do(self.openConnection)
     #else:
       #nothing to do
-      if debug:
+    if self.debug:
             print("wii pendant not selected in maslow settings")
       #self.wiiPendantRequest = "Not Present"
 
@@ -60,7 +61,7 @@ class WiiPendant(MakesmithInitFuncs):
     """
         copied from serial port connect routing to being connecting  - may not be needed
     """
-    if debug:
+    if self.debug:
           print("test connect ... need to open connection")
     self.data.config.setValue("Makesmith Settings","wiiPendantPresent",str(self.data.wiiPendant))
 
@@ -70,34 +71,36 @@ class WiiPendant(MakesmithInitFuncs):
        if not connected, then set t
     '''
     if self.debug:
-        print("is wii pendant selected?")
+        print("checking wiimote connection")
     if self.data.wiiPendantPresent:
       if self.debug:
-            print("yes, it is selected")
-            print("is the pendant actually running?")
+            print("User has Activated wiimote in menu")
+            #print("is the pendant actually running?")
       if not self.data.wiiPendantConnected:
             if self.debug:
-                  print("no it is not connected")
-                  print("is the wiimote object instantiated")
+                  print("Wiimote connection flag is false")
+                  #print("is the wiimote object instantiated")
             if self.wm == None:
               if self.debug:
-                    print("no, it is not instantiated")
-              #while not self.wm:
-               #if self.debug:
-              #     print("trying to connect")
-               #try:
-                 #self.wm=cwiid.Wiimote()
-                 #wm.rpt_mode = cwiiid.RPT_BTN
-                 #self.wm.rumble=True
-                 #time.sleep(.3)
-                 #self.wm.rumble = False
-                 #time.sleep(0.2)
-                 #self.wm.rumble=True
-                 #time.sleep(.3)
-                 #self.wm.rumble = False
-                 self.data.wiiPendantThread = self.WiiPendantThread()
-                 self.data.wiiPendantThread.data = self.data
-                 self.th = threading.Thread(target=self.data.wiiPendantThread.readbuttons)
+                    print("wiimote object is empty")
+              while not self.wm:
+               if self.debug:
+                   print("trying to connect")
+               try:
+                 self.wm=cwiid.Wiimote()
+                 wm.rpt_mode = cwiid.RPT_BTN
+                 self.wm.rumble=True
+                 time.sleep(.3)
+                 self.wm.rumble = False
+                 time.sleep(0.2)
+                 self.wm.rumble=True
+                 time.sleep(.3)
+                 self.wm.rumble = False
+                 print("wii connection success, spawning thread")
+                 x = WiiPendantThread()
+                 #x.setUpData(data)
+                 x.data = self.data
+                 self.th = threading.Thread(target=x.read_buttons)
                  self.th.daemon = True
                  self.th.start()
                  self.data.wiiPendantConnected = True
@@ -108,6 +111,8 @@ class WiiPendant(MakesmithInitFuncs):
                  '''
                  this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
                  '''
+                 print("wiimote connection error")
+                 #th.join()
         #  if (i>10):
         #    return(false)
         #  print ("Error opening wiimote connection" )
@@ -119,7 +124,8 @@ class WiiPendant(MakesmithInitFuncs):
             self.data.ui_queue1.put("Action", "connectionStatus",{'status': 'True'})
     else:
         if self.th != None:
-                self.th.stop()
+                self.th.join()
+                #self.th.stop()
           
  def closeConnection(self):
         '''
