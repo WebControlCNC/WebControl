@@ -18,6 +18,7 @@ from Background.webcamVideoStream import WebcamVideoStream
 from Boards.boardManager import BoardManager
 from ReleaseManager.releaseManager import ReleaseManager
 from HelpManager.helpManager import HelpManager
+from Connection.wiiPendant import WiiPendant
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -42,6 +43,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     boardManager = BoardManager()
     releaseManager = ReleaseManager()
     helpManager = HelpManager()
+    wiiPendant = WiiPendant()
 
     def setUpData(self, data):
         """
@@ -72,7 +74,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
         data.helpManager = self.helpManager
-
+        data.wiiPendant = self.wiiPendant
+        
         if hasattr(sys, '_MEIPASS'):
             data.platform = "PYINSTALLER"
             data.platformHome = sys._MEIPASS
@@ -126,7 +129,9 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.boardManager.initializeNewBoard()
         self.releaseManager.setUpData(data)
         self.helpManager.setUpData(data)
-
+        self.wiiPendant.setUpData(data)
+        self.wiiPendant.setup()
+        
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()
         #self.camera.start()

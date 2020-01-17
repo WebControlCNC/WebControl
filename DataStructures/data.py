@@ -46,7 +46,7 @@ class Data:
     pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
-
+ 
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used
@@ -97,6 +97,8 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
+    wiiPendantPresent = False # has user set wiimote as active?
+    wiiPendantConnected = False # is the wiimote BT connected?
 
     """
     Pointers to Objects
@@ -115,7 +117,8 @@ class Data:
     continuousCamera = False
     gpioActions = None
     boardManager = None
-
+    #wiiPendant = None  #wiiPendantThread = None
+    
     """
 
     Colors
