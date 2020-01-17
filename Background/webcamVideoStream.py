@@ -1,6 +1,6 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import threading
-import cv2
+#import cv2
 import time
 import base64
 
@@ -33,12 +33,13 @@ class WebcamVideoStream(MakesmithInitFuncs):
 
     def getSettings(self, src=0):
         cameraOff = False
-        if self.stream is None:
-            self.stream = cv2.VideoCapture(src)
-            self.setVideoSize()
-            self.setFPS()
-            cameraOff = True
+        #if self.stream is None:
+            #self.stream = cv2.VideoCapture(src)
+            #self.setVideoSize()
+            #self.setFPS()
+            #cameraOff = True
         # if debugging, print camera values
+        '''
         if self.debugCamera:
             self.data.console_queue.put("CAP_PROP_POS_MSEC=" + str(self.stream.get(cv2.CAP_PROP_POS_MSEC)))
             self.data.console_queue.put("CAP_PROP_POS_FRAMES=" + str(self.stream.get(cv2.CAP_PROP_POS_FRAMES)))
@@ -60,12 +61,18 @@ class WebcamVideoStream(MakesmithInitFuncs):
             self.data.console_queue.put("CAP_PROP_RECTIFICATION=" + str(self.stream.get(cv2.CAP_PROP_RECTIFICATION)))
             self.data.console_queue.put("CAP_PROP_ISO_SPEED=" + str(self.stream.get(cv2.CAP_PROP_ISO_SPEED)))
             self.data.console_queue.put("CAP_PROP_BUFFERSIZE=" + str(self.stream.get(cv2.CAP_PROP_BUFFERSIZE)))
+        
         if cameraOff:
             self.stream.release()
             self.stream = None
+        '''
 
     def start(self, src = 0):
         # start the thread to read frames from the video stream
+        return self
+        '''
+        following is unreachable
+        
         print("Starting camera thread")
         if self.stream is None:
             self.stream = cv2.VideoCapture(src)
@@ -85,9 +92,12 @@ class WebcamVideoStream(MakesmithInitFuncs):
         else:
             print("Camera already started")
         return self
+        '''
 
     def update(self):
         # keep looping infinitely until the thread is stopped
+        return
+        '''
         while True:
             time.sleep(self.cameraSleep)
             if not self.data.continuousCamera or time.time()-self.lastCameraRead < 20:
@@ -106,16 +116,19 @@ class WebcamVideoStream(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "updateCamera", "off")
                 return
             # otherwise, read the next frame from the stream
-            if self.frame is not None:
-                small = cv2.resize(self.frame, (256,192))
-                imgencode = cv2.imencode(".png",small )[1]
-                stringData = base64.b64encode(imgencode).decode()
-                self.data.cameraImage = stringData
-                self.data.cameraImageUpdated = True
+            #if self.frame is not None:
+                #small = cv2.resize(self.frame, (256,192))
+                #imgencode = cv2.imencode(".png",small )[1]
+                #stringData = base64.b64encode(imgencode).decode()
+                #self.data.cameraImage = stringData
+                #self.data.cameraImageUpdated = True
+        '''
 
     def read(self):
         # return the frame most recently read
         #print("Reading camera frame")
+        return None
+        '''
         if self.suspended:
             (self.grabbed, self.frame) = self.stream.read()
             self.suspended = False
@@ -126,6 +139,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
         if self.stopped:
             self.start()
         return self.frame
+        '''
 
     def stop(self):
         # indicate that the thread should be stopped
@@ -140,6 +154,8 @@ class WebcamVideoStream(MakesmithInitFuncs):
         return("running")
 
     def changeSetting(self, key, value):
+        return
+        '''
         if key == 'fps' and value != self.fps:
             self.fps = value
             if self.stream is not None:
@@ -156,15 +172,18 @@ class WebcamVideoStream(MakesmithInitFuncs):
                     self.stopped = True
                     self.stream.join()
                     self.start()
+        '''
 
     def setFPS(self):
-        self.stream.set(cv2.CAP_PROP_FPS, self.fps)
+        return
+        #self.stream.set(cv2.CAP_PROP_FPS, self.fps)
 
     def setVideoSize(self):
+        return
         width = 640
         height = 480
         if self.videoSize == '1024x768':
             width = 1024
             height = 768
-        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        #self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        #self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)

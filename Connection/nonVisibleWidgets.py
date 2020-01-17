@@ -10,7 +10,6 @@ from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
 from Actions.holeyCalibration import HoleyCalibration
 from Actions.HoleySimulationKinematics import Kinematics as HoleyKinematics
-from Actions.opticalCalibration import OpticalCalibration
 from Actions.gpioActions import GPIOActions
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
@@ -33,7 +32,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     importFile = ImportFile()
     actions = Actions()
     triangularCalibration = TriangularCalibration()
-    opticalCalibration = OpticalCalibration()
     holeyCalibration = HoleyCalibration()
     holeyKinematics = HoleyKinematics()
     messageProcessor = MessageProcessor()
@@ -66,7 +64,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.triangularCalibration = self.triangularCalibration
         data.holeyCalibration = self.holeyCalibration
         data.holeyKinematics = self.holeyKinematics
-        data.opticalCalibration = self.opticalCalibration
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
@@ -118,7 +115,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.triangularCalibration.setUpData(data)
         self.holeyCalibration.setUpData(data)
         self.holeyKinematics.setUpData(data)
-        self.opticalCalibration.setUpData(data)
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
