@@ -89,7 +89,10 @@
             <button type="button" id="stopButton" class="btn btn-block btn-danger" onclick="$(this).removeClass('stopbutton'); action('stopRun')">Stop</button>
           </div>
         </div>
-        <div class="row">
+        <div class="row moveButtons">
+        <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeSection',-1);">&lt;(S)</button>
+          </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeZ',-1);">&lt;Z</button>
           </div>
@@ -101,6 +104,9 @@
           </div>
           <div class="col mb-1">
             <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeZ',1);">Z&gt;</button>
+          </div>
+          <div class="col mb-1">
+            <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeSection',1);">(S)&gt;</button>
           </div>
         </div>
         <div class="row align-items-center">
