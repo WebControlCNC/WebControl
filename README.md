@@ -18,7 +18,7 @@ For Linux/RPI users, make a new subdirectory,and then issue the untar:
 
 >mkdir webcontrol</br>
 cd webcontrol</br>
-tar -zxvf ..\webcontrol-x.xxx-linux-singledirectory.tar.gz</br>
+tar -zxvf ../webcontrol-x.xxx-linux-singledirectory.tar.gz</br>
 
 where x.xxx is the release version.
 
@@ -33,11 +33,19 @@ https://github.com/madgrizzle/WebControl/releases
 
 Here's tentative instructions on how to get webcontrol to run on startup (from kayaker37 on forum).. This assumes you extracted webcontrol into a subdirectory called webcontrol:
 
+**For RPI:**
 >cd ~</br>
 >mkdir webcontrol</br>
 >cd webcontrol</br>
 >wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz
->tar -zxvf ..\webcontrol-0.920-linux-singledirectory.tar.gz</br>
+>tar -zxvf ../webcontrol-0.920-rpi-singledirectory.tar.gz</br>
+
+**For Linux:**
+>cd ~</br>
+>mkdir webcontrol</br>
+>cd webcontrol</br>
+>wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-linux-singledirectory.tar.gz
+>tar -zxvf ../webcontrol-0.920-linux-singledirectory.tar.gz</br>
 
 Change 0.920 to the lastest release if you want.
 
