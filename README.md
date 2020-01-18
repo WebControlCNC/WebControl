@@ -18,7 +18,7 @@ For Linux/RPI users, make a new subdirectory,and then issue the untar:
 
 >mkdir webcontrol</br>
 cd webcontrol</br>
-tar -zxvf ..\webcontrol-x.xxx-linux-singledirectory.tar.gz</br>
+tar -zxvf ../webcontrol-x.xxx-linux-singledirectory.tar.gz</br>
 
 where x.xxx is the release version.
 
