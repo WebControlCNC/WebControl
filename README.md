@@ -20,14 +20,14 @@ For Linux/RPI users, make a new subdirectory,and then issue the untar:
 >cd ~</br>
 >mkdir webcontrol</br>
 >cd webcontrol</br>
->wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz
+>wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz</br>
 >tar -zxvf webcontrol-0.920-rpi-singledirectory.tar.gz</br>
 
 **For Linux:**
 >cd ~</br>
 >mkdir webcontrol</br>
 >cd webcontrol</br>
->wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-linux-singledirectory.tar.gz
+>wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-linux-singledirectory.tar.gz</br>
 >tar -zxvf webcontrol-0.920-linux-singledirectory.tar.gz</br>
 
 Change 0.920 to the lastest release if you want.
