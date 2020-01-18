@@ -230,6 +230,7 @@ function setupStatusButtons(){
       $('#mobileClientStatus').show();
       $('#mobileCPUUsage').show();
       $('#mobileControllerStatusAlert').show();
+      $('.navbar-brand').hide();
   } else {
     $('#mobileClientStatus').hide();
     $('#mobileCPUUsage').hide();
