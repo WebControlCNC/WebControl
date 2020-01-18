@@ -89,6 +89,7 @@ class UIProcessor:
                                 ## new stuff
                                 # self.app.data.quick_queue.put("~")
                                 ## end new stuff
+                                self.app.data.pausedUnits = self.app.data.units
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message",
                                               {"command": "requestedSetting", "data": data, "dataFormat": "json"},
@@ -111,6 +112,7 @@ class UIProcessor:
                                 if message.find("adjust Z-Axis") != -1:
                                     # manual z-axis adjustment requested.
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
+                                    self.app.data.pausedUnits = self.app.data.units
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 elif message.find("Unable to find valid") != -1:
                                     # position alarm detected.. chain lengths do not allow for forward kinematic.
