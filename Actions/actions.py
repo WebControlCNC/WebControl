@@ -133,6 +133,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveGcodeZ":
                 if not self.moveGcodeZ(int(msg["data"]["arg"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeSection":
+                if not self.moveGcodeSection(int(msg["data"]["arg"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to comment section")
             elif msg["data"]["command"] == "moveGcodeGoto":
                 if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
@@ -635,6 +638,30 @@ class Actions(MakesmithInitFuncs):
                     break
                 if moves < 0 and zMove < self.data.gcodeIndex:
                     dist = self.data.zMoves[index + moves + 1] - self.data.gcodeIndex
+            if self.moveGcodeIndex(dist):
+                # this command will continue on in the moveGcodeIndex "if"
+                return True
+            else:
+                return False
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def moveGcodeSection(self, moves):
+        '''
+        Moves the gcode index to the next comment section.
+        :param moves:
+        :return:
+        '''
+        try:
+            dist = 0
+            #determine the number of lines to move to reach the next comment section.
+            for index, sectionComments in enumerate(self.data.sectionIndex):
+                if moves > 0 and sectionComments > self.data.gcodeIndex:
+                    dist = self.data.sectionIndex[index + moves - 1] - self.data.gcodeIndex
+                    break
+                if moves < 0 and sectionComments < self.data.gcodeIndex:
+                    dist = self.data.sectionIndex[index + moves + 1] - self.data.gcodeIndex
             if self.moveGcodeIndex(dist):
                 # this command will continue on in the moveGcodeIndex "if"
                 return True

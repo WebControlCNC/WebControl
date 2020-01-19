@@ -164,3 +164,7 @@ html, body{
 
 #controllerMessage { overflow-wrap: anywhere; }
 
+.moveButtons .btn {
+	padding-left: .125rem;
+	padding-left: .125rem;
+}

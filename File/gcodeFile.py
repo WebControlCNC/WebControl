@@ -146,8 +146,13 @@ class GCodeFile(MakesmithInitFuncs):
 
             # Find gcode indicies of z moves
             self.data.zMoves = [0]
+            self.data.sectionIndex = [0]
             zList = []
             for index, line in enumerate(self.data.gcode):
+                # Matches text "(" + any alphanumeric characters + ")" but ignores "(MSG, gcode message text)"
+                s = re.search("^\((?!MSG,).+\)", line)
+                if s:
+                    self.data.sectionIndex.append(index)
                 filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
                 line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
                 if not line.isspace(): # if all spaces, don't send.  likely a comment. #if line.find("(") == -1:

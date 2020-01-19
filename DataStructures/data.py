@@ -57,6 +57,8 @@ class Data:
     gcodeIndex = 0
     # Index of changes in z
     zMoves = []
+    # Index of section comments
+    sectionIndex = []
     # Holds the current value of the feed rate
     feedRate = 20
     # holds the address of the g-code file so that the gcode can be refreshed
