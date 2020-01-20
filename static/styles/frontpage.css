@@ -164,3 +164,10 @@ html, body{
 
 #controllerMessage { overflow-wrap: anywhere; }
 
+#stickyButtons {
+  position: sticky;
+  top: 0px;
+  z-index:1020;
+  background-color: #FFF;
+}
+
