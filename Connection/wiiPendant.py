@@ -46,24 +46,9 @@ class WiiPendant(MakesmithInitFuncs):
        try every 5 seconds to connect if the wiimote is an option
     """
     self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
-    
-    #if self.data.wiiPendantPresent:
-    if self.debug:
-          print("scheduling connection attempt every 10 seconds")
     schedule.every(10).seconds.do(self.openConnection)
-    #else:
-      #nothing to do
     if self.debug:
-            print("wii pendant not selected in maslow settings")
-      #self.wiiPendantRequest = "Not Present"
-
- def connect(self, *args):
-    """
-        copied from serial port connect routing to being connecting  - may not be needed
-    """
-    if self.debug:
-          print("test connect ... need to open connection")
-    self.data.config.setValue("Makesmith Settings","wiiPendantPresent",str(self.data.wiiPendant))
+            print("every 10 seconds will check to see if BT wii available for connect")
 
  def openConnection(self):
     '''
@@ -75,7 +60,6 @@ class WiiPendant(MakesmithInitFuncs):
     if self.data.wiiPendantPresent:
       if self.debug:
             print("User has Activated wiimote in menu")
-            #print("is the pendant actually running?")
       if not self.data.wiiPendantConnected:
             if self.debug:
                   print("Wiimote connection flag is false")
@@ -89,21 +73,21 @@ class WiiPendant(MakesmithInitFuncs):
                try:
                  self.wm=cwiid.Wiimote()
                  wm.rpt_mode = cwiid.RPT_BTN
+                 self.data.wiiPendantConnected = True
                  self.wm.rumble(0)
                  print("wii connection success, spawning thread")
                  x = WiiPendantThread()
-                 #x.setUpData(data)
                  x.data = self.data
                  self.th = threading.Thread(target=x.read_buttons)
                  self.th.daemon = True
                  self.th.start()
-                 self.data.wiiPendantConnected = True
                except RuntimeError:
                  '''
                  this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
                  '''
-                 print("wiimote connection error")
-     else:
+                 if self.debug
+                  print("wiimote connection error")
+      else:
             self.data.ui_queue1.put("Action", "connectionStatus",{'status': 'True'})
     else:
         if self.th != None:
