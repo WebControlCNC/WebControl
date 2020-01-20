@@ -873,3 +873,13 @@ function toggleBoard(){
     }
 }
 
+function moveAction(direction) {
+	distance = $("#distToMove").val();
+	distanceValid = distance.search(/^[0-9]*(\.[0-9]{0,3})?$/);
+	if (distanceValid == 0) {
+		action('move', direction, distance);
+	} else {
+		$("#distToMove").focus();
+	}
+}
+
