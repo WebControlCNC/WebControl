@@ -35,13 +35,13 @@ class GPIOActions(MakesmithInitFuncs):
             self.Buttons.remove(foundButton)
 
         foundLED = None
-        for led in self.LEDs:
-            if led.pin.number == pin:
-                led.pin.close()
-                foundLED = led
-                break
-        if foundLED is not None:
-            self.LEDs.remove(foundLED)
+        #for led in self.LEDs:
+        #    if led.pin.number == pin:
+        #        led.pin.close()
+        #        foundLED = led
+        #        break
+        #if foundLED is not None:
+        #    self.LEDs.remove(foundLED)
 
         type, pinAction = self.getAction(action)
         if type == "button":
@@ -49,11 +49,11 @@ class GPIOActions(MakesmithInitFuncs):
             button.when_pressed = pinAction
             self.Buttons.append(button)
             print("set Button with action: "+action)
-            if type == "led":
-                _led = LED(pin)
-            led = (action,_led)
-            self.LEDs.append(led)
-            print("set LED with action: " + action)
+        #if type == "led":
+        #    _led = LED(pin)
+        #    led = (action,_led)
+        #    self.LEDs.append(led)
+        #    print("set LED with action: " + action)
 
     def getAction(self, action):
         if action == "Stop":

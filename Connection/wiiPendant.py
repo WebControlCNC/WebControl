@@ -1,5 +1,5 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from Connection.wiiPendantThread import WiiPendantThread
+#from Connection.wiiPendantThread import WiiPendantThread
 #from DataStructures import data
 import schedule
 import threading
@@ -72,7 +72,7 @@ class WiiPendant(MakesmithInitFuncs):
                    print("trying to connect")
                try:
                  self.wm=cwiid.Wiimote()
-                 wm.rpt_mode = cwiid.RPT_BTN
+                 self.wm.rpt_mode = cwiid.RPT_BTN
                  self.data.wiiPendantConnected = True
                  self.wm.rumble(0)
                  print("wii connection success, spawning thread")
@@ -85,7 +85,7 @@ class WiiPendant(MakesmithInitFuncs):
                  '''
                  this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
                  '''
-                 if self.debug
+                 if self.debug:
                   print("wiimote connection error")
       else:
             self.data.ui_queue1.put("Action", "connectionStatus",{'status': 'True'})
@@ -105,7 +105,7 @@ class WiiPendant(MakesmithInitFuncs):
         '''
         return self.wiiPendantRequest
 
-def __init__(self):
+ def __init__(self):
     """
        set up the flags for interpreting the controls
     """
@@ -122,7 +122,7 @@ def __init__(self):
     self.HOME = 0
     self.A = 0
     self.wm = None
-    if debug:
+    if self.debug:
           print("initialized thread variables")
 
  def rumble(self,mode=0):
@@ -131,7 +131,7 @@ def __init__(self):
      Inputs:  mode 0 - heartbeat, 1, shutdown or timeout, 2 sled home reset confirmed, 3 z-axis zero confirmed
   '''
   if mode == 0: # start up heartbeat = 2 quick rumbles / prompt for confirmation
-    if debug:
+    if self.debug:
           print("rumble mode 0")
     self.wm.rumble=True
     time.sleep(.2)
@@ -142,7 +142,7 @@ def __init__(self):
     self.wm.rumble = False
 
   if mode == 1: # shutdown or timeout
-    if debug:
+    if self.debug:
           print("rumble mode 1")
     self.wm.rumble=True
     time.sleep(.1)
@@ -153,7 +153,7 @@ def __init__(self):
     self.wm.rumble = False
 
   if mode == 2: # sled home reset
-    if debug:
+    if self.debug:
           print("rumble mode 2")
     self.wm.rumble=True
     time.sleep(.3)
@@ -164,18 +164,18 @@ def __init__(self):
     self.wm.rumble = False
 
   if mode >= 30: # Z-axis zero
-    if debug:
+    if self.debug:
           print("rumble mode OUT")
     self.wm.rumble=True
     time.sleep(.4)
     self.wm.rumble = False
 
-#end rumble
+ #end rumble
 
  def read_buttons(self):
   
   if self.data.wiiPendantPresent == False:
-      if self.wm != None
+      if self.wm != None:
         self.wm = None
         self.data.wiiPendantConnected = False
       return
@@ -184,8 +184,8 @@ def __init__(self):
     #self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
     if self.data.wiiPendantPresent == False:
           print("wii thread running, but user has disabled option")
-          if self.wm = None
-          self.data.wiiPendantConnected = False
+          if self.wm == None:
+            self.data.wiiPendantConnected = False
           return
     if self.data.wiiPendantConnected == False and self.wm == None:
       print("Establishing wii mote connectiond")
@@ -325,5 +325,6 @@ def __init__(self):
         self.PLUS = 0
   return
   thread.exit()
+ #emd read_buttons
 #END class
 
