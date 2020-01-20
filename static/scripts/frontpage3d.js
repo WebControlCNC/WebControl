@@ -323,6 +323,7 @@ $(document).ready(function(){
             requestPage("screenAction",pos)
         }
     });
+    $("#stickyButtons").css("top", $(".navbar").outerHeight());
 });
 
 function pauseRun(){
