@@ -103,6 +103,7 @@ Added to TODO list?
 
 * **Madgrizzle** - *Initial work* - [madgrizzle](https://github.com/madgrizzle)
 * **John Boiles** - *Docker Expert* - [johnboiles](https://github.com/johnboiles)
+* **Tinker** - *UI Improvements/Bug Fixer/Etc.* - [gb0101010101](https://github.com/gb0101010101)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
