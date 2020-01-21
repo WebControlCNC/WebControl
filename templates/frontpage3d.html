@@ -10,7 +10,7 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019s') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019t') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -176,6 +176,20 @@
           </div>
           <div class="col-3 mb-1">
             <div id='machineState'></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3 mb-1">
+            <h5>Tool:</h5>
+          </div>
+          <div class="col-2 mb-1">
+            <div id='currentTool'></div>
+          </div>
+          <div class="col-4 mb-1">
+            <h5>Positioning:</h5>
+          </div>
+          <div class="col-3 mb-1">
+            <div id='currentPositioningMode'></div>
           </div>
         </div>
         <div class="row">

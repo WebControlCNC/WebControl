@@ -598,6 +598,7 @@ class UIProcessor:
                 "uploadFlag": self.app.data.uploadFlag,
             }
             self.sendHealthMessage(healthData)
+            self.performStatusCheck(True);
 
     def performStatusCheck(self, healthCheckCalled=False):
         '''

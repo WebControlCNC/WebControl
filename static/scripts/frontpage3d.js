@@ -883,3 +883,21 @@ function moveAction(direction) {
 	}
 }
 
+function processStatusMessage(data){
+    if (data.uploadFlag){
+        if (!isDisabled){
+            $('.disabler').prop('disabled', true);
+            isDisabled = true;
+        }
+    } else {
+        if (isDisabled){
+            $('.disabler').prop('disabled', false);
+            isDisabled = false;
+        }
+    }
+    $("#currentTool").text(data.currentTool.toString());
+    if (data.positioningMode == 0)
+        $("#currentPositioningMode").text("Absolute");
+    else
+        $("#currentPositioningMode").text("Incremental");
+}
