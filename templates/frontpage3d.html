@@ -19,58 +19,57 @@
     <div class="flex-fixed-width-item"><!--"col my-sidebar">-->
         <h3>Controls</h3>
         <div>
-        <div class="row">
-          <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block disabler" onclick="action('move','upLeft',$('#distToMove').val())"><i data-feather="arrow-up-left"></i></button>
+        <div class="controls row">
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-secondary btn-block disabler" onclick="moveAction('upLeft')"><i data-feather="arrow-up-left"></i></button>
           </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('move','up',$('#distToMove').val())";><i data-feather="arrow-up"></i></button>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('up')"><i data-feather="arrow-up"></i></button>
           </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','upRight',$('#distToMove').val())"><i data-feather="arrow-up-right"></i></button>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="moveAction('upRight')"><i data-feather="arrow-up-right"></i></button>
           </div>
-          <div class="col mb-1">
+          <div class="col-3 mb-1">
             <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">Macro1</button>
           </div>
           <div class="w-100"></div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('move','left',$('#distToMove').val())"><i data-feather="arrow-left"></i></button>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('left')"><i data-feather="arrow-left"></i></button>
           </div>
-          <div class="col mb-1">
+          <div class="col-3 mb-1">
             <button type="button" class="btn btn-dark btn-block" onclick="action('home')"><i data-feather="home"></i></button>
           </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('move','right',$('#distToMove').val())"><i data-feather="arrow-right"></i></button>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('right')"><i data-feather="arrow-right"></i></button>
           </div>
-          <div class="col mb-1">
+          <div class="col-3 mb-1">
             <button type="button" class="btn btn-primary btn-block" onclick="action('macro2')">Macro2</button>
           </div>
           <div class="w-100"></div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())"><i data-feather="arrow-down-left"></i></button>
-          </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())"><i data-feather="arrow-down"></i></button>
-          </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="action('move','downRight',$('#distToMove').val())"><i data-feather="arrow-down-right"></i></button>
-          </div>
-          <div class="col mb-1">
-            <button type="button" class="btn btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col mb-1">
-            <label>Dist To Move</label>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="moveAction('downLeft')"><i data-feather="arrow-down-left"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <input class="form-control" type="number" step="any"  id="distToMove" value="0.01">
+            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('down')"><i data-feather="arrow-down"></i></button>
           </div>
-          <div class="col-2 mb-1">
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-secondary btn-block" onclick="moveAction('downRight')"><i data-feather="arrow-down-right"></i></button>
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col-3 mb-1">
+            <label>Distance:</label>
+          </div>
+          <div class="col-3 mb-1">
+            <form id="distInput" onsubmit="return false;"><input class="form-control" type="text" pattern="^[0-9]*(\.[0-9]{0,3})?$" id="distToMove" title="Positive number with maximum 3 decimal places"></form>
+          </div>
+          <div class="col-3 mb-1">
             <button id="units" type="button" class="btn btn-secondary" onclick="unitSwitch();">--</button>
           </div>
-          <div class="col-4 mb-1">
-            <button type="button" class="btn btn-primary btn-block" onclick="action('defineHome')" >Def. Home</button>
+          <div class="col-3 mb-1">
+            <button id="btnDefHome" type="button" class="btn btn-primary btn-block" onclick="action('defineHome')" ><i data-feather="save">Def.</i> <i data-feather="home">Home</i></button>
           </div>
         </div>
         <div class="row">

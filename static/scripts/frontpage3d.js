@@ -323,6 +323,7 @@ $(document).ready(function(){
             requestPage("screenAction",pos)
         }
     });
+    $("#stickyButtons").css("top", $(".navbar").outerHeight());
 });
 
 function pauseRun(){
@@ -364,7 +365,7 @@ function processRequestedSetting(data){
 }
 
 function processPositionMessage(data){
-  $('#positionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' ZPos:'+parseFloat(data.zval).toFixed(2));
+  $('#positionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2));
   $('#percentComplete').html(data.pcom)
   $('#machineState').html(data.state)
   positionUpdate(data.xval,data.yval,data.zval);
@@ -426,12 +427,12 @@ function processErrorValueMessage(data){
 
 function processHomePositionMessage(data){
   console.log(data.xval)
-  $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  $('#homePositionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2));
   homePositionUpdate(data.xval,data.yval);
 }
 
 function processGCodePositionMessage(data){
-  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' Zpos:'+parseFloat(data.zval).toFixed(2));
+  $('#gcodePositionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2));
   $('#gcodeLine').html(data.gcodeLine);
   $('#gcodeLineIndex').val(data.gcodeLineIndex+1)
   gcodePositionUpdate(data.xval,data.yval,data.zval);
@@ -870,5 +871,15 @@ function toggleBoard(){
         scene.add(boardGroup);
         $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
     }
+}
+
+function moveAction(direction) {
+	distance = $("#distToMove").val();
+	distanceValid = distance.search(/^[0-9]*(\.[0-9]{0,3})?$/);
+	if (distanceValid == 0) {
+		action('move', direction, distance);
+	} else {
+		$("#distToMove").focus();
+	}
 }
 
