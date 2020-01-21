@@ -12,17 +12,6 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 
 function processHealthMessage(data){
     //console.log(data.cpuUsage);
-    if (data.uploadFlag==1){
-        if (!isDisabled){
-            $('.disabler').prop('disabled', true);
-            isDisabled = true;
-        }
-    } else {
-        if (isDisabled){
-            $('.disabler').prop('disabled', false);
-            isDisabled = false;
-        }
-    }
     $("#cpuUsage").text("CPU: "+Math.round(data.cpuUsage).toString()+"%");
     $("#mobileCPUUsage").text(Math.round(data.cpuUsage).toString()+"%");
     if (data.bufferSize == -1){
