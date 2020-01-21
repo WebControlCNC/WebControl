@@ -138,7 +138,7 @@ function processStatusMessage(data){
     }
     $("#currentTool").text(data.currentTool.toString());
     if (data.positioningMode == 0)
-        $("#currentPositioningMode").text("Absolute");
+        $("#currentPositioningMode").text("Absolute (G90)");
     else
-        $("#currentPositioningMode").text("Incremental");
+        $("#currentPositioningMode").text("Incremental (G91)");
 }
