@@ -561,18 +561,18 @@ class Actions(MakesmithInitFuncs):
                         self.data.gcode_queue.put("G20 ")
                     else:
                         self.data.gcode_queue.put("G21 ")
-                if self.data.pausedPositioningMode != self.data.positioningMode:
-                    if self.data.pausedPositioningMode == 0:
-                        self.data.gcode_queue.put("G90 ")
-                    else:
-                        self.data.gcode_queue.put("G91 ")
                 # move the z-axis back to where it was.
                 # note: this does not work correctly in relative mode.
                 # Todo: somehow manke this work when controller is in relative mode (G91)
+                # put in absolute mode to make z axis move
+                self.datat.gcode_queue.put("G90 ")
                 print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
+                # fix mode if needed.. compare against 0 because potential for race condition in processing gcode_queue
+                if self.data.pausedPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
                 # reenable the uploadFlag if it was previous set.
                 if self.data.previousUploadStatus == -1:
                     # if was M command pause, then set to 1
