@@ -69,6 +69,17 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.lengthOfLastLineStack.appendleft(len(message))
 
             message = message.encode()
+            '''
+            monitor for position change
+            '''
+            if message.find("G90") != -1:
+                self.data.positioningMode = 0
+            if message.find("G91") != -1:
+                self.data.positioningMode = 1
+
+            '''
+            try sending message
+            '''
             try:
                 self.serialInstance.write(message)
                 self.data.logger.writeToLog("Sent: " + str(message.decode()))
