@@ -367,15 +367,6 @@ class UIProcessor:
         socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
-    def sendHealthMessage(self, healthData):
-        '''
-        Sends the health message to UI client.  Not sure why I separated this from the only function that calls it.
-        :param position:
-        :return:
-        '''
-        socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
-                      namespace="/MaslowCNC")
-
     def sendCameraMessage(self, message, _data=""):
         '''
         Sends message to the UI client regarding camera.. message could be to turn camera display on or off, or to
@@ -597,10 +588,10 @@ class UIProcessor:
             healthData = {
                 "cpuUsage": load,
                 "bufferSize": bufferSize,
-                "uploadFlag": self.app.data.uploadFlag,
             }
-            self.sendHealthMessage(healthData)
-            self.performStatusCheck(True);
+            socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
+                          namespace="/MaslowCNC")
+            self.performStatusCheck(True)
 
     def performStatusCheck(self, healthCheckCalled=False):
         '''
@@ -612,10 +603,13 @@ class UIProcessor:
         update = healthCheckCalled
         if self.previousUploadFlag != self.app.data.uploadFlag:
             update = True
+            self.previousUploadFlag = self.app.data.uploadFlag
         if self.previousPositioningMode != self.app.data.positioningMode:
             update = True
+            self.previousPositioningMode = self.add.data.positioningMode
         if self.previousCurrentTool != self.app.data.currentTool:
             update = True
+            self.previousCurrentTool = self.app.data.currentTool
 
         #print("positioning mode = "+str(self.app.data.positioningMode))
 
