@@ -884,6 +884,7 @@ function moveAction(direction) {
 }
 
 function processStatusMessage(data){
+    console.log(data)
     if (data.uploadFlag){
         if (!isDisabled){
             $('.disabler').prop('disabled', true);
