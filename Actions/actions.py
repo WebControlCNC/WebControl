@@ -706,48 +706,26 @@ class Actions(MakesmithInitFuncs):
         else:
             diagMove = distToMove
         try:
+            self.data.gcode_queue.put("G91 ")
             if direction == "upLeft":
-                self.data.gcode_queue.put(
-                    "G91 G00 X"
-                    + str(-1.0 * diagMove)
-                    + " Y"
-                    + str(diagMove)
-                    + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X"+ str(-1.0 * diagMove)+ " Y"+ str(diagMove)+ " ")
             elif direction == "up":
-                self.data.gcode_queue.put("G91 G00 Y" + str(distToMove) + " G90 ")
+                self.data.gcode_queue.put("G00 Y" + str(distToMove) + " ")
             elif direction == "upRight":
-                self.data.gcode_queue.put(
-                    "G91 G00 X" + str(diagMove) + " Y" + str(diagMove) + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(diagMove) + " Y" + str(diagMove) + " ")
             elif direction == "left":
-                self.data.gcode_queue.put(
-                    "G91 G00 X" + str(-1.0 * distToMove) + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(-1.0 * distToMove) + " ")
             elif direction == "right":
-                self.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " G90 ")
+                self.data.gcode_queue.put("G00 X" + str(distToMove) + " ")
             elif direction == "downLeft":
-                self.data.gcode_queue.put(
-                    "G91 G00 X"
-                    + str(-1.0 * diagMove)
-                    + " Y"
-                    + str(-1.0 * diagMove)
-                    + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(-1.0 * diagMove) + " Y" + str(-1.0 * diagMove) + " ")
             elif direction == "down":
-                self.data.gcode_queue.put(
-                    "G91 G00 Y" + str(-1.0 * distToMove) + " G90 "
-                )
+                self.data.gcode_queue.put("G00 Y" + str(-1.0 * distToMove) + " ")
             elif direction == "downRight":
-                self.data.gcode_queue.put(
-                    "G91 G00 X"
-                    + str(diagMove)
-                    + " Y"
-                    + str(-1.0 * diagMove)
-                    + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(diagMove) + " Y" + str(-1.0 * diagMove) + " ")
             else:
                 return False
+            self.data.gcode_queue.put("G90 ")
             # keep track of the distToMove value
             self.data.config.setValue("Computed Settings", "distToMove", distToMove)
             return True
@@ -776,13 +754,13 @@ class Actions(MakesmithInitFuncs):
             else:
                 self.data.gcode_queue.put("G20 ")
             if direction == "raise":
-                self.data.gcode_queue.put(
-                    "G91 G00 Z" + str(float(distToMoveZ)) + " G90 "
-                )
+                self.data.gcode_queue.put("G91 ")
+                self.data.gcode_queue.put("G00 Z" + str(float(distToMoveZ)) + " ")
+                self.data.gcode_queue.put("G90 ")
             elif direction == "lower":
-                self.data.gcode_queue.put(
-                    "G91 G00 Z" + str(-1.0 * float(distToMoveZ)) + " G90 "
-                )
+                self.data.gcode_queue.put("G91 ")
+                self.data.gcode_queue.put("G00 Z" + str(-1.0 * float(distToMoveZ)) + " " )
+                self.data.gcode_queue.put("G90 ")
             # now, since we might have changed the units of the machine, make sure they are set back to what it was
             # originally.
             #units = self.data.config.getValue("Computed Settings", "units")
