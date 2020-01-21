@@ -68,7 +68,6 @@ class SerialPortThread(MakesmithInitFuncs):
             else:
                 self.lengthOfLastLineStack.appendleft(len(message))
 
-            message = message.encode()
             '''
             monitor for position change
             '''
@@ -76,6 +75,9 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.data.positioningMode = 0
             if message.find("G91") != -1:
                 self.data.positioningMode = 1
+
+
+            message = message.encode()
 
             '''
             try sending message
