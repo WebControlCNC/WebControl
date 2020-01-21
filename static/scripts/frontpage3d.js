@@ -323,6 +323,7 @@ $(document).ready(function(){
             requestPage("screenAction",pos)
         }
     });
+    $("#stickyButtons").css("top", $(".navbar").outerHeight());
 });
 
 function pauseRun(){
@@ -872,22 +873,13 @@ function toggleBoard(){
     }
 }
 
-function processHealthMessage(data){
-    //console.log(data.cpuUsage);
-    if (data.uploadFlag){
-        if (!isDisabled){
-            $('.disabler').prop('disabled', true);
-            isDisabled = true;
-        }
-    } else {
-        if (isDisabled){
-            $('.disabler').prop('disabled', false);
-            isDisabled = false;
-        }
-    }
-    $("#currentTool").text("Tool: "+data.currentTool.toString());
-    if (data.currentPositiningMode == 0)
-        $("#currentPositioningMode").text("Absolute");
-    else
-        $("#currentPositioningMode").text("Incremental");
-    }
+function moveAction(direction) {
+	distance = $("#distToMove").val();
+	distanceValid = distance.search(/^[0-9]*(\.[0-9]{0,3})?$/);
+	if (distanceValid == 0) {
+		action('move', direction, distance);
+	} else {
+		$("#distToMove").focus();
+	}
+}
+

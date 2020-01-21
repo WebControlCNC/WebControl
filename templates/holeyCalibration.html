@@ -1,90 +1,94 @@
 
 {% block content %}
 <div class="container-fluid">
-  <h5>Cut Test Pattern</h5>
-  <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutHoleyCalibrationPattern');">Cut Calibration Pattern</button>
-  <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">Stop</button>
-  <h5>Measurements</h5>
-  <form id="calibrateForm">
-    <input id="pageID" type="hidden" value="{{pageID}}">
-    <img class = "img-fluid" src="{{ url_for('static',filename='images/holeyCalibration/holeyCalibration.png' , version='11102019o') }}" >
-    <div class="form-group">
+  <div class="card-body">
+    <h4 class="card-title">Cut Test Pattern</h4>
+    <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutHoleyCalibrationPattern');">Cut Calibration Pattern</button>
+    <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">Stop</button>
+  </div>
+  <div class="card-body">
+    <h4 class="card-title">Measurements</h4>
+    <form id="calibrateForm">
+      <input id="pageID" type="hidden" value="{{pageID}}">
+      <img class = "img-fluid" src="{{ url_for('static',filename='images/holeyCalibration/holeyCalibration.png' , version='11102019o') }}" >
       <div class="form-group">
-        <label for="M1">M1</label>
-        <input id="M1" type="number" step="any" class="form-control" name="M1" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M2">M2</label>
-        <input id="M2" type="number" step="any" class="form-control" name="M2" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M3">M3</label>
-        <input id="M3" type="number" step="any"  class="form-control" name="M3" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M4">M4</label>
-        <input id="M4" type="number" step="any"  class="form-control" name="M4" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M5">M5</label>
-        <input id="M5" type="number" step="any"  class="form-control" name="M5" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M6">M6</label>
-        <input id="M6" type="number" step="any"  class="form-control" name="M6" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M7">M7</label>
-        <input id="M7" type="number" step="any"  class="form-control" name="M7" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M8">M8</label>
-        <input id="M8" type="number" step="any"  class="form-control" name="M8" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M9">M9</label>
-        <input id="M9" type="number" step="any"  class="form-control" name="M9" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M10">M10</label>
-        <input id="M10" type="number" step="any"  class="form-control" name="M10" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M11">M11</label>
-        <input id="M11" type="number" step="any"  class="form-control" name="M11" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="M12">M12</label>
-        <input id="M12" type="number" step="any"  class="form-control" name="M12" value="0">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="row">
-        <div class = "col-6">
-          <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
+        <div class="form-group">
+          <label for="M1">M1</label>
+          <input id="M1" type="number" step="any" class="form-control" name="M1" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
         </div>
-        <div class = "col-6">
-          <button id="acceptCalibration" disabled type="button" class="btn btn-lg btn-block btn-primary" onclick="action('acceptHoleyCalibrationResults',0,0);$('#contentModal').modal('toggle')">Accept Results</button>
+        <div class="form-group">
+          <label for="M2">M2</label>
+          <input id="M2" type="number" step="any" class="form-control" name="M2" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M3">M3</label>
+          <input id="M3" type="number" step="any"  class="form-control" name="M3" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M4">M4</label>
+          <input id="M4" type="number" step="any"  class="form-control" name="M4" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M5">M5</label>
+          <input id="M5" type="number" step="any"  class="form-control" name="M5" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M6">M6</label>
+          <input id="M6" type="number" step="any"  class="form-control" name="M6" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M7">M7</label>
+          <input id="M7" type="number" step="any"  class="form-control" name="M7" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M8">M8</label>
+          <input id="M8" type="number" step="any"  class="form-control" name="M8" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M9">M9</label>
+          <input id="M9" type="number" step="any"  class="form-control" name="M9" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M10">M10</label>
+          <input id="M10" type="number" step="any"  class="form-control" name="M10" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M11">M11</label>
+          <input id="M11" type="number" step="any"  class="form-control" name="M11" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="form-group">
+          <label for="M12">M12</label>
+          <input id="M12" type="number" step="any"  class="form-control" name="M12" value="0">
+          <small class="form-text text-muted">Enter value in mm only</small>
+        </div>
+        <div class="row">
+          <div class = "col">
+            <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
+          </div>
         </div>
       </div>
-    </div>
-  </form>
-  <h5>Results</h5>
-  <p><label id="motorYoffset">Height of Motors: {{motorYoffset}}</label></p>
-  <p><label id="distanceBetweenMotors">Distance Between Motors: {{distanceBetweenMotors}}</label></p>
-  <p><label id="leftChainTolerance">Left Chain Tolerance: {{leftChainTolerance}}</label></p>
-  <p><label id="rightChainTolerance">Right Chain Tolerance: {{rightChainTolerance}}</label></p>
-  <p><label id="calibrationError">Calibration Error: n/a</label></p>
+    </form>
+  </div>
+  <div class="card-body">
+    <h4 class="card-title">Results</h4>
+    <p><label id="motorYoffset">Height of Motors: {{motorYoffset}}</label></p>
+    <p><label id="distanceBetweenMotors">Distance Between Motors: {{distanceBetweenMotors}}</label></p>
+    <p><label id="leftChainTolerance">Left Chain Tolerance: {{leftChainTolerance}}</label></p>
+    <p><label id="rightChainTolerance">Right Chain Tolerance: {{rightChainTolerance}}</label></p>
+    <p><label id="calibrationError">Calibration Error: n/a</label></p>
+    <button id="acceptCalibration" disabled type="button" class="btn btn-lg btn-block btn-primary" onclick="action('acceptHoleyCalibrationResults',0,0);$('#contentModal').modal('toggle')">Accept Results</button>
+  </div>
 
 
 </div>
@@ -93,6 +97,7 @@
 {% block javascript %}
 <script>
 $(document).ready(function () {
+
     $('#calibrateForm').on('submit', function(e) {
         e.preventDefault();
         var url = $("#pageID").val()

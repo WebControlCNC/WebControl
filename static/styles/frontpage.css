@@ -164,7 +164,13 @@ html, body{
 
 #controllerMessage { overflow-wrap: anywhere; }
 
-.moveButtons .btn {
-	padding-left: .125rem;
-	padding-left: .125rem;
+#stickyButtons {
+  position: sticky;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  top: 0px;
+  z-index:1020;
+  background-color: #FFF;
 }
