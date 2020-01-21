@@ -580,6 +580,8 @@ class Actions(MakesmithInitFuncs):
                 else:
                     self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
+                # put in absolute mode to make z axis move
+                self.data.gcode_queue.put("G90 ")
                 print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
