@@ -20,6 +20,9 @@ class UIProcessor:
     app = None
     lastCameraTime = 0
     lastHealthCheck = 0
+    previousUploadFlag = None
+    previousCurrentTool = None
+    previousPositioningMode = None
 
     def start(self, _app):
 
@@ -369,6 +372,7 @@ class UIProcessor:
         socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
+
     def sendCameraMessage(self, message, _data=""):
         '''
         Sends message to the UI client regarding camera.. message could be to turn camera display on or off, or to
@@ -593,6 +597,32 @@ class UIProcessor:
                 "uploadFlag": self.app.data.uploadFlag,
             }
             self.sendHealthMessage(healthData)
+            self.performStatusCheck()
+
+    def performStatusCheck(self, healthCheckCalled = False):
+        '''
+        This function sends a message to the client if it detects a change in the following parameters:
+        uploadFlag, positioningMode, currentTool
+        Also sends on every health check to get new connected clients in sync.
+        :return:
+        '''
+        update = healthCheckCalled
+        if self.previousUploadFlag != self.app.data.uploadFlag:
+            update = True
+        if self.previousPositioningMode != self.app.data.positioningMode:
+            update = True
+        if self.previousCurrentTool != self.app.data.currentTool:
+            update = True
+
+        if update:
+            statusData = {
+                "uploadFlag": self.app.data.uploadFlag,
+                "positioningMode": self.app.data.positioningMode,
+                "currentTool": self.app.data.currentTool,
+            }
+            socketio.emit("message", {"command": "statusMessage", "data": json.dumps(statusData), "dataFormat": "json"},
+                          namespace="/MaslowCNC")
+
 
     def isChainLengthZero(self, msg):
         #Message: Unable to find valid machine position for chain lengths 0.00, 0.00 Left Chain Length

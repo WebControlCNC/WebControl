@@ -44,7 +44,6 @@ function processHealthMessage(data){
         $("#mobileBufferSize").text(data.bufferSize.toString());
     }
 
-
 }
 
 function processControllerStatus(data){

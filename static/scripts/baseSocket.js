@@ -100,6 +100,10 @@ function setListeners(){
       if (passValue)
       {
           switch(msg.command) {
+            case 'statusMessage':
+                //completed
+                processStatusMessage(data);
+                break;
             case 'healthMessage':
                 //completed
                 processHealthMessage(data);

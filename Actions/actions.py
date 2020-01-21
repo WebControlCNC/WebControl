@@ -278,7 +278,7 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def defineHome(self, posX, posY):
+    def defineHome(self, posX="", posY=""):
         '''
         Redefines the home location and sends message to update the UI client.  In a break from ground control, this
         does not alter the gcode.  Gcode is altered by the home location only when sent to the controller.
@@ -538,6 +538,8 @@ class Actions(MakesmithInitFuncs):
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
                 self.data.pausedzval = self.data.zval
+                self.data.pausedUnits = self.data.units
+                self.data.pausedPositioningMode = self.data.positioningMode
                 self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
@@ -562,6 +564,11 @@ class Actions(MakesmithInitFuncs):
                         self.data.gcode_queue.put("G20 ")
                     else:
                         self.data.gcode_queue.put("G21 ")
+                if self.data.pausedPositioningMode != self.data.PositioningMode:
+                    if self.data.pausedPositiningMode == 0:
+                        self.data.gcode_queue.put("G90 ")
+                    else:
+                        self.data.gcode_queue.put("G91 ")
                 # move the z-axis back to where it was.
                 # note: this does not work correctly in relative mode.
                 # Todo: somehow manke this work when controller is in relative mode (G91)
