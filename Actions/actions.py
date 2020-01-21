@@ -57,10 +57,57 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
-            elif self.data.uploadFlag > 0:
+            elif self.data.uploadFlag == 1:
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
             # Commands not allowed during sending gcode.. if you did these commands, something could screw up.
             # If uploadFlag was enabled (see above) then this would never be reached.
+
+            elif msg["data"]["command"] == "move":
+                if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
+            elif msg["data"]["command"] == "moveTo":
+                if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
+            elif msg["data"]["command"] == "moveZ":
+                if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "reportSettings":
+                self.data.gcode_queue.put("$$")
+            elif msg["data"]["command"] == "home":
+                if not self.home():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to home.")
+            elif msg["data"]["command"] == "defineZ0":
+                if not self.data.actions.defineZ0():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with defining Z-Axis zero.")
+            elif msg["data"]["command"] == "moveToDefault":
+                if not self.moveToDefault():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to default chain lengths")
+            elif msg["data"]["command"] == "returnToCenter":
+                if not self.returnToCenter():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to center")
+            elif msg["data"]["command"] == "moveGcodeZ":
+                if not self.moveGcodeZ(int(msg["data"]["arg"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeGoto":
+                if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeIndex":
+                if not self.moveGcodeIndex(int(msg["data"]["arg"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to index")
+            elif msg["data"]["command"] == "macro1":
+                if not self.macro(1):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro2":
+                if not self.macro(2):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "clearLogs":
+                if not self.clearLogs():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
+
+            elif self.data.uploadFlag > 1:
+                self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while paused sending gcode. You must press STOP before performing this action.")
+            # Commands not allowed while paused.. if you did these commands, something could screw up.
+
             elif msg["data"]["command"] == "startRun":
                 if not self.startRun():
                     if len(self.data.gcode) > 0:
@@ -86,20 +133,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "resetChainLengths":
                 if not self.resetChainLengths():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting chain lengths.")
-            elif msg["data"]["command"] == "move":
-                if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
-            elif msg["data"]["command"] == "moveTo":
-                if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
-            elif msg["data"]["command"] == "moveZ":
-                if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
-            elif msg["data"]["command"] == "reportSettings":
-                self.data.gcode_queue.put("$$")
-            elif msg["data"]["command"] == "home":
-                if not self.home():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to home.")
             elif msg["data"]["command"] == "defineHome":
                 posX= msg["data"]["arg"]
                 posY= msg["data"]["arg1"]
@@ -109,36 +142,18 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Action", "gcodeUpdate", "")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with defining home.")
-            elif msg["data"]["command"] == "defineZ0":
-                if not self.data.actions.defineZ0():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with defining Z-Axis zero.")
-            elif msg["data"]["command"] == "moveToDefault":
-                if not self.moveToDefault():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to default chain lengths")
             elif msg["data"]["command"] == "testMotors":
                 if not self.testMotors():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with testing motors")
             elif msg["data"]["command"] == "wipeEEPROM":
                 if not self.wipeEEPROM(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with wiping EEPROM")
-            elif msg["data"]["command"] == "returnToCenter":
-                if not self.returnToCenter():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to center")
             elif msg["data"]["command"] == "clearGCode":
                 if self.clearGCode():
                     # send blank gcode to UI
                     self.data.ui_queue1.put("Action", "gcodeUpdate", "")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with clearing gcode")
-            elif msg["data"]["command"] == "moveGcodeZ":
-                if not self.moveGcodeZ(int(msg["data"]["arg"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
-            elif msg["data"]["command"] == "moveGcodeGoto":
-                if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
-            elif msg["data"]["command"] == "moveGcodeIndex":
-                if not self.moveGcodeIndex(int(msg["data"]["arg"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to index")
             elif msg["data"]["command"] == "setSprockets":
                 if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")
@@ -157,12 +172,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "updatePorts":
                 if not self.updatePorts():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating list of ports")
-            elif msg["data"]["command"] == "macro1":
-                if not self.macro(1):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
-            elif msg["data"]["command"] == "macro2":
-                if not self.macro(2):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
             elif msg["data"]["command"] == "optical_onStart":
                 if not self.data.opticalCalibration.on_Start():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
@@ -232,9 +241,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "executePositionPIDTest":
                 if not self.positionPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
-            elif msg["data"]["command"] == "clearLogs":
-                if not self.clearLogs():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
             elif msg["data"]["command"] == "boardProcessGCode":
                 if not self.data.boardManager.processGCode():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with processing gcode")
@@ -529,7 +535,7 @@ class Actions(MakesmithInitFuncs):
         '''
         try:
             if self.data.uploadFlag == 1:
-                self.data.uploadFlag = 0
+                self.data.uploadFlag = 2
                 self.data.console_queue.put("Run Paused")
                 self.data.ui_queue1.put("Action", "setAsResume", "")
                 # The idea was to be able to make sure the machine returns to

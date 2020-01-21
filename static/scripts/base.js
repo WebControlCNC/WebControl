@@ -12,7 +12,7 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 
 function processHealthMessage(data){
     //console.log(data.cpuUsage);
-    if (data.uploadFlag){
+    if (data.uploadFlag==1){
         if (!isDisabled){
             $('.disabler').prop('disabled', true);
             isDisabled = true;

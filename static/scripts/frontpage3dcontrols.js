@@ -125,7 +125,7 @@ function clearAlarm(data){
 }
 
 function processStatusMessage(data){
-    if (data.uploadFlag){
+    if (data.uploadFlag == 1){
         if (!isDisabled){
             $('.disabler').prop('disabled', true);
             isDisabled = true;

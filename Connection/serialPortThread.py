@@ -316,7 +316,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 # Send the next line of gcode to the machine if we're running a program and uploadFlag is enabled. Will
                 # send lines to buffer if there is space and the feature is turned on
                 # Also, don't send if there's still data in gcode_queue.
-                if self.data.uploadFlag > 0 and len(self.data.gcode) > 0 and self.data.gcode_queue.empty():
+                if self.data.uploadFlag == 1 and len(self.data.gcode) > 0 and self.data.gcode_queue.empty():
                     if weAreBufferingLines:
                         try:
                             # todo: clean this up because the line gets filtered twice.. once to make sure its not too
