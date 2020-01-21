@@ -565,7 +565,7 @@ class Actions(MakesmithInitFuncs):
                 # note: this does not work correctly in relative mode.
                 # Todo: somehow manke this work when controller is in relative mode (G91)
                 # put in absolute mode to make z axis move
-                self.datat.gcode_queue.put("G90 ")
+                self.data.gcode_queue.put("G90 ")
                 print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
