@@ -1579,6 +1579,8 @@ class Actions(MakesmithInitFuncs):
         '''
         # move the Z-axis to the safe height
         print("moving to safe height as part of processgcode")
+        #force into absolute mode
+        self.data.gcode_queue.put("G90 ")
         self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight, 4))+" F"+str(round(zAxisFeedRate, 4)))
         # move the sled to the x, y coordinate it is supposed to be.
         self.data.gcode_queue.put("G0 X"+str(round(xpos, 4))+" Y"+str(round(ypos, 4))+" F"+str(round(xyAxisFeedRate, 4)))
