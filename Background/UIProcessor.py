@@ -33,6 +33,8 @@ class UIProcessor:
                 time.sleep(0.001)
                 # send health message
                 self.performHealthCheck()
+                # send status message
+                self.performStatusCheck()
                 # send message to UI client if this is the first time webcontrol is being run.
                 if self.app.data.config.firstRun:
                     self.app.data.config.firstRun = False
@@ -615,7 +617,7 @@ class UIProcessor:
         if self.previousCurrentTool != self.app.data.currentTool:
             update = True
 
-        print("positioning mode = "+str(self.app.data.positioningMode))
+        #print("positioning mode = "+str(self.app.data.positioningMode))
 
         if update:
             statusData = {
