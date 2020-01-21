@@ -71,8 +71,8 @@ class SerialPortThread(MakesmithInitFuncs):
             '''
             monitor for position change
             '''
-            findG90 = message.find("G90")
-            findG91 = message.find("G91")
+            findG90 = message.rfind("G90")
+            findG91 = message.rfind("G91")
 
             if findG90 != -1 and findG91 != -1:
                 if findG90 > findG91:
@@ -80,10 +80,10 @@ class SerialPortThread(MakesmithInitFuncs):
                 else:
                     self.data.positioningMode = 1
             else:
-                if message.find("G90") != -1:
+                if findG90 != -1:
                     self.data.positioningMode = 0
                     #print("set positioning mode = 0")
-                if message.find("G91") != -1:
+                if findG91 != -1:
                     self.data.positioningMode = 1
                     #print("set positioning mode = 1")
 
