@@ -74,10 +74,20 @@ function gcodeUpdate(msg){
   console.log("Unsupported");
 }
 
+function boardDataUpdate(msg){
+  console.log("Unsupported");
+}
+
 function gcodeUpdateCompressed(data){
   console.log("Unsupported");
   $("#fpCircle").hide();
 }
+
+function boardCutDataUpdateCompressed(data){
+  console.log("Unsupported");
+  $("#fpCircle").hide();
+}
+
 
 function showFPSpinner(msg){
     $("#fpCircle").show();
