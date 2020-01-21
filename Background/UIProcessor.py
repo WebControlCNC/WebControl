@@ -606,7 +606,7 @@ class UIProcessor:
             self.previousUploadFlag = self.app.data.uploadFlag
         if self.previousPositioningMode != self.app.data.positioningMode:
             update = True
-            self.previousPositioningMode = self.add.data.positioningMode
+            self.previousPositioningMode = self.app.data.positioningMode
         if self.previousCurrentTool != self.app.data.currentTool:
             update = True
             self.previousCurrentTool = self.app.data.currentTool
