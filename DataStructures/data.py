@@ -68,6 +68,9 @@ class Data:
     currentpos = [0.0, 0.0, 0.0]
     target = [0.0, 0.0, 0.0]
     units = "MM"
+    # Gcode positioning mode:
+    #  0 = G90 (Absolute)
+    #  1 = G91 (Relative)
     positioningMode = 0
     tolerance = 0.5
     gcodeShift = [0.0, 0.0]  # the amount that the gcode has been shifted

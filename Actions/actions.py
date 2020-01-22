@@ -543,6 +543,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.pausedzval = self.data.zval
                 self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
+                #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
                 self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
@@ -576,9 +577,6 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
-                # fix mode if needed.. compare against 0 because potential for race condition in processing gcode_queue
-                if self.data.pausedPositioningMode == 1:
-                    self.data.gcode_queue.put("G91 ")
                 # reenable the uploadFlag if it was previous set.
                 if self.data.previousUploadStatus == -1:
                     # if was M command pause, then set to 1
@@ -592,6 +590,17 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
+
+            # Restore the last gcode positioning mode in use before pauseRun executed.
+            # This must happen for all resume cases as multiple actions may have changed it (home, moveZ etc).
+            if self.data.pausedPositioningMode is not None and self.data.positioningMode != self.data.pausedPositioningMode:
+                #print("Restoring positioning mode: " + str(self.data.pausedPositioningMode))
+                if self.data.pausedPositioningMode == 0:
+                    self.data.gcode_queue.put("G90 ")
+                elif self.data.pausedPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
+                self.data.pausedPositioningMode = None
+
             # send cycle resume command to unpause the machine
             # needed only if user initiated pause, but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
