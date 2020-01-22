@@ -576,7 +576,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
-                # fix mode if needed.. compare against 0 because potential for race condition in processing gcode_queue
+                # fix mode if needed.. compare against 1 because potential for race condition in processing gcode_queue
                 if self.data.pausedPositioningMode == 1:
                     self.data.gcode_queue.put("G91 ")
                 # reenable the uploadFlag if it was previous set.
@@ -591,6 +591,9 @@ class Actions(MakesmithInitFuncs):
                 print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
                 self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
+                # fix mode if needed.. compare against 1 because potential for race condition in processing gcode_queue
+                if self.data.pausedPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
                 self.data.uploadFlag = 1
             # send cycle resume command to unpause the machine
             # needed only if user initiated pause, but doesn't actually cause harm to controller.
