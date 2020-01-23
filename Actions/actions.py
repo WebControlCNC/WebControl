@@ -589,6 +589,9 @@ class Actions(MakesmithInitFuncs):
                     self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
+                # fix mode if needed.. compare against 1 because potential for race condition in processing gcode_queue
+                if self.data.pausedPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
                 self.data.uploadFlag = 1
 
             # Restore the last gcode positioning mode in use before pauseRun executed.
