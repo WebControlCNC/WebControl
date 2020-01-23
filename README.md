@@ -255,7 +255,7 @@ Optimizing Cython debugger
 * Run the debugger by clicking the `bug` icon
 * It should give you a warning that Cython is not optimized and prints out a command like: (DO NOT USE THE FOLLOWING)
 
-    <PATH TO VIRTUALENV>/bin/python3" "/opt/eclipse/plugins/org.python.pydev.core_7.4.0.201910251334/pysrc/setup_cython.py" build_ext --inplace running build_ext
+    "[PATH TO VIRTUALENV]/bin/python3" "[PATH TO ECLIPSE]/plugins/org.python.pydev.core_7.4.0.201910251334/pysrc/setup_cython.py" build_ext --inplace running build_ext
 
 * Stop the debugger.
 * Copy and paste the whole line into Command Prompt/Terminal and run it. 
