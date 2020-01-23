@@ -69,25 +69,22 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.lengthOfLastLineStack.appendleft(len(message))
 
             '''
-            monitor for position change
+            Monitor gcode for positioning mode change requests
             '''
+            positioningMode = None
             findG90 = message.rfind("G90")
             findG91 = message.rfind("G91")
 
             if findG90 != -1 and findG91 != -1:
                 if findG90 > findG91:
-                    self.data.positioningMode = 0
+                    positioningMode = 0
                 else:
-                    self.data.positioningMode = 1
+                    positioningMode = 1
             else:
                 if findG90 != -1:
-                    self.data.positioningMode = 0
-                    #print("set positioning mode = 0")
+                    positioningMode = 0
                 if findG91 != -1:
-                    self.data.positioningMode = 1
-                    #print("set positioning mode = 1")
-
-
+                    positioningMode = 1
 
             message = message.encode()
 
@@ -96,6 +93,11 @@ class SerialPortThread(MakesmithInitFuncs):
             '''
             try:
                 self.serialInstance.write(message)
+                # Update positioning mode after message has been sent.
+                # In 'try' block to maintain state integrity if message send fails.
+                if (positioningMode is not None):
+                    self.data.positioningMode = positioningMode
+                    #print("Set positioning mode: " + str(positioningMode))
                 self.data.logger.writeToLog("Sent: " + str(message.decode()))
             except:
                 self.data.console_queue.put("write issue")

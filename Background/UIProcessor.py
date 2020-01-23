@@ -109,6 +109,8 @@ class UIProcessor:
                                 self.app.data.pausedzval = self.app.data.zval
                                 # remember the current units because user might switch them to zero the zaxis.
                                 self.app.data.pausedUnits = self.app.data.units
+                                # Remember current positioning mode.
+                                self.app.data.pausedPositioningMode = self.app.data.positioningMode
                                 self.app.data.console_queue.put("found tool change in message")
                                 # notify user
                                 self.activateModal("Notification:", message[13:], "notification", resume="resume")
