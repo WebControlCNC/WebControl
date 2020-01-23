@@ -561,20 +561,24 @@ class Actions(MakesmithInitFuncs):
         try:
             # if a tool change, then...
             print("at resume run with manualzaxisadjust = "+str(self.data.manualZAxisAdjust))
+
+            # Restore units.
+            if self.data.pausedUnits != self.data.units:
+                print("Restoring units to:" + str(self.data.pausedUnits))
+                if self.data.pausedUnits == "INCHES":
+                    self.data.gcode_queue.put("G20 ")
+                elif self.data.pausedUnits == "MM":
+                    self.data.gcode_queue.put("G21 ")
+
+            # Move the z-axis back to where it was.
+            # Put in absolute mode to make z axis move
+            self.data.gcode_queue.put("G90 ")
+            # THE ABOVE COMMAND IS NOT EXECUTED IN LINE AND REQUIRES FOLLOWING TO TRACK POSITIONING MODE
+            self.data.positioningMode = 0
+            print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
+            self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
+
             if self.data.manualZAxisAdjust:
-                # make sure the units match what they were
-                if self.data.pausedUnits != self.data.units:
-                    if self.data.pausedUnits == "INCHES":
-                        self.data.gcode_queue.put("G20 ")
-                    else:
-                        self.data.gcode_queue.put("G21 ")
-                # move the z-axis back to where it was.
-                # note: this does not work correctly in relative mode.
-                # Todo: somehow manke this work when controller is in relative mode (G91)
-                # put in absolute mode to make z axis move
-                self.data.gcode_queue.put("G90 ")
-                print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun")
-                self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
                 # reenable the uploadFlag if it was previous set.
@@ -584,17 +588,13 @@ class Actions(MakesmithInitFuncs):
                 else:
                     self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
-                # put in absolute mode to make z axis move
-                self.data.gcode_queue.put("G90 ")
-                print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
-                self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
 
             # Restore the last gcode positioning mode in use before pauseRun executed.
             # This must happen for all resume cases as multiple actions may have changed it (home, moveZ etc).
             if self.data.pausedPositioningMode is not None and self.data.positioningMode != self.data.pausedPositioningMode:
-                #print("Restoring positioning mode: " + str(self.data.pausedPositioningMode))
+                print("Restoring positioning mode: " + str(self.data.pausedPositioningMode))
                 if self.data.pausedPositioningMode == 0:
                     self.data.gcode_queue.put("G90 ")
                 elif self.data.pausedPositioningMode == 1:
