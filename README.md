@@ -215,11 +215,49 @@ If you don't have python3.6+ locally (to be able to run `black`), you can run `b
 
 ### IDE
 
-[Pycharm Community Edition](https://www.jetbrains.com/pycharm/download) is a free, well-featured Python IDE.
+#### PyCharm
+
+[PyCharm Community Edition](https://www.jetbrains.com/pycharm/download) is a free, well-featured Python IDE.
 
 With the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) and [BlackPycharm](https://plugins.jetbrains.com/plugin/10563-black-pycharm) plugins you can set up your editor to automatically format your code on save. Then you never have to think about code formatting again :tada:
 
 ![PyCharm Screenshot](https://user-images.githubusercontent.com/218876/47197011-817e1600-d318-11e8-8172-eb2c1ffe2d21.png)
+
+#### Eclipse PyDev
+
+[Eclipse](https://www.eclipse.org/downloads/packages/) is a free multiplatform IDE for multiple programming languages. Python developement is provided by the free [PyDev plugin](https://www.pydev.org/index.html).
+
+##### Configuration tips
+
+To use a python virtual environment:
+* Top Menu -> Windows -> Preferences -> PyDev -> Interpreters -> Python Interpreter
+* Click `Browse for Python/Pypy exe` button.
+* Navigate to the path of your virtual env (e.g. ~/.venv/bin) and select `python3` executable.
+* Name the Interpreter something unique. If this virtual env is just for Webcontrol you can name it `Webcontrol Python3`
+* Select all paths listed excluding paths that your Project uses.
+* Click `OK`
+* A window will appear listing folders to be included in Python Path. They should all be selected. Click `OK`.
+* Right click on Project Name 'WebControl' -> Properties -> PyDev - Intepreter/Grammar.
+* Select `Intepreter` -> The one you just created (e.g `WebControl Python3`)
+* Select `Grammar Version` ->  `Same as interpreter`. 
+* Click `Apply and Close` button.
+
+##### Debug Configuration tips
+
+This is required to work with `gevent monkey` as many break point will fail to work without it.
+* Top Menu -> Windows -> Preferences
+* Popup left menu -> PyDev -> Debug
+* Check `Gevent compatible debugging?`
+* Click `Apply and Close` button.
+
+Optimizing Cython debugger
+* Run the debugger by clicking the `bug` icon
+* It should give you a warning that Cython is not optimized and prints out a command like: (DO NOT USE THE FOLLOWING)
+"<PATH TO VIRTUALENV>/bin/python3" "/opt/eclipse/plugins/org.python.pydev.core_7.4.0.201910251334/pysrc/setup_cython.py" build_ext --inplace running build_ext"
+* Stop the debugger.
+* Copy and paste the whole line into Command Prompt/Terminal and run it. 
+* It will take a while to compile.
+* Start the debugger again. The message should now be gone and debugger runs fast.
 
 ## Contributing
 
