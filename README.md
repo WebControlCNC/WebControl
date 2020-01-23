@@ -227,10 +227,11 @@ With the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers
 
 [Eclipse](https://www.eclipse.org/downloads/packages/) is a free multiplatform IDE for multiple programming languages. Python developement is provided by the free [PyDev plugin](https://www.pydev.org/index.html).
 
-##### Configuration tips
+##### Eclipse Configuration
 
 To use a python virtual environment:
-* Top Menu -> Windows -> Preferences -> PyDev -> Interpreters -> Python Interpreter
+* Top Menu -> Windows -> Preferences
+* Popup Left menu -> PyDev -> Interpreters -> Python Interpreter
 * Click `Browse for Python/Pypy exe` button.
 * Navigate to the path of your virtual env (e.g. ~/.venv/bin) and select `python3` executable.
 * Name the Interpreter something unique. If this virtual env is just for Webcontrol you can name it `Webcontrol Python3`
@@ -242,7 +243,7 @@ To use a python virtual environment:
 * Select `Grammar Version` ->  `Same as interpreter`. 
 * Click `Apply and Close` button.
 
-##### Debug Configuration tips
+##### Eclipse Debug Configuration
 
 This is required to work with `gevent monkey` as many break point will fail to work without it.
 * Top Menu -> Windows -> Preferences
@@ -253,11 +254,24 @@ This is required to work with `gevent monkey` as many break point will fail to w
 Optimizing Cython debugger
 * Run the debugger by clicking the `bug` icon
 * It should give you a warning that Cython is not optimized and prints out a command like: (DO NOT USE THE FOLLOWING)
-"<PATH TO VIRTUALENV>/bin/python3" "/opt/eclipse/plugins/org.python.pydev.core_7.4.0.201910251334/pysrc/setup_cython.py" build_ext --inplace running build_ext"
+
+    <PATH TO VIRTUALENV>/bin/python3" "/opt/eclipse/plugins/org.python.pydev.core_7.4.0.201910251334/pysrc/setup_cython.py" build_ext --inplace running build_ext
+
 * Stop the debugger.
 * Copy and paste the whole line into Command Prompt/Terminal and run it. 
 * It will take a while to compile.
 * Start the debugger again. The message should now be gone and debugger runs fast.
+
+##### Eclipse Black code formatter
+
+* Install `black` to virtual environment as described above in `Automatic code formatting`
+* Top Menu -> Window -> Preferences
+* Popup Left menu -> PyDev -> Editor -> Code Style -> Code Formatter
+* Select `Black` from the `Formatter style` drop down.
+* Select `Search in interpreter` radio button.
+* Click `Apply and close` button.
+
+Open a python file and Top Menu -> Source -> Format Code. Or use keyboard shortcut [Ctrl] + [Shift] + [F].
 
 ## Contributing
 
