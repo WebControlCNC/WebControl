@@ -26,7 +26,7 @@ class SerialPortThread(MakesmithInitFuncs):
     bufferSize = 126  # The total size of the arduino buffer
     bufferSpace = bufferSize  # The amount of space currently available in the buffer
     lengthOfLastLineStack = deque()
-
+    weAreBufferingLines = 0
     # Minimum time between lines sent to allow Arduino to cope
     # could be smaller (0.02) however larger number doesn't seem to impact performance
     MINTimePerLine = 0.05
@@ -179,14 +179,19 @@ class SerialPortThread(MakesmithInitFuncs):
                 print("found M command")
                 self.data.uploadFlag = -1
                 self.data.currentTool = toolNumber
+                ## new stuff
+                #self.data.quick_queue.put("~")
+                #self.data.ui_queue1.put("Action", "setAsResume", "")
+                ## end new stuff
+
                 # now, the issue is that if the controller gets reset, then the tool number will revert to 0.. so
                 # on serial port connect/reconnect, reinitialize tool number to 0
 
             # but in the second case, just continue on..
 
             ## new stuff
-            # self.data.quick_queue.put("~")
-            # self.data.ui_queue1.put("Action", "setAsResume", "")
+            #self.data.quick_queue.put("~")
+            #self.data.ui_queue1.put("Action", "setAsResume", "")
             ## end new stuff
 
     def closeConnection(self):
@@ -218,7 +223,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 + " is installed"
             )
 
-        weAreBufferingLines = bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
+        self.weAreBufferingLines = bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
 
         try:
             self.data.comport = self.data.config.getValue("Maslow Settings", "COMport")
@@ -319,7 +324,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 # send lines to buffer if there is space and the feature is turned on
                 # Also, don't send if there's still data in gcode_queue.
                 if self.data.uploadFlag == 1 and len(self.data.gcode) > 0 and self.data.gcode_queue.empty():
-                    if weAreBufferingLines:
+                    if self.weAreBufferingLines:
                         try:
                             # todo: clean this up because the line gets filtered twice.. once to make sure its not too
                             # long, and the second in the sendNextLine command.. bit redundant.

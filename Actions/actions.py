@@ -104,7 +104,7 @@ class Actions(MakesmithInitFuncs):
                 if not self.clearLogs():
                     self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
 
-            elif self.data.uploadFlag > 1:
+            elif self.data.uploadFlag > 1 or self.data.uploadFlag < 0 :
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while paused sending gcode. You must press STOP before performing this action.")
             # Commands not allowed while paused.. if you did these commands, something could screw up.
 
@@ -134,6 +134,7 @@ class Actions(MakesmithInitFuncs):
                 if not self.resetChainLengths():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting chain lengths.")
             elif msg["data"]["command"] == "defineHome":
+                print(self.data.uploadFlag)
                 posX= msg["data"]["arg"]
                 posY= msg["data"]["arg1"]
                 if self.defineHome(posX, posY):
