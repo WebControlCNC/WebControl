@@ -255,7 +255,7 @@ class Config(MakesmithInitFuncs):
                                 value = "on"
                             else:
                                 value = "off"
-                        if value == "on":
+                        if value == "on" or value == "1" or value == 1:
                             storedValue = self.settings[section][x]["value"]
                             self.settings[section][x]["value"] = 1
                             updated = True
