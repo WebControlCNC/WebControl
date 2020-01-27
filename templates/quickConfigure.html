@@ -38,7 +38,7 @@
         </select>
         <p></p>
         <label for="rotationRadius">Rotational Radius</label>
-        <input class="form-control" type="number" name="rotationRadius" id="rotationRadius" value="{{rotationRadius}}">
+        <input class="form-control"  type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="rotationRadius" id="rotationRadius" value="{{rotationRadius}}">
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
@@ -70,7 +70,7 @@
         <img src="{{ url_for('static',filename='images/quickConfig/measureEdgeMotor.png') }}" height="300" width="300">
         <p></p>
         <label for="motorSpacingX">Distance Between Motors</label>
-        <input class="form-control" type="number" step="any" name="motorSpacingX" id="motorSpacingX" value="{{motorSpacingX}}">
+        <input class="form-control"  type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="motorSpacingX" id="motorSpacingX" value="{{motorSpacingX}}">
         <small class="form-text text-muted">Enter value in mm only</small>
         <button type="button" onclick="subtract40p4();">Subtract 40.4 mm</button>
       </div>
@@ -85,7 +85,7 @@
         <img src="{{ url_for('static',filename='images/quickConfig/motorOffsetY.png') }}" height="300" width="300">
         <p></p>
         <label for="motorOffsetY">Height of Motors Above Workspace</label>
-        <input class="form-control" type="number" step="any" name="motorOffsetY" id="motorOffSetY" value="{{motorOffsetY}}">
+        <input class="form-control"  type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="motorOffsetY" id="motorOffSetY" value="{{motorOffsetY}}">
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
