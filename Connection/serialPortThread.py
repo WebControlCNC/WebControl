@@ -142,9 +142,10 @@ class SerialPortThread(MakesmithInitFuncs):
             line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
             # check if command is going to be issued that pauses the controller.
             self.manageToolChange(line)
-            # put gcode home shift here
             if not line.isspace(): # if all spaces, don't send.  likely a comment.
-                line = self.data.gcodeFile.moveLine(line)
+                # put gcode home shift here.. only if in absolute mode (G90)    
+                if self.data.positioningMode == 0:
+                    line = self.data.gcodeFile.moveLine(line)
                 self._write(line)
                 # if there is a units change, then update the UI client so position messages are processed correctly.
                 if line.find("G20") != -1:

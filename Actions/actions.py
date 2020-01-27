@@ -1400,7 +1400,10 @@ class Actions(MakesmithInitFuncs):
                 # if in absolute mode
                 x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if x:
-                    xTarget = float(x.groups()[0])
+                    if self.data.positioningMode == 0:
+                        xTarget = float(x.groups()[0])
+                    else:
+                        xTarget = float(x.groups()[0]) + self.data.previousPosX
                     self.data.previousPosX = xTarget
                 else:
                     xTarget = self.data.previousPosX
@@ -1408,7 +1411,10 @@ class Actions(MakesmithInitFuncs):
                 y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
 
                 if y:
-                    yTarget = float(y.groups()[0])
+                    if self.data.positioningMode == 0:
+                        yTarget = float(y.groups()[0])
+                    else:
+                        yTarget = float(y.groups()[0]) + self.data.previousPosY
                     self.data.previousPosY = yTarget
                 else:
                     yTarget = self.data.previousPosY
@@ -1416,7 +1422,10 @@ class Actions(MakesmithInitFuncs):
                 z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
 
                 if z:
-                    zTarget = float(z.groups()[0])
+                    if self.data.positioningMode == 0:
+                        zTarget = float(z.groups()[0])
+                    else:
+                        zTarget = float(z.groups()[0]) + self.data.previousPosZ
                     self.data.previousPosZ = zTarget
                 else:
                     zTarget = self.data.previousPosZ
