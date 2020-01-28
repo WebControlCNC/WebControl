@@ -46,7 +46,7 @@
                 <label for="switch-{{setting.key}}"></label>
               </span>
             {% else %}
-              <input name="{{setting.key}}" {{'type="number" step="any"' | safe if setting.value | isnumber else '' }} data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+              <input name="{{setting.key}}" {{'type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$"' | safe if setting.value | isnumber else '' }} data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
             {% endif %}
           </div>
         </div>

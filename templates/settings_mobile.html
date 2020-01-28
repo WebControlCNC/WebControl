@@ -6,11 +6,11 @@
       {% for setting in settings %}
       <li class="list-group-item">
         <div class="row align-items-center">
-          <div class="col-8">
+          <div class="col-7">
             <h4 {{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.title}}</h4>
             <p {{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.desc}}</p>
           </div>
-          <div class="col-4">
+          <div class="col-5">
             {% if setting.key =="COMport" %}
               <div class="input-group mb-3">
                 <select class="custom-select" name="{{setting.key}}" id="comPorts" data-group="{{title}}">
@@ -46,7 +46,7 @@
                 <label for="switch-{{setting.key}}"></label>
               </span>
             {% else %}
-              <input name="{{setting.key}}" {{'type="number" step="any"' | safe if setting.value | isnumber else '' }} data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+              <input name="{{setting.key}}" {{'type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$"' | safe if setting.value | isnumber else '' }} data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
               <!--<input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>-->
             {% endif %}
           </div>
