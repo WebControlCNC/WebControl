@@ -7,7 +7,7 @@ import math
 import os
 
 
-monkey.patch_all()
+#monkey.patch_all(thread=False, threading=False)
 
 import schedule
 import time
@@ -57,7 +57,7 @@ app.LogStreamer = LogStreamer()
 def run_schedule():
     while 1:
         schedule.run_pending()
-        time.sleep(1)
+        socketio.sleep(1)
 
 ## this runs the scheduler to check for connections
 app.th = threading.Thread(target=run_schedule)
@@ -623,6 +623,7 @@ def test_connect():
         app.uithread = socketio.start_background_task(
             app.UIProcessor.start, current_app._get_current_object()
         )
+        # I don't think this is needed.
         app.uithread.start()
 
     if not app.data.connectionStatus:

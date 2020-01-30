@@ -1,3 +1,4 @@
+from __main__ import socketio
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import time
@@ -14,7 +15,7 @@ class MessageProcessor(MakesmithInitFuncs):
 
         while True:
             # give other threads opportunity to run
-            time.sleep(0.001)
+            socketio.sleep(0.001)
             # check for available update file every hour.
             if time.time()-self.data.lastChecked > 60*60:
                 self.data.lastChecked = time.time()

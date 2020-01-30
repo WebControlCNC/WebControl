@@ -73,7 +73,9 @@ class GPIOActions(MakesmithInitFuncs):
         for led in self.LEDs:
             if led[0] == action:
                 if onoff == "on":
+                    print(led[1])
                     led[1].on()
+                    print(led[1])
                 else:
                     led[1].off()
         if action == "PlayLED" and onoff == "on":

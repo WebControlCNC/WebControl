@@ -20,7 +20,7 @@ class LogStreamer:
         with self.app.app_context():
             while True:
                 # this sleep function is needed to keep it non-blocking.
-                time.sleep(0.001)
+                socketio.sleep(0.001)
                 # if there is new data to be read
                 loggerState = self.app.data.logger.getLoggerState()
                 while (not self.app.data.alog_streamer_queue.empty() or not self.app.data.log_streamer_queue.empty()):

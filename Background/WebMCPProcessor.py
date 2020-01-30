@@ -15,7 +15,7 @@ class WebMCPProcessor(MakesmithInitFuncs):
         self.app = _app
         self.data.webMCPActive = True
         while True:
-            time.sleep(0.001)
+            socketio.sleep(0.001)
             while (not self.data.mcp_queue.empty()):  # if there is new data to be read
                 message = self.data.mcp_queue.get()
                 #print("MCP Queue:"+message)

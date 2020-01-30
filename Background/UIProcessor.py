@@ -30,7 +30,7 @@ class UIProcessor:
         self.app.data.console_queue.put("starting UI")
         with self.app.app_context():
             while True:
-                time.sleep(0.001)
+                socketio.sleep(0.001)
                 # send health message
                 self.performHealthCheck()
                 # send status message

@@ -1,3 +1,4 @@
+from __main__ import socketio
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import threading
 import cv2
@@ -89,7 +90,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
     def update(self):
         # keep looping infinitely until the thread is stopped
         while True:
-            time.sleep(self.cameraSleep)
+            socketio.sleep(self.cameraSleep)
             if not self.data.continuousCamera or time.time()-self.lastCameraRead < 20:
                 (self.grabbed, self.frame) = self.stream.read()
                 self.suspended = False
