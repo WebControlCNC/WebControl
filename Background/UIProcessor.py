@@ -1,4 +1,4 @@
-from __main__ import socketio
+from app import socketio
 
 import time
 import math
@@ -15,6 +15,7 @@ are put).  There is a legacy ui_queue (not the missing 1) that I reworked into u
 This class is not MakesmithInitFuncs inherited, so it doesn't have direct access to the data.  Therefore, it gets
 passed the app.  
 '''
+
 
 class UIProcessor:
     app = None
@@ -75,7 +76,7 @@ class UIProcessor:
                         message = self.app.data.ui_controller_queue.get()
                         if message != "":
                             if message[0] == "<":
-                                #call function to parse position message and update UI clients
+                                # call function to parse position message and update UI clients
                                 self.setPosOnScreen(message)
                             elif message[0] == "[":
                                 # call function to parse position error message and update UI clients
@@ -91,14 +92,14 @@ class UIProcessor:
                                 # operation is to issue this 'un-pause' command which then lets two ok's to come back
                                 # (one for the tool change and one for the ~)  Without this, serialThread won't see
                                 # that the bufferSize = bufferSpace and therefore won't issue any commands.
-                                ## new stuff
+                                # # new stuff
                                 # self.app.data.quick_queue.put("~")
-                                ## end new stuff
+                                # # end new stuff
                                 self.app.data.pausedUnits = self.app.data.units
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message",
                                               {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                                              namespace="/MaslowCNC", )
+                                              namespace="/MaslowCNC",)
                             elif message[0:12] == "Tool Change:":
                                 # Tool change message detected.
                                 # not sure what manualzaxisadjust is.. ###
@@ -148,7 +149,7 @@ class UIProcessor:
                             elif message == "ok\r\n":
                                 pass  # displaying all the 'ok' messages clutters up the display
                             else:
-                                #if something else, send it to the UI to figure out.
+                                # if something else, send it to the UI to figure out.
                                 self.sendControllerMessage(message)
                     if not self.app.data.ui_queue1.empty():
                         # webcontrol generated messages to be sent to UI client
@@ -407,19 +408,19 @@ class UIProcessor:
             # turn on spinner on UI clients
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": len(self.app.data.compressedGCode3D), "dataFormat": "int"},
-                          namespace="/MaslowCNC", )
+                          namespace="/MaslowCNC",)
             # pause to let the spinner get turned on.
             time.sleep(0.25)
             # send the data.  Once processed by the UI client, the client will turn off the spinner.
             socketio.emit("message", {"command": "gcodeUpdateCompressed",
                                       "data": self.app.data.compressedGCode3D, "dataFormat": "base64"},
-                          namespace="/MaslowCNC", )
+                          namespace="/MaslowCNC",)
             self.app.data.console_queue.put("Sent Gcode compressed")
         else:
-            #send "" if there is no compressed data (i.e., because there's no gcode to compress)
+            # send "" if there is no compressed data (i.e., because there's no gcode to compress)
             socketio.emit("message", {"command": "gcodeUpdateCompressed",
                                       "data": "", "dataFormat": "base64"},
-                          namespace="/MaslowCNC", )
+                          namespace="/MaslowCNC",)
 
     def sendBoardUpdate(self):
         '''
@@ -432,7 +433,7 @@ class UIProcessor:
             self.app.data.console_queue.put("Sending Board Data")
             socketio.emit("message", {"command": "boardDataUpdate",
                                       "data": boardData, "dataFormat": "json"},
-                          namespace="/MaslowCNC", )
+                          namespace="/MaslowCNC",)
             self.app.data.console_queue.put("Sent Board Data")
 
         cutData = self.app.data.boardManager.getCurrentBoard().getCompressedCutData()
@@ -440,11 +441,11 @@ class UIProcessor:
             self.app.data.console_queue.put("Sending Board Cut Data compressed")
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": 1, "dataFormat": "int"},
-                          namespace="/MaslowCNC", )
+                          namespace="/MaslowCNC",)
             time.sleep(0.25)
             socketio.emit("message", {"command": "boardCutDataUpdateCompressed",
                                       "data": cutData, "dataFormat": "base64"},
-                          namespace="/MaslowCNC", )
+                          namespace="/MaslowCNC",)
             self.app.data.console_queue.put("Sent Board Cut Data compressed")
 
     def unitsUpdate(self):
@@ -457,7 +458,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "units", "value": units})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace="/MaslowCNC",)
 
     def distToMoveUpdate(self):
         '''
@@ -469,7 +470,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "distToMove", "value": distToMove})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace="/MaslowCNC",)
 
     def unitsUpdateZ(self):
         '''
@@ -481,7 +482,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "unitsZ", "value": unitsZ})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace="/MaslowCNC",)
 
     def distToMoveUpdateZ(self):
         '''
@@ -493,7 +494,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "distToMoveZ", "value": distToMoveZ})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace="/MaslowCNC",)
 
     def processMessage(self, _message):
         '''
@@ -523,7 +524,7 @@ class UIProcessor:
                 self.distToMoveUpdateZ()
             elif msg["message"] == "updateTimer":
                 # Todo: clean this up .. edit: sendCalibrationMessage got deleted somewhere.
-                #self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
+                # self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
                 pass
             elif msg["message"] == "updateCamera":
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
@@ -615,7 +616,7 @@ class UIProcessor:
             update = True
             self.previousCurrentTool = self.app.data.currentTool
 
-        #print("positioning mode = "+str(self.app.data.positioningMode))
+        # print("positioning mode = "+str(self.app.data.positioningMode))
 
         if update:
             statusData = {
@@ -628,7 +629,7 @@ class UIProcessor:
                           namespace="/MaslowCNC")
 
     def isChainLengthZero(self, msg):
-        #Message: Unable to find valid machine position for chain lengths 0.00, 0.00 Left Chain Length
+        # Message: Unable to find valid machine position for chain lengths 0.00, 0.00 Left Chain Length
         # If one chain length is zero, it will report as above.
         if msg.find("lengths 0.00") != -1:
             return True
