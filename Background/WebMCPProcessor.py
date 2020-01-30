@@ -32,7 +32,7 @@ class ConsoleProcessor(MakesmithInitFuncs):
     def start(self):
         print("Starting Console Queue Processor")
         while True:
-            time.sleep(0.001)
+            socketio.sleep(0.001)
             while (not self.data.console_queue.empty()):  # if there is new data to be read
                 message = self.data.console_queue.get()
                 print(message)

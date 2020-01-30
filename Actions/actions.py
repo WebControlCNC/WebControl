@@ -1,4 +1,4 @@
-
+from __main__ import socketio
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import os
@@ -513,7 +513,7 @@ class Actions(MakesmithInitFuncs):
                 return False
 
             #sync settings after 2 seconds (give time form controller to reset)
-            time.sleep(2)
+            socketio.sleep(2)
             self.data.gcode_queue.put("$$")
 
             #reset chain lengths so they aren't zero
@@ -1326,7 +1326,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("SpinnerMessage", "", "Holey Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/holey/*.hex"
             # wait half second.. not sure why..
-            time.sleep(.5)
+            socketio.sleep(.5)
             t0 = time.time()*1000
             portClosed = False
             # request the the serial port is closed
@@ -1337,7 +1337,7 @@ class Actions(MakesmithInitFuncs):
                     portClosed = True
                     break
             # wait 1.5 seconds.. not sure why...
-            time.sleep(1.5)
+            socketio.sleep(1.5)
             # if port is closed, then upgrade firmware..
             if portClosed:
                 # works if there is only only valid hex file in the directory
@@ -1686,7 +1686,7 @@ class Actions(MakesmithInitFuncs):
             for x in range(6):
                 self.data.ui_queue1.put("Action", "updateTimer", chain+":"+str(5-x))
                 self.data.console_queue.put("Action:updateTimer_" + chain + ":" + str(5 - x))
-                time.sleep(1)
+                socketio.sleep(1)
             if chain == "left":
                 self.data.gcode_queue.put("B02 L1 R0 ")
                 self.data.measureRequest = self.issueStopCommand

@@ -1,3 +1,4 @@
+from __main__ import socketio
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 #from scipy.spatial import distance as dist
 
@@ -22,7 +23,7 @@ import datetime
 class OpticalCalibration(MakesmithInitFuncs):
 
     camera = None
-    time.sleep(2.0)
+    socketio.sleep(2.0)
     gaussianBlurValue = 5
     cannyLowValue = 50
     cannyHighValue = 100
@@ -213,7 +214,7 @@ class OpticalCalibration(MakesmithInitFuncs):
         falseCounter = 0
         xA=0
         yA=0
-        time.sleep(1)
+        socketio.sleep(1)
         while True:
             #(grabbed, image) = self.camera.read()
             image = self.camera.read()

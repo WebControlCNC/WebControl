@@ -39,7 +39,7 @@ class UIProcessor:
                 if self.app.data.config.firstRun:
                     self.app.data.config.firstRun = False
                     # I *think* this was added to give time for the browser to open up.
-                    time.sleep(2)
+                    socketio.sleep(2)
                     self.activateModal("Notification:",
                                        "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.",
                                        "notification")
@@ -409,7 +409,7 @@ class UIProcessor:
                                       "data": len(self.app.data.compressedGCode3D), "dataFormat": "int"},
                           namespace="/MaslowCNC", )
             # pause to let the spinner get turned on.
-            time.sleep(0.25)
+            socketio.sleep(0.25)
             # send the data.  Once processed by the UI client, the client will turn off the spinner.
             socketio.emit("message", {"command": "gcodeUpdateCompressed",
                                       "data": self.app.data.compressedGCode3D, "dataFormat": "base64"},
@@ -441,7 +441,7 @@ class UIProcessor:
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": 1, "dataFormat": "int"},
                           namespace="/MaslowCNC", )
-            time.sleep(0.25)
+            socketio.sleep(0.25)
             socketio.emit("message", {"command": "boardCutDataUpdateCompressed",
                                       "data": cutData, "dataFormat": "base64"},
                           namespace="/MaslowCNC", )

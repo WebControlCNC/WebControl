@@ -1,4 +1,5 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
+from __main__ import socketio
 from DataStructures.data import Data
 import serial
 import time
@@ -42,7 +43,7 @@ class SerialPortThread(MakesmithInitFuncs):
         '''
         taken = time.time() - self.lastWriteTime
         if taken < self.MINTimePerLine:  # wait between sends
-            time.sleep(self.MINTimePerLine)  # could use (taken - MINTimePerLine)
+            socketio.sleep(self.MINTimePerLine)  # could use (taken - MINTimePerLine)
 
         message = message + "\n"
 
@@ -365,7 +366,7 @@ class SerialPortThread(MakesmithInitFuncs):
                     self.data.connectionStatus = 0
                     self.serialInstance.close()
 
-                time.sleep(0.01)
+                socketio.sleep(0.01)
 
     def extractGcodeValue(self, readString, target, defaultReturn):
         # Reads a string and returns the value of number following the target character.
