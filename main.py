@@ -1,13 +1,13 @@
 # main.py
+from gevent import monkey; monkey.patch_all(thread=False)
 from app import app, socketio
-from gevent import monkey
 import webbrowser
 import socket
 import math
 import os
 
 
-monkey.patch_all()
+
 
 import schedule
 import time

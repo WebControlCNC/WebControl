@@ -452,6 +452,7 @@ class Actions(MakesmithInitFuncs):
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
+            self.data.serialPort.clearAlarm()
             self.data.gpioActions.causeAction("StopLED", "on")
             return True
         except Exception as e:
@@ -575,7 +576,7 @@ class Actions(MakesmithInitFuncs):
             # Put in absolute mode to make z axis move
             self.data.gcode_queue.put("G90 ")
             # THE ABOVE COMMAND IS NOT EXECUTED IN LINE AND REQUIRES FOLLOWING TO TRACK POSITIONING MODE
-            self.data.positioningMode = 0
+            # self.data.positioningMode = 0
             print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
             self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
 
