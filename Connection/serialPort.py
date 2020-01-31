@@ -3,6 +3,7 @@ from Connection.serialPortThread import SerialPortThread
 
 import serial
 import threading
+import schedule
 
 
 class SerialPort(MakesmithInitFuncs):
@@ -25,7 +26,7 @@ class SerialPort(MakesmithInitFuncs):
         self._serialInstance = serial.Serial(baudrate=57600, timeout=0.25)
         self._stop_event = threading.Event()
 
-        # schedule.every(5).seconds.do(self.openConnection)
+        schedule.every(5).seconds.do(self.testConnection)
 
     def setUpData(self, data):
         self.data = data
@@ -100,6 +101,29 @@ class SerialPort(MakesmithInitFuncs):
                     "fakeServoStatus": self.data.fakeServoStatus,
                 },
             )
+
+    def testConnection(self):
+        print(self.data.connectionStatus)
+        if self.data.connectionStatus == 0:
+            self.data.ui_queue1.put(
+                "Action",
+                "connectionStatus",
+                {
+                    "status": "disconnected",
+                    "port": "none",
+                    "fakeServoStatus": self.data.fakeServoStatus,
+                },
+            )
+            self.openConnection()
+        self.data.ui_queue1.put(
+            "Action",
+            "connectionStatus",
+            {
+                "status": "connected",
+                "port": self.data.comport,
+                "fakeServoStatus": self.data.fakeServoStatus,
+            },
+        )
 
     def closeConnection(self):
         if self._serialInstance is not None and self._serialInstance.is_open:

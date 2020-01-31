@@ -287,11 +287,11 @@ class SerialPortThread(MakesmithInitFuncs):
 
             # Check for serial connection loss when not using fake servo
             # -------------------------------------------------------------------------------------
-            if self.data.fakeServoStatus == False:
-                if time.time() - self.lastMessageTime > 5:
-                    self.data.console_queue.put("Connection Timed Out")
-                    self.data.serialPort.closeConnection()
-                    return
+            #if self.data.fakeServoStatus == False:
+            if time.time() - self.lastMessageTime > 5:
+                self.data.console_queue.put("Connection Timed Out")
+                self.data.serialPort.closeConnection()
+                return
 
             time.sleep(0.01)
 
