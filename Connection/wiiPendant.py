@@ -19,7 +19,7 @@ class WiiPendant(MakesmithInitFuncs):
       hcitool scan
     record wiimote address and put it in the script file:
       mkdir bin
-      nano ./binconnectwii.sh
+      nano ./conwii.sh
       #!/bin/bash
       sleep 1 # Wait until Bluetooth services are fully initialized
       hcitool dev | grep hci >/dev/null
@@ -30,11 +30,13 @@ class WiiPendant(MakesmithInitFuncs):
           echo "Blue-tooth adapter not present!"
           exit 1
       fi
-    Here are instructions on using it:
-      sudo modprobe uinput
-      sudo nano /etc/profile.d/10-retropie.sh
-      rebootWithoutWiimotes=0
-      sudo /home/pi/bin/connectwii.sh
+      ...
+      $ sudo apt-get install bluetooth vorbis-tools python-cwiid wminput
+      $ sudo tee /etc/udev/rules.d/wiimote.rules << EOF
+      > KERNEL=="uinput", MODE="0666"
+      > EOF
+      sudo service udev restart
+      /etc/init.d/bluetooth status
  '''
  wiiPendantRequest = ""
  wm = None
@@ -45,10 +47,10 @@ class WiiPendant(MakesmithInitFuncs):
     """
        try every 5 seconds to connect if the wiimote is an option
     """
-    self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
-    schedule.every(10).seconds.do(self.openConnection)
-    if self.debug:
-            print("every 10 seconds will check to see if BT wii available for connect")
+    #self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
+    #schedule.every(10).seconds.do(self.openConnection)
+    #if self.debug:
+    #        print("every 10 seconds will check to see if BT wii available for connect")
 
  def openConnection(self):
     '''
