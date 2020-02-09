@@ -1,13 +1,10 @@
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-#from Connection.wiiPendantThread import WiiPendantThread
-#from DataStructures import data
 import schedule
 import threading
 import cwiid
 import time
 
 
-class WiiPendant(MakesmithInitFuncs):
+class WiiPendant():
  '''
     This class will start the communication thread for the wiimote Bluetooth connection
     This class relies on the setpoints in the /etc/cwiid/wminput/ folder of files that has the names of the input fields sent by the wiimote
@@ -38,75 +35,7 @@ class WiiPendant(MakesmithInitFuncs):
       sudo service udev restart
       /etc/init.d/bluetooth status
  '''
- wiiPendantRequest = ""
- wm = None
- debug = True
- th = None
  
- def setup(self):
-    """
-       try every 5 seconds to connect if the wiimote is an option
-    """
-    #self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
-    #schedule.every(10).seconds.do(self.openConnection)
-    #if self.debug:
-    #        print("every 10 seconds will check to see if BT wii available for connect")
-
- def openConnection(self):
-    '''
-       if the wiiPendantFlag in the config is True, then check if the wiiPendant is already connected
-       if not connected, then set t
-    '''
-    if self.debug:
-        print("checking wiimote connection")
-    if self.data.wiiPendantPresent:
-      if self.debug:
-            print("User has Activated wiimote in menu")
-      if not self.data.wiiPendantConnected:
-            if self.debug:
-                  print("Wiimote connection flag is false")
-                  #print("is the wiimote object instantiated")
-            if self.wm == None:
-              if self.debug:
-                    print("wiimote object is empty")
-              while not self.wm:
-               if self.debug:
-                   print("trying to connect")
-               try:
-                 self.wm=cwiid.Wiimote()
-                 self.wm.rpt_mode = cwiid.RPT_BTN
-                 self.data.wiiPendantConnected = True
-                 self.wm.rumble(0)
-                 print("wii connection success, spawning thread")
-                 x = WiiPendantThread()
-                 x.data = self.data
-                 self.th = threading.Thread(target=x.read_buttons)
-                 self.th.daemon = True
-                 self.th.start()
-               except RuntimeError:
-                 '''
-                 this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
-                 '''
-                 if self.debug:
-                  print("wiimote connection error")
-      else:
-            self.data.ui_queue1.put("Action", "connectionStatus",{'status': 'True'})
-    else:
-        if self.th != None:
-                self.th.join()
-          
- def closeConnection(self):
-        '''
-           tell wiiPendant to shut down
-        '''
-        self.wiiPendantRequest = "requestToClose"
-
- def getConnectionStatus(self):
-        '''
-          get the system handle
-        '''
-        return self.wiiPendantRequest
-
  def __init__(self):
     """
        set up the flags for interpreting the controls
@@ -124,8 +53,61 @@ class WiiPendant(MakesmithInitFuncs):
     self.HOME = 0
     self.A = 0
     self.wm = None
+    self.wiiPendantRequest = ""
+    self.wiiPendantConnected = False
+    self.debug = True
     if self.debug:
           print("initialized thread variables")
+          
+ def Send(command):
+    URL = "http://localhost:5000/pendant"
+    r=requests.put(URL,command)
+    print (r)
+    
+ def openConnection(self):
+    '''
+       if the wiiPendantFlag in the config is True, then check if the wiiPendant is already connected
+       if not connected, then set t
+    '''
+    if self.wm == None:
+      if self.debug:
+            print("wiimote object is empty")
+      while not self.wm:
+        if self.debug:
+            print("trying to connect")
+        try:
+          self.wm=cwiid.Wiimote()
+          self.wm.rpt_mode = cwiid.RPT_BTN
+          self.wiiPendantConnected = True
+          self.Send("system:connected")
+          self.wm.rumble(0)
+          print("wii connection success -> read buttons")
+          self.wiiPendantConnected = True
+          self.wm.led = self.L[self.LED_ON]
+        except RuntimeError:
+          '''
+          this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
+          '''
+          self.Send('system:disconnected')
+          print("wiimote connection error")
+          self.data.wiiPendantConnected = False
+          self.wm = None
+          return
+        sleep(0.5)
+      readbuttons() 
+       
+ def closeConnection(self):
+      '''
+        tell wiiPendant to shut down
+      '''
+      wm = None
+      self.wiiPendantRequest = "requestToClose"
+
+ def getConnectionStatus(self):
+        '''
+          get the system handle
+        '''
+        return self.wiiPendantConnected
 
  def rumble(self,mode=0):
   '''
@@ -173,40 +155,24 @@ class WiiPendant(MakesmithInitFuncs):
     self.wm.rumble = False
 
  #end rumble
-
+ def move_command(self,direction, distance):
+      if (('raise' in direction) or ('lower' in direction)):
+        command = "zaxis:" + direction + ":" + str(distance)
+      else:
+        command = "move:" + direction + ":" + str(distance)
+      return command
+      
  def read_buttons(self):
-  
-  if self.data.wiiPendantPresent == False:
-      if self.wm != None:
-        self.wm = None
-        self.data.wiiPendantConnected = False
-      return
-  while True:
-    time.sleep(0.05)
-    #self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings", "wiiPendantPresent")
-    if self.data.wiiPendantPresent == False:
-          print("wii thread running, but user has disabled option")
-          if self.wm == None:
-            self.data.wiiPendantConnected = False
-          return
-    if self.data.wiiPendantConnected == False and self.wm == None:
-      print("Establishing wii mote connectiond")
-      while not self.wm:
-        try:
-          self.wm=cwiid.Wiimote()
-          self.wm.rpt_mode = cwiid.RPT_BTN
-          self.rumble(0)
-          self.data.wiiPendantConnected = True
-          self.wm.led = self.L[self.LED_ON]
-        except RuntimeError:
-          '''
-            this is a silent fail if the wiimote is not there... should set something to know that it  isn't there$
-          '''
-          self.data.wiiPendantConnected = False
-          self.wm = None
-          return # closes the thread?
-    else:
+  ''' 
+  in the  self.wm.rpt_mode = cwiid.RPT_BTN button read mode, we scan the input of the wiibmots
+  '''
+  try:
+   while True:
+      time.sleep(0.05)
       #  not using classic, this is if the remote is standing up though you hold it sideways
+      if (self.wiiPendantConnected == False):
+            self.wm = None
+            return
       if self.CONFIRM > 0:
         elapsed = 1 - (time.time() - self.startTime)
         if elapsed > 5:
@@ -219,13 +185,19 @@ class WiiPendant(MakesmithInitFuncs):
             self.TRIGGER = 0
             print("HOME POSITION CONFIRMED")
             self.rumble(1)
-            self.data.ui_queue1.put("defineHome")
+            self.Send("sled:defineHome")
         elif self.ZTRIGGER == 1:
           self.ZTRIGGER = 0
           if self.CONFIRM > 0:
             print("Z PLUNGE RESET CONFIRMED")
             self.rumble(2)
-            self.data.ui_queue1.put("defineZ0")
+            self.Send("zAxis:defineZ0")
+        elif (self.wm.state['buttons'] & cwiid.BTN_B):
+              print("Wii Remote Disconnect - thread dead")
+              self.wiiPendantConnected = False
+              self.rumble(0)
+              wm = None
+              return
         else:
           self.A = 1
       else:
@@ -234,34 +206,30 @@ class WiiPendant(MakesmithInitFuncs):
       if (self.wm.state['buttons'] & cwiid.BTN_1):
         if self.TRIGGER == 0:
           if (self.wm.state['buttons'] & cwiid.BTN_UP):
-            print("MOVE LEFT")
+            print("Wiimote MOVE SLED LEFT")
             self.rumble(1)
             self.TRIGGER = 1
-            self.move_sled("-X",self.DISTANCE[self.LED_ON])
-            self.data.ui_queue1.put("move", "left", self.DISTANCE[self.LED_ON])
+            self.Send(move_command("left", self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_DOWN):
-            print("MOVE RIGHT")
+            print("Wiimote MOVE SLED RIGHT")
             self.rumble(1)
             self.TRIGGER = 1
             self.RIGHT = 0
-            self.move_sled("X",self.DISTANCE[self.LED_ON])
-            self.data.ui_queue1.put("move", "right", self.DISTANCE[self.LED_ON])
-          if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
-            print("MOVE UP")
+            self.Send(move_command("right", self.DISTANCE[self.LED_ON]))
+          if (self.wm.state['buttonscp '] & cwiid.BTN_RIGHT):
+            print("Wiimote MOVE SLED UP")
             self.rumble(1)
             self.TRIGGER = 1
             self.UP = 0
-            self.move_sled("Y",self.DISTANCE[self.LED_ON])
-            self.data.ui_queue1.put("move", "up", self.DISTANCE[self.LED_ON])
+            self.Send(move_command("up", self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
-            print("MOVE DOWN")
+            print("Wiimote MOVE SLED DOWN")
             self.rumble(1)
             self.TRIGGER = 1
             self.DOWN = 0
-            self.move_sled("-Y",self.DISTANCE[self.LED_ON])
-            self.data.ui_queue1.put("move", "down", self.DISTANCE[self.LED_ON])
+            self.Send(move_command("down", self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-            print("SET NEW HOME")
+            print("Wiimote SET NEW HOME")
             self.rumble(1)
             self.TRIGGER = 1
             self.rumble(0)
@@ -274,19 +242,17 @@ class WiiPendant(MakesmithInitFuncs):
         if self.ZTRIGGER == 0:
           self.TRIGGER = 0
           if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
-            print("MOVE Z UP")
+            print("Wiimote MOVE Z UP")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.move_z("Z",self.Z[self.LED_ON])
-            self.data.ui_queue1.put("moveZ", "left", self.DISTANCE[self.LED_ON])
+            self.Send(move_command("raise", self.Z[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
-            print("MOVE Z DOWN")
+            print("Wiimote MOVE Z DOWN")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.move_z("-Z",self.Z[self.LED_ON])
-            self.data.ui_queue1.put("move", "left", self.DISTANCE[self.LED_ON])
+            self.Send(move_command("lower", self.Z[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-            print("SET PLUNGE to 0")
+            print("Wiimote Reset Z AXIS to 0")
             self.rumble(2)
             self.ZTRIGGER = 1
             self.rumble(0)
@@ -297,7 +263,7 @@ class WiiPendant(MakesmithInitFuncs):
         if (self.wm.state['buttons'] & cwiid.BTN_HOME):
           if self.HOME == 0:
             self.HOME = 1
-            print ("MOVE TO HOME")
+            print ("Wiimote MOVE SLED TO HOME")
             self.rumble(1)
         else:
           self.HOME = 0
@@ -308,7 +274,7 @@ class WiiPendant(MakesmithInitFuncs):
           self.LED_ON = self.LED_ON - 1
           if self.LED_ON < 0:
             self.LED_ON = 3
-          print("Move Distance is ", self.DISTANCE[self.LED_ON])
+          print("Sled Move Distance is ", self.DISTANCE[self.LED_ON])
           print("Z Distance is ", self.Z[self.LED_ON])
           self.wm.led = self.L[self.LED_ON]
       else:
@@ -325,8 +291,15 @@ class WiiPendant(MakesmithInitFuncs):
           self.wm.led = self.L[self.LED_ON]
       else:
         self.PLUS = 0
-  return
-  thread.exit()
+   return
+  except RuntimeError:
+      '''
+          this is a silent fail if the wiimote is not there... should set something to know that it  isn'$
+      '''
+      print (" error, connection dropped, thread dead")
+      self.wm = None
+      self.wiiPendantConnected = False
+      return
  #emd read_buttons
 #END class
 

@@ -17,11 +17,12 @@ class GPIOActions(MakesmithInitFuncs):
     def setup(self):
         #self.setGPIOAction(2,"Stop")
         setValues = self.data.config.getJSONSettingSection("GPIO Settings")
-        #print(setValues)
+        print(setValues)
         for setting in setValues:
             if setting["value"] != "":
                 pinNumber = int(setting["key"][4:])
-                self.setGPIOAction(pinNumber, setting["value"])
+        #        self.setGPIOAction(pinNumber, setting["value"])
+        pass
 
     def setGPIOAction(self,pin, action):
         # first remove pin assignments if already made

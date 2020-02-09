@@ -93,6 +93,103 @@ def index(template):
     else:
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
 
+@app.route('/GPIO', methods=['PUT', 'GET'])
+def remote_function_call():
+    if (request.method == "PUT"):
+        print ("remote function call")
+        result = request.data
+        result = result.decode('utf-8')
+        resultlist = result.split(':')
+        print ('resultlist', resultlist)
+        if ('system' in resultlist):
+            print ('system selected')
+            if ('exit' in resultlist):
+              print ('shutdown')
+              app.nonVisibleWidgets.actions.shutdown()
+        if ('gcode' in resultlist):
+            print ('gcode selected')
+            if ('startRun' in resultlist):
+              print ('start gcode requested')
+              app.nonVisibleWidgets.actions.startRun()
+            if ('pauseRun' in resultlist):
+              print ('pause gcode requested')
+              app.nonVisibleWidgets.actions.pauseRun()
+            if (resultlist[1] == 'resumeRun'):
+              print ('continue gcode requested')
+              app.nonVisibleWidgets.actions.resumeRun()
+            if (resultlist[1] == 'stopRun'):
+              print ('stop gcode requested')
+              app.nonVisibleWidgets.actions.stopRun()
+        if ('system' in resultlist):
+            print ('system selected')
+            if ('exit' in resultlist):
+                print("system shutdown requested")
+                os._exit(0)
+        return ('data:125')
+    if (request.method == "GET"):
+        print ("get button information")
+        #if running, if paused, if stopped
+        #self.data.uploadFlag = 0
+        #self.data.gcodeIndex = 0
+        return jsonify("'info':'button information'")
+    
+@app.route('/pendant', methods=['PUT', 'GET'])
+def WiiMoteInput():
+    print ("remote function call")
+    result = request.data
+    result = result.decode('utf-8')
+    resultlist = result.split(':')
+    print ('resultlist', resultlist)
+    if (len(resultlist) > 2):
+        distance = resultlist[2]
+    if ('move' in resultlist):
+        print ('move selected')
+        if('up' in resultlist):
+            print ('move', distance, 'up')
+            app.nonVisibleWidgets.actions.move("up", distance)
+        if('down' in resultlist):
+            print ('move', distance, 'down')
+            app.nonVisibleWidgets.actions.move("down", distance)
+        if('left' in resultlist):
+            print ('move', distance, 'left')
+            app.nonVisibleWidgets.actions.move("left", distance)
+        if('right' in resultlist):
+            print ('move', distance, 'right')
+            app.nonVisibleWidgets.actions.move("right", distance)
+    if ('zAxis' in resultlist):
+        print ('zaxis selected')
+        if('raise' in resultlist):
+            print ('zaxis', distance, 'raise')
+            app.nonVisibleWidgets.actions.moveZ("raise", distance)
+        if('lower' in resultlist):
+            print ('zaxis', distance, 'lower')
+            app.nonVisibleWidgets.actions.moveZ("lower", distance)
+        if('stopZ' in resultlist):
+            print ('zaxis stop')
+            app.nonVisibleWidgets.actions.stopZ()
+        if('defineZ0' in resultlist):
+            print ('new Z axis zero point')
+            app.nonVisibleWidgets.actions.defineZ0()
+    if ('sled' in resultlist):
+        if('home' in resultlist):
+            print ('go home')
+            app.nonVisibleWidgets.actions.home()
+        if('defineHome' in resultlist):
+            print ('new home set')
+            app.nonVisibleWidgets.actions.defineHome()
+    if ('system' in resultlist):
+        print ('system selected')
+        if ('exit' in resultlist):
+            print("system shutdown requested")
+            os._exit(0)
+        if ('connected' in resultlist):
+            print("wiimote connected")
+            app.data.wiiPendantConnected = True
+        if ('disconnect' in resultlist):
+            print("wiimote disconnect")
+            app.data.wiiPendantConnected = False    
+        return ('data:125')
+           
 @app.route("/controls")
 @mobile_template("/controls/{mobile/}")
 def controls(template):
