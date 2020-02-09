@@ -55,14 +55,25 @@ class WiiPendant():
     self.wm = None
     self.wiiPendantRequest = ""
     self.wiiPendantConnected = False
+    self.wiiFlag = False
     self.debug = True
     if self.debug:
-          print("initialized thread variables")
+          print(" ---- wii Pendant activated ---- ")
           
- def Send(command):
+ def Send(self,command):
     URL = "http://localhost:5000/pendant"
-    r=requests.put(URL,command)
-    print (r)
+    try: 
+      r=requests.put(URL,command)
+      print (r)
+    except requests.exceptions.HTTPError as errh:
+        print ("Http Error:",errh)
+    except requests.exceptions.ConnectionError as errc:
+        print ("Error Connecting:",errc)
+    except requests.exceptions.Timeout as errt:
+        print ("Timeout Error:",errt)
+    except requests.exceptions.RequestException as err:
+        print ("OOps: Something Else",err)
+        return
     
  def openConnection(self):
     '''

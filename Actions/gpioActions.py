@@ -17,7 +17,7 @@ class GPIOActions(MakesmithInitFuncs):
     def setup(self):
         #self.setGPIOAction(2,"Stop")
         setValues = self.data.config.getJSONSettingSection("GPIO Settings")
-        print(setValues)
+        #print(setValues)
         for setting in setValues:
             if setting["value"] != "":
                 pinNumber = int(setting["key"][4:])

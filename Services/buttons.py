@@ -4,6 +4,7 @@ from gpiozero import LED
 from signal import pause
 import requests
 from wiiPendant import WiiPendant
+import time
 
 wp = WiiPendant()
 print("setting up buttons")
@@ -34,13 +35,8 @@ def Pause():
         pause = 0
         
 def Wii():
-    if (wp.wiiPendantConnected == True):
-        print("stopping wiimote")
-        wp.closeConnection() 
-    else:  
-        print("starting wiimote")
-        wp.openConnection() 
-       
+    wp.wiiFlag = not(wp.wiiFlag)
+     
 def Exit():
     print ("EXIT")
     Send("system:exit")
@@ -55,4 +51,14 @@ btnPause.when_pressed = Pause
 btnStop.when_pressed = Stop
 btnWiimote.when_pressed = Wii
 print("waiting for button press")
-pause()
+
+while True:
+    time.sleep (0.5)
+    if wp.wiiFlag:
+        wp.wiiFlag = False
+        if (wp.wiiPendantConnected == True):
+            print("stopping wiimote")
+            wp.closeConnection()
+        else:  
+            print("starting wiimote")
+            wp.openConnection() 
