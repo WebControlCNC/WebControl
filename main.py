@@ -362,7 +362,7 @@ def sendGcode():
     app.data.logger.resetIdler()
     #print(request.form)#["gcodeInput"])
     if request.method == "POST":
-        returnVal = app.data.actions.sendGCode(request.form["gcode"])
+        returnVal = app.data.actions.sendGCode(request.form["gcode"].rstrip())
         if returnVal:
             message = {"status": 200}
             resp = jsonify("success")
@@ -464,7 +464,7 @@ def editGCode():
     app.data.logger.resetIdler()
     #print(request.form["gcode"])
     if request.method == "POST":
-        returnVal = app.data.actions.updateGCode(request.form["gcode"])
+        returnVal = app.data.actions.updateGCode(request.form["gcode"].rstrip())
         if returnVal:
             message = {"status": 200}
             resp = jsonify("success")
