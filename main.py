@@ -111,15 +111,19 @@ def remote_function_call():
             if ('startRun' in resultlist):
               print ('start gcode requested')
               app.nonVisibleWidgets.actions.startRun()
+              return ("run")
             if ('pauseRun' in resultlist):
               print ('pause gcode requested')
               app.nonVisibleWidgets.actions.pauseRun()
+              return ("pause")
             if (resultlist[1] == 'resumeRun'):
               print ('continue gcode requested')
               app.nonVisibleWidgets.actions.resumeRun()
+              return ("resume")
             if (resultlist[1] == 'stopRun'):
               print ('stop gcode requested')
               app.nonVisibleWidgets.actions.stopRun()
+              return ("stopped")
         if ('system' in resultlist):
             print ('system selected')
             if ('exit' in resultlist):
@@ -127,11 +131,8 @@ def remote_function_call():
                 os._exit(0)
         return ('data:125')
     if (request.method == "GET"):
-        print ("get button information")
-        #if running, if paused, if stopped
-        #self.data.uploadFlag = 0
-        #self.data.gcodeIndex = 0
-        return jsonify("'info':'button information'")
+        dataout = 'index:' + str(app.data.gcodeIndex), 'flag:'+ str(app.data.uploadFlag)
+        return jsonify(dataout)
     
 @app.route('/pendant', methods=['PUT', 'GET'])
 def WiiMoteInput():
