@@ -7,8 +7,9 @@ import math
 import os
 
 
+#monkey.patch_all(thread = False, threading = False) 
 monkey.patch_all()
-
+    
 import schedule
 import time
 import threading
@@ -92,6 +93,47 @@ def index(template):
         return render_template("frontpage3d_mobile.html", modalStyle="modal-lg")
     else:
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
+
+@app.route('/GPIO', methods=['PUT', 'GET'])
+def remote_function_call():
+    if (request.method == "PUT"):
+        print ("remote function call")
+        result = request.data
+        result = result.decode('utf-8')
+        resultlist = result.split(':')
+        print ('resultlist', resultlist)
+        if ('system' in resultlist):
+            print ('system selected')
+            if ('exit' in resultlist):
+              print ('shutdown')
+              app.nonVisibleWidgets.actions.shutdown()
+        if ('gcode' in resultlist):
+            print ('gcode selected')
+            if ('startRun' in resultlist):
+              print ('start gcode requested')
+              app.nonVisibleWidgets.actions.startRun()
+              return ("run")
+            if ('pauseRun' in resultlist):
+              print ('pause gcode requested')
+              app.nonVisibleWidgets.actions.pauseRun()
+              return ("pause")
+            if (resultlist[1] == 'resumeRun'):
+              print ('continue gcode requested')
+              app.nonVisibleWidgets.actions.resumeRun()
+              return ("resume")
+            if (resultlist[1] == 'stopRun'):
+              print ('stop gcode requested')
+              app.nonVisibleWidgets.actions.stopRun()
+              return ("stopped")
+        if ('system' in resultlist):
+            print ('system selected')
+            if ('exit' in resultlist):
+                print("system shutdown requested")
+                os._exit(0)
+        return ('data:125')
+    if (request.method == "GET"):
+        dataout = 'index:' + str(app.data.gcodeIndex), 'flag:'+ str(app.data.uploadFlag)
+        return jsonify(dataout)
 
 @app.route("/controls")
 @mobile_template("/controls/{mobile/}")

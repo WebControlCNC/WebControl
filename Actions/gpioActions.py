@@ -1,7 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device, Button, LED
-
+from signal import pause
 
 class GPIOActions(MakesmithInitFuncs):
 
@@ -25,7 +25,7 @@ class GPIOActions(MakesmithInitFuncs):
         for setting in setValues:
             if setting["value"] != "":
                 pinNumber = int(setting["key"][4:])
-                self.setGPIOAction(pinNumber, setting["value"])
+                #self.setGPIOAction(pinNumber, setting["value"])
 
     def setGPIOAction(self,pin, action):
         # first remove pin assignments if already made
@@ -52,30 +52,36 @@ class GPIOActions(MakesmithInitFuncs):
             button = Button(pin)
             button.when_pressed = pinAction
             self.Buttons.append(button)
-            print("set Button with action: "+action)
+            print("set Button ", pin, " with action: ", action)
         if type == "led":
             _led = LED(pin)
             led = (action,_led)
             self.LEDs.append(led)
             print("set LED with action: " + action)
-
+        #pause()
     def getAction(self, action):
         if action == "Stop":
             return "button", self.data.actions.stopRun
         elif action == "Pause":
             return "button", self.data.actions.pauseRun
         elif action == "Play":
-            return "button", self.data.actions.startRun
+            return "button", self.runrun
         else:
             return "led", None
-
+        
+    def runrun(self):
+        print("gpio button press detected")
+        self.data.actions.startRun()
+        
     def causeAction(self, action, onoff):
         for led in self.LEDs:
             if led[0] == action:
+                print(led[1])
                 if onoff == "on":
                     led[1].on()
                 else:
                     led[1].off()
+                print(led[1])
         if action == "PlayLED" and onoff == "on":
             self.causeAction("PauseLED", "off")
             self.causeAction("StopLED", "off")

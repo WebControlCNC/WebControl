@@ -435,6 +435,7 @@ class Actions(MakesmithInitFuncs):
         Stops the uploading of gcode.
         :return:
         '''
+        print("stopping run")
         try:
             self.data.console_queue.put("stopping run")
             # this is necessary because of the way PID data is being processed.  Otherwise could potentially get stuck
@@ -534,6 +535,7 @@ class Actions(MakesmithInitFuncs):
         Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
         :return:
         '''
+        print("pause run selected")
         try:
             if self.data.uploadFlag == 1:
                 self.data.uploadFlag = 2
