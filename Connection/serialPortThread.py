@@ -141,6 +141,7 @@ class SerialPortThread(MakesmithInitFuncs):
             filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
             line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
             # check if command is going to be issued that pauses the controller.
+            self.managePause(line)
             self.manageToolChange(line)
             if not line.isspace(): # if all spaces, don't send.  likely a comment.
                 # put gcode home shift here.. only if in absolute mode (G90)    
@@ -165,8 +166,14 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.data.gcodeIndex = 0
                 self.data.console_queue.put("Gcode Ended")
 
+    def managePause(self, line):
+        if line.find("M0") != -1 or line.find("M1") != -1:
+            print("found M command")
+            self.data.uploadFlag = -1
+            self.data.ui_queue1.put("Action", "setAsResume", "")
+
     def manageToolChange(self, line):
-        if line.find("M0") != -1 or line.find("M1") != -1 or line.find("M6") != -1:
+        if line.find("M6") != -1:
             # if this is a different tool, the controller will respond with a 'Tool Change:' and pause.
             # if this is a the same tool as the controller is currently tracking, it will continue on.
             # first, determine the tool being called for...
