@@ -1,0 +1,14 @@
+[Unit]
+Description=Maslow Buttons daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3  /home/pi/buttons/buttons.py
+WorkingDirectory=/home/pi/buttons
+Environment=API_KEY=123456789
+Environment=API_PASS=password
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=sysinit.target
