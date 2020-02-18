@@ -553,8 +553,7 @@ class Actions(MakesmithInitFuncs):
                 #self.data.pausedzval = self.data.zval
                 #self.data.pausedUnits = self.data.units
                 self.data.pausedzval = self.data.currentZTarget
-                # this probably is not needed, but just in case because of buffering.
-                self.data.pausedUnits = self.data.currentZTargetUnits
+                self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
                 #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
                 self.data.gpioActions.causeAction("PauseLED", "on")

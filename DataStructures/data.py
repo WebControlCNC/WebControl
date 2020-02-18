@@ -76,7 +76,6 @@ class Data:
     gcodeShift = [0.0, 0.0]  # the amount that the gcode has been shifted
     currentTool = 0  # current tool.. upon startup, 0 is the same value as what the controller would have.
     currentZTarget = 0  # current target for Z-Axis move.  Need to track so if user pauses, we can move back to that spot.
-    currentZTargetUnits = "INCHES" # might need to track the units for the Z-Axis move as well.
     message = ""  # used to update the client
     logger = Logger()  # the module which records the machines behavior to review later
     config = Config()

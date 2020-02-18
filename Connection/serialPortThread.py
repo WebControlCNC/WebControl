@@ -161,7 +161,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
                 if z:
                     self.data.currentZTarget = float(z.groups()[0])
-                    self.data.currentZTargetUnits = self.data.units
+                    #self.data.currentZTargetUnits = self.data.units
 
             # increment gcode index
             if self.data.gcodeIndex + 1 < len(self.data.gcode):
