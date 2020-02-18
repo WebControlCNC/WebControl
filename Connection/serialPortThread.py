@@ -179,7 +179,7 @@ class SerialPortThread(MakesmithInitFuncs):
             self.data.ui_queue1.put("Action", "setAsResume", "")
 
     def manageToolChange(self, line):
-        if line.find("M6 ") or line.find("M06") != -1:
+        if line.find("M6 ") != -1 or line.find("M06") != -1:
             # if this is a different tool, the controller will respond with a 'Tool Change:' and pause.
             # if this is a the same tool as the controller is currently tracking, it will continue on.
             # first, determine the tool being called for...
