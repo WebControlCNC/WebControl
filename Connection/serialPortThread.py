@@ -175,6 +175,7 @@ class SerialPortThread(MakesmithInitFuncs):
         if line.find("M0") != -1 or line.find("M1") != -1:
             print("found M command")
             self.data.uploadFlag = -1
+            self.data.pausedUnits = self.data.units
             self.data.ui_queue1.put("Action", "setAsResume", "")
 
     def manageToolChange(self, line):
@@ -192,6 +193,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 print("found M command")
                 self.data.uploadFlag = -1
                 self.data.currentTool = toolNumber
+                self.data.pausedUnits = self.data.units
                 ## new stuff
                 #self.data.quick_queue.put("~")
                 #self.data.ui_queue1.put("Action", "setAsResume", "")
