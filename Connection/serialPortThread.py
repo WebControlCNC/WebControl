@@ -157,6 +157,11 @@ class SerialPortThread(MakesmithInitFuncs):
                         self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
                 # send a gcode update to UI client.
                 self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
+                # track current target Z-Axis position
+                z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                if z:
+                    self.data.currentZTarget = float(z.groups()[0])
+                    self.data.currentZTargetUnits = self.data.units
 
             # increment gcode index
             if self.data.gcodeIndex + 1 < len(self.data.gcode):

@@ -98,16 +98,16 @@ sled.position.set(0,0,0);
 
 
 var homeHorizontalLineSegments = new THREE.Geometry();
-homeHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.0, 0, 0));
-homeHorizontalLineSegments.vertices.push(new THREE.Vector3(1.0, 0, 0));
+homeHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.25, 0, 0));
+homeHorizontalLineSegments.vertices.push(new THREE.Vector3(1.25, 0, 0));
 var homeHorizontalLine = new THREE.LineSegments(homeHorizontalLineSegments, greenLineMaterial);
 
 var homeVerticalLineSegments = new THREE.Geometry();
-homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.0, 0));
-homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.0, 0));
+homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.25, 0));
+homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.25, 0));
 var homeVerticalLine = new THREE.LineSegments(homeVerticalLineSegments, greenLineMaterial);
 
-var homeCircleGeometry = new THREE.CircleGeometry(.5,32);
+var homeCircleGeometry = new THREE.CircleGeometry(.75,32);
 var homeCircleEdges = new THREE.EdgesGeometry(homeCircleGeometry)
 var homeCircle = new THREE.LineSegments(homeCircleEdges,greenLineMaterial);
 

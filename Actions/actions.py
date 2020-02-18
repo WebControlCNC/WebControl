@@ -255,6 +255,12 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "setFakeServo":
                 if not self.setFakeServo(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with changing Fake Servo")
+            elif msg["data"]["command"] == "resetHomeToCenter":
+                if self.defineHome(0, 0):
+                    ## notify UI of home change to request gcode update
+                    self.data.ui_queue1.put("Action", "gcodeUpdate", "")
+                else:
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with resetting home to center")
             else:
                 response = "Function not currently implemented.. Sorry."
                 response = response + "["+msg["data"]["command"]+"]"
@@ -541,8 +547,11 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "setAsResume", "")
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
-                self.data.pausedzval = self.data.zval
-                self.data.pausedUnits = self.data.units
+                #self.data.pausedzval = self.data.zval
+                #self.data.pausedUnits = self.data.units
+                self.data.pausedzval = self.data.currentZTarget
+                # this probably is not needed, but just in case because of buffering.
+                self.data.pausedUnits = self.data.currentZTargetUnits
                 self.data.pausedPositioningMode = self.data.positioningMode
                 #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
                 self.data.gpioActions.causeAction("PauseLED", "on")
