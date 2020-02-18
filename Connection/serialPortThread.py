@@ -172,14 +172,14 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.data.console_queue.put("Gcode Ended")
 
     def managePause(self, line):
-        if line.find("M0") != -1 or line.find("M1") != -1:
-            print("found M command")
+        if line.find("M0 ") != -1 or line.find("M00") != -1 or line.find("M1 ") != -1 or line.find("M01") != -1:
+            print("found M command for pause")
             self.data.uploadFlag = -1
             self.data.pausedUnits = self.data.units
             self.data.ui_queue1.put("Action", "setAsResume", "")
 
     def manageToolChange(self, line):
-        if line.find("M6") != -1:
+        if line.find("M6 ") or line.find("M06") != -1:
             # if this is a different tool, the controller will respond with a 'Tool Change:' and pause.
             # if this is a the same tool as the controller is currently tracking, it will continue on.
             # first, determine the tool being called for...
