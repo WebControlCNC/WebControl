@@ -139,7 +139,7 @@ class SerialPortThread(MakesmithInitFuncs):
             line = self.data.gcode[self.data.gcodeIndex]
             # filter comments from line
             filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
-            line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+            line = re.sub(r';([^\n]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
             # check if command is going to be issued that pauses the controller.
             self.managePause(line)
             self.manageToolChange(line)
@@ -320,7 +320,7 @@ class SerialPortThread(MakesmithInitFuncs):
                             # replace mach3 style gcode comments with newline
                             filtersparsed = re.sub(r'\(([^)]*)\)', '', command)
                             # replace standard ; initiated gcode comments with ''
-                            command = re.sub(r';([^.]*)?', '', filtersparsed)
+                            command = re.sub(r';([^\n]*)?', '', filtersparsed)
                             # if there's something left..
                             if len(command) != 0:
                                 command = command + " "
@@ -347,7 +347,7 @@ class SerialPortThread(MakesmithInitFuncs):
                             # replace mach3 style gcode comments with newline
                             filtersparsed = re.sub(r'\(([^)]*)\)', '', line)
                             # replace standard ; initiated gcode comments with newline
-                            line = re.sub(r';([^.]*)?', '', filtersparsed)
+                            line = re.sub(r';([^\n]*)?', '', filtersparsed)
                             # if there is space in the buffer send line
                             if self.bufferSpace > len(line):
                                 self.sendNextLine()
@@ -388,8 +388,10 @@ class SerialPortThread(MakesmithInitFuncs):
         begin = readString.find(target)
         end = self.findEndOfNumber(readString, begin + 1)
         numberAsString = readString[begin + 1: end]
-
-        numberAsFloat = float(numberAsString)
+        try:
+            numberAsFloat = float(numberAsString)
+        except:
+            return defaultReturn
 
         if begin == -1:
             return defaultReturn

@@ -155,7 +155,7 @@ class GCodeFile(MakesmithInitFuncs):
             zList = []
             for index, line in enumerate(self.data.gcode):
                 filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
-                line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                line = re.sub(r';([^\n]*)?', '\n',filtersparsed)  # replace standard ; initiated gcode comments with newline
                 if not line.isspace(): # if all spaces, don't send.  likely a comment. #if line.find("(") == -1:
                     if line.find("G20") != -1:
                         self.data.tolerance = 0.020
@@ -494,7 +494,7 @@ class GCodeFile(MakesmithInitFuncs):
 
         filtersparsed = re.sub(r'\(([^)]*)\)', '\n', fullString)  # replace mach3 style gcode comments with newline
         #fullString = re.sub(r';([^\n]*)\n', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
-        fullString = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+        fullString = re.sub(r';([^\n]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
         #print("fullString:"+fullString)
         # if the line contains multiple gcode commands split them and execute them individually
         listOfLines = fullString.split("G")
