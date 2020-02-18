@@ -459,6 +459,9 @@ class Actions(MakesmithInitFuncs):
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
             self.data.gpioActions.causeAction("StopLED", "on")
+            # reset pause
+            self.data.ui_queue1.put("Action", "setAsPause", "")
+            self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
