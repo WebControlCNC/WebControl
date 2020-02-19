@@ -57,10 +57,57 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
-            elif self.data.uploadFlag > 0:
+            elif self.data.uploadFlag == 1:
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
             # Commands not allowed during sending gcode.. if you did these commands, something could screw up.
             # If uploadFlag was enabled (see above) then this would never be reached.
+
+            elif msg["data"]["command"] == "move":
+                if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
+            elif msg["data"]["command"] == "moveTo":
+                if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
+            elif msg["data"]["command"] == "moveZ":
+                if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "reportSettings":
+                self.data.gcode_queue.put("$$")
+            elif msg["data"]["command"] == "home":
+                if not self.home():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to home.")
+            elif msg["data"]["command"] == "defineZ0":
+                if not self.data.actions.defineZ0():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with defining Z-Axis zero.")
+            elif msg["data"]["command"] == "moveToDefault":
+                if not self.moveToDefault():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to default chain lengths")
+            elif msg["data"]["command"] == "returnToCenter":
+                if not self.returnToCenter():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to center")
+            elif msg["data"]["command"] == "moveGcodeZ":
+                if not self.moveGcodeZ(int(msg["data"]["arg"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeGoto":
+                if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
+            elif msg["data"]["command"] == "moveGcodeIndex":
+                if not self.moveGcodeIndex(int(msg["data"]["arg"])):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to index")
+            elif msg["data"]["command"] == "macro1":
+                if not self.macro(1):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro2":
+                if not self.macro(2):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "clearLogs":
+                if not self.clearLogs():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
+
+            elif self.data.uploadFlag > 1 or self.data.uploadFlag < 0 :
+                self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while paused sending gcode. You must press STOP before performing this action.")
+            # Commands not allowed while paused.. if you did these commands, something could screw up.
+
             elif msg["data"]["command"] == "startRun":
                 if not self.startRun():
                     if len(self.data.gcode) > 0:
@@ -86,21 +133,8 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "resetChainLengths":
                 if not self.resetChainLengths():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting chain lengths.")
-            elif msg["data"]["command"] == "move":
-                if not self.move(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
-            elif msg["data"]["command"] == "moveTo":
-                if not self.moveTo(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating move.")
-            elif msg["data"]["command"] == "moveZ":
-                if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
-            elif msg["data"]["command"] == "reportSettings":
-                self.data.gcode_queue.put("$$")
-            elif msg["data"]["command"] == "home":
-                if not self.home():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to home.")
             elif msg["data"]["command"] == "defineHome":
+                print(self.data.uploadFlag)
                 posX= msg["data"]["arg"]
                 posY= msg["data"]["arg1"]
                 if self.defineHome(posX, posY):
@@ -109,36 +143,18 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Action", "gcodeUpdate", "")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with defining home.")
-            elif msg["data"]["command"] == "defineZ0":
-                if not self.data.actions.defineZ0():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with defining Z-Axis zero.")
-            elif msg["data"]["command"] == "moveToDefault":
-                if not self.moveToDefault():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to default chain lengths")
             elif msg["data"]["command"] == "testMotors":
                 if not self.testMotors():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with testing motors")
             elif msg["data"]["command"] == "wipeEEPROM":
                 if not self.wipeEEPROM(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with wiping EEPROM")
-            elif msg["data"]["command"] == "returnToCenter":
-                if not self.returnToCenter():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with returning to center")
             elif msg["data"]["command"] == "clearGCode":
                 if self.clearGCode():
                     # send blank gcode to UI
                     self.data.ui_queue1.put("Action", "gcodeUpdate", "")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with clearing gcode")
-            elif msg["data"]["command"] == "moveGcodeZ":
-                if not self.moveGcodeZ(int(msg["data"]["arg"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
-            elif msg["data"]["command"] == "moveGcodeGoto":
-                if not self.moveGcodeIndex(int(msg["data"]["arg"]), True):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to Z move")
-            elif msg["data"]["command"] == "moveGcodeIndex":
-                if not self.moveGcodeIndex(int(msg["data"]["arg"])):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving to index")
             elif msg["data"]["command"] == "setSprockets":
                 if not self.setSprockets(msg["data"]["arg"], msg["data"]["arg1"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with setting sprocket")
@@ -157,12 +173,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "updatePorts":
                 if not self.updatePorts():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating list of ports")
-            elif msg["data"]["command"] == "macro1":
-                if not self.macro(1):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
-            elif msg["data"]["command"] == "macro2":
-                if not self.macro(2):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
             elif msg["data"]["command"] == "optical_onStart":
                 pass
                 #if not self.data.opticalCalibration.on_Start():
@@ -247,9 +257,6 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "executePositionPIDTest":
                 if not self.positionPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
-            elif msg["data"]["command"] == "clearLogs":
-                if not self.clearLogs():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
             elif msg["data"]["command"] == "boardProcessGCode":
                 if not self.data.boardManager.processGCode():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with processing gcode")
@@ -290,7 +297,7 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def defineHome(self, posX, posY):
+    def defineHome(self, posX="", posY=""):
         '''
         Redefines the home location and sends message to update the UI client.  In a break from ground control, this
         does not alter the gcode.  Gcode is altered by the home location only when sent to the controller.
@@ -427,6 +434,7 @@ class Actions(MakesmithInitFuncs):
                 else:
                     print("h6")
                     self.data.uploadFlag = 1
+                self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
             else:
                 return False
@@ -442,6 +450,7 @@ class Actions(MakesmithInitFuncs):
         Stops the uploading of gcode.
         :return:
         '''
+        print("stopping run")
         try:
             self.data.console_queue.put("stopping run")
             # this is necessary because of the way PID data is being processed.  Otherwise could potentially get stuck
@@ -459,6 +468,7 @@ class Actions(MakesmithInitFuncs):
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
+            self.data.gpioActions.causeAction("StopLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -540,14 +550,19 @@ class Actions(MakesmithInitFuncs):
         Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
         :return:
         '''
+        print("pause run selected")
         try:
             if self.data.uploadFlag == 1:
-                self.data.uploadFlag = 0
+                self.data.uploadFlag = 2
                 self.data.console_queue.put("Run Paused")
                 self.data.ui_queue1.put("Action", "setAsResume", "")
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
                 self.data.pausedzval = self.data.zval
+                self.data.pausedUnits = self.data.units
+                self.data.pausedPositioningMode = self.data.positioningMode
+                #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
+                self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -564,18 +579,36 @@ class Actions(MakesmithInitFuncs):
         try:
             # if a tool change, then...
             print("at resume run with manualzaxisadjust = "+str(self.data.manualZAxisAdjust))
+
+            # Restore units.
+            if self.data.pausedUnits != self.data.units:
+                print("Restoring units to:" + str(self.data.pausedUnits))
+                if self.data.pausedUnits == "INCHES":
+                    self.data.gcode_queue.put("G20 ")
+                elif self.data.pausedUnits == "MM":
+                    self.data.gcode_queue.put("G21 ")
+
+            # Move the z-axis back to where it was.
+            # Put in absolute mode to make z axis move
+            self.data.gcode_queue.put("G90 ")
+            # THE ABOVE COMMAND IS NOT EXECUTED IN LINE AND REQUIRES FOLLOWING TO TRACK POSITIONING MODE
+            self.data.positioningMode = 0
+            print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
+            self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
+
+            # Restore the last gcode positioning mode in use before pauseRun executed.
+            # This must happen for all resume cases as multiple actions may have changed it (home, moveZ etc).
+            if self.data.pausedPositioningMode is not None and self.data.positioningMode != self.data.pausedPositioningMode:
+                print("Restoring positioning mode: " + str(self.data.pausedPositioningMode))
+                if self.data.pausedPositioningMode == 0:
+                    # this line technically should be unreachable
+                    self.data.gcode_queue.put("G90 ")
+                elif self.data.pausedPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
+                self.data.pausedPositioningMode = None
+
+            # Restore self.data.upladFlag properly
             if self.data.manualZAxisAdjust:
-                # make sure the units match what they were
-                if self.data.pausedUnits != self.data.units:
-                    if self.data.pausedUnits == "INCHES":
-                        self.data.gcode_queue.put("G20 ")
-                    else:
-                        self.data.gcode_queue.put("G21 ")
-                # move the z-axis back to where it was.
-                # note: this does not work correctly in relative mode.
-                # Todo: somehow manke this work when controller is in relative mode (G91)
-                print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun")
-                self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 # clear the flag since resume
                 self.data.manualZAxisAdjust = False
                 # reenable the uploadFlag if it was previous set.
@@ -585,14 +618,14 @@ class Actions(MakesmithInitFuncs):
                 else:
                     self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
-                print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
-                self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
+
             # send cycle resume command to unpause the machine
             # needed only if user initiated pause, but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
+            self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -710,48 +743,26 @@ class Actions(MakesmithInitFuncs):
         else:
             diagMove = distToMove
         try:
+            self.data.gcode_queue.put("G91 ")
             if direction == "upLeft":
-                self.data.gcode_queue.put(
-                    "G91 G00 X"
-                    + str(-1.0 * diagMove)
-                    + " Y"
-                    + str(diagMove)
-                    + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X"+ str(-1.0 * diagMove)+ " Y"+ str(diagMove)+ " ")
             elif direction == "up":
-                self.data.gcode_queue.put("G91 G00 Y" + str(distToMove) + " G90 ")
+                self.data.gcode_queue.put("G00 Y" + str(distToMove) + " ")
             elif direction == "upRight":
-                self.data.gcode_queue.put(
-                    "G91 G00 X" + str(diagMove) + " Y" + str(diagMove) + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(diagMove) + " Y" + str(diagMove) + " ")
             elif direction == "left":
-                self.data.gcode_queue.put(
-                    "G91 G00 X" + str(-1.0 * distToMove) + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(-1.0 * distToMove) + " ")
             elif direction == "right":
-                self.data.gcode_queue.put("G91 G00 X" + str(distToMove) + " G90 ")
+                self.data.gcode_queue.put("G00 X" + str(distToMove) + " ")
             elif direction == "downLeft":
-                self.data.gcode_queue.put(
-                    "G91 G00 X"
-                    + str(-1.0 * diagMove)
-                    + " Y"
-                    + str(-1.0 * diagMove)
-                    + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(-1.0 * diagMove) + " Y" + str(-1.0 * diagMove) + " ")
             elif direction == "down":
-                self.data.gcode_queue.put(
-                    "G91 G00 Y" + str(-1.0 * distToMove) + " G90 "
-                )
+                self.data.gcode_queue.put("G00 Y" + str(-1.0 * distToMove) + " ")
             elif direction == "downRight":
-                self.data.gcode_queue.put(
-                    "G91 G00 X"
-                    + str(diagMove)
-                    + " Y"
-                    + str(-1.0 * diagMove)
-                    + " G90 "
-                )
+                self.data.gcode_queue.put("G00 X" + str(diagMove) + " Y" + str(-1.0 * diagMove) + " ")
             else:
                 return False
+            self.data.gcode_queue.put("G90 ")
             # keep track of the distToMove value
             self.data.config.setValue("Computed Settings", "distToMove", distToMove)
             return True
@@ -780,13 +791,13 @@ class Actions(MakesmithInitFuncs):
             else:
                 self.data.gcode_queue.put("G20 ")
             if direction == "raise":
-                self.data.gcode_queue.put(
-                    "G91 G00 Z" + str(float(distToMoveZ)) + " G90 "
-                )
+                self.data.gcode_queue.put("G91 ")
+                self.data.gcode_queue.put("G00 Z" + str(float(distToMoveZ)) + " ")
+                self.data.gcode_queue.put("G90 ")
             elif direction == "lower":
-                self.data.gcode_queue.put(
-                    "G91 G00 Z" + str(-1.0 * float(distToMoveZ)) + " G90 "
-                )
+                self.data.gcode_queue.put("G91 ")
+                self.data.gcode_queue.put("G00 Z" + str(-1.0 * float(distToMoveZ)) + " " )
+                self.data.gcode_queue.put("G90 ")
             # now, since we might have changed the units of the machine, make sure they are set back to what it was
             # originally.
             #units = self.data.config.getValue("Computed Settings", "units")
@@ -1406,7 +1417,10 @@ class Actions(MakesmithInitFuncs):
                 # if in absolute mode
                 x = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if x:
-                    xTarget = float(x.groups()[0])
+                    if self.data.positioningMode == 0:
+                        xTarget = float(x.groups()[0])
+                    else:
+                        xTarget = float(x.groups()[0]) + self.data.previousPosX
                     self.data.previousPosX = xTarget
                 else:
                     xTarget = self.data.previousPosX
@@ -1414,7 +1428,10 @@ class Actions(MakesmithInitFuncs):
                 y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
 
                 if y:
-                    yTarget = float(y.groups()[0])
+                    if self.data.positioningMode == 0:
+                        yTarget = float(y.groups()[0])
+                    else:
+                        yTarget = float(y.groups()[0]) + self.data.previousPosY
                     self.data.previousPosY = yTarget
                 else:
                     yTarget = self.data.previousPosY
@@ -1422,7 +1439,10 @@ class Actions(MakesmithInitFuncs):
                 z = re.search("Z(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
 
                 if z:
-                    zTarget = float(z.groups()[0])
+                    if self.data.positioningMode == 0:
+                        zTarget = float(z.groups()[0])
+                    else:
+                        zTarget = float(z.groups()[0]) + self.data.previousPosZ
                     self.data.previousPosZ = zTarget
                 else:
                     zTarget = self.data.previousPosZ
@@ -1605,6 +1625,8 @@ class Actions(MakesmithInitFuncs):
         '''
         # move the Z-axis to the safe height
         print("moving to safe height as part of processgcode")
+        #force into absolute mode
+        self.data.gcode_queue.put("G90 ")
         self.data.gcode_queue.put("G0 Z"+str(round(zAxisSafeHeight, 4))+" F"+str(round(zAxisFeedRate, 4)))
         # move the sled to the x, y coordinate it is supposed to be.
         self.data.gcode_queue.put("G0 X"+str(round(xpos, 4))+" Y"+str(round(ypos, 4))+" F"+str(round(xyAxisFeedRate, 4)))

@@ -8,21 +8,15 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
   isMobile = true;
 }
 
-
+$(document).ready(function(){
+	// Make all navbar drop down items collapse the menu when clicked.
+	if (isMobile) {
+		$("#navbarSupportedContent a.dropdown-item").attr("data-toggle", "collapse").attr("data-target", "#navbarSupportedContent");
+	}
+})
 
 function processHealthMessage(data){
     //console.log(data.cpuUsage);
-    if (data.uploadFlag){
-        if (!isDisabled){
-            $('.disabler').prop('disabled', true);
-            isDisabled = true;
-        }
-    } else {
-        if (isDisabled){
-            $('.disabler').prop('disabled', false);
-            isDisabled = false;
-        }
-    }
     $("#cpuUsage").text("CPU: "+Math.round(data.cpuUsage).toString()+"%");
     $("#mobileCPUUsage").text(Math.round(data.cpuUsage).toString()+"%");
     if (data.bufferSize == -1){
@@ -230,6 +224,7 @@ function setupStatusButtons(){
       $('#mobileClientStatus').show();
       $('#mobileCPUUsage').show();
       $('#mobileControllerStatusAlert').show();
+      $('.navbar-brand').hide();
   } else {
     $('#mobileClientStatus').hide();
     $('#mobileCPUUsage').hide();

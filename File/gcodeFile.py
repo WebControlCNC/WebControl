@@ -38,6 +38,12 @@ class GCodeFile(MakesmithInitFuncs):
 
     filename = ""
     line3D = []
+    '''
+    prependString is defined here so it can be persistent across each 'moveOneLine'.  That way, if a gcode line
+    does not contain a valid gcode, it uses the previous line's gcode.  Thanks to @amantalion for discovering the
+    glitch.  https://github.com/madgrizzle/WebControl/issues/78
+    '''
+    prependString = ""
 
 
     def serializeGCode3D(self):
@@ -524,7 +530,7 @@ class GCodeFile(MakesmithInitFuncs):
             fullString + " "
         )  # ensures that there is a space at the end of the line
         # find 'G' anywhere in string
-        self.prependString = ""
+
         gString = fullString[fullString.find("G") : fullString.find("G") + 3]
 
         if gString in validPrefixList:

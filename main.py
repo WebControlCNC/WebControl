@@ -7,8 +7,9 @@ import math
 import os
 
 
+#monkey.patch_all(thread = False, threading = False) 
 monkey.patch_all()
-
+    
 import schedule
 import time
 import threading
@@ -191,6 +192,7 @@ def WiiMoteInput():
             app.data.wiiPendantConnected = False    
         return ('data:125')
            
+
 @app.route("/controls")
 @mobile_template("/controls/{mobile/}")
 def controls(template):

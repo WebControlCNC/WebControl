@@ -143,3 +143,34 @@ html, body{
   100% { background-color: #B20000; box-shadow: 0 0 3px #B20000; }
 }
 
+.controls {
+  align-items: center;
+}
+
+.controls .btn {
+  width: 100%;
+  padding: .375rem .125rem;
+}
+
+.controls label {
+  width: 100%;
+  margin-bottom: auto;
+  text-align: right;
+}
+
+#pauseButton {
+	color: #fff;
+}
+
+#controllerMessage { overflow-wrap: anywhere; }
+
+#stickyButtons {
+  position: sticky;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  top: 0px;
+  z-index:1020;
+  background-color: #FFF;
+}

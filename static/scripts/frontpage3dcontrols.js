@@ -50,7 +50,7 @@ function processRequestedSetting(data){
 }
 
 function processPositionMessage(data){
-  $('#positionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' ZPos:'+parseFloat(data.zval).toFixed(2));
+  $('#positionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2));
   $('#percentComplete').html(data.pcom)
   $('#machineState').html(data.state)
 }
@@ -61,11 +61,11 @@ function processErrorValueMessage(data){
 }
 
 function processHomePositionMessage(data){
-  $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  $('#homePositionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2));
 }
 
 function processGCodePositionMessage(data){
-  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
+  $('#gcodePositionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2));
   $('#gcodeLine').html(data.gcodeLine);
   $('#gcodeLineIndex').val(data.gcodeLineIndex+1)
 }
@@ -74,10 +74,20 @@ function gcodeUpdate(msg){
   console.log("Unsupported");
 }
 
+function boardDataUpdate(msg){
+  console.log("Unsupported");
+}
+
 function gcodeUpdateCompressed(data){
   console.log("Unsupported");
   $("#fpCircle").hide();
 }
+
+function boardCutDataUpdateCompressed(data){
+  console.log("Unsupported");
+  $("#fpCircle").hide();
+}
+
 
 function showFPSpinner(msg){
     $("#fpCircle").show();
@@ -122,4 +132,23 @@ function clearAlarm(data){
     console.log("clearing alarm");
     $("#alarms").text("Alarm cleared.");
     $("#alarms").removeClass('alert-danger').addClass('alert-success');
+}
+
+function processStatusMessage(data){
+    if (data.uploadFlag == 1){
+        if (!isDisabled){
+            $('.disabler').prop('disabled', true);
+            isDisabled = true;
+        }
+    } else {
+        if (isDisabled){
+            $('.disabler').prop('disabled', false);
+            isDisabled = false;
+        }
+    }
+    $("#currentTool").text(data.currentTool.toString());
+    if (data.positioningMode == 0)
+        $("#currentPositioningMode").text("Absolute (G90)");
+    else
+        $("#currentPositioningMode").text("Incremental (G91)");
 }

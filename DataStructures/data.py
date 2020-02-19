@@ -38,7 +38,7 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.920
+    pyInstallCurrentVersion = 0.923
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
@@ -68,6 +68,10 @@ class Data:
     currentpos = [0.0, 0.0, 0.0]
     target = [0.0, 0.0, 0.0]
     units = "MM"
+    # Gcode positioning mode:
+    #  0 = G90 (Absolute)
+    #  1 = G91 (Relative)
+    positioningMode = 0
     tolerance = 0.5
     gcodeShift = [0.0, 0.0]  # the amount that the gcode has been shifted
     currentTool = 0  # current tool.. upon startup, 0 is the same value as what the controller would have.
@@ -186,6 +190,8 @@ class Data:
     bufferSize = 127
 
     pausedzval = 0.0
+    pausedPositioningMode = 0
+    pausedUnits = "INCHES"
 
     """
     GCode Position Values

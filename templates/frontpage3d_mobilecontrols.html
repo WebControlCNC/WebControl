@@ -7,7 +7,7 @@
 
 {% block javascript %}
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018r') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018t') }}" crossorigin="anonymous"></script>
 <script> feather.replace() </script>
 {% endblock %}
 
@@ -129,7 +129,7 @@
         <h5>Line #:</h5>
       </div>
       <div class="col-4 mb-1">
-        <input class="form-control" type="number" step="any"  id="gcodeLineIndex" value="1">
+        <input class="form-control" type="number" step="1"  id="gcodeLineIndex" value="1">
       </div>
       <div class="col-3 mb-1">
         <button type="button" class="btn btn-block btn-secondary" onclick="action('moveGcodeGoto',$('#gcodeLineIndex').val()-1);")>Goto</button>
@@ -186,6 +186,20 @@
     </div>
     <div class="col-3 mb-1">
       <div id='machineState'></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 mb-1">
+      <h5>Tool:</h5>
+    </div>
+    <div class="col-1 mb-1">
+      <div id='currentTool'></div>
+    </div>
+    <div class="col-4 mb-1">
+      <h5>Positioning:</h5>
+    </div>
+    <div class="col-5 mb-1">
+      <div id='currentPositioningMode'></div>
     </div>
   </div>
   <div id="fpCircle" style="display: none;">
