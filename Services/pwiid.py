@@ -8,29 +8,24 @@ class WiiPendant():
     This class will connect to the wiimode with the Bluetooth address specified in the input file
     This class relies on the setpoints in the /etc/cwiid/wminput/ folder of files that has the names of the input fields sent by the wiimote
     'BTN_1', 'BTN_2', 'BTN_A', 'BTN_B', 'BTN_DOWN', 'BTN_HOME', 'BTN_LEFT', 'BTN_MINUS', 'BTN_PLUS', 'BTN_RIGHT', 'BTN_UP', etc.
-    It also requires that the connection script with the specific bluetooth ID of the wiimote be in /home/pi/bin/
-    to get the ID:
-      push 1&2 buttons on wiimote
-    start pi blutooth scan:
-      hcitool scan
-    record wiimote address and put it in the script file:
-      mkdir bin
-      nano ./binconnectwii.sh
-      #!/bin/bash
-      sleep 1 # Wait until Bluetooth services are fully initialized
-      hcitool dev | grep hci >/dev/null
-      if test $? -eq 0 ; then
-          wminput -d -c  /home/pi/mywminput 00:19:1D:48:D8:FD &
-          wminput -d -c  /home/pi/mywminput 00:22:D7:C2:A6:B9 &
-      else
-          echo "Blue-tooth adapter not present!"
-          exit 1
-      fi
-    Here are instructions on using it:
-      sudo modprobe uinput
-      sudo nano /etc/profile.d/10-retropie.sh
-      rebootWithoutWiimotes=0
-      sudo /home/pi/bin/connectwii.sh
+    Commands (with wiimote readable)
+      move sled
+        UP: 1 + right
+        DOWN: 1 + left
+        LEFT: 1 + up
+        RIGHT: 1 + down
+        Home: HOME
+      move Z-Axis
+        UP: 2 + RIGHT
+        DOWN: 2 + LEFT
+      supervisory
+        Set HOME: 1 + HOME -> then A
+        Set Z axis zero: 2 + HOME -> then A
+        Disconnect wiimote: A + Z
+        PLAY: Z + RIGHT
+        PAUSE: Z + UP
+        RESUME: Z + DOWN
+        STOP: Z + LEFT       
  '''
 
  def __init__(self):
