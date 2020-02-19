@@ -115,7 +115,13 @@ class Data:
     continuousCamera = False
     gpioActions = None
     boardManager = None
+<<<<<<< Updated upstream
 
+=======
+    #wiiPendant = None  
+    #wiiPendantThread = None
+    
+>>>>>>> Stashed changes
     """
 
     Colors
