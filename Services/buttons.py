@@ -19,7 +19,16 @@ LEDPause = LED(5)
 LEDIR = LED(6) #5.6.13.19
 LEDPpower = LED(19)
 pause = 0
-
+Buttons = []
+LEDs = []
+actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
+def getpause():
+    return pause
+def setpause(newpause):
+    pause = newpause
+    
+def getActionList(self):
+    return actionList
 def Start():
     print ("start press")
     Send("gcode:playRun")
@@ -31,12 +40,12 @@ def Stop():
 
 def Pause():
     print ("Pause press")
-    if (pause == 0):
+    if (getpause() == 0):
         Send("gcode:pauseRun")
-        pause = 1
+        setpause(1)
     else:
         Send("gcode:resumeRun")
-        pause = 0
+        setpause(0)
 
 #def Wii():
 #    wp.wiiFlag = not(wp.wiiFlag)
@@ -60,10 +69,81 @@ def Shutdown():
     print ("shutting down system from button press")
     check_call(['sudo', 'poweroff'])
 
-btnStart.when_pressed = Start
-btnPause.when_pressed = Pause
-btnStop.when_pressed = Stop
-btnExit.when_pressed = Shutdown
+def setup():
+    setValues = Put("GPIO")
+    print(setValues)
+    for setting in setValues:
+        if setting["value"] != "":
+            pinNumber = int(setting["key"][4:])
+            setGPIOAction(pinNumber, setting["value"])
+
+def setGPIOAction(pin, action):
+    # first remove pin assignments if already made
+    foundButton = None
+    for button in Buttons:
+        if button.pin.number == pin:
+            button.pin.close()
+            foundButton = button
+            break
+    if foundButton is not None:
+        Buttons.remove(foundButton)
+
+    foundLED = None
+    for led in LEDs:
+        if led[1].pin.number == pin:
+            led[1].pin.close()
+            foundLED = led
+            break
+    if foundLED is not None:
+        LEDs.remove(foundLED)
+
+    type, pinAction = getAction(action)
+    if type == "button":
+        button = Button(pin)
+        button.when_pressed = pinAction
+        Buttons.append(button)
+        print("set Button ", pin, " with action: ", action)
+    if type == "led":
+        _led = LED(pin)
+        led = (action,_led)
+        LEDs.append(led)
+        print("set LED with action: " + action)
+    #pause()
+def getAction(action):
+    if action == "Stop":
+        return "button", Stop
+    elif action == "Pause":
+        return "button", Pause
+    elif action == "Play":
+        return "button", Start
+    else:
+        return "led", None
+    
+def causeAction(action, onoff):
+    for led in LEDs:
+        if led[0] == action:
+            print(led[1])
+            if onoff == "on":
+                led[1].on()
+            else:
+                led[1].off()
+            print(led[1])
+    if action == "PlayLED" and onoff == "on":
+        causeAction("PauseLED", "off")
+        causeAction("StopLED", "off")
+    if action == "PauseLED" and onoff == "on":
+        causeAction("PlayLED", "off")
+        causeAction("StopLED", "off")
+    if action == "StopLED" and onoff == "on":
+        causeAction("PauseLED", "off")
+        causeAction("PlayLED", "off")
+
+#btnStart.when_pressed = Start
+#btnPause.when_pressed = Pause
+#btnStop.when_pressed = Stop
+#btnExit.when_pressed = Shutdown
+setup()
+
 bad_chars = "'"
 #btnWiimote.when_pressed = Wii
 print("waiting for button press")

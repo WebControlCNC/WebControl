@@ -130,6 +130,9 @@ def remote_function_call():
             if ('exit' in resultlist):
                 print("system shutdown requested")
                 os._exit(0)
+        if ('GPIO' in resultlist):
+            setValues = app.data.config.getJSONSettingSection("GPIO Settings")
+            return(setValues)
         return ('data:125')
     if (request.method == "GET"):
         dataout = 'index:' + str(app.data.gcodeIndex), 'flag:'+ str(app.data.uploadFlag)
