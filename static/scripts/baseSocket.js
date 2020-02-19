@@ -90,9 +90,9 @@ function setListeners(){
       else
         data = msg.data;
       passValue = true
-      if (data.hasOwnProperty('client'))
+      if ((data !=null) && (data.hasOwnProperty('client')))
       {
-            console.log(data.client);
+            //console.log(data.client);
             if ((data.client != socketClientID) && (data.client!="all"))
                 passValue = false;
       }
