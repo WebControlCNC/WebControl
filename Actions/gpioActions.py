@@ -1,11 +1,6 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device, Button, LED
-<<<<<<< Updated upstream
-
-=======
-from signal import pause
->>>>>>> Stashed changes
 
 class GPIOActions(MakesmithInitFuncs):
 
@@ -17,13 +12,10 @@ class GPIOActions(MakesmithInitFuncs):
     '''
     Buttons = []
     LEDs = []
-<<<<<<< Updated upstream
-=======
     actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 
     def getActionList(self):
         return self.actionList
->>>>>>> Stashed changes
 
     def setup(self):
         #self.setGPIOAction(2,"Stop")
@@ -32,11 +24,7 @@ class GPIOActions(MakesmithInitFuncs):
         for setting in setValues:
             if setting["value"] != "":
                 pinNumber = int(setting["key"][4:])
-<<<<<<< Updated upstream
-                self.setGPIOAction(pinNumber, setting["value"])
-=======
                 #self.setGPIOAction(pinNumber, setting["value"])
->>>>>>> Stashed changes
 
     def setGPIOAction(self,pin, action):
         # first remove pin assignments if already made
@@ -51,13 +39,8 @@ class GPIOActions(MakesmithInitFuncs):
 
         foundLED = None
         for led in self.LEDs:
-<<<<<<< Updated upstream
-            if led.pin.number == pin:
-                led.pin.close()
-=======
             if led[1].pin.number == pin:
                 led[1].pin.close()
->>>>>>> Stashed changes
                 foundLED = led
                 break
         if foundLED is not None:
@@ -68,17 +51,6 @@ class GPIOActions(MakesmithInitFuncs):
             button = Button(pin)
             button.when_pressed = pinAction
             self.Buttons.append(button)
-<<<<<<< Updated upstream
-
-
-    def getAction(self, action):
-        if action == "Stop":
-            return "button", self.data.actions.stopRun
-        if action == "Pause":
-            return "button", self.data.actions.pauseRun
-        if action == "Play":
-            return "button", self.data.actions.startRun
-=======
             print("set Button ", pin, " with action: ", action)
         if type == "led":
             _led = LED(pin)
@@ -92,7 +64,7 @@ class GPIOActions(MakesmithInitFuncs):
         elif action == "Pause":
             return "button", self.data.actions.pauseRun
         elif action == "Play":
-            return "button", self.runrun
+            return "button", self.data.action.startRun
         else:
             return "led", None
         
@@ -118,5 +90,4 @@ class GPIOActions(MakesmithInitFuncs):
         if action == "StopLED" and onoff == "on":
             self.causeAction("PauseLED", "off")
             self.causeAction("PlayLED", "off")
->>>>>>> Stashed changes
 
