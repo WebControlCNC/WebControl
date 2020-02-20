@@ -1,5 +1,5 @@
 [Unit]
-Description=Raspberry Pi Wiimote Input
+Description=Maslow Wiimote Input
 After=network-online.target
  
 [Service]

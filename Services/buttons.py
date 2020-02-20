@@ -18,17 +18,23 @@ LEDRun = LED(13)
 LEDPause = LED(5)
 LEDIR = LED(6) #5.6.13.19
 LEDPpower = LED(19)
-pause = 0
+runpause = 0
+pendantService = false
+
 Buttons = []
 LEDs = []
+
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
+
 def getpause():
     return pause
+
 def setpause(newpause):
     pause = newpause
     
 def getActionList(self):
     return actionList
+
 def Start():
     print ("start press")
     Send("gcode:playRun")
@@ -37,40 +43,68 @@ def Start():
 def Stop():
     print ("Stop press")
     Send("gcode:stopRun")
+def getrunPause():
+    return(runpause)
+def setrunPause(rp:int):
+    runpause = rp
+    print("set runpause to ", str(rp))
 
-def Pause():
-    print ("Pause press")
-    if (getpause() == 0):
+def runPause():
+    rp = getrunPause()
+    print ("Pause press ", str(rp)))
+    if (rp == 0):
+        setrunPause(1)
         Send("gcode:pauseRun")
-        setpause(1)
     else:
+        setrunPause(0)
         Send("gcode:resumeRun")
-        setpause(0)
-
-#def Wii():
-#    wp.wiiFlag = not(wp.wiiFlag)
 
 def Exit():
     print ("EXIT")
     Send("system:exit")
 
 def Get(command):
-    URL = "http://localhost:5000/GPIO"
-    r = requests.get(URL,params = command)
-    print (r.text)
-    return r.text
+    try:
+        URL = "http://localhost:5000/GPIO"
+        r = requests.get(URL,params = command)
+        print (r.text)
+        return r.text
+    except:
+        print ('error getting data, check server')
 
 def Send(command):
-    URL = "http://localhost:5000/GPIO"
-    r=requests.put(URL,command)
-    print (r)
+    try:
+        URL = "http://localhost:5000/GPIO"
+        r=requests.put(URL,command)
+        print (r)
 
 def Shutdown():
     print ("shutting down system from button press")
     check_call(['sudo', 'poweroff'])
 
+def startPendant():
+    #if (pendantService == False):
+        
+        print("kickstart pendant process (TOTALLY SEPARATE)")
+        #mp.set_start_method('spawn')
+        #q = mp.Queue()
+        #print (q)
+        #p = mp.Process(target='/home/pi/buttons/pwiid.sh')
+        #print (p)
+        #p.start()
+        #print(q.get())
+        subprocess.run(['/home/pi/buttons/MaslowPendantservice.sh'])
+        print ('subprocess started a service')
+    
+   # else:
+        #print('stopping service')
+        #subprocess.run('/home/pi/buttons/pwiidshutdown.sh')
+       # pendantService = False
+
 def setup():
-    setValues = Put("GPIO")
+    URL = "http://localhost:5000/GPIO"
+    setValues = requests.put(URL,command)
+    #setValues = Put("GPIO")
     print(setValues)
     for setting in setValues:
         if setting["value"] != "":
