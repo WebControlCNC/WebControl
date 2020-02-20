@@ -341,7 +341,7 @@ function resumeRun(){
 
 
 function processRequestedSetting(data){
-  //console.log(msg);
+  //console.log(data);
   if (data.setting=="pauseButtonSetting"){
     if(data.value=="Resume")
         $('#pauseButton').removeClass('btn-warning').addClass('btn-info');

@@ -1300,7 +1300,7 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
                 except Exception as e:
                     self.data.console_queue.put(str(e))
-            elif setting == "pauseButtonSettting":
+            elif setting == "pauseButtonSetting":
                 # send current pause button state
                 try:
                     if self.data.uploadFlag == 0 or self.data.uploadFlag == 1:
