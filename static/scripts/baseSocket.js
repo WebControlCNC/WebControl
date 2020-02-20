@@ -32,6 +32,7 @@ function setListeners(){
       settingRequest("Computed Settings","homePosition");
       settingRequest("Computed Settings","unitsZ");
       settingRequest("Computed Settings","distToMoveZ");
+      settingRequest("None","pauseButtonSetting");
       checkForGCodeUpdate();
       checkForBoardUpdate();
   });
