@@ -6,20 +6,21 @@ import requests
 #from wiiPendant import WiiPendant
 import time
 from subprocess import check_call
+import json
 
 #wp = WiiPendant()
 print("setting up buttons")
-btnStart = Button(16) #21 # 21,20,16,12
-btnPause = Button(20) #20
-btnStop = Button(21) #16
-btnExit = Button(12) #12
+#btnStart = Button(16) #21 # 21,20,16,12
+#btnPause = Button(20) #20
+#btnStop = Button(21) #16
+#btnExit = Button(12) #12
 #btnWiimote = Button(26) #26
-LEDRun = LED(13)
-LEDPause = LED(5)
-LEDIR = LED(6) #5.6.13.19
-LEDPpower = LED(19)
+#LEDRun = LED(13)
+#LEDPause = LED(5)
+#LEDIR = LED(6) #5.6.13.19
+#LEDPpower = LED(19)
 runpause = 0
-pendantService = false
+pendantService = False
 
 Buttons = []
 LEDs = []
@@ -51,7 +52,7 @@ def setrunPause(rp:int):
 
 def runPause():
     rp = getrunPause()
-    print ("Pause press ", str(rp)))
+    print ("Pause press ", str(rp))
     if (rp == 0):
         setrunPause(1)
         Send("gcode:pauseRun")
@@ -63,20 +64,24 @@ def Exit():
     print ("EXIT")
     Send("system:exit")
 
-def Get(command):
+def Get(address,command):
     try:
-        URL = "http://localhost:5000/GPIO"
+        URL = "http://localhost:5000/" + str(address)
+        #print (URL)
         r = requests.get(URL,params = command)
-        print (r.text)
-        return r.text
+        #print (r.text)
+        return r.json()
     except:
         print ('error getting data, check server')
-
+        return ('error:error')
+    
 def Send(command):
     try:
         URL = "http://localhost:5000/GPIO"
         r=requests.put(URL,command)
         print (r)
+    except:
+        print ('error sending command, check server')
 
 def Shutdown():
     print ("shutting down system from button press")
@@ -102,10 +107,12 @@ def startPendant():
        # pendantService = False
 
 def setup():
+    #retdata = Get("GPIO", "GPIO")
     URL = "http://localhost:5000/GPIO"
-    setValues = requests.put(URL,command)
-    #setValues = Put("GPIO")
-    print(setValues)
+    retdata = requests.get(URL,'GPIO')
+    setValues = retdata.json()
+    
+    #print(setValues)
     for setting in setValues:
         if setting["value"] != "":
             pinNumber = int(setting["key"][4:])
@@ -159,8 +166,11 @@ def causeAction(action, onoff):
             print(led[1])
             if onoff == "on":
                 led[1].on()
+            elif onoff == "blink":
+                led[1].blink()
             else:
                 led[1].off()
+            
             print(led[1])
     if action == "PlayLED" and onoff == "on":
         causeAction("PauseLED", "off")
@@ -181,46 +191,53 @@ setup()
 bad_chars = "'"
 #btnWiimote.when_pressed = Wii
 print("waiting for button press")
-
+print (LEDs)
 while True:
-    time.sleep (2)
-    try:
-      items = Get("stuff")
-      itemss = items.replace('"', '')
-      #for i in bad_chars : 
-      items = items.replace('\n', '')
-      items = items.replace('[', '')
-      items = items.replace(']', '')                        
-      #print (items)
-      details = items.split(",")
-      #print (details[0])
-      items = details[0].split(":")
-      
-      #print (items[1])
-      gcodeIndex = str(int(items[1].replace('"', '')))
-      #print (led1)
-      items = details[1].split(":")
-      #print (items)
-      Flag = str(int(items[1].replace('"', '')))
-      if Flag == '0': # run or stopped
-        if gcodeIndex == '0': # if 0, then stopped
+      time.sleep (2)
+    #try:
+      items = Get('LED','stuff')
+      #if (items != None):
+      stuff = items # eval(items)
+      #print(items)
+      print (type(stuff))
+      print (stuff)
+      for i in range (0, len(stuff)):
+          ss = stuff[i].split(":")
+          print (ss)
+          if (ss[0] == 'flag'): # run or stopped
+              flag = ss[1]
+          if (ss[0] == 'index'):
+              index = ss[1]
+          if (ss[0] == 'moving'):
+              moving = ss[1]
+          if (ss[0] == 'RGC'):
+              RGC = ss[1]
+          if (ss[0] == 'pausedGcode'):
+              pausedGcode = ss[1]
+      if (index == '0'):  
+        if (flag == '0'): # if 0, then stopped
             print("stopped")
             #LEDStop.on()
-            LEDPause.off()
-            LEDRun.off()
+            #LEDPause.off()
+            LEDs['PlayLED'].off()
         else:
-            print ("Paused")
-            LEDPause.on()
-            #LEDStop.off()
-            LEDRun.off()
+            if (pausedGcode == 'True'):
+              print ("Paused")
+              #LEDPause.on()
+              #LEDStop.off()
+              LEDs[0].on()
+        if (moving == 'True'):
+              print ("Moving")
+              LED[1].blink()
       else:
-        print ("Running")
-        LEDRun.on()
-        #LEDStop.off()
-        LEDPause.off()
-    except requests.exceptions.RequestException as e:
-        print ("error")
-        #      fail in silence
+            if (moving == 'True'):
+              print ("Running")
+              LEDs[0].blink()
+              #LEDStop.off()
+              #LEDPause.off()
+    #except:
+     #  print ("error")
+        #       fail in silence
 
  #   if wp.wiiFlag:
  #       wp.wiiFlag = False

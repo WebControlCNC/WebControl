@@ -116,10 +116,12 @@ def remote_function_call():
             if ('pauseRun' in resultlist):
               print ('pause gcode requested')
               app.nonVisibleWidgets.actions.pauseRun()
+              app.data.pausedGcode = True
               return ("pause")
             if (resultlist[1] == 'resumeRun'):
               print ('continue gcode requested')
               app.nonVisibleWidgets.actions.resumeRun()
+              app.data.pausedGcode = False
               return ("resume")
             if (resultlist[1] == 'stopRun'):
               print ('stop gcode requested')
@@ -132,19 +134,20 @@ def remote_function_call():
                 os._exit(0)
         return ('data:125')
     if (request.method == "GET"):
-        result = request.data
-        result = result.decode('utf-8')
-        resultlist = result.split(':')
-        print (resultlist)
-        if ('stuff' in resultlist):
-            dataout = 'index:' + str(app.data.gcodeIndex), 'flag:'+ str(app.data.uploadFlag)
+        setValues = app.data.config.getJSONSettingSection("GPIO Settings")
+        #print (setValues)
+        #print (jsonify(setValues))
+        return (jsonify(setValues))
+        
+@app.route('/LED', methods=['PUT','GET'])
+def getLEDinfo():
+    if (request.method == 'GET'):
+        try:
+            dataout = 'index:' + str(app.data.gcodeIndex), 'flag:'+ str(app.data.uploadFlag), 'moving:' + str(app.data.sledMoving), 'RGC:' + str(app.data.runningGcode), 'pausedGcode:' + str(app.data.pausedGcode)
             return jsonify(dataout)
-        if ('GPIO' in resultlist):
-            setValues = app.data.config.getJSONSettingSection("GPIO Settings")
-            print (setValues)
-            print (jsonify(setValues))
-            return (jsonify(setValues))
-
+        except:
+            return (jsonify("error:none"))
+        
 @app.route('/pendant', methods=['PUT', 'GET'])
 def WiiMoteInput():
     print ("remote function call")

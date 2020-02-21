@@ -38,11 +38,11 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.923
+    pyInstallCurrentVersion = 0.926
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
-    pyInstallPlatform = "win"
+    pyInstallPlatform = "rpi"
     pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
@@ -103,7 +103,12 @@ class Data:
     PIDPositionTestVersion = 0
     wiiPendantPresent = False # has user set wiimote as active?
     wiiPendantConnected = False # is the wiimote BT connected?
-
+    sledMoving = False # for LED light status
+    zMoving = False
+    runningGcode = False # for LED light status
+    pausedGcode = False # for LED light status
+    moveDistance = 10 # CHECK UNITS!!
+    
     """
     Pointers to Objects
     """
@@ -121,7 +126,6 @@ class Data:
     continuousCamera = False
     gpioActions = None
     boardManager = None
-    #wiiPendant = None  #wiiPendantThread = None
     
     """
 

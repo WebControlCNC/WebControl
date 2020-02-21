@@ -341,6 +341,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.data.sledMoving = True
             self.data.gcode_queue.put("G90  ")
             safeHeightMM = float(
                 self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
@@ -360,9 +361,11 @@ class Actions(MakesmithInitFuncs):
                 + " "
             )
             self.data.gcode_queue.put("G00 Z0 ")
+            self.data.sledMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def resetChainLengths(self):
@@ -743,6 +746,7 @@ class Actions(MakesmithInitFuncs):
         else:
             diagMove = distToMove
         try:
+            self.data.sledMoving = True
             self.data.gcode_queue.put("G91 ")
             if direction == "upLeft":
                 self.data.gcode_queue.put("G00 X"+ str(-1.0 * diagMove)+ " Y"+ str(diagMove)+ " ")
@@ -765,9 +769,11 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 ")
             # keep track of the distToMove value
             self.data.config.setValue("Computed Settings", "distToMove", distToMove)
+            self.data.sledMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def moveZ(self, direction, distToMoveZ):
@@ -786,6 +792,7 @@ class Actions(MakesmithInitFuncs):
             # the correct units when the z-axis move is sent
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             previousUnits = self.data.config.getValue("Computed Settings", "units")
+            self.data.zMoving = True
             if unitsZ == "MM":
                 self.data.gcode_queue.put("G21 ")
             else:
@@ -806,9 +813,11 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcode_queue.put("G21 ")
                 else:
                     self.data.gcode_queue.put("G20 ")
+            self.data.zMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.zMoving = False
             return False
 
 
@@ -820,6 +829,7 @@ class Actions(MakesmithInitFuncs):
         try:
             plungeDepth = self.data.config.getValue("Advanced Settings", "maxTouchProbePlungeDistance")
             revertToInches = False
+            self.data.zMoving = True
             if self.data.units == "INCHES":
                 revertToInches = True
                 self.data.gcode_queue.put("G21")
@@ -829,9 +839,11 @@ class Actions(MakesmithInitFuncs):
             # don't think this line is needed
             # todo: remove if not needed.
             self.data.measureRequest = self.defineZ0()
+            self.data.zMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.zMoving = False
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
@@ -1476,6 +1488,7 @@ class Actions(MakesmithInitFuncs):
         bedWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4
         try:
             if posX<=bedWidth/2 and posX>=bedWidth/-2 and posY<=bedHeight/2 and posY>=bedHeight/-2:
+                self.data.sledMoving = True
                 if self.data.units == "INCHES":
                     posX=round(posX,4)
                     posY=round(posY,4)
@@ -1490,10 +1503,12 @@ class Actions(MakesmithInitFuncs):
                     + str(posY)
                     + " "
                 )
+                self.data.sledMoving = False
                 return True
             return False
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def processGCode(self):
