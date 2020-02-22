@@ -3,8 +3,8 @@ Description=Maslow Wiimote Input
 After=network-online.target
  
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/buttons/pwiid.py
-WorkingDirectory=/home/pi/buttons/
+ExecStart=/usr/bin/python3 /usr/local/etc/MaslowPendant.py
+WorkingDirectory=/usr/local/etc
 StandardOutput=inherit
 StandardError=inherit
 Restart=never

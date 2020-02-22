@@ -105,8 +105,8 @@ class Data:
     wiiPendantConnected = False # is the wiimote BT connected?
     sledMoving = False # for LED light status
     zMoving = False
-    runningGcode = False # for LED light status
-    pausedGcode = False # for LED light status
+    #runningGcode = False # for LED light status
+    #pausedGcode = False # for LED light status
     moveDistance = 10 # CHECK UNITS!!
     
     """

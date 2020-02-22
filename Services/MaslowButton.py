@@ -6,7 +6,9 @@ import requests
 #from wiiPendant import WiiPendant
 import time
 from subprocess import check_call
+#from subprocess import run
 import json
+import os
 
 #wp = WiiPendant()
 print("setting up buttons")
@@ -15,15 +17,17 @@ print("setting up buttons")
 #btnStop = Button(21) #16
 #btnExit = Button(12) #12
 #btnWiimote = Button(26) #26
-#LEDRun = LED(13)
-#LEDPause = LED(5)
+#LEDRun = LED(26)
+#LEDPause = LED(19)
 #LEDIR = LED(6) #5.6.13.19
-#LEDPpower = LED(19)
+#LEDPower = LED(13)
 runpause = 0
 pendantService = False
-
+flag = 0
 Buttons = []
 LEDs = []
+index = 0
+moving = False
 
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 
@@ -44,8 +48,10 @@ def Start():
 def Stop():
     print ("Stop press")
     Send("gcode:stopRun")
+    
 def getrunPause():
     return(runpause)
+
 def setrunPause(rp:int):
     runpause = rp
     print("set runpause to ", str(rp))
@@ -59,10 +65,15 @@ def runPause():
     else:
         setrunPause(0)
         Send("gcode:resumeRun")
-
+        
+def returnHome():
+    print ("return to center")
+    Send("gcode:home")
+    
 def Exit():
     print ("EXIT")
-    Send("system:exit")
+    #Send("system:exit")
+    os._exit(0)
 
 def Get(address,command):
     try:
@@ -87,25 +98,14 @@ def Shutdown():
     print ("shutting down system from button press")
     check_call(['sudo', 'poweroff'])
 
-def startPendant():
-    #if (pendantService == False):
-        
-        print("kickstart pendant process (TOTALLY SEPARATE)")
-        #mp.set_start_method('spawn')
-        #q = mp.Queue()
-        #print (q)
-        #p = mp.Process(target='/home/pi/buttons/pwiid.sh')
-        #print (p)
-        #p.start()
-        #print(q.get())
-        subprocess.run(['/home/pi/buttons/MaslowPendantservice.sh'])
-        print ('subprocess started a service')
-    
-   # else:
-        #print('stopping service')
-        #subprocess.run('/home/pi/buttons/pwiidshutdown.sh')
-       # pendantService = False
-
+def startPendant():  
+    print("kickstart pendant process (TOTALLY SEPARATE)")
+    try:
+        printsubprocess.run(['/usr/local/etc/MaslowPendantStart.sh'])
+        print ('subprocess started Pendant service')
+    except:
+        print ('error starting pendant sub process')
+   
 def setup():
     #retdata = Get("GPIO", "GPIO")
     URL = "http://localhost:5000/GPIO"
@@ -137,7 +137,8 @@ def setGPIOAction(pin, action):
             break
     if foundLED is not None:
         LEDs.remove(foundLED)
-
+    print (LEDs)
+    
     type, pinAction = getAction(action)
     if type == "button":
         button = Button(pin)
@@ -154,9 +155,15 @@ def getAction(action):
     if action == "Stop":
         return "button", Stop
     elif action == "Pause":
-        return "button", Pause
+        return "button", runPause
     elif action == "Play":
         return "button", Start
+    elif action == "Shutdown":
+        return "Shutdown", Shutdown
+    elif action == "Pendant":
+        return "Pendant", startPendant
+    elif action == "Return To Center":
+        return "button", returnHome
     else:
         return "led", None
     
@@ -176,7 +183,7 @@ def causeAction(action, onoff):
         causeAction("PauseLED", "off")
         causeAction("StopLED", "off")
     if action == "PauseLED" and onoff == "on":
-        causeAction("PlayLED", "off")
+        causeAction("PlayLED", "on")
         causeAction("StopLED", "off")
     if action == "StopLED" and onoff == "on":
         causeAction("PauseLED", "off")
@@ -191,54 +198,40 @@ setup()
 bad_chars = "'"
 #btnWiimote.when_pressed = Wii
 print("waiting for button press")
-print (LEDs)
+#print (LEDs)
 while True:
-      time.sleep (2)
+        time.sleep (2)
     #try:
-      items = Get('LED','stuff')
-      #if (items != None):
-      stuff = items # eval(items)
-      #print(items)
-      print (type(stuff))
-      print (stuff)
-      for i in range (0, len(stuff)):
-          ss = stuff[i].split(":")
-          print (ss)
-          if (ss[0] == 'flag'): # run or stopped
-              flag = ss[1]
-          if (ss[0] == 'index'):
-              index = ss[1]
-          if (ss[0] == 'moving'):
-              moving = ss[1]
-          if (ss[0] == 'RGC'):
-              RGC = ss[1]
-          if (ss[0] == 'pausedGcode'):
-              pausedGcode = ss[1]
-      if (index == '0'):  
+        items = Get('LED','stuff')
+        if (items != None):
+            flag = items["data"]["flag"]
+            index = items["data"]["index"]
+            moving = items["data"]["moving"]
+            print (flag)
+            print (index)
+            print (moving)
+        print(items)
+        if (flag == 1):
+            RGC = True
+            pausedGcode = False          
+        if (flag == 2):
+            pausedGcode = True
+        #if (index == '0'):  
         if (flag == '0'): # if 0, then stopped
             print("stopped")
-            #LEDStop.on()
-            #LEDPause.off()
-            LEDs['PlayLED'].off()
-        else:
-            if (pausedGcode == 'True'):
-              print ("Paused")
-              #LEDPause.on()
-              #LEDStop.off()
-              LEDs[0].on()
-        if (moving == 'True'):
-              print ("Moving")
-              LED[1].blink()
-      else:
+            causeAction("StopLED", "on")
             if (moving == 'True'):
-              print ("Running")
-              LEDs[0].blink()
-              #LEDStop.off()
-              #LEDPause.off()
+                print ("Moving")
+                causeAction("PlayLED", "blink")
+        elif (flag == '1'):
+            print ("running")
+            causeAction("PlayLED", "on")
+        elif (flag == '2'):
+            print ("Paused")
+            causeAction("PauseLED", "on")
     #except:
      #  print ("error")
         #       fail in silence
-
  #   if wp.wiiFlag:
  #       wp.wiiFlag = False
  #       if (wp.wiiPendantConnected == True):

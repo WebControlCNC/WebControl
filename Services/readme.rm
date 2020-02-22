@@ -1,0 +1,22 @@
+To set up buttons:
+
+go to webcontrol/Services folder
+
+chmod 777 *
+
+sudo copy the following files from /Service  to /usr/local/etc/
+
+MaslowButtonRestart.sh 
+MaslowButtonStart.sh
+MaslowButtonStop.sh
+MaslowPendantStart.sh
+MaslowPendantRestart.sh
+MaslowPendantStop.sh 
+MaslowButton.py
+MaslwoPendant.py
+
+
+sudo copy the following files /Service to /etc/systemd/system/
+
+MaslowButton.service
+MaslowPendant.service

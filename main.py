@@ -5,7 +5,7 @@ import webbrowser
 import socket
 import math
 import os
-
+import subprocess
 
 #monkey.patch_all(thread = False, threading = False) 
 monkey.patch_all()
@@ -98,55 +98,61 @@ def index(template):
 def remote_function_call():
     if (request.method == "PUT"):
         print ("remote function call")
+        message = {"data":{"gpio":"selected"}}
         result = request.data
         result = result.decode('utf-8')
         resultlist = result.split(':')
         print ('resultlist', resultlist)
-        if ('system' in resultlist):
-            print ('system selected')
-            if ('exit' in resultlist):
-              print ('shutdown')
-              app.nonVisibleWidgets.actions.shutdown()
+                
         if ('gcode' in resultlist):
             print ('gcode selected')
+            message = {"data":{"gcode":"selected"}}
             if ('startRun' in resultlist):
-              print ('start gcode requested')
-              app.nonVisibleWidgets.actions.startRun()
-              return ("run")
+                print ('start gcode requested')
+                #app.nonVisibleWidgets.actions.startRun()
+                app.nonVisibleWidgets.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
+                message = {"data":{"buttonrun":"started"}}
             if ('pauseRun' in resultlist):
-              print ('pause gcode requested')
-              app.nonVisibleWidgets.actions.pauseRun()
-              app.data.pausedGcode = True
-              return ("pause")
+                print ('pause gcode requested')
+                #app.nonVisibleWidgets.actions.pauseRun()
+                app.nonVisibleWidgets.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
+                message = {"data":{"buttonrun":"paused"}}
             if (resultlist[1] == 'resumeRun'):
-              print ('continue gcode requested')
-              app.nonVisibleWidgets.actions.resumeRun()
-              app.data.pausedGcode = False
-              return ("resume")
+                print ('continue gcode requested')
+                #app.nonVisibleWidgets.actions.resumeRun()
+                app.nonVisibleWidgets.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+                message = {"data":{"buttonrun":"resumed"}}
             if (resultlist[1] == 'stopRun'):
-              print ('stop gcode requested')
-              app.nonVisibleWidgets.actions.stopRun()
-              return ("stopped")
-        if ('system' in resultlist):
-            print ('system selected')
-            if ('exit' in resultlist):
-                print("system shutdown requested")
-                os._exit(0)
-        return ('data:125')
+                print ('stop gcode requested')
+                app.nonVisibleWidgets.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+                #app.nonVisibleWidgets.actions.stopRun()
+                message = {"data":{"butttonrun":"stopped"}}
+            if('home' in resultlist):
+                print ('go home')
+                app.nonVisibleWidgets.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
+                message = {"data":{"buttonmove":"movetoHome"}}
+        
+        resp = jsonify(message)
+        resp.status_code = 200 # or whatever the correct number should be
+        return (resp)
+    
     if (request.method == "GET"):
         setValues = app.data.config.getJSONSettingSection("GPIO Settings")
-        #print (setValues)
-        #print (jsonify(setValues))
         return (jsonify(setValues))
         
 @app.route('/LED', methods=['PUT','GET'])
 def getLEDinfo():
     if (request.method == 'GET'):
         try:
-            dataout = 'index:' + str(app.data.gcodeIndex), 'flag:'+ str(app.data.uploadFlag), 'moving:' + str(app.data.sledMoving), 'RGC:' + str(app.data.runningGcode), 'pausedGcode:' + str(app.data.pausedGcode)
-            return jsonify(dataout)
+            message = {"data":{"index": str(app.data.gcodeIndex), "flag": str(app.data.uploadFlag), "moving": str(app.data.sledMoving)}}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return (resp)
         except:
-            return (jsonify("error:none"))
+            message = jsonify({"data":{"error":"no data"}})
+            resp = jsonify(message)
+            resp.status_code = 404 # or whatever the correct number should be
+            return (resp)
         
 @app.route('/pendant', methods=['PUT', 'GET'])
 def WiiMoteInput():
@@ -155,55 +161,88 @@ def WiiMoteInput():
     result = result.decode('utf-8')
     resultlist = result.split(':')
     print ('resultlist', resultlist)
+    message = {"data":{"pendant:selected"}}
     if (len(resultlist) > 2):
         distance = resultlist[2]
     if ('move' in resultlist):
         print ('move selected')
+        message = {"data":{"move:selected"}}
         if('up' in resultlist):
             print ('move', distance, 'up')
-            app.nonVisibleWidgets.actions.move("up", distance)
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"up","arg1":distance}})
+            #app.nonVisibleWidgets.actions.processAction.move("up", distance)
+            message = {"data":{"move":"up"}}
         if('down' in resultlist):
             print ('move', distance, 'down')
-            app.nonVisibleWidgets.actions.move("down", distance)
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"down","arg1":distance}})
+            #app.nonVisibleWidgets.actions.move("down", distance)
+            message = {"data":{"move":"down"}}
         if('left' in resultlist):
             print ('move', distance, 'left')
-            app.nonVisibleWidgets.actions.move("left", distance)
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"left","arg1":distance}})
+            #app.nonVisibleWidgets.actions.move("left", distance)
+            message = {"data":{"move":"left"}}
         if('right' in resultlist):
             print ('move', distance, 'right')
-            app.nonVisibleWidgets.actions.move("right", distance)
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"right","arg1":distance}})
+            #app.nonVisibleWidgets.actions.move("right", distance)
+            message = {"data":{"move":"right"}}
     if ('zAxis' in resultlist):
         print ('zaxis selected')
+        message = {"data":{"z:selected"}}
         if('raise' in resultlist):
             print ('zaxis', distance, 'raise')
-            app.nonVisibleWidgets.actions.moveZ("raise", distance)
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"moveZ","arg":"raise","arg1":distance}})
+            #app.nonVisibleWidgets.actions.moveZ("raise", distance)
+            message = {"data":{"Z":"raise"}}
         if('lower' in resultlist):
             print ('zaxis', distance, 'lower')
-            app.nonVisibleWidgets.actions.moveZ("lower", distance)
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"moveZ","arg":"lower","arg1":distance}})
+            #app.nonVisibleWidgets.actions.moveZ("lower", distance)
+            message = {"data":{"Z":"Lower"}}
         if('stopZ' in resultlist):
             print ('zaxis stop')
-            app.nonVisibleWidgets.actions.stopZ()
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"stopZ","arg":"","arg1":""}})
+            #app.nonVisibleWidgets.actions.stopZ()
+            message = {"data":{"Z":"stopZ"}}
         if('defineZ0' in resultlist):
             print ('new Z axis zero point')
-            app.nonVisibleWidgets.actions.defineZ0()
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"defineZ0","arg":"","arg1":""}})
+            #app.nonVisibleWidgets.actions.defineZ0()
+            message = {"data":{"Z":"defineZ"}}
     if ('sled' in resultlist):
+        message = {"data":{"sled":"selected"}}
         if('home' in resultlist):
             print ('go home')
-            app.nonVisibleWidgets.actions.home()
+            app.nonVisibleWidgets.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
+            message = {"data":{"sled":"movetoHome"}}
         if('defineHome' in resultlist):
             print ('new home set')
-            app.nonVisibleWidgets.actions.defineHome()
+            app.actions.processAction({"data":{"command":"defineHome","arg":"","arg1":""}})
+            message = {"data":{"sled":"NewHome"}}
     if ('system' in resultlist):
         print ('system selected')
+        message = {"data":{"system":"selected"}}
         if ('exit' in resultlist):
             print("system shutdown requested")
-            os._exit(0)
+            if (app.data.uploadFlag == 0):
+                os._exit(0)
+            else:
+                app.nonVisiblewidgets.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+                print("denied: running code.  Code stopped near try again")
+                message = {"data":{"system":"shutdownAttempt"}}
         if ('connected' in resultlist):
             print("wiimote connected")
+            message = {"data":{"system":"Connect"}}
             app.data.wiiPendantConnected = True
         if ('disconnect' in resultlist):
             print("wiimote disconnect")
             app.data.wiiPendantConnected = False    
-        return ('data:125')
+            message = {"data":{"system":"disconnect"}}
+    resp = jsonify(message)
+    resp.status_code = 200
+    return (resp)
+    
            
 
 @app.route("/controls")
@@ -282,6 +321,14 @@ def gpioSettings():
         message = {"status": 200}
         resp = jsonify(message)
         resp.status_code = 200
+        # restart button service here
+        # this button service resets the button maps for the updated gpio pins
+        print("restarting maslow button service") 
+        try:
+            subprocess.run(['sudo /usr/local/etc/MaslowButtonRestart.sh'])
+            print("restarted maslow button service")
+        except:
+            print("error restarting button service")
         return resp
         
 @app.route("/uploadGCode", methods=["POST"])
