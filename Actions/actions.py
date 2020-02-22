@@ -1507,6 +1507,7 @@ class Actions(MakesmithInitFuncs):
         state prior to starting the current gcode move.  Currently processed are relative/absolute
         positioning (G90/G91), imperial/metric units (G20/G21) and x, y and z positions
         '''
+        positioning = "G90 "
         zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings", "zAxisSafeHeight"))
         zAxisFeedRate = 12.8  # currently hardcoded, but Todo: Add setting
         xyAxisFeedRate = float(self.data.config.getValue("Advanced Settings", "maxFeedrate"))
