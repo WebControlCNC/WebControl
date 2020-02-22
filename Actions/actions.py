@@ -405,6 +405,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            print("z!")
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+import requests
 import cwiid
 import time
 
@@ -43,10 +43,26 @@ class WiiPendant():
     self.A = 0
     self.wm = None
     if self.connect():
+      self.send({"system":"connect"})
       self.wm.led = self.L[self.LED_ON]
       self.wm.rpt_mode = cwiid.RPT_BTN
     else:
       print("no controllers found")
+ 
+ def Send(self,command):
+    URL = "http://localhost:5000/pendant"
+    try:
+      r=requests.put(URL,command)
+      print (r)
+    except requests.exceptions.HTTPError as errh:
+        print ("Http Error:",errh)
+    except requests.exceptions.ConnectionError as errc:
+        print ("Error Connecting:",errc)
+    except requests.exceptions.Timeout as errt:
+        print ("Timeout Error:",errt)
+    except requests.exceptions.RequestException as err:
+        print ("OOps: Something Else",err)
+        return
 
  def connect(self):
       i=2
@@ -96,123 +112,167 @@ class WiiPendant():
     self.wm.rumble=True
     time.sleep(.8)
     self.wm.rumble = False
-
 #end rumble
 
  def read_buttons(self):
 
     # not using classic, this is if the remote is standing up though you hold it sideways
-    if self.CONFIRM > 0:
-      elapsed = 1 - (time.time() - self.startTime)
-      if elapsed > 5:
-        self.rumble(1)  # cancelled due to timeout
-        self.CONFIRM = - 10 # go back to normal
+      if self.CONFIRM > 0:
+        elapsed = 1 - (time.time() - self.startTime)
+        if elapsed > 5:
+          self.rumble(1)  # cancelled due to timeout
+          self.CONFIRM = - 10 # go back to normal
 
-    if (self.wm.state['buttons'] & cwiid.BTN_A):
-      if self.TRIGGER == 1:
-        if self.CONFIRM > 0:
-          self.TRIGGER = 0
-          print("HOME POSITION CONFIRMED")
-          self.rumble(1)
-      elif self.ZTRIGGER == 1:
-        self.ZTRIGGER = 0
-        if self.CONFIRM > 0:
-          print("Z PLUNGE RESET CONFIRMED")
-          self.rumble(2)
-
+      if (self.wm.state['buttons'] & cwiid.BTN_A):
+          if self.TRIGGER == 1:
+            if self.CONFIRM > 0:
+              self.TRIGGER = 0
+              print("HOME POSITION CONFIRMED")
+              self.rumble(1)
+              self.Send("sled:defineHome")
+          elif self.ZTRIGGER == 1:
+            self.ZTRIGGER = 0
+            if self.CONFIRM > 0:
+              print("Z PLUNGE RESET CONFIRMED")
+              self.rumble(2)
+              self.Send("zAxis:defineZ0")
+          elif (self.wm.state['buttons'] & cwiid.BTN_B):
+                print("Wii Remote Disconnect - thread dead")
+                self.send("system:disconnect")
+                self.wiiPendantConnected = False
+                self.rumble(0)
+                wm = None
+                return
+          else:
+            self.A = 1
       else:
-        self.A = 1
-    else:
         self.A = 0
-
-    if (self.wm.state['buttons'] & cwiid.BTN_1):
-      if self.TRIGGER == 0:
-        if (self.wm.state['buttons'] & cwiid.BTN_UP):
-          print("MOVE LEFT")
-          self.rumble(1)
-          self.TRIGGER = 1
-          self.move_sled("-X",self.DISTANCE[self.LED_ON])
-        if (self.wm.state['buttons'] & cwiid.BTN_DOWN):
-          print("MOVE RIGHT")
-          self.rumble(1)
-          self.TRIGGER = 1
-          self.RIGHT = 0
-          self.move_sled("X",self.DISTANCE[self.LED_ON])
-        if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
-          print("MOVE UP")
-          self.rumble(1)
-          self.TRIGGER = 1
-          self.UP = 0
-          self.move_sled("Y",self.DISTANCE[self.LED_ON])
-        if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
-          print("MOVE DOWN")
-          self.rumble(1)
-          self.TRIGGER = 1
-          self.DOWN = 0
-          self.move_sled("-Y",self.DISTANCE[self.LED_ON])
-        if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-          print("SET NEW HOME")
-          self.rumble(1)
-          self.TRIGGER = 1
-          self.rumble(0)
-          self.CONFIRM = 500
-          self.startTime = time.clock()
-    else:
-     self.TRIGGER = 0
-
-     if (self.wm.state['buttons'] & cwiid.BTN_2):
-      if self.ZTRIGGER == 0:
+      if (self.wm.state['buttons'] & cwiid.BTN_B):
+        if (self.B == 0):
+            if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
+                print("Wiimote Start")
+                self.rumble(1)
+                self.B = 1
+                self.Send("gcode:startRun")
+            if (self.wm.state['buttons'] & cwiid.BTN_UP):
+                print("Wiimote Pause")
+                self.rumble(1)
+                self.B = 1
+                self.Send("gcode:pauseRun")
+            if (self.wm.state['buttons'] & cwiid.BTN_DOWN):
+                print("Wiimote Resume")
+                self.rumble(1)
+                self.B = 1
+                self.Send("gcode:resumeRun")
+            if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
+                print("Wiimote Stop")
+                self.rumble(1)
+                self.B = 1
+                self.Send("gcode:stopRun")
+            elif (self.wm.state['buttons'] & cwiid.BTN_A):
+                print("Wii Remote Disconnect - thread dead")
+                self.Send("system:disconnect")
+                self.wiiPendantConnected = False
+                self.rumble(0)
+                wm = None
+                return
+        else:
+          self.B = 0
+      if (self.wm.state['buttons'] & cwiid.BTN_1):
+        if self.TRIGGER == 0:
+          if (self.wm.state['buttons'] & cwiid.BTN_UP):
+            print("Wiimote MOVE SLED LEFT")
+            self.rumble(1)
+            self.TRIGGER = 1
+            self.Send("sled:left", self.DISTANCE[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_DOWN):
+            print("Wiimote MOVE SLED RIGHT")
+            self.rumble(1)
+            self.TRIGGER = 1
+            self.RIGHT = 0
+            self.Send("sled:right", self.DISTANCE[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
+            print("Wiimote MOVE SLED UP")
+            self.rumble(1)
+            self.TRIGGER = 1
+            self.UP = 0
+            self.Send("sled:up", self.DISTANCE[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
+            print("Wiimote MOVE SLED DOWN")
+            self.rumble(1)
+            self.TRIGGER = 1
+            self.DOWN = 0
+            self.Send("sled:down:", self.DISTANCE[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_HOME):
+            print("Wiimote SET NEW HOME")
+            self.rumble(1)
+            self.TRIGGER = 1
+            self.rumble(0)
+            self.CONFIRM = 500
+            self.startTime = time.clock()
+      else:
         self.TRIGGER = 0
-        if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
-            print("MOVE Z UP")
+
+      if (self.wm.state['buttons'] & cwiid.BTN_2):
+        if self.ZTRIGGER == 0:
+          self.TRIGGER = 0
+          if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
+            print("Wiimote MOVE Z UP")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.move_z("Z",self.Z[self.LED_ON])
-        if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
-            print("MOVE Z DOWN")
+            self.Send("zAxis:raise", self.Z[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
+            print("Wiimote MOVE Z DOWN")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.move_z("-Z",self.Z[self.LED_ON])
-        if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-            print("SET PLUNGE to 0")
+            self.Send("zAxis:lower", self.Z[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_UP):
+            print("Wiimote stop Z axis")
+            self.rumble(2)
+            self.ZTRIGGER = 1
+            self.Send("zAxis:stopZ", self.Z[self.LED_ON])
+          if (self.wm.state['buttons'] & cwiid.BTN_HOME):
+            print("Wiimote Reset Z AXIS to 0")
             self.rumble(2)
             self.ZTRIGGER = 1
             self.rumble(0)
             self.CONFIRM = 200
             self.startTime = time.clock()
-     else:
+      else:
         self.ZTRIGGER = 0
         if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-         if self.HOME == 0:
-          self.HOME = 1
-          print ("MOVE TO HOME")
-          self.rumble(1)
+          if self.HOME == 0:
+            self.HOME = 1
+            print ("Wiimote MOVE SLED TO HOME")
+            self.Send("sled:home")
+            self.rumble(1)
         else:
           self.HOME = 0
 
-    if (self.wm.state['buttons'] & cwiid.BTN_MINUS):
-      if self.MINUS == 0:
-        self.MINUS = 1
-        self.LED_ON = self.LED_ON - 1
-        if self.LED_ON < 0:
-          self.LED_ON = 3
-        print("Move Distance is ", self.DISTANCE[self.LED_ON])
-        print("Z Distance is ", self.Z[self.LED_ON])
-        self.wm.led = self.L[self.LED_ON]
-    else:
-      self.MINUS = 0
+      if (self.wm.state['buttons'] & cwiid.BTN_MINUS):
+        if self.MINUS == 0:
+          self.MINUS = 1
+          self.LED_ON = self.LED_ON - 1
+          if self.LED_ON < 0:
+            self.LED_ON = 3
+          print("Sled Move Distance is ", self.DISTANCE[self.LED_ON])
+          print("Z Distance is ", self.Z[self.LED_ON])
+          self.wm.led = self.L[self.LED_ON]
+      else:
+        self.MINUS = 0
 
-    if (self.wm.state['buttons'] & cwiid.BTN_PLUS):
-      if self.PLUS == 0:
-        self.PLUS = 1
-        self.LED_ON = self.LED_ON + 1
-        if self.LED_ON > 3:
-          self.LED_ON = 0
-        print("Move Distance is ", self.DISTANCE[self.LED_ON])
-        print("Z Distance is ", self.Z[self.LED_ON])
-        self.wm.led = self.L[self.LED_ON]
-    else:
-      self.PLUS = 0
+      if (self.wm.state['buttons'] & cwiid.BTN_PLUS):
+        if self.PLUS == 0:
+          self.PLUS = 1
+          self.LED_ON = self.LED_ON + 1
+          if self.LED_ON > 3:
+            self.LED_ON = 0
+          print("Sled move Distance is ", self.DISTANCE[self.LED_ON])
+          print("Z Distance is ", self.Z[self.LED_ON])
+          self.wm.led = self.L[self.LED_ON]
+      else:
+        self.PLUS = 0
+      return True
 
   #end button scan
 #END class

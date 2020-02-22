@@ -1,3 +1,3 @@
 #/bin/bash
 
-sudo  systemctl restart MaslowButton.service
+sudo  systemctl restart MaslowButton

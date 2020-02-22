@@ -101,7 +101,7 @@ def Shutdown():
 def startPendant():  
     print("kickstart pendant process (TOTALLY SEPARATE)")
     try:
-        printsubprocess.run(['/usr/local/etc/MaslowPendantStart.sh'])
+        subprocess.run(['sudo','/usr/local/etc/MaslowPendantStart.sh'])
         print ('subprocess started Pendant service')
     except:
         print ('error starting pendant sub process')
@@ -137,7 +137,7 @@ def setGPIOAction(pin, action):
             break
     if foundLED is not None:
         LEDs.remove(foundLED)
-    print (LEDs)
+    #print (LEDs)
     
     type, pinAction = getAction(action)
     if type == "button":
@@ -152,6 +152,7 @@ def setGPIOAction(pin, action):
         print("set LED with action: " + action)
     #pause()
 def getAction(action):
+    #print(action)
     if action == "Stop":
         return "button", Stop
     elif action == "Pause":
@@ -159,10 +160,11 @@ def getAction(action):
     elif action == "Play":
         return "button", Start
     elif action == "Shutdown":
-        return "Shutdown", Shutdown
+        return "button", Shutdown
     elif action == "Pendant":
-        return "Pendant", startPendant
-    elif action == "Return To Center":
+        return "button", startPendant
+    elif "Return" in action:
+        print("set return to center as button")
         return "button", returnHome
     else:
         return "led", None
@@ -170,7 +172,7 @@ def getAction(action):
 def causeAction(action, onoff):
     for led in LEDs:
         if led[0] == action:
-            print(led[1])
+            #print(led[1])
             if onoff == "on":
                 led[1].on()
             elif onoff == "blink":
@@ -178,7 +180,7 @@ def causeAction(action, onoff):
             else:
                 led[1].off()
             
-            print(led[1])
+            #print(led[1])
     if action == "PlayLED" and onoff == "on":
         causeAction("PauseLED", "off")
         causeAction("StopLED", "off")
@@ -207,9 +209,9 @@ while True:
             flag = items["data"]["flag"]
             index = items["data"]["index"]
             moving = items["data"]["moving"]
-            print (flag)
-            print (index)
-            print (moving)
+            #print (flag)
+            #print (index)
+            #print (moving)
         print(items)
         if (flag == 1):
             RGC = True

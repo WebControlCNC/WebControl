@@ -1,3 +1,3 @@
 #/bin/bash
 
-sudo  systemctl stop MaslowButton.service
+sudo  systemctl stop MaslowButton

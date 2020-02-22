@@ -1,3 +1,3 @@
 #/bin/bash
 
-sudo  systemctl restart MaslowPendant.service
+sudo  systemctl restart MaslowPendant

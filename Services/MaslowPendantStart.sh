@@ -1,3 +1,3 @@
 #/bin/bash
 
-sudo  systemctl start MaslowPendant.service
+sudo  systemctl start MaslowPendant
