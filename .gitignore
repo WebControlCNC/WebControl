@@ -22,3 +22,5 @@ alog.txt
 __pycache__/
 *.py[cod]
 *$py.class
+Services/tp.py
+Services/tr.py

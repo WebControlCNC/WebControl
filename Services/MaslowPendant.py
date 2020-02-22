@@ -41,9 +41,10 @@ class WiiPendant():
     self.StartTiime = time.time()
     self.HOME = 0
     self.A = 0
+    self.B = 0
     self.wm = None
     if self.connect():
-      self.send({"system":"connect"})
+      self.Send("system:connect")
       self.wm.led = self.L[self.LED_ON]
       self.wm.rpt_mode = cwiid.RPT_BTN
     else:
@@ -174,7 +175,7 @@ class WiiPendant():
                 self.Send("system:disconnect")
                 self.wiiPendantConnected = False
                 self.rumble(0)
-                wm = None
+                self.wm = None
                 return
         else:
           self.B = 0
@@ -184,25 +185,25 @@ class WiiPendant():
             print("Wiimote MOVE SLED LEFT")
             self.rumble(1)
             self.TRIGGER = 1
-            self.Send("sled:left", self.DISTANCE[self.LED_ON])
+            self.Send("sled:left:" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_DOWN):
             print("Wiimote MOVE SLED RIGHT")
             self.rumble(1)
             self.TRIGGER = 1
             self.RIGHT = 0
-            self.Send("sled:right", self.DISTANCE[self.LED_ON])
+            self.Send("sled:right" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
             print("Wiimote MOVE SLED UP")
             self.rumble(1)
             self.TRIGGER = 1
             self.UP = 0
-            self.Send("sled:up", self.DISTANCE[self.LED_ON])
+            self.Send("sled:up" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
             print("Wiimote MOVE SLED DOWN")
             self.rumble(1)
             self.TRIGGER = 1
             self.DOWN = 0
-            self.Send("sled:down:", self.DISTANCE[self.LED_ON])
+            self.Send("sled:down:" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_HOME):
             print("Wiimote SET NEW HOME")
             self.rumble(1)
@@ -220,17 +221,17 @@ class WiiPendant():
             print("Wiimote MOVE Z UP")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.Send("zAxis:raise", self.Z[self.LED_ON])
+            self.Send("zAxis:raise" + str(self.Z[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
             print("Wiimote MOVE Z DOWN")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.Send("zAxis:lower", self.Z[self.LED_ON])
+            self.Send("zAxis:lower"+ str(self.Z[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_UP):
             print("Wiimote stop Z axis")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.Send("zAxis:stopZ", self.Z[self.LED_ON])
+            self.Send("zAxis:stopZ")
           if (self.wm.state['buttons'] & cwiid.BTN_HOME):
             print("Wiimote Reset Z AXIS to 0")
             self.rumble(2)
