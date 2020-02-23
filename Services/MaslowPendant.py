@@ -29,6 +29,12 @@ class WiiPendant():
  '''
 
  def __init__(self):
+    '''
+    init sets up the object properties that are used with the various functions below
+    A, trigger, ztrigger, confirm, home, a, b, all help with making the buttons single press
+    wm is the wiimote object
+    wiiPendantConnect is the flag that lets the class know to try and reconnect
+    '''   
     self.L = [1,2,4,8]
     self.DISTANCE = [0.1,1,10,100]
     self.Z = [0.1, 0.5, 1, 5]
@@ -43,14 +49,19 @@ class WiiPendant():
     self.A = 0
     self.B = 0
     self.wm = None
+    self.wiiPendantConnected = False
+    
     if self.connect():
       self.Send("system:connect")
-      self.wm.led = self.L[self.LED_ON]
-      self.wm.rpt_mode = cwiid.RPT_BTN
     else:
       print("no controllers found")
  
  def Send(self,command):
+    '''
+    sends a put request to the webcontrol flask / socket io server at port 5000
+    the /pendant in the address directs the server what commands to interpret
+    input is the command that is set by the wiimote button press
+    '''
     URL = "http://localhost:5000/pendant"
     try:
       r=requests.put(URL,command)
@@ -63,25 +74,40 @@ class WiiPendant():
         print ("Timeout Error:",errt)
     except requests.exceptions.RequestException as err:
         print ("OOps: Something Else",err)
-        return
 
  def connect(self):
+      '''
+      try to establish bluetooth communication with wii controller
+      once connected, set LED to indicate distance
+      set to button mode or it won't work at all
+      if no connection, count and then return
+      
+      funciton returns 
+         True when it connects
+         False after 10 timeouts
+      
+      '''
       i=2
       while not self.wm:
         try:
           self.wm=cwiid.Wiimote()
-#          self.wm.led.battery = 1  # this should show the battery power with the LED's when it connects...
+          self.wiiPendantConnected = True
+          self.wm.led = self.L[self.LED_ON]
+          self.wm.rpt_mode = cwiid.RPT_BTN
           return(True)
         except RuntimeError:
-          if (i>10):
-            return(false)
-          print ("Error opening wiimote connection" )
+          if (i>5):
+            return(False)
+          #print ("Error opening wiimote connection" )
+          time.sleep(5)
           print ("attempt " + str(i))
           i += 1
 #end init
 
  def rumble(self,mode=0):
-
+  '''
+  rumble shakes the wiimote when called.  short time delays vary the shake pattern
+  '''
   if mode == 0: # start up heartbeat = 2 quick rumbles / prompt for confirmation
     self.wm.rumble=True
     time.sleep(.3)
@@ -116,9 +142,14 @@ class WiiPendant():
 #end rumble
 
  def read_buttons(self):
-
-    # not using classic, this is if the remote is standing up though you hold it sideways
-      if self.CONFIRM > 0:
+   if (self.wiiPendantConnected == False):
+      time.sleep(10)
+      print ("connecting")
+      if (self.connect()):
+          print("connected")
+   while(self.wiiPendantConnected == True):      
+      # not using classic, this is if the remote is standing up though you hold it sideways
+      if (self.CONFIRM > 0):
         elapsed = 1 - (time.time() - self.startTime)
         if elapsed > 5:
           self.rumble(1)  # cancelled due to timeout
@@ -138,11 +169,11 @@ class WiiPendant():
               self.rumble(2)
               self.Send("zAxis:defineZ0")
           elif (self.wm.state['buttons'] & cwiid.BTN_B):
-                print("Wii Remote Disconnect - thread dead")
-                self.send("system:disconnect")
+                print("Wii Remote Disconnect")
+                self.Send("system:disconnect")
                 self.wiiPendantConnected = False
                 self.rumble(0)
-                wm = None
+                self.wm = None
                 return
           else:
             self.A = 1
@@ -171,7 +202,7 @@ class WiiPendant():
                 self.B = 1
                 self.Send("gcode:stopRun")
             elif (self.wm.state['buttons'] & cwiid.BTN_A):
-                print("Wii Remote Disconnect - thread dead")
+                print("Wii Remote Disconnect")
                 self.Send("system:disconnect")
                 self.wiiPendantConnected = False
                 self.rumble(0)
@@ -191,13 +222,13 @@ class WiiPendant():
             self.rumble(1)
             self.TRIGGER = 1
             self.RIGHT = 0
-            self.Send("sled:right" + str(self.DISTANCE[self.LED_ON]))
+            self.Send("sled:right:" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
             print("Wiimote MOVE SLED UP")
             self.rumble(1)
             self.TRIGGER = 1
             self.UP = 0
-            self.Send("sled:up" + str(self.DISTANCE[self.LED_ON]))
+            self.Send("sled:up:" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
             print("Wiimote MOVE SLED DOWN")
             self.rumble(1)
@@ -221,12 +252,12 @@ class WiiPendant():
             print("Wiimote MOVE Z UP")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.Send("zAxis:raise" + str(self.Z[self.LED_ON]))
+            self.Send("zAxis:raise:" + str(self.Z[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_LEFT):
             print("Wiimote MOVE Z DOWN")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.Send("zAxis:lower"+ str(self.Z[self.LED_ON]))
+            self.Send("zAxis:lower:"+ str(self.Z[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_UP):
             print("Wiimote stop Z axis")
             self.rumble(2)
@@ -273,17 +304,18 @@ class WiiPendant():
           self.wm.led = self.L[self.LED_ON]
       else:
         self.PLUS = 0
-      return True
+   #return True
 
   #end button scan
 #END class
 
 
 def main():
-  wp = WiiPendant()
-
-  while True:
-    wp.read_buttons()
-
+  wp = WiiPendant() # instantiate a wiipendant object named wp
+  #while True:
+  wp.read_buttons() # read the buttons in the wp object
+   
+  # when the remote is disconnected, the program stops
+  # datetime A combination of a date and a time. Attributes: ()
 if __name__ == "__main__":
     main()

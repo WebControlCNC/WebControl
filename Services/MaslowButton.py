@@ -5,6 +5,7 @@ from signal import pause
 import requests
 #from wiiPendant import WiiPendant
 import time
+import subprocess
 from subprocess import check_call
 #from subprocess import run
 import json
