@@ -270,6 +270,12 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "setFakeServo":
                 if not self.setFakeServo(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with changing Fake Servo")
+            elif msg["data"]["command"] == "resetHomeToCenter":
+                if self.defineHome(0, 0):
+                    ## notify UI of home change to request gcode update
+                    self.data.ui_queue1.put("Action", "gcodeUpdate", "")
+                else:
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with resetting home to center")
             else:
                 response = "Function not currently implemented.. Sorry."
                 response = response + "["+msg["data"]["command"]+"]"
@@ -474,6 +480,9 @@ class Actions(MakesmithInitFuncs):
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
             #self.data.gpioActions.causeAction("StopLED", "on")
+            # reset pause
+            self.data.ui_queue1.put("Action", "setAsPause", "")
+            #self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -563,7 +572,9 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "setAsResume", "")
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
-                self.data.pausedzval = self.data.zval
+                #self.data.pausedzval = self.data.zval
+                #self.data.pausedUnits = self.data.units
+                self.data.pausedzval = self.data.currentZTarget
                 self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
                 #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
@@ -1320,6 +1331,15 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
                 except Exception as e:
                     self.data.console_queue.put(str(e))
+            elif setting == "pauseButtonSetting":
+                # send current pause button state
+                try:
+                    if self.data.uploadFlag == 0 or self.data.uploadFlag == 1:
+                        return setting, "Pause"
+                    else:
+                        return setting, "Resume"
+                except Exception as e:
+                    self.data.console_queue.put(str(e))
             else:
                 # send whatever is being request
                 if setting == "units":
@@ -1521,6 +1541,7 @@ class Actions(MakesmithInitFuncs):
         state prior to starting the current gcode move.  Currently processed are relative/absolute
         positioning (G90/G91), imperial/metric units (G20/G21) and x, y and z positions
         '''
+        positioning = "G90 "
         zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings", "zAxisSafeHeight"))
         zAxisFeedRate = 12.8  # currently hardcoded, but Todo: Add setting
         xyAxisFeedRate = float(self.data.config.getValue("Advanced Settings", "maxFeedrate"))
@@ -1543,7 +1564,7 @@ class Actions(MakesmithInitFuncs):
         # start parsing through gcode file up to the index
         for x in range(self.data.gcodeIndex):
             filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
-            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with nothing
+            filtersparsed = re.sub(r';([^\n]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with nothing
             if not filtersparsed.isspace():  # if all spaces, don't send.  likely a comment. #self.data.gcode[x][0] != "(":
                 #lines = self.data.gcode[x].split(" ")
                 lines = filtersparsed.split(" ")
@@ -1677,7 +1698,7 @@ class Actions(MakesmithInitFuncs):
         zpos = 0
         for x in range(index):
             filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
-            filtersparsed = re.sub(r';([^.]*)?', '', filtersparsed)  # replace standard ; initiated gcode comments with ""
+            filtersparsed = re.sub(r';([^\n]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with ""
             if not filtersparsed.isspace():  # if all spaces, don't send.  likely a comment.  #self.data.gcode[x][0] != "(":
                 listOfLines = filter(None, re.split("(G)", filtersparsed)) # self.data.gcode[x]))  # self.data.gcode[x].split("G")
                 # it is necessary to split the lines along G commands so that commands concatenated on one line

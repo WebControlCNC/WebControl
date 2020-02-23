@@ -346,7 +346,7 @@ class WebPageProcessor:
             for line in self.data.gcode:
                 text = text + line + "\n"
             #text = self.gcodePreProcessor()
-            page = render_template("editGCode.html", gcode=text, pageID="editGCode",)
+            page = render_template("editGCode.html", gcode=text.rstrip(), pageID="editGCode",)
             return page, "Edit GCode", True, "medium", "content", "footerSubmit"
         elif pageID == "sendGCode":
             text = self.data.sentCustomGCode

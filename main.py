@@ -89,10 +89,12 @@ app.logstreamerthread = None
 @mobile_template("{mobile/}")
 def index(template):
     app.data.logger.resetIdler()
+    macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
+    macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "mobile/":
-        return render_template("frontpage3d_mobile.html", modalStyle="modal-lg")
+        return render_template("frontpage3d_mobile.html", modalStyle="modal-lg", macro1_title=macro1Title,  macro2_title=macro2Title)
     else:
-        return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
+        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
 
 @app.route('/GPIO', methods=['PUT', 'GET'])
 # GPIO route is for the button process to input button press information to the queue
@@ -541,7 +543,7 @@ def sendGcode():
     app.data.logger.resetIdler()
     #print(request.form)#["gcodeInput"])
     if request.method == "POST":
-        returnVal = app.data.actions.sendGCode(request.form["gcode"])
+        returnVal = app.data.actions.sendGCode(request.form["gcode"].rstrip())
         if returnVal:
             message = {"status": 200}
             resp = jsonify("success")
@@ -643,7 +645,7 @@ def editGCode():
     app.data.logger.resetIdler()
     #print(request.form["gcode"])
     if request.method == "POST":
-        returnVal = app.data.actions.updateGCode(request.form["gcode"])
+        returnVal = app.data.actions.updateGCode(request.form["gcode"].rstrip())
         if returnVal:
             message = {"status": 200}
             resp = jsonify("success")
