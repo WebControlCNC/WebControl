@@ -7,8 +7,8 @@ ExecStart=/usr/bin/python3  /usr/local/etc/MaslowButton.py
 WorkingDirectory=/usr/local/etc
 Environment=API_KEY=123456789
 Environment=API_PASS=password
-Restart=always
-RestartSec=2
+Restart=never
+user=pi
 
 [Install]
 WantedBy=sysinit.target
