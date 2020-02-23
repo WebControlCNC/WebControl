@@ -149,7 +149,7 @@ def remote_function_call():
 def getLEDinfo():
     if (request.method == 'GET'):
         try:
-            message = {"data":{"index": str(app.data.gcodeIndex), "flag": str(app.data.uploadFlag), "moving": str(app.data.sledMoving)}}  #assemble json string
+            message = {"data":{"index": str(app.data.gcodeIndex), "flag": str(app.data.uploadFlag), "moving": str(app.data.sledMoving), "Zmove": str(app.data.zMoving)}}  #assemble json string
             resp = jsonify(message) # java script object notation convrsion of the message
             resp.status_code = 200
             return (resp) # send the message

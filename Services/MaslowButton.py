@@ -210,6 +210,7 @@ while True:
             flag = items["data"]["flag"]
             index = items["data"]["index"]
             moving = items["data"]["moving"]
+            zMove = items["data"]["zMove"]
             #print (flag)
             #print (index)
             #print (moving)
@@ -225,6 +226,9 @@ while True:
             causeAction("StopLED", "on")
             if (moving == 'True'):
                 print ("Moving")
+                causeAction("PlayLED", "blink")
+            if (moving == 'True'):
+                print ("zMove")
                 causeAction("PlayLED", "blink")
         elif (flag == '1'):
             print ("running")

@@ -409,6 +409,7 @@ class Actions(MakesmithInitFuncs):
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
+            self.data.Zmoving = False    
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -472,7 +473,7 @@ class Actions(MakesmithInitFuncs):
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
-            self.data.gpioActions.causeAction("StopLED", "on")
+            #self.data.gpioActions.causeAction("StopLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -566,7 +567,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
                 #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
-                self.data.gpioActions.causeAction("PauseLED", "on")
+                #self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -629,7 +630,7 @@ class Actions(MakesmithInitFuncs):
             # needed only if user initiated pause, but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
-            self.data.gpioActions.causeAction("PauseLED", "off")
+            #self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
