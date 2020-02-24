@@ -120,6 +120,13 @@ settings = {
             "default": 0,
         },
         {
+            "type": "bool",
+            "title": "Raspberry Pi Button Service Active",
+            "desc": "GPIO buttons run in separate process / system service",
+            "key": "MaslowButtonService",
+            "default": 0,
+        },
+        {
             "type": "options",
             "title": "Color Scheme",
             "desc": "Switch between the light and dark color schemes. Restarting GC is needed for this change to take effect",

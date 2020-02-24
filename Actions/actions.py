@@ -445,7 +445,7 @@ class Actions(MakesmithInitFuncs):
                 else:
                     print("h6")
                     self.data.uploadFlag = 1
-                self.data.gpioActions.causeAction("PlayLED", "on")
+                #self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
             else:
                 return False

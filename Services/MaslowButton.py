@@ -23,7 +23,7 @@ print("setting up buttons")
 #LEDIR = LED(6) #5.6.13.19
 #LEDPower = LED(13)
 runpause = 0
-pendantService = False
+wiiPendantPresent = False
 flag = 0
 Buttons = []
 LEDs = []
@@ -100,12 +100,13 @@ def Shutdown():
     check_call(['sudo', 'poweroff'])
 
 def startPendant():  
-    print("kickstart pendant process (TOTALLY SEPARATE)")
-    try:
-        subprocess.run(['sudo','/usr/local/etc/MaslowPendantStart.sh'])
-        print ('subprocess started Pendant service')
-    except:
-        print ('error starting pendant sub process')
+    if (wiiPendantPresent):
+        print("kickstart pendant process (TOTALLY SEPARATE)")
+        try:
+            subprocess.run(['sudo','/usr/local/etc/MaslowPendantStart.sh'])
+            print ('subprocess started Pendant service')
+        except:
+            print ('error starting pendant sub process')
    
 def setup():
     #retdata = Get("GPIO", "GPIO")
@@ -211,6 +212,7 @@ while True:
             index = items["data"]["index"]
             moving = items["data"]["moving"]
             zMove = items["data"]["zMove"]
+            wiiPendantPresent = items["data"]["wiiPendantPresent"]
             #print (flag)
             #print (index)
             #print (moving)

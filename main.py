@@ -151,7 +151,7 @@ def remote_function_call():
 def getLEDinfo():
     if (request.method == 'GET'):
         try:
-            message = {"data":{"index": str(app.data.gcodeIndex), "flag": str(app.data.uploadFlag), "moving": str(app.data.sledMoving), "Zmove": str(app.data.zMoving)}}  #assemble json string
+            message = {"data":{"index": str(app.data.gcodeIndex), "flag": str(app.data.uploadFlag), "moving": str(app.data.sledMoving), "zMove": str(app.data.zMoving), "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent"))}}  #assemble json string
             resp = jsonify(message) # java script object notation convrsion of the message
             resp.status_code = 200
             return (resp) # send the message
@@ -919,6 +919,12 @@ if __name__ == "__main__":
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
+    
+    app.data.gpiobuttonService = app.data.config.getValue("Maslow Settings","MaslowButtonService")
+    # start button service next to last
+    if (app.data.gpiobuttonService):
+        print("starting Maslow GPIO button service")
+        subprocess.run('/usr/local/etc/MaslowButtonStart.sh')
     
     #app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)

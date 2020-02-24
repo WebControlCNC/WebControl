@@ -102,6 +102,7 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
+    GPIOButtonService = False
     wiiPendantPresent = False # has user set wiimote as active?
     wiiPendantConnected = False # is the wiimote BT connected?
     sledMoving = False # for LED light status

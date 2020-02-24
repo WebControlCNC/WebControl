@@ -18,7 +18,6 @@ from Background.webcamVideoStream import WebcamVideoStream
 from Boards.boardManager import BoardManager
 from ReleaseManager.releaseManager import ReleaseManager
 from HelpManager.helpManager import HelpManager
-#from Connection.wiiPendant import WiiPendant
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -74,7 +73,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
         data.helpManager = self.helpManager
-        #data.wiiPendant = self.wiiPendant
         
         if hasattr(sys, '_MEIPASS'):
             data.platform = "PYINSTALLER"
@@ -135,4 +133,5 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()
         #self.camera.start()
-
+        
+        
