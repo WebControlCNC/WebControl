@@ -20,3 +20,12 @@ sudo copy the following files /Service to /etc/systemd/system/
 
 MaslowButton.service
 MaslowPendant.service
+
+This service requires the installation of the cwiid library compiled for python 3
+
+git clone https://github.com/azzra/python3-wiimote.git
+aclocal
+autoconf
+./configure
+make
+sudo make install
