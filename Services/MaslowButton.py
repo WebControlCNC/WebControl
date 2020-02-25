@@ -33,10 +33,10 @@ moving = False
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 
 def getpause():
-    return pause
+    return runpause
 
 def setpause(newpause):
-    pause = newpause
+    runpause = newpause
     
 def getActionList(self):
     return actionList
@@ -204,7 +204,7 @@ bad_chars = "'"
 print("waiting for button press")
 #print (LEDs)
 while True:
-        time.sleep (2)
+        time.sleep (3)
     #try:
         items = Get('LED','stuff')
         if (items != None):
