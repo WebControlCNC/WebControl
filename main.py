@@ -920,9 +920,9 @@ if __name__ == "__main__":
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
     
-    app.data.gpiobuttonService = app.data.config.getValue("Maslow Settings","MaslowButtonService")
+    app.data.GPIOButtonService = app.data.config.getValue("Maslow Settings","MaslowButtonService")
     # start button service next to last
-    if (app.data.gpiobuttonService):
+    if (app.data.GPIOButtonService):
         print("starting Maslow GPIO button service")
         subprocess.run('/usr/local/etc/MaslowButtonStart.sh')
     
