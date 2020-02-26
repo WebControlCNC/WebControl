@@ -148,10 +148,26 @@ def remote_function_call():
 #This is the LED method responds to requests from the button process (every 5 seconds or so) that gets the system state so the LED can be updated in the button service.
 #The data consists of the gcode index, the gcode upload flag (upload to the arduino) which indicates it is running or paused or stopped
 #The moving flag is for sled moves without "running" gcode
+#The 
 def getLEDinfo():
     if (request.method == 'GET'):
         try:
-            message = {"data":{"index": str(app.data.gcodeIndex), "flag": str(app.data.uploadFlag), "moving": str(app.data.sledMoving), "zMove": str(app.data.zMoving), "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent"))}}  #assemble json string
+            message = {"data":{"index": str(app.data.gcodeIndex), \
+                "flag": str(app.data.uploadFlag), \
+                "moving": str(app.data.sledMoving), \
+                "zMove": str(app.data.zMoving), \
+                "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent")) \
+                "sled_location_X": str(app.data.xval, \
+                "sled_location_y": str(app.data.yval), \
+                "sled_location_z": str(app.data.zval), \
+                "home_location_x": str(app.data.config.getValue("Advanced Settings","HomeX")) ,\
+                "home_location_y": str(app.data.config.getValue("Advanced Settings","HomeY")),\
+                "gcode_max_x": str(app.data.config.getvalue("")),\
+                "gcode_min_x": ,\
+                "gcode_max_y": ,\
+                "gcode_min_y":) ,\
+                ""
+                }}  #assemble json string
             resp = jsonify(message) # java script object notation convrsion of the message
             resp.status_code = 200
             return (resp) # send the message
@@ -160,7 +176,7 @@ def getLEDinfo():
             resp = jsonify(message)
             resp.status_code = 404 # or whatever the correct number should be
             return (resp)
-        
+    
 @app.route('/pendant', methods=['PUT', 'GET']) # this takes data from a wii control pendant via local onboard bluetooth, though it could be from any web device.
 # all calls to this app route from the pendant are routed through localhost:5000 using requests library and either PUT or GET
 # sending json dict types did not work, so plain text is parsed by splitting a sent command of  r = requests.put("http://localhost:5000/pendant", "move:up:distance") 

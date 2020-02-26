@@ -238,6 +238,7 @@ while True:
         elif (flag == '2'):
             print ("Paused")
             causeAction("PauseLED", "on")
+        if (clidisplay == True)
     #except:
      #  print ("error")
         #       fail in silence
