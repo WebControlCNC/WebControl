@@ -76,6 +76,9 @@
           <div class = "col">
             <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
           </div>
+          <div class = "col">
+            <button id="acceptCalibration" type="button" class="btn btn-lg btn-block btn-primary" >Accept Results</button>
+          </div>
         </div>
       </div>
     </form>
@@ -87,16 +90,20 @@
     <p><label id="leftChainTolerance">Left Chain Tolerance: {{leftChainTolerance}}</label></p>
     <p><label id="rightChainTolerance">Right Chain Tolerance: {{rightChainTolerance}}</label></p>
     <p><label id="calibrationError">Calibration Error: n/a</label></p>
-    <button id="acceptCalibration" disabled type="button" class="btn btn-lg btn-block btn-primary" onclick="action('acceptHoleyCalibrationResults',0,0);$('#contentModal').modal('toggle')">Accept Results</button>
   </div>
-
-
 </div>
 {% endblock %}
 
 {% block javascript %}
 <script>
-$(document).ready(function () {
+var localAction;
+$(document).ready(function() {
+
+    $("#acceptCalibration").on('click', function(){
+      action('acceptHoleyCalibrationResults',0,0);
+      $('#contentModal').modal('toggle');
+      return false;
+    });
 
     $('#calibrateForm').on('submit', function(e) {
         e.preventDefault();
