@@ -20,7 +20,7 @@
 }
 
 .scrollText {
-    height: calc(100vh - 720px);
+    height: calc(100vh - 740px);
     overflow-y: scroll;
 }
 
