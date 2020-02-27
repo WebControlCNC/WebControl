@@ -28,11 +28,21 @@
             <img src="{{ url_for('static',filename='images/quickConfig/quadrilateral.png') }}" height="300" width="300">
           </div>
         </div>
+        <div class="row">
+          <div class="col-6">
+            <h5>Metal Maslow Linkage</h5>
+            <img src="{{ url_for('static',filename='images/quickConfig/metalMaslow.png') }}" height="300" width="300">
+          </div>
+          <div class="col-6">
+          </div>
+        </div>
+
         <p></p>
         <select class="custom-select" name="kinematicsType" id="kinematicsType">
           <option value="Ring" {{'selected' if kinematicsType=='Ring' else ''}}>Ring</option>
           <option value="Linkage" {{'selected' if kinematicsType=='Linkage' else '' }}>45 Degree Linkage</option>
           <option value="Pantograph" {{'selected' if kinematicsType=='Pantograph' else '' }}>Top Mounted Pantograph</option>
+          <option value="Metal Maslow" {{'selected' if kinematicsType=='Metal Maslow' else '' }}>Metal Maslow Linkage</option>
           <option value="Custom" {{'selected' if kinematicsType=='Custom' else ''}}>Custom</option>
           <option value="Quadrilateral" {{'selected' if kinematicsType=='Quadrilateral' else ''}}>Quadrilateral</option>
         </select>
@@ -128,6 +138,9 @@ $(document).ready(function () {
           break;
         case "Pantograph":
           rotationRadius = 100;
+          break;
+        case "Metal Maslow":
+          rotationRadius = 180.34;
           break;
         case "Quadrilateral":
           rotationRadius = 0;

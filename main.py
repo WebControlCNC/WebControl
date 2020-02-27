@@ -99,10 +99,23 @@ def index(template):
 @mobile_template("/controls/{mobile/}")
 def controls(template):
     app.data.logger.resetIdler()
+    macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
+    macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "/controls/mobile/":
-        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True)
+        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
     else:
-        return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
+        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+
+@app.route("/text")
+@mobile_template("/text/{mobile/}")
+def text(template):
+    app.data.logger.resetIdler()
+    macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
+    macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
+    if template == "/text/mobile":
+        return render_template("frontpageText_mobile.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
+    else:
+        return render_template("frontpageText.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
 
 @app.route("/logs")
 @mobile_template("/logs/{mobile/}")
