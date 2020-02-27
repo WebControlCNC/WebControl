@@ -156,18 +156,16 @@ def getLEDinfo():
                 "flag": str(app.data.uploadFlag), \
                 "moving": str(app.data.sledMoving), \
                 "zMove": str(app.data.zMoving), \
-                "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent")) \
-                "sled_location_X": str(app.data.xval, \
-                "sled_location_y": str(app.data.yval), \
-                "sled_location_z": str(app.data.zval), \
-                "home_location_x": str(app.data.config.getValue("Advanced Settings","HomeX")) ,\
-                "home_location_y": str(app.data.config.getValue("Advanced Settings","HomeY")),\
-                "gcode_max_x": str(app.data.config.getvalue("")),\
-                "gcode_min_x": ,\
-                "gcode_max_y": ,\
-                "gcode_min_y":) ,\
-                ""
-                }}  #assemble json string
+                "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent")), \
+                "sled_location_X": str(app.data.computedX), \
+                "sled_location_y": str(app.data.computedY), \
+                #"sled_location_z": str(app.data.zval), \
+                "home_location_x": str(app.data.config.getValue("Advanced Settings","HomeX")), \
+                "home_location_y": str(app.data.config.getValue("Advanced Settings","HomeY")), \
+                }}#"gcode_max_x": str(app.data.config.getvalue(""), \
+                #"gcode_min_x": str(app.data.config.getvalue(""), \
+                #"gcode_max_y": str(app.data.config.getvalue(""), \
+                #"gcode_min_y": str(app.data.config.getvalue("")}}  #assemble json string
             resp = jsonify(message) # java script object notation convrsion of the message
             resp.status_code = 200
             return (resp) # send the message

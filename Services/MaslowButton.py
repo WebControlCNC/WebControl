@@ -3,25 +3,13 @@ from gpiozero import Button
 from gpiozero import LED
 from signal import pause
 import requests
-#from wiiPendant import WiiPendant
 import time
 import subprocess
 from subprocess import check_call
-#from subprocess import run
 import json
 import os
 
-#wp = WiiPendant()
 print("setting up buttons")
-#btnStart = Button(16) #21 # 21,20,16,12
-#btnPause = Button(20) #20
-#btnStop = Button(21) #16
-#btnExit = Button(12) #12
-#btnWiimote = Button(26) #26
-#LEDRun = LED(26)
-#LEDPause = LED(19)
-#LEDIR = LED(6) #5.6.13.19
-#LEDPower = LED(13)
 runpause = 0
 wiiPendantPresent = False
 flag = 0
@@ -29,7 +17,10 @@ Buttons = []
 LEDs = []
 index = 0
 moving = False
-
+homeX = 0
+homeY = 0
+sledX = 0
+sledY = 0
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 
 def getpause():
@@ -213,7 +204,11 @@ while True:
             moving = items["data"]["moving"]
             zMove = items["data"]["zMove"]
             wiiPendantPresent = items["data"]["wiiPendantPresent"]
-            #print (flag)
+            sledX = items["data"]["sled_location_X"]
+            sledy = items["data"]["sled_location_y"]
+                #"sled_location_z": str(app.data.zval), \
+            homeX = items["data"]["home_location_x"]
+            homeY = ["data"]["home_location_y"] #print (flag)
             #print (index)
             #print (moving)
         print(items)
