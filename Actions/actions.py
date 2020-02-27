@@ -13,8 +13,6 @@ import zipfile
 import threading
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
-from numpy.f2py.crackfortran import endifpattern, endifs
-from numpy.distutils.fcompiler import none
 
 '''
 This class does most of the heavy lifting in processing messages from the UI client.
