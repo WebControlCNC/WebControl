@@ -406,24 +406,22 @@ class Actions(MakesmithInitFuncs):
         Starts the process of sending the gcode to the controller.
         :return:
         '''
-        print("h1")
         try:
             if len(self.data.gcode) > 0:
-                print("h2")
+                # set current Z target to the current z height in case gcode doesn't include a z move before an xy move.
+                # if it doesn't and the user pauses during an xy move, then the target Z is set to 0.  This sets it to
+                # what it currently is when the user started the gcode send.
+                self.data.currentZTarget = self.data.zval
                 # if the gcode index is not 0, then make sure the machine is in the proper state before starting to send
                 # the gcode.
                 if self.data.gcodeIndex > 0:
-                    print("h3")
                     # get machine into proper state by sending appropriate commands
                     self.processGCode()
-                    print("h4")
                     # update the gcode position on the UI client.. Have to recalculate it from the gcode because
                     # starting at some place other than 0
                     self.sendGCodePositionUpdate(recalculate=True)
-                    print("h5")
                     self.data.uploadFlag = 1
                 else:
-                    print("h6")
                     self.data.uploadFlag = 1
                 self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
