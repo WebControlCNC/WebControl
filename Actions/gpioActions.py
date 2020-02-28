@@ -14,16 +14,16 @@ class GPIOActions(MakesmithInitFuncs):
     Buttons = []
     LEDs = []
     actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center","Pendant", "PlayLED", "PauseLED", "StopLED"]
-    self.data.GPIOButtonService = self.data.config.getValue("Maslow Settings","MaslowButtonService")
-    if (self.data.GPIOButtonService):
-        self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings","wiiPendantPresent")
-        
+       
     def getActionList(self):
         return self.actionList
 
     def setup(self):
         #self.setGPIOAction(2,"Stop")
         setValues = self.data.config.getJSONSettingSection("GPIO Settings")
+        self.data.GPIOButtonService = self.data.config.getValue("Maslow Settings","MaslowButtonService")
+        if (self.data.GPIOButtonService):
+            self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings","wiiPendantPresent")
         #print(setValues)
         for setting in setValues:
             if setting["value"] != "":
