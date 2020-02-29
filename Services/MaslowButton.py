@@ -274,8 +274,7 @@ while True:
                 if (wiiconnected == 1):
                     print("wiimote: attached")
                 else:
-                    print("wiimote: none")
-            else:
+                    print("wiimote: none")                
             print("Sled: ",sledX, " , ", sledY)
             print("")
             print("Home: ",homeX, " , ", homeY)
