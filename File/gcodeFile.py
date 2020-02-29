@@ -90,7 +90,14 @@ class GCodeFile(MakesmithInitFuncs):
             filename = self.data.gcodeFile.filename
             self.data.gcodeShift[0] = round(float(self.data.config.getValue("Advanced Settings", "homeX")),4)
             self.data.gcodeShift[1] = round(float(self.data.config.getValue("Advanced Settings", "homeY")),4)
-
+            if (self.data.gcodeShift[0] > self.data.gcode_x_min):
+                self.data.gcode_x_min = self.data.gcodeShift[0]
+            if (self.data.gcodeShift[0] < self.data.gcode_x_max):
+                self.data.gcode_x_max = self.data.gcodeShift[0]
+            if (self.data.gcodeShift[0] > self.data.gcode_y_min):
+                self.data.gcode_y_min = self.data.gcodeShift[1]
+            if (self.data.gcodeShift[0] < self.data.gcode_y_max):
+                self.data.gcode_y_max = self.data.gcodeShift[1]
             del self.line3D[:]
             if filename is "":  # Blank the g-code if we're loading "nothing"
                 self.data.gcode = ""

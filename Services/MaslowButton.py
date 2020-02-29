@@ -8,6 +8,7 @@ import subprocess
 from subprocess import check_call
 import json
 import os
+from os import system, name   # import only system from os 
 
 print("setting up buttons")
 runpause = 0
@@ -22,6 +23,8 @@ homeY = 0
 sledX = 0
 sledY = 0
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
+start_time = time.time()
+end_time = time.time()
 
 def getpause():
     return runpause
@@ -183,6 +186,21 @@ def causeAction(action, onoff):
     if action == "StopLED" and onoff == "on":
         causeAction("PauseLED", "off")
         causeAction("PlayLED", "off")
+# define our clear function 
+def clear(): 
+    # for windows 
+    if name == 'nt': 
+        _ = system('cls')   
+    # for mac and linux(here, os.name is 'posix') 
+    else: 
+        _ = system('clear') 
+
+def hms_string(sec_elapsed):
+    h = int(sec_elapsed / (60 * 60))
+    m = int((sec_elapsed % (60 * 60)) / 60)
+    s = sec_elapsed % 60.
+    return "{}:{:>02}:{:>05.2f}".format(h, m, s)
+# End hms_string
 
 #btnStart.when_pressed = Start
 #btnPause.when_pressed = Pause
@@ -199,16 +217,28 @@ while True:
     #try:
         items = Get('LED','stuff')
         if (items != None):
+            if (flag == "0"):
+                if(items["data"]["flag"] == "1"):
+                    start_time = time.time()
+            else:
+                if(items["data"]["flag"] == "0"):
+                    stop_time = time.time()
             flag = items["data"]["flag"]
             index = items["data"]["index"]
             moving = items["data"]["moving"]
             zMove = items["data"]["zMove"]
             wiiPendantPresent = items["data"]["wiiPendantPresent"]
+            wiiconnected = items["data"]["wiiconnected"]
+            clidisplay = items["data"]["clidisplay"]
             sledX = items["data"]["sled_location_X"]
             sledy = items["data"]["sled_location_y"]
                 #"sled_location_z": str(app.data.zval), \
             homeX = items["data"]["home_location_x"]
-            homeY = ["data"]["home_location_y"] #print (flag)
+            homeY = items["data"]["home_location_y"] #print (flag)
+            xmin = items["data"]["gcode_min_x"]
+            xmax = items["data"]["gcode_max_x"]
+            ymin = items["data"]["gcode_min_y"]
+            ymax = items["data"]["gcode_max_y"]
             #print (index)
             #print (moving)
         print(items)
@@ -233,7 +263,33 @@ while True:
         elif (flag == '2'):
             print ("Paused")
             causeAction("PauseLED", "on")
-        if (clidisplay == True)
+        if (clidisplay == True):
+            clear()
+            print("")
+            if (flag == 1):
+                print("run time: {}".format(hms_string(end_time - start_time)))
+            else:
+                print("not running")
+            if (wiiPendantPresent == 1):
+                if (wiiconnected == 1):
+                    print("wiimote: attached")
+                else:
+                    print("wiimote: none")
+            else:
+            print("Sled: ",sledX, " , ", sledY)
+            print("")
+            print("Home: ",homeX, " , ", homeY)
+            print("")
+            print("Bound box from sled")
+            upper = ymax - sledY
+            right = xmax - sledX
+            print("Upper: ", upper, ", Right: ", right)
+            print("")
+            print ("Absolute bounds")
+            print("              Upper Right: ", xmax, ", ", ymax)
+            print("Lower Left: ", xmin,", ",ymin)
+            #moving or other temp step, then mention?
+            
     #except:
      #  print ("error")
         #       fail in silence

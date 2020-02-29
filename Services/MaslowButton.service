@@ -5,8 +5,6 @@ Description=Maslow Buttons daemon
 Type=simple
 ExecStart=/usr/bin/python3  /usr/local/etc/MaslowButton.py
 WorkingDirectory=/usr/local/etc
-Environment=API_KEY=123456789
-Environment=API_PASS=password
 StandardOutput=tty
 TTYPath=/dev/tty1
 Restart=never

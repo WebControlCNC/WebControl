@@ -693,6 +693,14 @@
             "value": 0
         },
         {
+            "default": 0,
+            "desc": "Attached command line text display on Maslow",
+            "key": "clidisplay",
+            "title": "RPI Text display",
+            "type": "bool",
+            "value": 0
+        },
+        {
             "default": "",
             "desc": "The path to the open file\\ndefault setting: your home directory",
             "key": "openFile",

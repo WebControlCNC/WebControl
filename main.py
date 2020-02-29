@@ -157,15 +157,17 @@ def getLEDinfo():
                 "moving": str(app.data.sledMoving), \
                 "zMove": str(app.data.zMoving), \
                 "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent")), \
+                "wiiconnected" : str(app.data.wiiPendantConnected), \
+                "clidisplay" : str(app.data.clidisplay), \
                 "sled_location_X": str(app.data.computedX), \
                 "sled_location_y": str(app.data.computedY), \
                 #"sled_location_z": str(app.data.zval), \
                 "home_location_x": str(app.data.config.getValue("Advanced Settings","HomeX")), \
                 "home_location_y": str(app.data.config.getValue("Advanced Settings","HomeY")), \
-                }}#"gcode_max_x": str(app.data.config.getvalue(""), \
-                #"gcode_min_x": str(app.data.config.getvalue(""), \
-                #"gcode_max_y": str(app.data.config.getvalue(""), \
-                #"gcode_min_y": str(app.data.config.getvalue("")}}  #assemble json string
+                "gcode_max_x": str(app.data.gcode_x_max), \
+                "gcode_min_x": str(app.data.gcode_x_min), \
+                "gcode_max_y": str(app.data.gcode_y_max), \
+                "gcode_min_y": str(app.data.gcode_y_min)}}  #assemble json string
             resp = jsonify(message) # java script object notation convrsion of the message
             resp.status_code = 200
             return (resp) # send the message

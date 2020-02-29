@@ -103,12 +103,18 @@ class Data:
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
     GPIOButtonService = False
+    clidisplay = False
     wiiPendantPresent = False # has user set wiimote as active?
     wiiPendantConnected = False # is the wiimote BT connected?
     sledMoving = False # for LED light status
     zMoving = False
-    #runningGcode = False # for LED light status
-    #pausedGcode = False # for LED light status
+    #gcode position flags for imported gcode to show outer bouding box
+    gcode_x_min = 2000
+    gcode_x_max = -2000
+    gcode_y_min = 1000
+    gcode_y_max = -1000
+    gcode_z_min = 10
+    gcode_z_max = -10
     moveDistance = 10 # CHECK UNITS!!
     
     """
