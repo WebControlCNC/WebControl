@@ -158,12 +158,12 @@ def getLEDinfo():
                 "zMove": str(app.data.zMoving), \
                 "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent")), \
                 "wiiconnected" : str(app.data.wiiPendantConnected), \
-                "clidisplay" : str(app.data.clidisplay), \
+                "clidisplay" : str(app.data.config.getValue("Maslow Settings","clidisplay")), \
                 "sled_location_X": str(app.data.computedX), \
                 "sled_location_y": str(app.data.computedY), \
                 #"sled_location_z": str(app.data.zval), \
-                "home_location_x": str(app.data.config.getValue("Advanced Settings","HomeX")), \
-                "home_location_y": str(app.data.config.getValue("Advanced Settings","HomeY")), \
+                "home_location_x": str(app.data.config.getValue("Advanced Settings","homeX")), \
+                "home_location_y": str(app.data.config.getValue("Advanced Settings","homeY")), \
                 "gcode_max_x": str(app.data.gcode_x_max), \
                 "gcode_min_x": str(app.data.gcode_x_min), \
                 "gcode_max_y": str(app.data.gcode_y_max), \

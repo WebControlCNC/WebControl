@@ -24,6 +24,7 @@ class GPIOActions(MakesmithInitFuncs):
         self.data.GPIOButtonService = self.data.config.getValue("Maslow Settings","MaslowButtonService")
         if (self.data.GPIOButtonService):
             self.data.wiiPendantPresent = self.data.config.getValue("Maslow Settings","wiiPendantPresent")
+            self.clidisplay = self.data.config.getValue("Maslow Settings", "clidisplay")
         #print(setValues)
         for setting in setValues:
             if setting["value"] != "":

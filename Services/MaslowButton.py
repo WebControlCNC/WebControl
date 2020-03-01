@@ -13,15 +13,20 @@ from os import system, name   # import only system from os
 print("setting up buttons")
 runpause = 0
 wiiPendantPresent = False
-flag = 0
+clidisplay = False
+flag = '0'
 Buttons = []
 LEDs = []
 index = 0
 moving = False
-homeX = 0
-homeY = 0
-sledX = 0
-sledY = 0
+homeX = 0.00
+homeY = 0.00
+sledX = 0.00
+sledY = 0.00
+minX = 0.00
+minY = 0.00
+maxX = 0.00
+maxY = 0.00
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 start_time = time.time()
 end_time = time.time()
@@ -213,8 +218,8 @@ bad_chars = "'"
 print("waiting for button press")
 #print (LEDs)
 while True:
-        time.sleep (3)
-    #try:
+    time.sleep (3)
+    try:
         items = Get('LED','stuff')
         if (items != None):
             if (flag == "0"):
@@ -227,21 +232,21 @@ while True:
             index = items["data"]["index"]
             moving = items["data"]["moving"]
             zMove = items["data"]["zMove"]
-            wiiPendantPresent = items["data"]["wiiPendantPresent"]
-            wiiconnected = items["data"]["wiiconnected"]
-            clidisplay = items["data"]["clidisplay"]
-            sledX = items["data"]["sled_location_X"]
-            sledy = items["data"]["sled_location_y"]
+            wiiPendantPresent = bool(items["data"]["wiiPendantPresent"])
+            wiiconnected = bool(items["data"]["wiiconnected"])
+            clidisplay = bool(items["data"]["clidisplay"])
+            sledX = float(items["data"]["sled_location_X"])
+            sledY = float(items["data"]["sled_location_y"])
                 #"sled_location_z": str(app.data.zval), \
-            homeX = items["data"]["home_location_x"]
-            homeY = items["data"]["home_location_y"] #print (flag)
+            homeX = float(items["data"]["home_location_x"])
+            homeY = float(items["data"]["home_location_y"])
             xmin = items["data"]["gcode_min_x"]
-            xmax = items["data"]["gcode_max_x"]
+            xmax = float(items["data"]["gcode_max_x"])
             ymin = items["data"]["gcode_min_y"]
-            ymax = items["data"]["gcode_max_y"]
+            ymax = float(items["data"]["gcode_max_y"])
             #print (index)
             #print (moving)
-        print(items)
+            #print(items)
         if (flag == 1):
             RGC = True
             pausedGcode = False          
@@ -266,12 +271,14 @@ while True:
         if (clidisplay == True):
             clear()
             print("")
-            if (flag == 1):
-                print("run time: {}".format(hms_string(end_time - start_time)))
+            if (flag == '1'):
+                print("STATUS - run time: {}".format(hms_string(end_time - start_time)))
+                print("")
             else:
-                print("not running")
-            if (wiiPendantPresent == 1):
-                if (wiiconnected == 1):
+                print("STATUS - not running")
+                print("")
+            if (wiiPendantPresent == True):
+                if (wiiconnected == True):
                     print("wiimote: attached")
                 else:
                     print("wiimote: none")                
@@ -285,18 +292,10 @@ while True:
             print("Upper: ", upper, ", Right: ", right)
             print("")
             print ("Absolute bounds")
-            print("              Upper Right: ", xmax, ", ", ymax)
+            print("Upper Right: ", xmax, ", ", ymax)
             print("Lower Left: ", xmin,", ",ymin)
-            #moving or other temp step, then mention?
-            
-    #except:
-     #  print ("error")
+            #moving or other temp step, then mention?        
+    except:
+       # pass
+        print ("error with display")
         #       fail in silence
- #   if wp.wiiFlag:
- #       wp.wiiFlag = False
- #       if (wp.wiiPendantConnected == True):
- #           print("stopping wiimote")
- #           wp.closeConnection()
- #       else:
- #           print("starting wiimote")
- #           wp.openConnection()
