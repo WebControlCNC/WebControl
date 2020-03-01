@@ -286,10 +286,10 @@ while True:
             print("")
             print("Home: ",homeX, " , ", homeY)
             print("")
-            print("Bound box from sled")
+            print("Bound box from sled (inches)")
             upper = ymax - sledY
             right = xmax - sledX
-            print("Upper: ", upper, ", Right: ", right)
+            print("Upper: ", upper/25.4, ", Right: ", right/25.4)
             print("")
             print ("Absolute bounds")
             print("Upper Right: ", xmax, ", ", ymax)
