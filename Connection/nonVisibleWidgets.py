@@ -10,7 +10,6 @@ from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
 from Actions.holeyCalibration import HoleyCalibration
 from Actions.HoleySimulationKinematics import Kinematics as HoleyKinematics
-from Actions.opticalCalibration import OpticalCalibration
 from Actions.gpioActions import GPIOActions
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
@@ -33,7 +32,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     importFile = ImportFile()
     actions = Actions()
     triangularCalibration = TriangularCalibration()
-    opticalCalibration = OpticalCalibration()
     holeyCalibration = HoleyCalibration()
     holeyKinematics = HoleyKinematics()
     messageProcessor = MessageProcessor()
@@ -44,6 +42,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     boardManager = BoardManager()
     releaseManager = ReleaseManager()
     helpManager = HelpManager()
+    #iiPendant = WiiPendant()
 
     def setUpData(self, data):
         """
@@ -66,7 +65,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.triangularCalibration = self.triangularCalibration
         data.holeyCalibration = self.holeyCalibration
         data.holeyKinematics = self.holeyKinematics
-        data.opticalCalibration = self.opticalCalibration
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
@@ -75,7 +73,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
         data.helpManager = self.helpManager
-
+        
         if hasattr(sys, '_MEIPASS'):
             data.platform = "PYINSTALLER"
             data.platformHome = sys._MEIPASS
@@ -118,7 +116,6 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.triangularCalibration.setUpData(data)
         self.holeyCalibration.setUpData(data)
         self.holeyKinematics.setUpData(data)
-        self.opticalCalibration.setUpData(data)
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
@@ -130,8 +127,11 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.boardManager.initializeNewBoard()
         self.releaseManager.setUpData(data)
         self.helpManager.setUpData(data)
-
+        #self.wiiPendant.setUpData(data)
+        #self.wiiPendant.setup()
+        
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()
         #self.camera.start()
-
+        
+        

@@ -90,7 +90,6 @@ class GCodeFile(MakesmithInitFuncs):
             filename = self.data.gcodeFile.filename
             self.data.gcodeShift[0] = round(float(self.data.config.getValue("Advanced Settings", "homeX")),4)
             self.data.gcodeShift[1] = round(float(self.data.config.getValue("Advanced Settings", "homeY")),4)
-
             del self.line3D[:]
             if filename is "":  # Blank the g-code if we're loading "nothing"
                 self.data.gcode = ""
@@ -147,7 +146,18 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
-
+            '''
+            get max and min drawing locations, then offset from defined home position
+            xmin = []
+            if (self.data.gcodeShift[0] < self.data.gcode_x_min):
+                self.data.gcode_x_min = self.data.gcodeShift[0]
+            if (self.data.gcodeShift[0] > self.data.gcode_x_max):
+                self.data.gcode_x_max = self.data.gcodeShift[0]
+            if (self.data.gcodeShift[0] < self.data.gcode_y_min):
+                self.data.gcode_y_min = self.data.gcodeShift[1]
+            if (self.data.gcodeShift[0] > self.data.gcode_y_max):
+                self.data.gcode_y_max = self.data.gcodeShift[1]
+            '''
 
 
             # Find gcode indicies of z moves
@@ -422,7 +432,7 @@ class GCodeFile(MakesmithInitFuncs):
         #This test should always pass so taking it out
         #if gCodeLine.find("(") == -1 and gCodeLine.find(";") == -1:
         if True:
-            try:
+            #try:
                 gCodeLine = gCodeLine.upper() + " "
                 x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if x:
@@ -474,11 +484,11 @@ class GCodeFile(MakesmithInitFuncs):
                 #now, put any comment back.
                 gCodeLine = gCodeLine+comment
                 return gCodeLine
-            except ValueError:
-                self.data.console_queue.put("line could not be moved:")
-                self.data.console_queue.put(originalLine)
-                return originalLine
-        return originalLine
+            #except ValueError:
+            #    self.data.console_queue.put("line could not be moved:")
+            #    self.data.console_queue.put(originalLine)
+            #    return originalLine
+        #return originalLine
 
     def loadNextLine(self):
         """

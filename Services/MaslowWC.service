@@ -1,0 +1,15 @@
+[Unit]
+Description=Maslow WebControl
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3  /home/pi/wiiControl/main.py
+WorkingDirectory=/home/pi/wiiControl
+StandardOutput=inherit
+StandardError=inherit
+Restart=never
+user=pi
+
+[Install]
+WantedBy=sysinit.target

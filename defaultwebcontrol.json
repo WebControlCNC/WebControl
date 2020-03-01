@@ -676,6 +676,31 @@
             "value": "3.17"
         },
         {
+            "default": 0,
+            "desc": "Wii controller connected via Bluetooth?\ndefault setting: 0",
+            "key": "wiiPendantPresent",
+            "section": "Maslow Settings",
+            "title": "Wii Pendant Installed",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
+            "desc": "GPIO buttons run in separate process / system service",
+            "key": "MaslowButtonService",
+            "title": "Raspberry Pi Button Service Active",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
+            "desc": "Attached command line text display on Maslow",
+            "key": "clidisplay",
+            "title": "RPI Text display",
+            "type": "bool",
+            "value": 0
+        },
+        {
             "default": "",
             "desc": "The path to the open file\\ndefault setting: your home directory",
             "key": "openFile",

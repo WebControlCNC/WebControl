@@ -1,0 +1,14 @@
+[Unit]
+Description=Maslow Wiimote Input
+After=network-online.target
+ 
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/etc/MaslowPendant.py
+WorkingDirectory=/usr/local/etc
+StandardOutput=inherit
+StandardError=inherit
+Restart=never
+User=pi
+ 
+[Install]
+WantedBy=multi-user.target

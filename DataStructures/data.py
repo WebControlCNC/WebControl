@@ -42,11 +42,11 @@ class Data:
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
-    pyInstallPlatform = "win"
+    pyInstallPlatform = "rpi"
     pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
-
+ 
     # all of the available COM ports
     comPorts = []
     # This defines which COM port is used
@@ -102,7 +102,21 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
-
+    GPIOButtonService = False
+    clidisplay = False
+    wiiPendantPresent = False # has user set wiimote as active?
+    wiiPendantConnected = False # is the wiimote BT connected?
+    sledMoving = False # for LED light status
+    zMoving = False
+    #gcode position flags for imported gcode to show outer bouding box
+    gcode_x_min = 2000
+    gcode_x_max = -2000
+    gcode_y_min = 1000
+    gcode_y_max = -1000
+    gcode_z_min = 10
+    gcode_z_max = -10
+    moveDistance = 10 # CHECK UNITS!!
+    
     """
     Pointers to Objects
     """
@@ -120,13 +134,6 @@ class Data:
     continuousCamera = False
     gpioActions = None
     boardManager = None
-<<<<<<< Updated upstream
-
-=======
-    #wiiPendant = None  
-    #wiiPendantThread = None
-    
->>>>>>> Stashed changes
     """
 
     Colors

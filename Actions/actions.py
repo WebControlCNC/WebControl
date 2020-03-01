@@ -174,40 +174,54 @@ class Actions(MakesmithInitFuncs):
                 if not self.updatePorts():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating list of ports")
             elif msg["data"]["command"] == "optical_onStart":
-                if not self.data.opticalCalibration.on_Start():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
+                pass
+                #if not self.data.opticalCalibration.on_Start():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
             elif msg["data"]["command"] == "optical_Calibrate":
-                if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
+                pass
+                #if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
             elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
-                if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving optical calibration configuration")
+                pass
+                #if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving optical calibration configuration")
             elif msg["data"]["command"] == "stopOpticalCalibration":
-                if not self.data.opticalCalibration.stopOpticalCalibration():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping optical calibration.")
+                pass
+                #if not self.data.opticalCalibration.stopOpticalCalibration():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping optical calibration.")
             elif msg["data"]["command"] == "testOpticalCalibration":
-                if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with test image.")
+                pass
+                #if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with test image.")
             elif msg["data"]["command"] == "findCenterOpticalCalibration":
-                if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with find Center.")
+                pass
+                #if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with find Center.")
             elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
-                if not self.data.opticalCalibration.saveAndSend():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving and sending calibration matrix.")
+                pass
+                #if not self.data.opticalCalibration.saveAndSend():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving and sending calibration matrix.")
             elif msg["data"]["command"] == "reloadCalibration":
+                pass
+                '''
                 errorX, errorY, curveX, curveY = self.data.opticalCalibration.reloadCalibration()
                 if errorX is None or errorY is None or curveX is None or curveY is None:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with (re)loading calibration.")
                 else:
                     data = {"errorX": errorX, "errorY": errorY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
+                '''
             elif msg["data"]["command"] == "saveCalibrationToCSV":
-                if not self.data.opticalCalibration.saveCalibrationToCSV():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving calibration to CSV.")
+                pass
+                #if not self.data.opticalCalibration.saveCalibrationToCSV():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving calibration to CSV.")
             elif msg["data"]["command"] == "clearCalibration":
-                if not self.data.opticalCalibration.clearCalibration():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with clearing calibration.")
+                pass
+                #if not self.data.opticalCalibration.clearCalibration():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with clearing calibration.")
             elif msg["data"]["command"] == "curveFitOpticalCalibration":
+                pass
+                '''
                 curveX, curveY = self.data.opticalCalibration.surfaceFit()
                 #curveX, curveY = self.data.opticalCalibration.polySurfaceFit()
                 if curveX is None or curveY is None:
@@ -215,6 +229,7 @@ class Actions(MakesmithInitFuncs):
                 else:
                     data = {"curveX": curveX, "curveY": curveY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationCurve", data)
+                '''
             elif msg["data"]["command"] == "adjustCenter":
                 if not self.adjustCenter(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting center.")
@@ -332,6 +347,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.data.sledMoving = True
             self.data.gcode_queue.put("G90  ")
             safeHeightMM = float(
                 self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
@@ -351,9 +367,11 @@ class Actions(MakesmithInitFuncs):
                 + " "
             )
             self.data.gcode_queue.put("G00 Z0 ")
+            self.data.sledMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def resetChainLengths(self):
@@ -393,9 +411,11 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            print("z!")
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
+            self.data.Zmoving = False    
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -423,7 +443,8 @@ class Actions(MakesmithInitFuncs):
                     self.data.uploadFlag = 1
                 else:
                     self.data.uploadFlag = 1
-                self.data.gpioActions.causeAction("PlayLED", "on")
+                if (self.data.GPIOButtonService == False):
+                    self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
             else:
                 return False
@@ -439,6 +460,7 @@ class Actions(MakesmithInitFuncs):
         Stops the uploading of gcode.
         :return:
         '''
+        print("stopping run")
         try:
             self.data.console_queue.put("stopping run")
             # this is necessary because of the way PID data is being processed.  Otherwise could potentially get stuck
@@ -456,10 +478,12 @@ class Actions(MakesmithInitFuncs):
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
-            self.data.gpioActions.causeAction("StopLED", "on")
+            if (self.data.GPIOButtonService == False):
+                self.data.gpioActions.causeAction("StopLED", "on")
             # reset pause
             self.data.ui_queue1.put("Action", "setAsPause", "")
-            self.data.gpioActions.causeAction("PauseLED", "off")
+            if (self.data.GPIOButtonService == False):
+                self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -541,6 +565,7 @@ class Actions(MakesmithInitFuncs):
         Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
         :return:
         '''
+        print("pause run selected")
         try:
             if self.data.uploadFlag == 1:
                 self.data.uploadFlag = 2
@@ -554,7 +579,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
                 #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
-                self.data.gpioActions.causeAction("PauseLED", "on")
+                if (self.data.GPIOButtonService == False):
+                    self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -621,7 +647,8 @@ class Actions(MakesmithInitFuncs):
             # Only needed if user initiated pause; but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
-            self.data.gpioActions.causeAction("PauseLED", "off")
+            if (self.data.GPIOButtonService == False):
+                self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -739,6 +766,7 @@ class Actions(MakesmithInitFuncs):
         else:
             diagMove = distToMove
         try:
+            self.data.sledMoving = True
             self.data.gcode_queue.put("G91 ")
             if direction == "upLeft":
                 self.data.gcode_queue.put("G00 X"+ str(-1.0 * diagMove)+ " Y"+ str(diagMove)+ " ")
@@ -761,9 +789,11 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 ")
             # keep track of the distToMove value
             self.data.config.setValue("Computed Settings", "distToMove", distToMove)
+            self.data.sledMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def moveZ(self, direction, distToMoveZ):
@@ -782,6 +812,7 @@ class Actions(MakesmithInitFuncs):
             # the correct units when the z-axis move is sent
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             previousUnits = self.data.config.getValue("Computed Settings", "units")
+            self.data.zMoving = True
             if unitsZ == "MM":
                 self.data.gcode_queue.put("G21 ")
             else:
@@ -802,9 +833,11 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcode_queue.put("G21 ")
                 else:
                     self.data.gcode_queue.put("G20 ")
+            self.data.zMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.zMoving = False
             return False
 
 
@@ -816,6 +849,7 @@ class Actions(MakesmithInitFuncs):
         try:
             plungeDepth = self.data.config.getValue("Advanced Settings", "maxTouchProbePlungeDistance")
             revertToInches = False
+            self.data.zMoving = True
             if self.data.units == "INCHES":
                 revertToInches = True
                 self.data.gcode_queue.put("G21")
@@ -825,9 +859,11 @@ class Actions(MakesmithInitFuncs):
             # don't think this line is needed
             # todo: remove if not needed.
             self.data.measureRequest = self.defineZ0()
+            self.data.zMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.zMoving = False
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
@@ -1226,20 +1262,20 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def testImage(self):
-        '''
-        Calls function to send the test image from optical calibration
-        Todo: move to processAction
-        :return:
-        '''
+        #
+        #Calls function to send the test image from optical calibration
+        #Todo: move to processAction
+        #:return:
+        #
         try:
             self.data.opticalCalibration.testImage()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def adjustCenter(self, dist):
         '''
         Used in optical calibration to allow user to raise/lower the center point and then move there.
@@ -1481,6 +1517,7 @@ class Actions(MakesmithInitFuncs):
         bedWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4
         try:
             if posX<=bedWidth/2 and posX>=bedWidth/-2 and posY<=bedHeight/2 and posY>=bedHeight/-2:
+                self.data.sledMoving = True
                 if self.data.units == "INCHES":
                     posX=round(posX,4)
                     posY=round(posY,4)
@@ -1495,10 +1532,12 @@ class Actions(MakesmithInitFuncs):
                     + str(posY)
                     + " "
                 )
+                self.data.sledMoving = False
                 return True
             return False
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def processGCode(self):
