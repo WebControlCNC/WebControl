@@ -282,18 +282,19 @@ while True:
                     print("wiimote: attached")
                 else:
                     print("wiimote: none")                
-            print("Sled: ",sledX, " , ", sledY)
+            print("Sled: {:.2f},{:.2f}".format(sledX,sledY))
             print("")
-            print("Home: ",homeX, " , ", homeY)
+            print("Home: {:.2f},{:.2f}".format(homeX,homeY))
             print("")
             print("Bound box from sled (inches)")
-            upper = ymax - sledY
-            right = xmax - sledX
-            print("Upper: ", upper/25.4, ", Right: ", right/25.4)
+            upper = (ymax - sledY)/25.4
+            right = (xmax - sledX)/25.4
+            print("Top: {:.2f}".format(upper))
+            print("Right: {:.2f}".format(right))
             print("")
             print ("Absolute bounds")
-            print("Upper Right: ", xmax, ", ", ymax)
-            print("Lower Left: ", xmin,", ",ymin)
+            print("Upper Right: {:.2f}, {:.2f}".format(xmax, ymax))
+            print("Lower Left: {:.2f}, {:.2f}".format(xmin,ymin))
             #moving or other temp step, then mention?        
     except:
        # pass
