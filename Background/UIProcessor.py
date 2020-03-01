@@ -20,6 +20,9 @@ class UIProcessor:
     app = None
     lastCameraTime = 0
     lastHealthCheck = 0
+    previousUploadFlag = None
+    previousCurrentTool = None
+    previousPositioningMode = None
 
     def start(self, _app):
 
@@ -30,6 +33,8 @@ class UIProcessor:
                 time.sleep(0.001)
                 # send health message
                 self.performHealthCheck()
+                # send status message
+                self.performStatusCheck()
                 # send message to UI client if this is the first time webcontrol is being run.
                 if self.app.data.config.firstRun:
                     self.app.data.config.firstRun = False
@@ -89,6 +94,7 @@ class UIProcessor:
                                 ## new stuff
                                 # self.app.data.quick_queue.put("~")
                                 ## end new stuff
+                                self.app.data.pausedUnits = self.app.data.units
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message",
                                               {"command": "requestedSetting", "data": data, "dataFormat": "json"},
@@ -103,7 +109,11 @@ class UIProcessor:
                                 self.app.data.pausedzval = self.app.data.zval
                                 # remember the current units because user might switch them to zero the zaxis.
                                 self.app.data.pausedUnits = self.app.data.units
+                                # Remember current positioning mode.
+                                self.app.data.pausedPositioningMode = self.app.data.positioningMode
                                 self.app.data.console_queue.put("found tool change in message")
+                                # send unpause
+                                self.app.data.quick_queue.put("~")
                                 # notify user
                                 self.activateModal("Notification:", message[13:], "notification", resume="resume")
                             elif message[0:8] == "Message:":
@@ -111,6 +121,7 @@ class UIProcessor:
                                 if message.find("adjust Z-Axis") != -1:
                                     # manual z-axis adjustment requested.
                                     self.app.data.console_queue.put("found adjust Z-Axis in message")
+                                    self.app.data.pausedUnits = self.app.data.units
                                     self.activateModal("Notification:", message[9:], "notification", resume="resume")
                                 elif message.find("Unable to find valid") != -1:
                                     # position alarm detected.. chain lengths do not allow for forward kinematic.
@@ -360,15 +371,6 @@ class UIProcessor:
         socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
-    def sendHealthMessage(self, healthData):
-        '''
-        Sends the health message to UI client.  Not sure why I separated this from the only function that calls it.
-        :param position:
-        :return:
-        '''
-        socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
-                      namespace="/MaslowCNC")
-
     def sendCameraMessage(self, message, _data=""):
         '''
         Sends message to the UI client regarding camera.. message could be to turn camera display on or off, or to
@@ -590,9 +592,40 @@ class UIProcessor:
             healthData = {
                 "cpuUsage": load,
                 "bufferSize": bufferSize,
-                "uploadFlag": self.app.data.uploadFlag,
             }
-            self.sendHealthMessage(healthData)
+            socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
+                          namespace="/MaslowCNC")
+            self.performStatusCheck(True)
+
+    def performStatusCheck(self, healthCheckCalled=False):
+        '''
+        This function sends a message to the client if it detects a change in the following parameters:
+        uploadFlag, positioningMode, currentTool
+        Also sends on every health check to get new connected clients in sync.
+        :return:
+        '''
+        update = healthCheckCalled
+        if self.previousUploadFlag != self.app.data.uploadFlag:
+            update = True
+            self.previousUploadFlag = self.app.data.uploadFlag
+        if self.previousPositioningMode != self.app.data.positioningMode:
+            update = True
+            self.previousPositioningMode = self.app.data.positioningMode
+        if self.previousCurrentTool != self.app.data.currentTool:
+            update = True
+            self.previousCurrentTool = self.app.data.currentTool
+
+        #print("positioning mode = "+str(self.app.data.positioningMode))
+
+        if update:
+            statusData = {
+                "uploadFlag": self.app.data.uploadFlag,
+                "positioningMode": self.app.data.positioningMode,
+                "currentTool": self.app.data.currentTool,
+            }
+            socketio.emit("message",
+                          {"command": "statusMessage", "data": json.dumps(statusData), "dataFormat": "json"},
+                          namespace="/MaslowCNC")
 
     def isChainLengthZero(self, msg):
         #Message: Unable to find valid machine position for chain lengths 0.00, 0.00 Left Chain Length

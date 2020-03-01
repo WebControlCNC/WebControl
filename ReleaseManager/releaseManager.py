@@ -28,28 +28,26 @@ class ReleaseManager(MakesmithInitFuncs):
 
     def checkForLatestPyRelease(self):
         if True:  # self.data.platform=="PYINSTALLER":
-            print("check for pyrelease")
-            g = Github()
-            repo = g.get_repo("madgrizzle/WebControl")
-            self.releases = repo.get_releases()
-            latest = 0
-            latestRelease = None
-            type = self.data.pyInstallType
-            platform = self.data.pyInstallPlatform
-            for release in self.releases:
-                try:
+            print("Checking latest pyrelease.")
+            try:
+                g = Github()
+                repo = g.get_repo("madgrizzle/WebControl")
+                self.releases = repo.get_releases()
+                latestVersionGithub = 0
+                self.latestRelease = None
+                # type = self.data.pyInstallType
+                platform = self.data.pyInstallPlatform
+                for release in self.releases:
                     tag_name = re.sub(r'[v]', r'', release.tag_name)
+                    tag_float = float(tag_name)
                     # print(tag_name)
-                    if float(tag_name) > latest:
-                        latest = float(tag_name)
+                    if tag_float > latestVersionGithub:
+                        latestVersionGithub = tag_float
                         self.latestRelease = release
 
-                except:
-                    print("error parsing tagname")
-            print(latest)
-            if latest > self.data.pyInstallCurrentVersion:
-                if self.latestRelease is not None:
-                    print(self.latestRelease.tag_name)
+                print("Latest pyrelease: " + str(latestVersionGithub))
+                if self.latestRelease is not None and latestVersionGithub > self.data.pyInstallCurrentVersion:
+                    print("Latest release tag: " + self.latestRelease.tag_name)
                     assets = self.latestRelease.get_assets()
                     for asset in assets:
                         if asset.name.find(type) != -1 and asset.name.find(platform) != -1:
@@ -58,7 +56,9 @@ class ReleaseManager(MakesmithInitFuncs):
                             self.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
                             self.data.pyInstallUpdateAvailable = True
                             self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
-                            self.data.pyInstallUpdateVersion = latest
+                            self.data.pyInstallUpdateVersion = self.latestRelease
+            except Exception as e:
+                print("Error checking pyrelease: " + str(e))
 
     def processAbsolutePath(self, path):
         index = path.find("main.py")

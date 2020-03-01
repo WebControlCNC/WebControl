@@ -26,7 +26,7 @@ class SerialPortThread(MakesmithInitFuncs):
     bufferSize = 126  # The total size of the arduino buffer
     bufferSpace = bufferSize  # The amount of space currently available in the buffer
     lengthOfLastLineStack = deque()
-
+    weAreBufferingLines = 0
     # Minimum time between lines sent to allow Arduino to cope
     # could be smaller (0.02) however larger number doesn't seem to impact performance
     MINTimePerLine = 0.05
@@ -68,9 +68,36 @@ class SerialPortThread(MakesmithInitFuncs):
             else:
                 self.lengthOfLastLineStack.appendleft(len(message))
 
+            '''
+            Monitor gcode for positioning mode change requests
+            '''
+            positioningMode = None
+            findG90 = message.rfind("G90")
+            findG91 = message.rfind("G91")
+
+            if findG90 != -1 and findG91 != -1:
+                if findG90 > findG91:
+                    positioningMode = 0
+                else:
+                    positioningMode = 1
+            else:
+                if findG90 != -1:
+                    positioningMode = 0
+                if findG91 != -1:
+                    positioningMode = 1
+
             message = message.encode()
+
+            '''
+            try sending message
+            '''
             try:
                 self.serialInstance.write(message)
+                # Update positioning mode after message has been sent.
+                # In 'try' block to maintain state integrity if message send fails.
+                if (positioningMode is not None):
+                    self.data.positioningMode = positioningMode
+                    #print("Set positioning mode: " + str(positioningMode))
                 self.data.logger.writeToLog("Sent: " + str(message.decode()))
             except:
                 self.data.console_queue.put("write issue")
@@ -112,12 +139,14 @@ class SerialPortThread(MakesmithInitFuncs):
             line = self.data.gcode[self.data.gcodeIndex]
             # filter comments from line
             filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
-            line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+            line = re.sub(r';([^\n]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
             # check if command is going to be issued that pauses the controller.
+            self.managePause(line)
             self.manageToolChange(line)
-            # put gcode home shift here
             if not line.isspace(): # if all spaces, don't send.  likely a comment.
-                line = self.data.gcodeFile.moveLine(line)
+                # put gcode home shift here.. only if in absolute mode (G90)    
+                if self.data.positioningMode == 0:
+                    line = self.data.gcodeFile.moveLine(line)
                 self._write(line)
                 # if there is a units change, then update the UI client so position messages are processed correctly.
                 if line.find("G20") != -1:
@@ -128,6 +157,11 @@ class SerialPortThread(MakesmithInitFuncs):
                         self.data.actions.updateSetting("toMM", 0, True)  # value = doesn't matter
                 # send a gcode update to UI client.
                 self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex)
+                # track current target Z-Axis position
+                z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                if z:
+                    self.data.currentZTarget = float(z.groups()[0])
+                    #self.data.currentZTargetUnits = self.data.units
 
             # increment gcode index
             if self.data.gcodeIndex + 1 < len(self.data.gcode):
@@ -137,8 +171,15 @@ class SerialPortThread(MakesmithInitFuncs):
                 self.data.gcodeIndex = 0
                 self.data.console_queue.put("Gcode Ended")
 
+    def managePause(self, line):
+        if line.find("M0 ") != -1 or line.find("M00") != -1 or line.find("M1 ") != -1 or line.find("M01") != -1:
+            print("found M command for pause")
+            self.data.uploadFlag = -1
+            self.data.pausedUnits = self.data.units
+            self.data.ui_queue1.put("Action", "setAsResume", "")
+
     def manageToolChange(self, line):
-        if line.find("M0") != -1 or line.find("M1") != -1 or line.find("M6") != -1:
+        if line.find("M6 ") != -1 or line.find("M06") != -1:
             # if this is a different tool, the controller will respond with a 'Tool Change:' and pause.
             # if this is a the same tool as the controller is currently tracking, it will continue on.
             # first, determine the tool being called for...
@@ -152,14 +193,20 @@ class SerialPortThread(MakesmithInitFuncs):
                 print("found M command")
                 self.data.uploadFlag = -1
                 self.data.currentTool = toolNumber
+                self.data.pausedUnits = self.data.units
+                ## new stuff
+                #self.data.quick_queue.put("~")
+                #self.data.ui_queue1.put("Action", "setAsResume", "")
+                ## end new stuff
+
                 # now, the issue is that if the controller gets reset, then the tool number will revert to 0.. so
                 # on serial port connect/reconnect, reinitialize tool number to 0
 
             # but in the second case, just continue on..
 
             ## new stuff
-            # self.data.quick_queue.put("~")
-            # self.data.ui_queue1.put("Action", "setAsResume", "")
+            #self.data.quick_queue.put("~")
+            #self.data.ui_queue1.put("Action", "setAsResume", "")
             ## end new stuff
 
     def closeConnection(self):
@@ -191,7 +238,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 + " is installed"
             )
 
-        weAreBufferingLines = bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
+        self.weAreBufferingLines = bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
 
         try:
             self.data.comport = self.data.config.getValue("Maslow Settings", "COMport")
@@ -273,7 +320,7 @@ class SerialPortThread(MakesmithInitFuncs):
                             # replace mach3 style gcode comments with newline
                             filtersparsed = re.sub(r'\(([^)]*)\)', '', command)
                             # replace standard ; initiated gcode comments with ''
-                            command = re.sub(r';([^.]*)?', '', filtersparsed)
+                            command = re.sub(r';([^\n]*)?', '', filtersparsed)
                             # if there's something left..
                             if len(command) != 0:
                                 command = command + " "
@@ -291,8 +338,8 @@ class SerialPortThread(MakesmithInitFuncs):
                 # Send the next line of gcode to the machine if we're running a program and uploadFlag is enabled. Will
                 # send lines to buffer if there is space and the feature is turned on
                 # Also, don't send if there's still data in gcode_queue.
-                if self.data.uploadFlag > 0 and len(self.data.gcode) > 0 and self.data.gcode_queue.empty():
-                    if weAreBufferingLines:
+                if self.data.uploadFlag == 1 and len(self.data.gcode) > 0 and self.data.gcode_queue.empty():
+                    if self.weAreBufferingLines:
                         try:
                             # todo: clean this up because the line gets filtered twice.. once to make sure its not too
                             # long, and the second in the sendNextLine command.. bit redundant.
@@ -300,7 +347,7 @@ class SerialPortThread(MakesmithInitFuncs):
                             # replace mach3 style gcode comments with newline
                             filtersparsed = re.sub(r'\(([^)]*)\)', '', line)
                             # replace standard ; initiated gcode comments with newline
-                            line = re.sub(r';([^.]*)?', '', filtersparsed)
+                            line = re.sub(r';([^\n]*)?', '', filtersparsed)
                             # if there is space in the buffer send line
                             if self.bufferSpace > len(line):
                                 self.sendNextLine()
@@ -341,8 +388,10 @@ class SerialPortThread(MakesmithInitFuncs):
         begin = readString.find(target)
         end = self.findEndOfNumber(readString, begin + 1)
         numberAsString = readString[begin + 1: end]
-
-        numberAsFloat = float(numberAsString)
+        try:
+            numberAsFloat = float(numberAsString)
+        except:
+            return defaultReturn
 
         if begin == -1:
             return defaultReturn

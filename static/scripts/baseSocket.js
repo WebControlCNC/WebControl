@@ -2,6 +2,7 @@ var socket;
 var socketClientID;
 var controllerMessages = [];
 var hostAddress = "..."
+var enable3D = true;
 $(document).ready(function(){
   namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
@@ -32,6 +33,7 @@ function setListeners(){
       settingRequest("Computed Settings","homePosition");
       settingRequest("Computed Settings","unitsZ");
       settingRequest("Computed Settings","distToMoveZ");
+      settingRequest("None","pauseButtonSetting");
       checkForGCodeUpdate();
       checkForBoardUpdate();
   });
@@ -90,9 +92,9 @@ function setListeners(){
       else
         data = msg.data;
       passValue = true
-      if (data.hasOwnProperty('client'))
+      if ((data !=null) && (data.hasOwnProperty('client')))
       {
-            console.log(data.client);
+            //console.log(data.client);
             if ((data.client != socketClientID) && (data.client!="all"))
                 passValue = false;
       }
@@ -100,6 +102,10 @@ function setListeners(){
       if (passValue)
       {
           switch(msg.command) {
+            case 'statusMessage':
+                //completed
+                processStatusMessage(data);
+                break;
             case 'healthMessage':
                 //completed
                 processHealthMessage(data);
@@ -121,7 +127,8 @@ function setListeners(){
                 break;
             case 'cameraMessage':
                 //completed
-                processCameraMessage(data);
+                if (enable3D)
+                    processCameraMessage(data);
                 break;
             case 'positionMessage':
                 //completed
@@ -156,20 +163,29 @@ function setListeners(){
                 break;
             case 'gcodeUpdate':
                 console.log("---gcodeUpdate received via socket---");
-                gcodeUpdate(msg.message);
+                if (enable3D)
+                    gcodeUpdate(msg.message);
+                else
+                    $("#fpCircle").hide();
                 break;
             case 'showFPSpinner':
                 //completed
                 showFPSpinner(msg.message);
                 break;
             case 'gcodeUpdateCompressed':
-                gcodeUpdateCompressed(data);
+                if (enable3D)
+                    gcodeUpdateCompressed(data);
+                else
+                    $("#fpCircle").hide();
                 break;
             case 'boardDataUpdate':
                 boardDataUpdate(data);
                 break;
             case 'boardCutDataUpdateCompressed':
-                boardCutDataUpdateCompressed(data);
+                if (enable3D)
+                    boardCutDataUpdateCompressed(data);
+                else
+                    $("#fpCircle").hide();
                 break;
             case 'updatePorts':
                 //completed

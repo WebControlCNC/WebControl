@@ -2,13 +2,6 @@
 
 //setInterval(function(){ alert("Hello"); }, 3000);
 
-var boardWidth = 96
-var boardHeight = 48
-var boardThickness = 0.75
-var boardCenterX = 0
-var boardCenterY = 0
-var boardID = "-"
-var boardMaterial = "-"
 var cutSquareGroup = new THREE.Group();
 var showBoard = true;
 var homeX = 0;
@@ -98,16 +91,16 @@ sled.position.set(0,0,0);
 
 
 var homeHorizontalLineSegments = new THREE.Geometry();
-homeHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.0, 0, 0));
-homeHorizontalLineSegments.vertices.push(new THREE.Vector3(1.0, 0, 0));
+homeHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.25, 0, 0));
+homeHorizontalLineSegments.vertices.push(new THREE.Vector3(1.25, 0, 0));
 var homeHorizontalLine = new THREE.LineSegments(homeHorizontalLineSegments, greenLineMaterial);
 
 var homeVerticalLineSegments = new THREE.Geometry();
-homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.0, 0));
-homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.0, 0));
+homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.25, 0));
+homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.25, 0));
 var homeVerticalLine = new THREE.LineSegments(homeVerticalLineSegments, greenLineMaterial);
 
-var homeCircleGeometry = new THREE.CircleGeometry(.5,32);
+var homeCircleGeometry = new THREE.CircleGeometry(.75,32);
 var homeCircleEdges = new THREE.EdgesGeometry(homeCircleGeometry)
 var homeCircle = new THREE.LineSegments(homeCircleEdges,greenLineMaterial);
 
@@ -286,28 +279,7 @@ function gcodePositionUpdate(x,y,z){
     //console.log("x="+x+", y="+y)
 }
 
-
-function unitSwitch(){
-  if ( $("#units").text()=="MM") {
-    distToMove = (parseFloat($("#distToMove").val())/25.4).toFixed(3)
-    updateSetting('toInches',distToMove);
-  } else {
-    distToMove = (parseFloat($("#distToMove").val())*25.4).toFixed(3)
-    updateSetting('toMM',distToMove);
-  }
-}
-
 $(document).ready(function(){
-    //settingRequest("Computed Settings","units");
-    //settingRequest("Computed Settings","distToMove");
-    //settingRequest("Computed Settings","homePosition");
-    action("statusRequest","cameraStatus");
-    //checkForGCodeUpdate();
-    var controllerMessage = document.getElementById('controllerMessage');
-    controllerMessage.scrollTop = controllerMessage.scrollHeight;
-    //var $controllerMessage = $("#controllerMessage");
-    //$controllerMessage.scrollTop($controllerMessage[0].scrollHeight);
-
     $( "#workarea" ).contextmenu(function() {
         if (!view3D)
         {
@@ -325,62 +297,11 @@ $(document).ready(function(){
     });
 });
 
-function pauseRun(){
-  if ($("#pauseButton").text()=="Pause"){
-    action('pauseRun');
-  }
-  else {
-    action('resumeRun');
-  }
-}
-
-function resumeRun(){
-    action('resumeRun')
-}
-
-
-function processRequestedSetting(data){
-  //console.log(msg);
-  if (data.setting=="pauseButtonSetting"){
-    if(data.value=="Resume")
-        $('#pauseButton').removeClass('btn-warning').addClass('btn-info');
-    else
-        $('#pauseButton').removeClass('btn-info').addClass('btn-warning');
-    $("#pauseButton").text(data.value);
-  }
-  if (data.setting=="units"){
-    console.log("requestedSetting:"+data.value);
-    $("#units").text(data.value)
-  }
-  if (data.setting=="distToMove"){
-    console.log("requestedSetting for distToMove:"+data.value);
-    $("#distToMove").val(data.value)
-  }
-  if ((data.setting=="unitsZ") || (data.setting=="distToMoveZ")){
-    if (typeof processZAxisRequestedSetting === "function") {
-       processZAxisRequestedSetting(data)
-    }
-  }
-}
-
-function processPositionMessage(data){
-  $('#positionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' ZPos:'+parseFloat(data.zval).toFixed(2));
-  $('#percentComplete').html(data.pcom)
-  $('#machineState').html(data.state)
-  positionUpdate(data.xval,data.yval,data.zval);
-}
-
-function processErrorValueMessage(data){
- //console.log(data.leftError);
- $('#leftError').css('width', data.leftError*100+'%').attr('aria-valuenow', data.leftError*100);
- $('#rightError').css('width', data.rightError*100+'%').attr('aria-valuenow', data.rightError*100);
- //check to see if data is valid (i.e., not -999999)
- //console.log(data.computedEnabled);
+function processError3d(data){
  if ( !data.computedEnabled )
  {
     if (isComputedEnabled){
         scene.remove(computedSled);
-        //scene.remove(cutTrailGroup);
         isComputedEnabled = false;
     }
     return;
@@ -393,53 +314,17 @@ function processErrorValueMessage(data){
         x /= 25.4
         y /= 25.4
      }
-     //console.log(x+", "+y);
-     /*var cutTrail = new THREE.Geometry();
-     cutTrail.vertices.push(new THREE.Vector3(computedSled.position.getComponent(0), computedSled.position.getComponent(1), computedSled.position.getComponent(2)));
-     */
      computedSled.position.setComponent(0,x);
      computedSled.position.setComponent(1,y);
-     /*
-     cutTrail.vertices.push(new THREE.Vector3(x, y, computedSled.position.getComponent(2)));
-     console.log(cutTrail.vertices);
-     cutTrailLine = new THREE.Line(cutTrail, greenLineMaterial);
-     scene.add(cutTrailLine);
-     cutTrailGroup.add(cutTrailLine);
-
-     if (isComputedEnabled)
-     {
-        scene.remove(cutTrailGroup);
-        scene.add(cutTrailGroup);
-     }
-     console.log(cutTrailGroup);
-     */
      if (!isComputedEnabled){
         scene.add(computedSled);
         //scene.add(cutTrailGroup);
         isComputedEnabled = true;
      }
  }
- //following always comes in mm so convert to inches for 3d space
-
 }
 
 
-function processHomePositionMessage(data){
-  console.log(data.xval)
-  $('#homePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2));
-  homePositionUpdate(data.xval,data.yval);
-}
-
-function processGCodePositionMessage(data){
-  $('#gcodePositionMessage').html('XPos:'+parseFloat(data.xval).toFixed(2)+' Ypos:'+parseFloat(data.yval).toFixed(2)+' Zpos:'+parseFloat(data.zval).toFixed(2));
-  $('#gcodeLine').html(data.gcodeLine);
-  $('#gcodeLineIndex').val(data.gcodeLineIndex+1)
-  gcodePositionUpdate(data.xval,data.yval,data.zval);
-}
-
-function gcodeUpdate(msg){
-  console.log("updating gcode");
-}
 function gcodeUpdateCompressed(data){
   console.log("updating gcode compressed");
   if (gcode.children.length!=0) {
@@ -495,14 +380,6 @@ function gcodeUpdateCompressed(data){
 
       }
     });
-    //gcode.move(originX,originY)
-    //var gcodeDashed = new THREE.LineSegments(gcodeDashedLineSegments, greenLineDashedMaterial)
-    //gcodeDashed.computeLineDistances();
-    //var gcodeUndashed = new THREE.LineSegments(gcodeLineSegments, blueLineMaterial)
-    //gcode.add(gcodeDashed);
-    //gcode.add(gcodeUndashed);
-    //scene.add(gcode);
-    //console.log(gcodeUndashed);
     scene.add(gcode);
   }
   else{
@@ -511,76 +388,6 @@ function gcodeUpdateCompressed(data){
   $("#fpCircle").hide();
 
 }
-/*
-function gcodeUpdateCompressed(msg){
-
-  //This routine was an attempt at seeing if individual line segments could be stored such
-  //that we could change their color as the cut progresses.  It worked on small gcode but
-  //crashed on a large file.  will need to find another way.
-  console.log("updating gcode compressed");
-  console.log(gcode.length);
-  if (gcode.children.length!=0) {
-    for (var i = gcode.children.length -1; i>=0; i--){
-        gcode.remove(gcode.children[i]);
-    }
-  }
-
-
-  var gcodeLineSegments = new THREE.Geometry();
-  var gcodeDashedLineSegments = new THREE.Geometry();
-
-  var gcodeDashed = []
-  var gcodeUndashed = []
-
-  index1 = 0
-  index2 = 0
-  if (msg.data!=null){
-    var uncompressed = pako.inflate(msg.data);
-    var _str = ab2str(uncompressed);
-    var data = JSON.parse(_str)
-    var pX, pY, pZ = -99999.9
-    data.forEach(function(line) {
-      if (line.type=='line'){
-        //console.log("Line length="+line.points.length+", dashed="+line.dashed);
-        if (line.dashed==true) {
-          line.points.forEach(function(point) {
-            gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-            if (index1 != 0) {
-                gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-                gcodeDashed[index1]=new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
-                gcodeDashed[index1].computeLineDistances();
-                gcodeDashedLineSegments = new THREE.Geometry();
-            }
-            index1=index1+1
-          })
-        } else {
-          line.points.forEach(function(point) {
-            gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-            if (index2 != 0) {
-                gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-                gcodeUndashed[index2]=new THREE.Line(gcodeLineSegments, blueLineMaterial)
-                gcodeUndashedLineSegments = new THREE.Geometry();
-            }
-            index2=index2+1
-          })
-        }
-      }
-    });
-    //gcode.move(originX,originY)
-    gcodeDashed.forEach(function(line){
-        gcode.add(line);
-    })
-    gcodeUndashed.forEach(function(line){
-        gcode.add(line);
-    })
-
-
-    scene.add(gcode);
-  }
-  $("#fpCircle").hide();
-
-}
-*/
 
 function ab2str(buf) {
     var bufView = new Uint16Array(buf);
@@ -718,31 +525,6 @@ function processCameraMessage(data){
     }
 }
 
-function processControllerMessage(data){
-    if (controllerMessages.length >100)
-        controllerMessages.shift();
-    controllerMessages.push(data);
-    $('#controllerMessage').html('');
-    controllerMessages.forEach(function(message){
-        $('#controllerMessage').append(message+"<br>");
-    });
-    $('#controllerMessage').scrollBottom();
-}
-
-function processAlarm(data){
-    console.log("alarm received");
-    $("#alarms").html("<marquee behavior='scroll' direction='left'>"+data.message+"</marquee>");
-    $("#alarms").removeClass('alert-success').addClass('alert-danger');
-    $("#stopButton").addClass('stopbutton');
-}
-
-function clearAlarm(data){
-    console.log("clearing alarm");
-    $("#alarms").text("Alarm cleared.");
-    $("#alarms").removeClass('alert-danger').addClass('alert-success');
-    $("#stopButton").removeClass('stopbutton');
-}
-
 document.onmousemove = function(event){
     if (!isMobile)
     {
@@ -787,16 +569,8 @@ function confine(value, low, high)
     return value;
 }
 
-function boardDataUpdate(data){
+function board3DDataUpdate(data){
   console.log("updating board data");
-  boardWidth = data.width;
-  boardHeight = data.height;
-  boardThickness = data.thickness;
-  boardCenterX = data.centerX;
-  boardCenterY = data.centerY;
-  boardID = data.boardID;
-  boardMaterial = data.material;
-
   boardOutlineGeometry.dispose();
   boardOutlineGeometry = new THREE.BoxBufferGeometry(boardWidth,boardHeight,boardThickness);
   boardOutlineFill.geometry = boardOutlineGeometry;
@@ -806,9 +580,6 @@ function boardDataUpdate(data){
   boardOutlineFill.geometry.needsUpdate=true;
   boardOutlineOutline.geometry.needsUpdate=true;
   boardGroup.position.set(boardCenterX,boardCenterY,boardThickness/-2.0);
-
-  $("#boardID").text("Board: "+boardID+", Material: "+boardMaterial);
-
 
 }
 

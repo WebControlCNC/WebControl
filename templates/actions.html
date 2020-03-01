@@ -32,11 +32,13 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importGCini');$('#contentModal').modal('hide');">Import groundcontrol.ini File</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importWCJSON');$('#contentModal').modal('hide');">Import webcontrol.json File</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('quickConfigure');$('#contentModal').modal('hide');">Quick Configure</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets & Reset Chains</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');">Triangular Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets & Chains</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('resetChains');$('#contentModal').modal('hide');">Reset Chains</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if not enableCustom and not enableHoley else 'data-toggle="tooltip" title="Stock Firmware Required"' | safe}} onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');" {{'' if not enableCustom and not enableHoley else 'disabled'}}>Triangular Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');$('#contentModal').modal('hide');">Return to Center</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('resetHomeToCenter');$('#contentModal').modal('hide');">Reset Home to Center</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Check for Chain Skip</button>
 			</div>
 		</div>

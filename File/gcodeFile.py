@@ -38,6 +38,12 @@ class GCodeFile(MakesmithInitFuncs):
 
     filename = ""
     line3D = []
+    '''
+    prependString is defined here so it can be persistent across each 'moveOneLine'.  That way, if a gcode line
+    does not contain a valid gcode, it uses the previous line's gcode.  Thanks to @amantalion for discovering the
+    glitch.  https://github.com/madgrizzle/WebControl/issues/78
+    '''
+    prependString = ""
 
 
     def serializeGCode3D(self):
@@ -149,7 +155,7 @@ class GCodeFile(MakesmithInitFuncs):
             zList = []
             for index, line in enumerate(self.data.gcode):
                 filtersparsed = re.sub(r'\(([^)]*)\)', '', line)  # replace mach3 style gcode comments with newline
-                line = re.sub(r';([^.]*)?', '',filtersparsed)  # replace standard ; initiated gcode comments with newline
+                line = re.sub(r';([^\n]*)?', '\n',filtersparsed)  # replace standard ; initiated gcode comments with newline
                 if not line.isspace(): # if all spaces, don't send.  likely a comment. #if line.find("(") == -1:
                     if line.find("G20") != -1:
                         self.data.tolerance = 0.020
@@ -488,7 +494,7 @@ class GCodeFile(MakesmithInitFuncs):
 
         filtersparsed = re.sub(r'\(([^)]*)\)', '\n', fullString)  # replace mach3 style gcode comments with newline
         #fullString = re.sub(r';([^\n]*)\n', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
-        fullString = re.sub(r';([^.]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
+        fullString = re.sub(r';([^\n]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with newline
         #print("fullString:"+fullString)
         # if the line contains multiple gcode commands split them and execute them individually
         listOfLines = fullString.split("G")
@@ -524,7 +530,7 @@ class GCodeFile(MakesmithInitFuncs):
             fullString + " "
         )  # ensures that there is a space at the end of the line
         # find 'G' anywhere in string
-        self.prependString = ""
+
         gString = fullString[fullString.find("G") : fullString.find("G") + 3]
 
         if gString in validPrefixList:

@@ -57,30 +57,23 @@ class GPIOActions(MakesmithInitFuncs):
             led = (action,_led)
             self.LEDs.append(led)
             print("set LED with action: " + action)
-        #pause()
     def getAction(self, action):
         if action == "Stop":
             return "button", self.data.actions.stopRun
         elif action == "Pause":
             return "button", self.data.actions.pauseRun
         elif action == "Play":
-            return "button", self.data.action.startRun
+            return "button", self.data.actions.startRun
         else:
             return "led", None
-        
-    def runrun(self):
-        print("gpio button press detected")
-        self.data.actions.startRun()
-        
+
     def causeAction(self, action, onoff):
         for led in self.LEDs:
             if led[0] == action:
-                print(led[1])
                 if onoff == "on":
                     led[1].on()
                 else:
                     led[1].off()
-                print(led[1])
         if action == "PlayLED" and onoff == "on":
             self.causeAction("PauseLED", "off")
             self.causeAction("StopLED", "off")

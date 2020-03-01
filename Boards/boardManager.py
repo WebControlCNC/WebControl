@@ -143,8 +143,13 @@ class BoardManager(MakesmithInitFuncs):
         offsetX = pointsX / 2 - self.currentBoard.centerX
         offsetY = pointsY / 2 - self.currentBoard.centerY
 
-        homeX = self.data.gcodeShift[0]
-        homeY = self.data.gcodeShift[1]
+        if self.data.units == "MM":
+            scale = 1/25.4
+        else:
+            scale = 1
+        homeX = self.data.gcodeShift[0]*scale
+        homeY = self.data.gcodeShift[1]*scale
+
 
         # initialize an array
         cutPoints = [False for i in range( pointsX * pointsY )]
