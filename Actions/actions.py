@@ -71,6 +71,12 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveZ":
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "moveZzero":
+                if not self.moveZzero():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving Z-Axis to zero.")
+            elif msg["data"]["command"] == "moveZsafe":
+                if not self.moveZsafe():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with moving Z-Axis to safe traverse height.")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
             elif msg["data"]["command"] == "home":
@@ -807,6 +813,48 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def moveZabsolute(self, height, units = "MM"):
+        try:
+            if units == "MM" or units == "INCHES":
+                orgUnits = self.data.units
+                orgPositioningMode = self.data.positioningMode
+
+                # Set movement units if needed.
+                if orgUnits != units:
+                    if units == "MM":
+                        self.data.gcode_queue.put("G21 ")
+                    else:
+                        self.data.gcode_queue.put("G20 ")
+
+                # Set positioning mode to absolute if needed.
+                if orgPositioningMode == 1:
+                    self.data.gcode_queue.put("G90 ")
+
+                # Move to speficied height.
+                self.data.gcode_queue.put("G00 Z" + str(float(height)) + " ")
+
+                # Set units back to what they were.
+                if orgUnits != units:
+                    if orgUnits == "MM":
+                        self.data.gcode_queue.put("G21 ")
+                    else:
+                        self.data.gcode_queue.put("G20 ")
+
+                # Set positioning mode back to what it was.
+                if orgPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
+
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def moveZzero(self):
+        return self.moveZabsolute(0)
+
+    def moveZsafe(self):
+        height = self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
+        return self.moveZabsolute(height)
 
     def touchZ(self):
         '''
