@@ -6,6 +6,7 @@ import socket
 import math
 import os
 import subprocess
+import sys
 
 #monkey.patch_all(thread = False, threading = False) 
 monkey.patch_all()
@@ -35,6 +36,12 @@ app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
 app.data.config.computeSettings(None, None, None, True)
 app.data.config.parseFirmwareVersions()
+if version[:2] > (3, 5):
+    app.data.pythonVersion35 = False
+    print("Using routines for Python > 3.5")
+else:
+    app.data.pythonVersion35 = True
+    print("Using routines for Python == 3.5")
 app.data.units = app.data.config.getValue("Computed Settings", "units")
 app.data.tolerance = app.data.config.getValue("Computed Settings", "tolerance")
 app.data.distToMove = app.data.config.getValue("Computed Settings", "distToMove")
@@ -112,28 +119,28 @@ def remote_function_call():
             message = {"data":{"gcode":"selected"}}
             if ('startRun' in resultlist):
                 print ('start gcode requested')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
                 message = {"data":{"buttonrun":"started"}}
             if ('pauseRun' in resultlist):
                 if (app.data.uploadFlag == 1):
                     print ('pause gcode requested')
-                    app.nonVisibleWidgets.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
+                    app.data.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
                     message = {"data":{"buttonrun":"paused"}}
                 elif (app.data.uploadFlag == 2):
                     print ('continue gcode requested')
-                    app.nonVisibleWidgets.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+                    app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
                     message = {"data":{"buttonrun":"resumed"}}
             if (resultlist[1] == 'resumeRun'):
                 print ('continue gcode requested')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
                 message = {"data":{"buttonrun":"resumed"}}
             if (resultlist[1] == 'stopRun'):
                 print ('stop gcode requested')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
                 message = {"data":{"butttonrun":"stopped"}}
             if('home' in resultlist):
                 print ('go home')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
                 message = {"data":{"buttonmove":"movetoHome"}}
         
         resp = jsonify(message)
@@ -197,67 +204,67 @@ def WiiMoteInput():
         message = {"data":{"z:selected"}}
         if('raise' in resultlist):
             print ('zaxis', distance, 'raise')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"moveZ","arg":"raise","arg1":distance}})
+            app.data.actions.processAction({"data":{"command":"moveZ","arg":"raise","arg1":distance}})
             message = {"data":{"Z":"raise"}}
         if('lower' in resultlist):
             print ('zaxis', distance, 'lower')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"moveZ","arg":"lower","arg1":distance}})
+            app.data.actions.processAction({"data":{"command":"moveZ","arg":"lower","arg1":distance}})
             message = {"data":{"Z":"Lower"}}
         if('stopZ' in resultlist):
             print ('zaxis stop')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"stopZ","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"stopZ","arg":"","arg1":""}})
             message = {"data":{"Z":"stopZ"}}
         if('defineZ0' in resultlist):
             print ('new Z axis zero point')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"defineZ0","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"defineZ0","arg":"","arg1":""}})
             message = {"data":{"Z":"defineZ"}}  # this command set will move or change the sled
     if ('sled' in resultlist):    
         message = {"data":{"sled":"selected"}}
         if('up' in resultlist):
             print ('move', distance, 'up')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"up","arg1":distance}})
+            app.data.actions.processAction({"data":{"command":"move","arg":"up","arg1":distance}})
             message = {"data":{"move":"up"}}
         if('down' in resultlist):
             print ('move', distance, 'down')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"down","arg1":distance}})
+            app.data.actions.processAction({"data":{"command":"move","arg":"down","arg1":distance}})
             message = {"data":{"move":"down"}}
         if('left' in resultlist):
             print ('move', distance, 'left')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"left","arg1":distance}})
+            app.data.actions.processAction({"data":{"command":"move","arg":"left","arg1":distance}})
             message = {"data":{"move":"left"}}
         if('right' in resultlist):
             print ('move', distance, 'right')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"move","arg":"right","arg1":distance}})
+            app.data.actions.processAction({"data":{"command":"move","arg":"right","arg1":distance}})
             message = {"data":{"move":"right"}}
         if('home' in resultlist):
             print ('go home')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
             message = {"data":{"sled":"movetoHome"}}
         if('defineHome' in resultlist):
             print ('new home set')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"defineHome","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"defineHome","arg":"","arg1":""}})
             message = {"data":{"sled":"NewHome"}}
     if ('gcode' in resultlist): # this command set will start, pause, stop the execution of gcode files
         if (resultlist[1] == 'startRun'):
                 print ('start gcode requested')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
                 message = {"data":{"pendantrun":"started"}}
         if (resultlist[1] == 'pauseRun'):
             if (app.data.uploadFlag == 1):
                 print ('pause gcode requested')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
                 message = {"data":{"pendantrun":"paused"}}
             elif (app.data.uploadFlag == 2):
                 print ('continue gcode requested')
-                app.nonVisibleWidgets.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
                 message = {"data":{"pendantrun":"resumed"}}
         if (resultlist[1] == 'resumeRun'):
             print ('continue gcode requested')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
             message = {"data":{"pendantrun":"resumed"}}
         if (resultlist[1] == 'stopRun'):
             print ('stop gcode requested')
-            app.nonVisibleWidgets.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
             message = {"data":{"pendantrun":"stopped"}} 
     if ('system' in resultlist): # this command set will adjust the system including pendant connection status and system power
         print ('system selected')
@@ -267,7 +274,7 @@ def WiiMoteInput():
             if (app.data.uploadFlag == 0):
                 os._exit(0)
             else:
-                app.nonVisiblewidgets.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+                app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
                 print("denied: running code.  Code stopped near try again")
                 message = {"data":{"system":"shutdownAttempt"}}
         if ('connected' in resultlist):

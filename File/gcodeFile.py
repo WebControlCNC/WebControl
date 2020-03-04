@@ -446,14 +446,16 @@ class GCodeFile(MakesmithInitFuncs):
 
                     e = re.search(".*e-", q)
 
-                    if e:
-                        fmtX = (
-                            "%0%.%sf" % eNtnX
-                        )  # if e-notation, use the exponent from the e notation
-                    else:
-                        fmtX = "%0%.%sf" % len(
-                            eNtnX
-                        )  # use the number of digits after the decimal place
+                    if (self.data.pythonVersion35 == False):
+                        if e:
+                            fmtX = "%0.{0}f".format(eNtnX)
+                        else:
+                            fmtX = "%0.{0}f".format(len(eNtnX))
+                    else:    #deprecated python 3.6
+                        if e:
+                            fmtX = ("%0%.%sf" % eNtnX)  # if e-notation, use the exponent from the e notation
+                        else:
+                            fmtX = "%0%.%sf" % len(eNtnX)  # use the number of digits after the decimal place
                     gCodeLine = (
                         gCodeLine[0 : x.start() + 1]
                         + (fmtX % (float(x.groups()[0]) + shiftX))
@@ -471,11 +473,16 @@ class GCodeFile(MakesmithInitFuncs):
                     eNtnY = re.sub("\-?\d\.|\d*e-", "", q, )
 
                     e = re.search(".*e-", q )
-
-                    if e:
-                        fmtY = "%0%.%sf" % eNtnY
-                    else:
-                        fmtY = "%0%.%sf" % len(eNtnY)
+                    if (self.data.pythonVersion35 == False):
+                        if e:
+                            fmtY = "%0%.%sf" % eNtnY
+                        else:
+                            fmtY = "%0%.%sf" % len(eNtnY)
+                    else:    #deprecated python 3.6
+                        if e:
+                            fmtY = ("%0%.%sf" % eNtnY)  # if e-notation, use the exponent from the e notation
+                        else:
+                            fmtY = "%0%.%sf" % len(eNtnY)  # use the number of digits after the decimal place                  
                     gCodeLine = (
                         gCodeLine[0 : y.start() + 1]
                         + (fmtY % (float(y.groups()[0]) + shiftY))
