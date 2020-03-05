@@ -432,7 +432,7 @@ class GCodeFile(MakesmithInitFuncs):
         #This test should always pass so taking it out
         #if gCodeLine.find("(") == -1 and gCodeLine.find(";") == -1:
         if True:
-            #try:
+            try:
                 gCodeLine = gCodeLine.upper() + " "
                 x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if x:
@@ -491,11 +491,11 @@ class GCodeFile(MakesmithInitFuncs):
                 #now, put any comment back.
                 gCodeLine = gCodeLine+comment
                 return gCodeLine
-            #except ValueError:
-            #    self.data.console_queue.put("line could not be moved:")
-            #    self.data.console_queue.put(originalLine)
-            #    return originalLine
-        #return originalLine
+            except ValueError:
+                self.data.console_queue.put("line could not be moved:")
+                self.data.console_queue.put(originalLine)
+                return originalLine
+        return originalLine
 
     def loadNextLine(self):
         """
