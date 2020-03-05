@@ -1,4 +1,5 @@
 //checkForGCodeUpdate();
+//checkForGCodeUpdate();
 
 //setInterval(function(){ alert("Hello"); }, 3000);
 
@@ -8,9 +9,10 @@ var homeX = 0;
 var homeY = 0;
 
 var renderer = new THREE.WebGLRenderer();
-var w = $("#workarea").width()-20;
-var h = $("#workarea").height()-20;
+var w = $("#workarea").width();//-20;
+var h = $("#workarea").height();//-20;
 renderer.setSize( w, h );
+//console.log("w="+w+", h="+h);
 
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
@@ -19,7 +21,7 @@ var imageShowing = 1
 var gcode = new THREE.Group();
 //var cutTrailGroup = new THREE.Group();
 
-var cameraPerspective = 1; // 0 = Orthographic, 1 = Perspective
+var cameraPerspective = 0; // 0 = Orthographic, 1 = Perspective
 var scale = .07
 var cameraO;
 var cameraP;
@@ -241,12 +243,24 @@ window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
 
-    cameraO.aspect = window.innerWidth / window.innerHeight;
+    //w=window.innerWidth;
+    //h=window.innerHeight;
+    //console.log("wr="+w+", hr="+h);
+    we = $("#workarea").width(); //-20;
+    he = $("#workarea").height(); //-20;
+    //console.log("we="+we+", he="+he);
+
+    //cameraO.aspect = window.innerWidth / window.innerHeight;
+    cameraO.left = we/-2*scale;
+    cameraO.right = we/2*scale;
+    cameraO.top = he/2*scale;
+    cameraO.bottom = he/-2*scale;
     cameraO.updateProjectionMatrix();
-    cameraP.aspect = window.innerWidth / window.innerHeight;
+    //cameraP.aspect = window.innerWidth / window.innerHeight;
+    cameraP.aspect = we / he;
     cameraP.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( we, he );
 
 }
 
@@ -690,12 +704,15 @@ function toggle3DPO(){
     cameraPerspective = !cameraPerspective;
     if (cameraPerspective == 0){
         $("#buttonPO").text("Ortho");
+        $("#mobilebuttonPO").text("Ortho");
         renderer.render(scene, cameraO)
     }
     else {
         $("#buttonPO").text("Persp");
-        renderer.render(scene, camera1)
+        $("#mobilebuttonPO").text("Persp");
+        renderer.render(scene, cameraP)
     }
 }
+
 
 
