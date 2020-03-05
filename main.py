@@ -5,9 +5,11 @@ import webbrowser
 import socket
 import math
 import os
+import sys
 
 
 monkey.patch_all()
+
 
 import schedule
 import time
@@ -44,6 +46,15 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")),
     float(app.data.config.getValue("Advanced Settings", "homeY")),
 ]
+
+version = sys.version_info
+
+if version[:2] > (3, 5):
+    app.data.pythonVersion35 = False
+    print("Using routines for Python > 3.5")
+else:
+    app.data.pythonVersion35 = True
+    print("Using routines for Python == 3.5")
 
 app.data.firstRun = False
 # app.previousPosX = 0.0
@@ -99,10 +110,23 @@ def index(template):
 @mobile_template("/controls/{mobile/}")
 def controls(template):
     app.data.logger.resetIdler()
+    macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
+    macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "/controls/mobile/":
-        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True)
+        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
     else:
-        return render_template("frontpage3d.html", modalStyle="mw-100 w-75")
+        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+
+@app.route("/text")
+@mobile_template("/text/{mobile/}")
+def text(template):
+    app.data.logger.resetIdler()
+    macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
+    macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
+    if template == "/text/mobile":
+        return render_template("frontpageText_mobile.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
+    else:
+        return render_template("frontpageText.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
 
 @app.route("/logs")
 @mobile_template("/logs/{mobile/}")

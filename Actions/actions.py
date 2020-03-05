@@ -406,24 +406,22 @@ class Actions(MakesmithInitFuncs):
         Starts the process of sending the gcode to the controller.
         :return:
         '''
-        print("h1")
         try:
             if len(self.data.gcode) > 0:
-                print("h2")
+                # set current Z target to the current z height in case gcode doesn't include a z move before an xy move.
+                # if it doesn't and the user pauses during an xy move, then the target Z is set to 0.  This sets it to
+                # what it currently is when the user started the gcode send.
+                self.data.currentZTarget = self.data.zval
                 # if the gcode index is not 0, then make sure the machine is in the proper state before starting to send
                 # the gcode.
                 if self.data.gcodeIndex > 0:
-                    print("h3")
                     # get machine into proper state by sending appropriate commands
                     self.processGCode()
-                    print("h4")
                     # update the gcode position on the UI client.. Have to recalculate it from the gcode because
                     # starting at some place other than 0
                     self.sendGCodePositionUpdate(recalculate=True)
-                    print("h5")
                     self.data.uploadFlag = 1
                 else:
-                    print("h6")
                     self.data.uploadFlag = 1
                 self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
@@ -571,52 +569,56 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
-            # if a tool change, then...
-            print("at resume run with manualzaxisadjust = "+str(self.data.manualZAxisAdjust))
-
-            # Restore units.
-            if self.data.pausedUnits != self.data.units:
-                print("Restoring units to:" + str(self.data.pausedUnits))
-                if self.data.pausedUnits == "INCHES":
-                    self.data.gcode_queue.put("G20 ")
-                elif self.data.pausedUnits == "MM":
-                    self.data.gcode_queue.put("G21 ")
-
-            # Move the z-axis back to where it was.
-            # Put in absolute mode to make z axis move
-            self.data.gcode_queue.put("G90 ")
-            # THE ABOVE COMMAND IS NOT EXECUTED IN LINE AND REQUIRES FOLLOWING TO TRACK POSITIONING MODE
-            self.data.positioningMode = 0
-            print("sending pausedzval equal to "+str(self.data.pausedzval)+" from resumeRun without manual change")
-            self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
-
-            # Restore the last gcode positioning mode in use before pauseRun executed.
-            # This must happen for all resume cases as multiple actions may have changed it (home, moveZ etc).
-            if self.data.pausedPositioningMode is not None and self.data.positioningMode != self.data.pausedPositioningMode:
-                print("Restoring positioning mode: " + str(self.data.pausedPositioningMode))
-                if self.data.pausedPositioningMode == 0:
-                    # this line technically should be unreachable
-                    self.data.gcode_queue.put("G90 ")
-                elif self.data.pausedPositioningMode == 1:
-                    self.data.gcode_queue.put("G91 ")
-                self.data.pausedPositioningMode = None
-
             # Restore self.data.upladFlag properly
             if self.data.manualZAxisAdjust:
-                # clear the flag since resume
+                # Z-axis is disabled and requires manual adjustment.
+                print("Resume run with manual z-axis adjust.")
+                # Clear the flag.
                 self.data.manualZAxisAdjust = False
-                # reenable the uploadFlag if it was previous set.
+                # Reenable the uploadFlag if it was previous set.
                 if self.data.previousUploadStatus == -1:
-                    # if was M command pause, then set to 1
+                    # If this was M command pause, then set to 1.
                     self.data.uploadFlag = 1
                 else:
                     self.data.uploadFlag = self.data.previousUploadStatus ### just moved this here from after if statement
             else:
+                # User has paused and is now resuming.
+                # User could have used UI to move z-axis so restore paused values.
+                print("Resume run without manual z-axis adjust.")
+                # Restore units.
+                if self.data.pausedUnits is not None and self.data.pausedUnits != self.data.units:
+                    print("Restoring units to:" + str(self.data.pausedUnits))
+                    if self.data.pausedUnits == "INCHES":
+                        self.data.gcode_queue.put("G20 ")
+                    elif self.data.pausedUnits == "MM":
+                        self.data.gcode_queue.put("G21 ")
+                    self.data.pausedUnits = None
+
+                # Move the z-axis back to where it was.
+                if self.data.pausedzval is not None and self.data.pausedzval != self.data.zval:
+                    # Put in absolute mode to make z axis move.
+                    self.data.gcode_queue.put("G90 ")
+                    # THE ABOVE COMMAND IS NOT EXECUTED IN LINE AND REQUIRES THE FOLLOWING TO TRACK POSITIONING MODE
+                    self.data.positioningMode = 0
+                    print("Restoring paused Z value: " + str(self.data.pausedzval))
+                    self.data.gcode_queue.put("G0 Z" + str(self.data.pausedzval) + " ")
+                    self.data.pausedzval = None
+
+                # Restore the last gcode positioning mode in use before pauseRun executed.
+                if self.data.pausedPositioningMode is not None and self.data.positioningMode != self.data.pausedPositioningMode:
+                    print("Restoring positioning mode: " + str(self.data.pausedPositioningMode))
+                    if self.data.pausedPositioningMode == 0:
+                        # this line technically should be unreachable
+                        self.data.gcode_queue.put("G90 ")
+                    elif self.data.pausedPositioningMode == 1:
+                        self.data.gcode_queue.put("G91 ")
+                    self.data.pausedPositioningMode = None
+
                 self.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
                 self.data.uploadFlag = 1
 
-            # send cycle resume command to unpause the machine
-            # needed only if user initiated pause, but doesn't actually cause harm to controller.
+            # Send cycle resume command to unpause the machine.
+            # Only needed if user initiated pause; but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
             self.data.gpioActions.causeAction("PauseLED", "off")

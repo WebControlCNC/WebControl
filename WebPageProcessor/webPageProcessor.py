@@ -279,6 +279,19 @@ class WebPageProcessor:
             else:
                 page = render_template("setSprockets.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
             return page, "Set Sprockets", False, "medium", "content", False
+        elif pageID == "resetChains":
+            if self.data.controllerFirmwareVersion < 100:
+                fourMotor = False
+            else:
+                fourMotor = True
+            chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            if isMobile:
+                page = render_template("resetChains_mobile.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
+            else:
+                page = render_template("resetChains.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
+            return page, "Reset Chains", False, "medium", "content", False
+
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")

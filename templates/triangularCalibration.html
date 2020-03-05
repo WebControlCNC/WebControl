@@ -29,7 +29,14 @@
         <input id="bitDiameter" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="bitDiameter" value="6.35">
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
-      <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
+      <div class="row">
+          <div class = "col">
+            <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
+          </div>
+          <div class = "col">
+            <button id="acceptCalibration" type="button" class="btn btn-lg btn-block btn-primary">Accept Results</button>
+          </div>
+      </div>
     </div>
   </form>
   <h5>Parameters</h5>
@@ -37,13 +44,19 @@
   <p><label id="rotationRadius">Rotational Radius: {{rotationRadius}}</label></p>
   <p><label id="chainSagCorrection">Chain Sag Correction: {{chainSagCorrection}}</label></p>
   <p><label id="calibrationError">Calibration Error: n/a</label></p>
-  <button id="acceptCalibration" disabled type="Accept" class="btn btn-lg btn-block btn-primary" onclick="action('acceptTriangularCalibrationResults',0,0);$('#contentModal').modal('toggle')">Accept Results</button>
 </div>
 {% endblock %}
 
 {% block javascript %}
 <script>
 $(document).ready(function () {
+
+    $("#acceptCalibration").on('click', function(){
+      action('acceptTriangularCalibrationResults',0,0);
+      $('#contentModal').modal('toggle');
+      return false;
+    });
+
     $('#calibrateForm').on('submit', function(e) {
         e.preventDefault();
         var url = $("#pageID").val()

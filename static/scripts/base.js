@@ -47,9 +47,14 @@ function processControllerStatus(data){
       $("#controllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
       $("#mobileControllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
       if (isMobile)
+      {
         $("#mobileControllerStatusAlert").show();
+        $("#mobileControllerStatusAlert svg.feather.feather-check-circle").replaceWith(feather.icons["alert-circle"].toSvg());
+      }
+      else
+        $("#mobileControllerStatusAlert").hide();
       $("#mobileControllerStatusButton").hide();
-      $("#mobileControllerStatusAlert svg.feather.feather-check-circle").replaceWith(feather.icons["alert-circle"].toSvg());
+
       //feather.replace();
     }
     else
@@ -59,8 +64,12 @@ function processControllerStatus(data){
         $("#controllerStatusAlert").hide();
         $("#mobileControllerStatusAlert").hide();
         if(isMobile)
+        {
             $("#mobileControllerStatusButton").show();
-        $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
+            $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
+        }
+        else
+            $("#mobileControllerStatusAlert").hide();
         $("#controllerStatusButton").show();
         $("#controllerStatusButton").html(text);
         //feather.replace();
@@ -70,13 +79,16 @@ function processControllerStatus(data){
       else{
         text = data.port;
         $("#controllerStatusAlert").show();
-        $("#mobileControllerStatusAlert").show();
+        if (isMobile){
+            $("#mobileControllerStatusAlert").show();
+            $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
+            $("#mobileControllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
+        }
         $("#controllerStatusButton").hide();
         $("#mobileControllerStatusButton").hide();
         $("#controllerStatusAlert").text(text);
-        $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
         $("#controllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
-        $("#mobileControllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
+
         //feather.replace();
       }
     }

@@ -10,7 +10,8 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018r') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018s') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102018s') }}" crossorigin="anonymous"></script>
   <script>feather.replace()</script>
 {% endblock %}
 
@@ -205,17 +206,23 @@
     </div>
   </div>
   <div class="row mb-1">
-    <div class="col-6">
+    <div class="col-4">
       <button class="btn btn-secondary btn-block" type="button" id="mobilebutton3D" onclick="toggle3DView()">3D</button>
     </div>
-    <div class="col-6">
+    <div class="col-4">
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonPO" onclick="toggle3DPO()">Ortho</button>
+    </div>
+    <div class="col-4">
       <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonReset" onclick="resetView()">Reset</button>
     </div>
   </div>
   <div class="row mb-1">
     <button id="boardID" class="btn btn-primary btn-block" onclick="toggleBoard()">...</button>
   </div>
-  <div id="workarea" class="row" style="height:400px">
+  <div class="card">
+    <div class = "card-body">
+      <div id="workarea" style="height:400px"></div>
+    </div>
   </div>
   <div class="col-3 mb-1">
     <button id="videoStatus" type="button" class="btn btn-block btn-secondary" onclick="action('toggleCamera')"><i data-feather="video-off"></i></button>

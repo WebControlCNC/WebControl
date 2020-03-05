@@ -223,20 +223,13 @@
 
   <div class="row mb-3">
     <div class="col mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="setSprocketsZero()">Define Zero</button>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <div class="col mb-1">
-      <button disabled type="button" id="leftChainDefault" class="btn btn-lg btn-secondary btn-block" onclick="action('adjustChain','left')">Extend Left To {{chainExtendLength}} mm</button>
-    </div>
-    <div class="col mb-1">
-      <button disabled type="button" id="rightChainDefault" class="btn btn-lg btn-secondary btn-block" onclick="action('adjustChain', 'right')">Extend Right To {{chainExtendLength}} mm</button>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <div class="col mb-1">
       <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault');$('#contentModal').modal('hide');">I Have Manually Reset Both Chains with Marked Link on Vertical Tooth</button>
     </div>
   </div>
 </div>
