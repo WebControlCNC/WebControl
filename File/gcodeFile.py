@@ -437,13 +437,9 @@ class GCodeFile(MakesmithInitFuncs):
                     e = re.search(".*e-", q)
 
                     if e:
-                        fmtX = (
-                            "%0%.%sf" % eNtnX
-                        )  # if e-notation, use the exponent from the e notation
+                        fmtX = "%0.{0}f".format(eNtnX)
                     else:
-                        fmtX = "%0%.%sf" % len(
-                            eNtnX
-                        )  # use the number of digits after the decimal place
+                        fmtX = "%0.{0}f".format(len(eNtnX))
                     gCodeLine = (
                         gCodeLine[0 : x.start() + 1]
                         + (fmtX % (float(x.groups()[0]) + shiftX))
@@ -463,9 +459,9 @@ class GCodeFile(MakesmithInitFuncs):
                     e = re.search(".*e-", q )
 
                     if e:
-                        fmtY = "%0%.%sf" % eNtnY
+                        fmtY = "%0.{0}f".format(eNtnY)
                     else:
-                        fmtY = "%0%.%sf" % len(eNtnY)
+                        fmtY = "%0.{0}f".format(len(eNtnY))
                     gCodeLine = (
                         gCodeLine[0 : y.start() + 1]
                         + (fmtY % (float(y.groups()[0]) + shiftY))

@@ -19,17 +19,30 @@ var imageShowing = 1
 var gcode = new THREE.Group();
 //var cutTrailGroup = new THREE.Group();
 
-var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
-//var camera = new THREE.OrthographicCamera(w/-2, w/2, h/2, h/-2, 1, 500);
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.screenSpacePanning = true;
+var cameraPerspective = 1; // 0 = Orthographic, 1 = Perspective
+var scale = .07
+var cameraO;
+var cameraP;
 
-camera.position.set(0, 0, 100);
-camera.lookAt(0,0,0);
+var cameraO = new THREE.OrthographicCamera(w/-2*scale, w/2*scale, h/2*scale, h/-2*scale, 1, 100*500/380);
+cameraO.position.set(0, 0, 100); //380
+cameraO.lookAt(0,0,0);
+var cameraP = new THREE.PerspectiveCamera(45, w/h, 1, 500);
+cameraP.position.set(0, 0, 100);
+cameraP.lookAt(0,0,0);
+
+
+//setCameraPerspective(true); // true indicates initial setting
+var controlsO = new THREE.OrbitControls(cameraO, renderer.domElement);
+var controlsP = new THREE.OrbitControls(cameraP, renderer.domElement);
+controlsO.screenSpacePanning = true;
+controlsP.screenSpacePanning = true;
+
 var view3D = true;
 toggle3DView(); // makes it not true and applies appropriate settings
 //controls.update();
-controls.saveState();
+controlsO.saveState();
+controlsP.saveState();
 
 var scene = new THREE.Scene();
 scene.background= new THREE.Color(0xeeeeee);
@@ -228,8 +241,10 @@ window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    cameraO.aspect = window.innerWidth / window.innerHeight;
+    cameraO.updateProjectionMatrix();
+    cameraP.aspect = window.innerWidth / window.innerHeight;
+    cameraP.updateProjectionMatrix();
 
     renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -238,8 +253,12 @@ function onWindowResize(){
 
 function animate() {
     requestAnimationFrame(animate);
-    controls.update();
-    renderer.render( scene, camera );
+    controlsO.update();
+    controlsP.update();
+    if (cameraPerspective == 0)
+        renderer.render( scene, cameraO );
+    else
+        renderer.render( scene, cameraP );
 }
 
 function positionUpdate(x,y,z){
@@ -402,16 +421,24 @@ function showFPSpinner(msg){
     $("#fpCircle").show();
 }
 
+
 function toggle3DView()
 {
     console.log("toggling");
     if (view3D){
-        controls.enableRotate = false;
-        controls.mouseButtons = {
+        controlsO.enableRotate = false;
+        controlsO.mouseButtons = {
             LEFT: THREE.MOUSE.RIGHT,
             MIDDLE: THREE.MOUSE.MIDDLE,
             RIGHT: THREE.MOUSE.LEFT
         }
+        controlsP.enableRotate = false;
+        controlsP.mouseButtons = {
+            LEFT: THREE.MOUSE.RIGHT,
+            MIDDLE: THREE.MOUSE.MIDDLE,
+            RIGHT: THREE.MOUSE.LEFT
+        }
+
         view3D=false;
         if (isMobile)
         {
@@ -423,12 +450,19 @@ function toggle3DView()
         }
         console.log("toggled off");
     } else {
-        controls.enableRotate = true;
-        controls.mouseButtons = {
+        controlsO.enableRotate = true;
+        controlsO.mouseButtons = {
             LEFT: THREE.MOUSE.RIGHT,
             MIDDLE: THREE.MOUSE.MIDDLE,
             RIGHT: THREE.MOUSE.LEFT
         }
+        controlsP.enableRotate = true;
+        controlsP.mouseButtons = {
+            LEFT: THREE.MOUSE.RIGHT,
+            MIDDLE: THREE.MOUSE.MIDDLE,
+            RIGHT: THREE.MOUSE.LEFT
+        }
+
         view3D=true;
         if (isMobile)
         {
@@ -440,11 +474,13 @@ function toggle3DView()
         }
         console.log("toggled on");
     }
-    controls.update();
+    controlsO.update();
+    controlsP.update();
 }
 
 function resetView(){
-    controls.reset();
+    controlsO.reset();
+    controlsP.reset();
 }
 
 function cursorPosition(){
@@ -456,13 +492,20 @@ function cursorPosition(){
         - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
         0.5 );
 
-    vec.unproject( camera );
-
-    vec.sub( camera.position ).normalize();
-
-    var distance = - camera.position.z / vec.z;
-
-    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    if (cameraPerspective == 0)
+    {
+        vec.unproject( cameraO );
+        vec.sub( cameraO.position ).normalize();
+        var distance = - cameraO.position.z / vec.z;
+        pos.copy( cameraO.position ).add( vec.multiplyScalar( distance ) );
+    }
+    else
+    {
+        vec.unproject( cameraP );
+        vec.sub( cameraP.position ).normalize();
+        var distance = - cameraP.position.z / vec.z;
+        pos.copy( cameraP.position ).add( vec.multiplyScalar( distance ) );
+    }
     //console.log(pos);
     return(pos);
 }
@@ -642,4 +685,17 @@ function toggleBoard(){
         $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
     }
 }
+
+function toggle3DPO(){
+    cameraPerspective = !cameraPerspective;
+    if (cameraPerspective == 0){
+        $("#buttonPO").text("Ortho");
+        renderer.render(scene, cameraO)
+    }
+    else {
+        $("#buttonPO").text("Persp");
+        renderer.render(scene, camera1)
+    }
+}
+
 
