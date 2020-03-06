@@ -118,8 +118,8 @@ class Data:
     gcode_x_max = -2000
     gcode_y_min = 1000
     gcode_y_max = -1000
-    gcode_z_min = 10
-    gcode_z_max = -10
+    gcode_z_min = 20
+    gcode_z_max = -20
     moveDistance = 10 # CHECK UNITS!!
     
     """

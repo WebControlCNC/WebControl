@@ -85,7 +85,13 @@ class GCodeFile(MakesmithInitFuncs):
             self.canvasScaleFactor = self.MILLIMETERS
         else:
             self.canvasScaleFactor = self.INCHES
-
+        if (self.data.clidisplay):
+            self.data.gcode_x_min = 2000
+            self.data.gcode_x_max = -2000
+            self.data.gcode_y_min = 1000
+            self.data.gcode_y_max = -1000
+            self.data.gcode_z_min = 20
+            self.data.gcode_z_max = -20
         if gcode == "":
             filename = self.data.gcodeFile.filename
             self.data.gcodeShift[0] = round(float(self.data.config.getValue("Advanced Settings", "homeX")),4)
@@ -199,7 +205,16 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.gcode_y_min = y
         if (y > self.data.gcode_y_max):
             self.data.gcode_y_max = y
-        
+    
+    def displayZ(self,z):
+        '''
+        check min and max z values
+        '''
+        if (z < self.data.gcode_z_min):
+            self.data.gcode_z_min = z
+        if (z > self.data.gcode_z_max):
+            self.data.gcode_z_max = z
+            
     def isClose(self, a, b):
         return abs(a - b) <= self.data.tolerance
 
@@ -262,7 +277,8 @@ class GCodeFile(MakesmithInitFuncs):
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
-
+                if (self.data.clidisplay):
+                    self.displayZ(zTarget)
             if self.isNotReallyClose(self.xPosition, xTarget) or self.isNotReallyClose(
                 self.yPosition, yTarget
             ):
@@ -346,7 +362,9 @@ class GCodeFile(MakesmithInitFuncs):
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
-
+                if (self.data.clidisplay):
+                    self.displayZ(zTarget)
+                    
             radius = math.sqrt(iTarget ** 2 + jTarget ** 2)
             centerX = self.xPosition + iTarget
             centerY = self.yPosition + jTarget
@@ -421,9 +439,6 @@ class GCodeFile(MakesmithInitFuncs):
         self.data.gcode = []
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
-
-
-
 
     def moveLine(self, gCodeLine):
 
