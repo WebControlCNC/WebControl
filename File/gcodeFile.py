@@ -146,18 +146,6 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
-            '''
-            get max and min drawing locations, then offset from defined home position
-            xmin = []
-            if (self.data.gcodeShift[0] < self.data.gcode_x_min):
-                self.data.gcode_x_min = self.data.gcodeShift[0]
-            if (self.data.gcodeShift[0] > self.data.gcode_x_max):
-                self.data.gcode_x_max = self.data.gcodeShift[0]
-            if (self.data.gcodeShift[0] < self.data.gcode_y_min):
-                self.data.gcode_y_min = self.data.gcodeShift[1]
-            if (self.data.gcodeShift[0] > self.data.gcode_y_max):
-                self.data.gcode_y_max = self.data.gcodeShift[1]
-            '''
 
 
             # Find gcode indicies of z moves
@@ -194,6 +182,24 @@ class GCodeFile(MakesmithInitFuncs):
         self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
         return True
 
+    def displayX(self,x):
+        '''
+        get max and min X then offset from defined home position
+        '''
+        if (x < self.data.gcode_x_min):
+            self.data.gcode_x_min = x
+        if (x > self.data.gcode_x_max):
+            self.data.gcode_x_max = x
+        
+    def displayY(self,y):
+        '''
+        check min and max Y values against each Y point for line draw or arc draw
+        '''
+        if (y < self.data.gcode_y_min):
+            self.data.gcode_y_min = y
+        if (y > self.data.gcode_y_max):
+            self.data.gcode_y_max = y
+        
     def isClose(self, a, b):
         return abs(a - b) <= self.data.tolerance
 
@@ -242,12 +248,17 @@ class GCodeFile(MakesmithInitFuncs):
                 xTarget = float(x.groups()[0]) * self.canvasScaleFactor
                 if self.absoluteFlag == 1:
                     xTarget = self.xPosition + xTarget
+                if (self.data.clidisplay):
+                    self.displayX(xTarget)
 
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
                 yTarget = float(y.groups()[0]) * self.canvasScaleFactor
                 if self.absoluteFlag == 1:
                     yTarget = self.yPosition + yTarget
+                if (self.data.clidisplay):
+                    self.displayY(yTarget)
+                
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
@@ -315,15 +326,23 @@ class GCodeFile(MakesmithInitFuncs):
             x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if x:
                 xTarget = float(x.groups()[0]) * self.canvasScaleFactor
+                if (self.data.clidisplay):
+                    self.checkX(xTarget)
+                
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
                 yTarget = float(y.groups()[0]) * self.canvasScaleFactor
+                if (self.data.clidisplay):
+                    self.checkY(yTarget)
+                
             i = re.search("I(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if i:
                 iTarget = float(i.groups()[0]) * self.canvasScaleFactor
+                
             j = re.search("J(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if j:
                 jTarget = float(j.groups()[0]) * self.canvasScaleFactor
+                
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor

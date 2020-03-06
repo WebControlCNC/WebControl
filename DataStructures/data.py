@@ -108,7 +108,7 @@ class Data:
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
     GPIOButtonService = False
-    clidisplay = False
+    clidisplay = False # if you have a local RPI display
     wiiPendantPresent = False # has user set wiimote as active?
     wiiPendantConnected = False # is the wiimote BT connected?
     sledMoving = False # for LED light status
