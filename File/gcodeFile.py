@@ -78,6 +78,7 @@ class GCodeFile(MakesmithInitFuncs):
 
 
     def loadUpdateFile(self, gcode=""):
+        print("At loadUpdateFile")
         gcodeLoad = False
         if gcode=="":
             gcodeLoad = True
@@ -117,6 +118,7 @@ class GCodeFile(MakesmithInitFuncs):
                 r";([^\n]*)\n", "\n", filtersparsed
             )  # replace standard ; initiated gcode comments with newline
             '''
+            print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
                 r"([0-9])([GXYZIJFTM]) *", "\\1 \\2", filtersparsed
