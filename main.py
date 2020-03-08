@@ -29,18 +29,19 @@ from WebPageProcessor.webPageProcessor import WebPageProcessor
 
 from os import listdir
 from os.path import isfile, join
-
+import sys
 
 app.data = Data()
 app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
 app.data.config.computeSettings(None, None, None, True)
 app.data.config.parseFirmwareVersions()
+version = sys.version_info # this is for python newer than 3.5
 if version[:2] > (3, 5):
-    app.data.pythonVersion35 = False
+    app.data.pythonVersion35 = False  # set data flag
     print("Using routines for Python > 3.5")
 else:
-    app.data.pythonVersion35 = True
+    app.data.pythonVersion35 = True # set data flag
     print("Using routines for Python == 3.5")
 app.data.units = app.data.config.getValue("Computed Settings", "units")
 app.data.tolerance = app.data.config.getValue("Computed Settings", "tolerance")
@@ -104,8 +105,12 @@ def index(template):
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
 
 @app.route('/GPIO', methods=['PUT', 'GET'])
-# GPIO route is for the button process to input button press information to the queue
 def remote_function_call():
+    '''
+    MaslowButton.py starts as a separate python process if the maslow setting flag is true
+    The GPIO is for raspberry pi general purpoe input/output such as button and LED hardware physically attached to the raspberry pi
+    When those buttons are pressed, the seaparate process issues an HTTP/PUT request and this method handles it.  The /LED section below sends information for LEDs
+    ''' 
     if (request.method == "PUT"):
         print ("button function call")
         message = {"data":{"gpio":"selected"}}
@@ -152,11 +157,15 @@ def remote_function_call():
         return (jsonify(setValues))
         
 @app.route('/LED', methods=['PUT','GET'])
-#This is the LED method responds to requests from the button process (every 5 seconds or so) that gets the system state so the LED can be updated in the button service.
-#The data consists of the gcode index, the gcode upload flag (upload to the arduino) which indicates it is running or paused or stopped
-#The moving flag is for sled moves without "running" gcode
-#The 
 def getLEDinfo():
+    '''
+    The MaslowButton.py has provisions for an on-system display.  
+    This is the LED method responds MaslowButton.py requests via HTTP/GET
+    and processses the repeated inquiry every 2-5 seconds.
+    Upload flag signifies system state as running, paused, or stopped,
+    Moving flag indicates a stopped cut condition, but the sled is moving
+    zmove is the z axis moving    
+    ''' 
     if (request.method == 'GET'):
         try:
             message = {"data":{"index": str(app.data.gcodeIndex), \
@@ -184,10 +193,14 @@ def getLEDinfo():
             resp.status_code = 404 # or whatever the correct number should be
             return (resp)
     
-@app.route('/pendant', methods=['PUT', 'GET']) # this takes data from a wii control pendant via local onboard bluetooth, though it could be from any web device.
-# all calls to this app route from the pendant are routed through localhost:5000 using requests library and either PUT or GET
-# sending json dict types did not work, so plain text is parsed by splitting a sent command of  r = requests.put("http://localhost:5000/pendant", "move:up:distance") 
+@app.route('/pendant', methods=['PUT', 'GET']) 
 def WiiMoteInput():
+    '''
+    This is for the raspberry pi
+    The MaslowButton.py runs as a separate MaslowPendant.py process
+    that interacts with this function via HTTP/PUT
+    and this routine interprets those commands from the wii to move Maslow
+    '''
     print ("pendant function call")
     result = request.data  #pull off the data parameters
     #print (result)
