@@ -288,6 +288,47 @@ class GCodeFile(MakesmithInitFuncs):
             self.yPosition = yTarget
             self.zPosition = zTarget
 
+    def drawMCommand(self, mString):
+        """
+
+        drawToolChange draws a circle indicating a tool change.
+
+        """
+        code = mString[1:2] #just the number?
+        circleSize = 0
+        print(code)
+        if code == "3":
+            speed = self.getSpindleSpeed(mString)
+            if speed == 0:
+                circleSize = 5
+            else:
+                circleSize = 3
+        if code == "4":
+            speed = self.getSpindleSpeed(mString)
+            if speed == 0:
+                circleSize = 5
+            else:
+                circleSize = 4
+        if (code == "5"): # Spindle Stop
+            circleSize = 5
+        if (code == "6"):  # Tool Change
+            circleSize = 6
+
+
+        self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
+        self.line3D[-1].type = "circle"
+        self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
+        self.addPoint3D(circleSize, 0, self.zPosition)
+        self.line3D[-1].dashed = False
+
+    def getSpindleSpeed(self, mString):
+        code = mString[mString.find("S")+1:]
+        if code!="":
+            return float(code)
+        else:
+            return 0
+
+
     def drawArc(self, gCodeLine, command):
         """
 
@@ -579,6 +620,15 @@ class GCodeFile(MakesmithInitFuncs):
 
         if gString == "G91":
             self.absoluteFlag = 1
+
+        tString = fullString[fullString.find("T") : fullString.find("T") + 2]
+        if tString.find("T") != -1:
+            self.currentDrawTool = tString[1:]
+
+        mString = fullString[fullString.find("M") : ]
+        if mString.find("M") != -1:
+            self.drawMCommand(mString)
+
 
     def callBackMechanism(self):
         """

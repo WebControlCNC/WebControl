@@ -19,6 +19,7 @@ container.appendChild(renderer.domElement);
 var imageShowing = 1
 
 var gcode = new THREE.Group();
+var textLabels = new THREE.Group();
 //var cutTrailGroup = new THREE.Group();
 
 var cameraPerspective = 0; // 0 = Orthographic, 1 = Perspective
@@ -365,6 +366,11 @@ function gcodeUpdateCompressed(data){
         gcode.remove(gcode.children[i]);
     }
   }
+  if (textLabels.children.length!=0) {
+    for (var i = textLabels.children.length -1; i>=0; i--){
+        textLabels.remove(textLabels.children[i]);
+    }
+  }
 
   var gcodeLineSegments = new THREE.Geometry();
   var gcodeDashedLineSegments = new THREE.Geometry();
@@ -397,12 +403,73 @@ function gcodeUpdateCompressed(data){
           gcode.add(gcodeUndashed);
 
         }
-      } else {
-        var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
-        var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
-        var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,greenLineMaterial);
-        gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
-        gcode.add(gcodeCircle);
+      }
+      else
+      {
+        if ( (line.points[1][0]>=3) && (line.points[1][0]<=5) )
+        {
+            //spindle
+            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
+            var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+            var circleMaterial = redLineMaterial;
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+            gcode.add(gcodeCircle);
+            var gcodeLineSegments = new THREE.Geometry();
+            var xFactor = 3.25;
+            var yFactor = 3.25;
+            if (line.points[1][0]==5)
+            {
+                xFactor = .707107*2.25;
+                yFactor = .707107*2.25;
+            }
+            if (line.points[1][0]==4)
+            {
+                xFactor = 3.25;
+                yFactor = 3.25;
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+            }
+            else
+            {
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+            }
+            gcodeUndashed = new THREE.Line(gcodeLineSegments, redLineMaterial)
+            gcode.add(gcodeUndashed);
+            text = new SpriteText('S',.1, 'red');
+            text.position.x = line.points[0][0];
+            text.position.y = line.points[0][1];
+            text.position.z = line.points[0][2];
+            textLabels.add(text);
+        }
+        else
+        {
+            var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
+            var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+            var circleMaterial = greenLineMaterial;
+            if (line.points[1][0]==6) // Tool Change
+            {
+                circleMaterial = redLineMaterial;
+                text = new SpriteText('T',.1, 'red');
+                text.position.x = line.points[0][0];
+                text.position.y = line.points[0][1];
+                text.position.z = line.points[0][2];
+                textLabels.add(text);
+            }
+
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+            gcode.add(gcodeCircle);
+        }
 
         var gcodeLineSegments = new THREE.Geometry();
         gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
@@ -410,13 +477,14 @@ function gcodeUpdateCompressed(data){
         gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
         gcode.add(gcodeUndashed);
 
-
       }
     });
     scene.add(gcode);
+    scene.add(textLabels);
   }
   else{
     scene.remove(gcode);
+    scene.remove(textLabels);
   }
   $("#fpCircle").hide();
 
@@ -713,6 +781,4 @@ function toggle3DPO(){
         renderer.render(scene, cameraP)
     }
 }
-
-
 
