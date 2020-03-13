@@ -4,7 +4,8 @@
 //setInterval(function(){ alert("Hello"); }, 3000);
 
 var cutSquareGroup = new THREE.Group();
-var showBoard = true;
+var showBoard = false;
+var showLabels = false;
 var homeX = 0;
 var homeY = 0;
 
@@ -225,10 +226,11 @@ boardGroup.add(boardOutlineOutline);
 
 boardGroup.position.set(0,0,-0.75/2);
 
-scene.add(cutSquareGroup);
-scene.add(boardGroup);
-
-
+if (showBoard)
+{
+    scene.add(cutSquareGroup);
+    scene.add(boardGroup);
+}
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
@@ -406,7 +408,7 @@ function gcodeUpdateCompressed(data){
       }
       else
       {
-        if ( (line.points[1][0]>=3) && (line.points[1][0]<=5) )
+        if ( (line.command == "SpindleOnCW") || (line.command=="SpindlenOnCCW") || (line.command=="SpindleOff") ) //(line.points[1][0]>=3) && (line.points[1][0]<=5) )
         {
             //spindle
             var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
@@ -418,12 +420,12 @@ function gcodeUpdateCompressed(data){
             var gcodeLineSegments = new THREE.Geometry();
             var xFactor = 3.25;
             var yFactor = 3.25;
-            if (line.points[1][0]==5)
+            if (line.command == "SpindleOff") //(line.points[1][0]==5)
             {
                 xFactor = .707107*2.25;
                 yFactor = .707107*2.25;
             }
-            if (line.points[1][0]==4)
+            if (line.command == "SpindleOnCCW") // (line.points[1][0]==4)
             {
                 xFactor = 3.25;
                 yFactor = 3.25;
@@ -445,27 +447,31 @@ function gcodeUpdateCompressed(data){
             }
             gcodeUndashed = new THREE.Line(gcodeLineSegments, redLineMaterial)
             gcode.add(gcodeUndashed);
-            text = new SpriteText('S',.1, 'red');
+            text = new SpriteText('S'+line.points[1][1].toString(),.1, 'red');
             text.position.x = line.points[0][0];
             text.position.y = line.points[0][1];
             text.position.z = line.points[0][2];
             textLabels.add(text);
+        }
+        else if (line.command == "ToolChange")
+        {
+            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
+            var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+            circleMaterial = redLineMaterial;
+            text = new SpriteText('T'+line.points[1][1].toString(),.1, 'red');
+            text.position.x = line.points[0][0];
+            text.position.y = line.points[0][1];
+            text.position.z = line.points[0][2];
+            textLabels.add(text);
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+            gcode.add(gcodeCircle);
         }
         else
         {
             var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
             var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
             var circleMaterial = greenLineMaterial;
-            if (line.points[1][0]==6) // Tool Change
-            {
-                circleMaterial = redLineMaterial;
-                text = new SpriteText('T',.1, 'red');
-                text.position.x = line.points[0][0];
-                text.position.y = line.points[0][1];
-                text.position.z = line.points[0][2];
-                textLabels.add(text);
-            }
-
             var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
             gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
             gcode.add(gcodeCircle);
@@ -480,7 +486,8 @@ function gcodeUpdateCompressed(data){
       }
     });
     scene.add(gcode);
-    scene.add(textLabels);
+    if (showLabels)
+        scene.add(textLabels);
   }
   else{
     scene.remove(gcode);
@@ -488,6 +495,21 @@ function gcodeUpdateCompressed(data){
   }
   $("#fpCircle").hide();
 
+}
+
+function toggleLabels()
+{
+    if (showLabels)
+    {
+        scene.remove(textLabels);
+        $("#labelsID").removeClass('btn-primary').addClass('btn-secondary');
+    }
+    else
+    {
+        scene.add(textLabels);
+        $("#labelsID").removeClass('btn-secondary').addClass('btn-primary');
+    }
+    showLabels = !showLabels;
 }
 
 function ab2str(buf) {
