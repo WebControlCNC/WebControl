@@ -265,17 +265,6 @@ function action() {
   socket.emit('action', msg);
 }
 
-function move(direction){
-  distToMove = $("#distToMove").val();
-  console.log(distToMove)
-  socket.emit('move',{data:{direction:direction,distToMove:distToMove}});
-}
-
-function moveZ(direction){
-  distToMoveZ = $("#distToMoveZ").val();
-  console.log(distToMoveZ)
-  socket.emit('moveZ',{data:{direction:direction,distToMoveZ:distToMoveZ}});
-}
 
 function settingRequest(section,setting){
   console.log("requesting..")
