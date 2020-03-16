@@ -155,6 +155,7 @@ class Logger(MakesmithInitFuncs):
         """
         Delete log files
         """
+        #TODO: This is wrong and executes file check on <home>/.WebControl/log.txt 1000 times for no reason without using x.
         success1 = False
         for x in range(0, 1000):
             try:
@@ -163,7 +164,7 @@ class Logger(MakesmithInitFuncs):
                 break
             except:
                 success1 = False
-
+        #TODO: Again x is not used and wastes 1000 opertaions.
         success2 = False
         for x in range(0, 1000):
             try:
