@@ -2264,15 +2264,11 @@ class Actions(MakesmithInitFuncs):
 
     def backupWebControl(self):
         try:
-            timestr = time.strftime("%Y%m%d-%H%M%S")
+            timestr = time.strftime("%Y-%m-%d_%H-%M-%S")
             home = self.data.config.getHome()
             filename = home + "/wc_backup_" + timestr + ".zip"
-            print(filename)
             folder = self.data.config.home + "/.WebControl"
-            print(folder)
             self.zipfolder(filename, folder)
-            # self.addDirToZip(zipObj, self.data.config.home+'/.Webcontrol')
-            # zipObj.close()
             return filename
         except Exception as e:
             self._logException(e, "Error with backing up webcontrol config.")
