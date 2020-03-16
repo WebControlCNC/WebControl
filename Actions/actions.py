@@ -266,9 +266,9 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Action", "gcodeUpdate", "")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting home to center")
-            elif msg["data"]["command"] == "optimizeGCode":
-                if not self.data.gcodeOptimizer.optimize():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with optimizing gcode")
+            #elif msg["data"]["command"] == "optimizeGCode":
+            #    if not self.data.gcodeOptimizer.optimize():
+            #        self.data.ui_queue1.put("Alert", "Alert", "Error with optimizing gcode")
             else:
                 response = "Function not currently implemented.. Sorry."
                 response = response + "["+msg["data"]["command"]+"]"
