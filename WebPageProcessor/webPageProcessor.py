@@ -231,8 +231,8 @@ class WebPageProcessor:
             return page, "Import groundcontrol.ini", False, "medium", "content", False
         elif pageID == "importWCJSON":
             url = "importFileWCJSON"
-            page = render_template("importFile.html", url=url)
-            return page, "Import webcontrol.json", False, "medium", "content", False
+            page = render_template("importFile.html", url=url, mimetypes=".json")
+            return page, "Import WebControl.json", False, "medium", "content", False
         elif pageID == "restoreWebControl":
             url = "importRestoreWebControl"
             page = render_template("importFile.html", url=url, mimetypes=".zip")
