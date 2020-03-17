@@ -655,7 +655,7 @@ class Actions(MakesmithInitFuncs):
             if revertToInches:
                 self.data.gcode_queue.put("G20")
             # don't think this line is needed
-            # todo: remove if not needed.
+            # TODO: remove if not needed.
             self.data.measureRequest = self.defineZ0()
             return True
         except Exception as e:
@@ -682,7 +682,7 @@ class Actions(MakesmithInitFuncs):
             # if front page button has been pressed or serialPortThread is going to send gcode with a G21 or G20..
             if setting == "toInches" or setting == "toMM":
                 # this shouldn't be reached any more after I reordered the processActions function
-                # todo: remove this if if not needed.
+                # TODO: remove this if if not needed.
                 if self.data.uploadFlag == 1 and fromGcode == False:
                     self.data.ui_queue1.put(
                         "Alert", "Alert", "Cannot change units while sending gcode."
@@ -774,7 +774,7 @@ class Actions(MakesmithInitFuncs):
                 self.sendGCodePositionUpdate(recalculate=True)
             elif setting == "toInchesZ":
                 # this shouldn't be reached any more after I reordered the processActions function
-                # todo: remove this if if not needed.
+                # TODO: remove this if if not needed.
                 if self.data.uploadFlag == 1:
                     self.data.ui_queue1.put(
                         "Alert", "Alert", "Cannot change units while sending gcode."
@@ -789,7 +789,7 @@ class Actions(MakesmithInitFuncs):
 
             elif setting == "toMMZ":
                 # this shouldn't be reached any more after I reordered the processActions function
-                # todo: remove this if if not needed.
+                # TODO: remove this if if not needed.
                 if self.data.uploadFlag == 1:
                     self.data.ui_queue1.put(
                         "Alert", "Alert", "Cannot change units while sending gcode."
@@ -981,7 +981,7 @@ class Actions(MakesmithInitFuncs):
     def acceptTriangularKinematicsResults(self):
         """
         Calls function to accept the results of the triangular calibration.
-        Todo: call directly from processActions.
+        TODO: call directly from processActions.
         :return:
         """
         try:
@@ -1117,7 +1117,7 @@ class Actions(MakesmithInitFuncs):
     def testImage(self):
         """
         Calls function to send the test image from optical calibration
-        Todo: move to processAction
+        TODO: move to processAction
         :return:
         """
         try:
@@ -1326,7 +1326,7 @@ class Actions(MakesmithInitFuncs):
                 # works if there is only only valid hex file in the directory
                 for filename in glob.glob(path):
                     port = self.data.comport
-                    # this was commented out below. probably not needed.  Todo: cleanup
+                    # this was commented out below. probably not needed.  TODO: cleanup
                     # if home != "":
                     #    cmd = "\"C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\avrdude\" -Cavr/avrdude.conf -v -patmega2560 -cwiring -P" + port + " -b115200 -D -Uflash:w:" + filename + ":i"
                     # else:
@@ -1912,7 +1912,7 @@ class Actions(MakesmithInitFuncs):
     def cameraStatus(self):
         """
         Sends the status of the camera to the UI client.  Not sure why its not called requestCameraStatus
-        Todo: update name to request cameraStatus
+        TODO: update name to request cameraStatus
         :return:
         """
         try:
@@ -1931,7 +1931,7 @@ class Actions(MakesmithInitFuncs):
     def queryCamera(self):
         """
         Query the camera's settings.  Probably could be called directly by processAction
-        Todo: move to processAction
+        TODO: move to processAction
         :return:
         """
         try:
@@ -1944,7 +1944,7 @@ class Actions(MakesmithInitFuncs):
     def velocityPIDTest(self, parameters):
         """
         Send commands to start the veloctiy pid test
-        Todo: further explain this
+        TODO: further explain this
         :param parameters:
         :return:
         """
@@ -1977,7 +1977,7 @@ class Actions(MakesmithInitFuncs):
     def executePositionPIDTest(self, parameters):
         """
         Send commands to start the position pid test
-        Todo: further explain this
+        TODO: further explain this
         :param parameters:
         :return:
         """
