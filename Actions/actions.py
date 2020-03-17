@@ -1109,10 +1109,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def macro1(self):
-            return self.macro(self, 1)
+        return self.macro(1)
 
     def macro2(self):
-            return self.macro(self, 2)
+        return self.macro(2)
 
     def testImage(self):
         """
