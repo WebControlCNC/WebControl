@@ -52,7 +52,7 @@ class Actions(MakesmithInitFuncs):
                 return False
 
         except Exception as e:
-            self._logException(e, "Error processing action.")
+            self._logException(e, "Error processing action [" + str(msg['command']) + "]: " + str(e))
 
     def shutdown(self):
         """
@@ -215,7 +215,7 @@ class Actions(MakesmithInitFuncs):
             return True
         except Exception as e:
             # Something goes wrong, stop uploading.
-            self._logException(e, "Error starting run.")
+            self._logException(e, "Error starting run: " + str(e))
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             return False
