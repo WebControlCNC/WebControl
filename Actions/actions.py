@@ -1381,7 +1381,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue1.put("Action", "updateDirectories", data)
             return True
         except Exception as e:
-            self._logException(e, "Error with creating directory.")
+            self._logException(e, "Error creating directory: " + directory)
             return False
 
     def acceptTriangularCalibrationResults(self):
