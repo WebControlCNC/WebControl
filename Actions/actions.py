@@ -332,6 +332,30 @@ class Actions(MakesmithInitFuncs):
             self._logException(e, "Error with wiping eeprom.")
             return False
 
+    def pauseRun(self):
+        '''
+        Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
+        :return:
+        '''
+        try:
+            if self.data.uploadFlag == 1:
+                self.data.uploadFlag = 2
+                self.data.console_queue.put("Run Paused")
+                self.data.ui_queue1.put("Action", "setAsResume", "")
+                # The idea was to be able to make sure the machine returns to
+                # the correct z-height after a pause in the event the user raised/lowered the bit.
+                #self.data.pausedzval = self.data.zval
+                #self.data.pausedUnits = self.data.units
+                self.data.pausedzval = self.data.currentZTarget
+                self.data.pausedUnits = self.data.units
+                self.data.pausedPositioningMode = self.data.positioningMode
+                #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
+                self.data.gpioActions.causeAction("PauseLED", "on")
+            return True
+        except Exception as e:
+            self._logException(e, "Error with pause Run.")
+            return False
+
     def optical_onStart(self):
         try:
             return self.data.opticalCalibration.on_Start()
