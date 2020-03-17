@@ -333,10 +333,10 @@ class Actions(MakesmithInitFuncs):
             return False
 
     def pauseRun(self):
-        '''
+        """
         Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
         :return:
-        '''
+        """
         try:
             if self.data.uploadFlag == 1:
                 self.data.uploadFlag = 2
@@ -344,12 +344,12 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "setAsResume", "")
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
-                #self.data.pausedzval = self.data.zval
-                #self.data.pausedUnits = self.data.units
+                # self.data.pausedzval = self.data.zval
+                # self.data.pausedUnits = self.data.units
                 self.data.pausedzval = self.data.currentZTarget
                 self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
-                #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
+                # print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
                 self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
