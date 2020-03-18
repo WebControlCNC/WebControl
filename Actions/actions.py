@@ -41,7 +41,7 @@ class Actions(MakesmithInitFuncs):
             command = getattr(self, msg['command'], None);
             args = msg.get("args", []);
             if command is not None:
-                if self.data.uploadFlag == 1 and command not in self._safe_commands:
+                if self.data.uploadFlag == 1 and msg['command'] not in self._safe_commands:
                     self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
                     return False
                 return command(*args)
