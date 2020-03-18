@@ -1,0 +1,31 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+    <ul class="list-group">
+      {% for release in releases %}
+      <li class="list-group-item">
+        <div class="row">
+            <p>{{release.tag_name}}</p>
+        </div>
+        <div class="row">
+            <h4>{{release.title}}</h4>
+            <p>{{release.body|markdown}}</p>
+        </div>
+        <div class="row">
+            {% if release.tag_name == currentRelease %}
+                <button type="button" class="btn btn-block btn-secondary disabled ">Current</button>
+            {% elif release.tag_name == latestRelease.tag_name %}
+                <button type="submit" class="btn btn-block btn-primary" onclick="action('update','{{release.tag_name}}');$('#contentModal').modal('hide');">Update</button>
+            {% else %}
+                <button type="submit" class="btn btn-block btn-secondary" onclick="action('update','{{release.tag_name}}');$('#contentModal').modal('hide');">Update</button>
+            {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<!--<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>-->
+{% endblock %}

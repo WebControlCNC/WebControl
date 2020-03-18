@@ -370,6 +370,12 @@ class Actions(MakesmithInitFuncs):
             self._logException(e, "Error with starting optical calibration.")
             return False
 
+    def optimizeGCode(self):
+        try:
+            return self.data.gcodeOptimizer.optimize()
+        except Exception as e:
+            self._logException(e, "Error with optimizing gcode.")
+
     def resumeRun(self):
         """
         Resumes sending the gcode.  If a tool change command was received, then the manualZAxisAdjust is enabled and

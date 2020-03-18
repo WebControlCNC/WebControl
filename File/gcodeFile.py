@@ -15,6 +15,8 @@ class Line:
         self.color = None
         self.dashed = False
         self.type = None
+        self.radius = None
+        self.command = None
 
 
 class GCodeFile(MakesmithInitFuncs):
@@ -78,6 +80,7 @@ class GCodeFile(MakesmithInitFuncs):
 
 
     def loadUpdateFile(self, gcode=""):
+        print("At loadUpdateFile")
         gcodeLoad = False
         if gcode=="":
             gcodeLoad = True
@@ -117,6 +120,7 @@ class GCodeFile(MakesmithInitFuncs):
                 r";([^\n]*)\n", "\n", filtersparsed
             )  # replace standard ; initiated gcode comments with newline
             '''
+            #print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
                 r"([0-9])([GXYZIJFTM]) *", "\\1 \\2", filtersparsed
@@ -251,6 +255,7 @@ class GCodeFile(MakesmithInitFuncs):
 
                     self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line3D[-1].type = "line"
+                    self.line3D[-1].command = None
                     self.line3D[-1].dashed = True
                     self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                     self.addPoint3D(xTarget, yTarget, zTarget)
@@ -259,6 +264,7 @@ class GCodeFile(MakesmithInitFuncs):
                     if (len(self.line3D) == 0 or self.line3D[-1].dashed or self.line3D[-1].type != "line"):  #test123
                         self.line3D.append( Line() )
                         self.line3D[-1].type = "line"
+                        self.line3D[-1].command = None
                         self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                         self.line3D[-1].dashed = False
 
@@ -278,13 +284,71 @@ class GCodeFile(MakesmithInitFuncs):
 
                     self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line3D[-1].type = "circle"
+                    self.line3D[-1].command = None
                     self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
-                    self.addPoint3D(radius, 0, zTarget)
+                    self.addPoint3D(radius, 0, zTarget)  #targetOut
                     self.line3D[-1].dashed = False
 
             self.xPosition = xTarget
             self.yPosition = yTarget
             self.zPosition = zTarget
+
+    def drawMCommand(self, mString):
+        """
+
+        drawToolChange draws a circle indicating a tool change.
+
+        """
+        code = mString[1:2] #just the number?
+        circleSize = 0
+        print(code)
+        arg = 0
+        command = None
+        if code == "3":
+            arg = self.getSpindleSpeed(mString)
+            if arg == 0:
+                circleSize = 5
+                command = "SpindleOff"
+            else:
+                circleSize = 3
+                command = "SpindleOnCW"
+        if code == "4":
+            arg = self.getSpindleSpeed(mString)
+            if arg == 0:
+                circleSize = 5
+                command = "SpindleOff"
+            else:
+                circleSize = 4
+                command = "SpindleOnCCW"
+        if code == "5": # Spindle Stop
+            circleSize = 5
+        if code == "6":  # Tool Change
+            circleSize = 6
+            command = "ToolChange"
+            arg = self.getToolNumber(mString)
+
+
+        self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
+        self.line3D[-1].type = "circle"
+        self.line3D[-1].command = command
+        self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
+        self.addPoint3D(circleSize, arg, self.zPosition)
+        self.line3D[-1].dashed = False
+
+    def getSpindleSpeed(self, mString):
+        code = mString[mString.find("S")+1:]
+        if code!="":
+            return float(code)
+        else:
+            return 0
+
+    def getToolNumber(self, mString):
+        code = mString[mString.find("T")+1:]
+        if code!="":
+            return int(code)
+        else:
+            return 0
+
 
     def drawArc(self, gCodeLine, command):
         """
@@ -577,6 +641,15 @@ class GCodeFile(MakesmithInitFuncs):
 
         if gString == "G91":
             self.absoluteFlag = 1
+
+        tString = fullString[fullString.find("T") : fullString.find("T") + 2]
+        if tString.find("T") != -1:
+            self.currentDrawTool = tString[1:]
+
+        mString = fullString[fullString.find("M") : ]
+        if mString.find("M") != -1:
+            self.drawMCommand(mString)
+
 
     def callBackMechanism(self):
         """
