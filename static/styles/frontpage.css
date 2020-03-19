@@ -1,107 +1,105 @@
 .my-sidebar {
-    -ms-flex: 0 0 460px;
-    flex: 0 0 460px;
-    height: calc(100vh - 85px)
+  -ms-flex: 0 0 460px;
+  flex: 0 0 460px;
+  height: calc(100vh - 85px)
 }
 
 .flex-fixed-width-item {
-    flex: 0 0 410px;
-    height: calc(100vh - 85px);
+  flex: 0 0 410px;
+  height: calc(100vh - 85px);
 }
 
 .text-nowrap {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-wrap {
-    white-space: normal !important;
+  white-space: normal !important;
 }
 
 .scrollText {
-    height: calc(100vh - 750px);
-    overflow-y: scroll;
+  height: calc(100vh - 750px);
+  overflow-y: scroll;
 }
 
 .scrollTextMobile {
-    height: 400px;
-    overflow-y: scroll;
+  height: 400px;
+  overflow-y: scroll;
 }
 
 .container-fluid {
 }
 
-html, body{
+html, body {
   height: 100vh;
 }
 
 .flex-fill {
-  flex:1;
+  flex: 1;
 }
 
 .fullWorkArea {
-    height: calc(100vh - 85px);
-    cursor: none;
+  height: calc(100vh - 85px);
+  cursor: none;
 }
 
 /*#button3D, #buttonReset {*/
-#button3DResetGroup{
-    position: absolute;
-    /*display: inline-block;*/
-    z-index: 95;
-    left: 1%;
-
-}
-
-#cursorPosition{
-    width: 125px;
+#button3DResetGroup {
+  position: absolute;
+  /*display: inline-block;*/
+  z-index: 95;
+  left: 1%;
 }
 
 #cursorPosition {
-    cursor: none;
+  width: 125px;
+}
+
+#cursorPosition {
+  cursor: none;
 }
 
 #cameraDiv1 {
-    position: absolute;
-    display: block;
-    z-index: 95;
-    top: 77%;
-    left: 1%;
-    width: 256;
-    height: 192;
+  position: absolute;
+  display: block;
+  z-index: 95;
+  top: 77%;
+  left: 1%;
+  width: 256;
+  height: 192;
 }
 
 #cameraDiv2 {
-    position: absolute;
-    display: block;
-    z-index: 94;
-    top: 77%;
-    left: 1%;
-    width: 256;
-    height: 192;
+  position: absolute;
+  display: block;
+  z-index: 94;
+  top: 77%;
+  left: 1%;
+  width: 256;
+  height: 192;
 }
 
 #mobileCameraDiv1 {
-    position: absolute;
-    display: block;
-    z-index: 95;
-    top: 0%;
-    left: 0%;
-    width: 100%;
-    height: 200;
+  position: absolute;
+  display: block;
+  z-index: 95;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 200;
 }
 
 #mobileCameraDiv2 {
-    position: absolute;
-    display: block;
-    z-index: 94;
-    top: 0%;
-    left: 0%;
-    width: 100%;
-    height: 200;
+  position: absolute;
+  display: block;
+  z-index: 94;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 200;
 }
-
 
 .stopbutton {
   background-color: #004A7F;
@@ -119,6 +117,7 @@ html, body{
   -o-animation: glowing 1500ms infinite;
   animation: glowing 1500ms infinite;
 }
+
 @-webkit-keyframes glowing {
   0% { background-color: #B20000; -webkit-box-shadow: 0 0 3px #B20000; }
   50% { background-color: #FF0000; -webkit-box-shadow: 0 0 40px #FF0000; }
@@ -159,10 +158,12 @@ html, body{
 }
 
 #pauseButton {
-	color: #fff;
+  color: #fff;
 }
 
-#controllerMessage { overflow-wrap: anywhere; }
+#controllerMessage {
+  overflow-wrap: anywhere;
+}
 
 #stickyButtons {
   position: sticky;
@@ -171,6 +172,6 @@ html, body{
   position: -ms-sticky;
   position: -o-sticky;
   top: 0px;
-  z-index:1020;
+  z-index: 1020;
   background-color: #FFF;
 }
