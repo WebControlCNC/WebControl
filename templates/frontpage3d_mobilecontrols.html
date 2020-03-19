@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 
-{% block header %}
+{% block head %}
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='10262019b') }}" crossorigin="anonymous">
+{% endblock %}
+
+{% block header %}
   <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endblock %}
 
 {% block javascript %}
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018t') }}" crossorigin="anonymous"></script>
-<script> feather.replace() </script>
+  <script> feather.replace() </script>
 {% endblock %}
 
 {% block content %}
