@@ -447,11 +447,14 @@ function gcodeUpdateCompressed(data){
             }
             gcodeUndashed = new THREE.Line(gcodeLineSegments, redLineMaterial)
             gcode.add(gcodeUndashed);
-            text = new SpriteText('S'+line.points[1][1].toString(),.1, 'red');
-            text.position.x = line.points[0][0];
-            text.position.y = line.points[0][1];
-            text.position.z = line.points[0][2];
-            textLabels.add(text);
+            if (line.command != "SpindleOff")
+            {
+                text = new SpriteText('S'+line.points[1][1].toString(),.1, 'red');
+                text.position.x = line.points[0][0];
+                text.position.y = line.points[0][1];
+                text.position.z = line.points[0][2];
+                textLabels.add(text);
+            }
         }
         else if (line.command == "ToolChange")
         {

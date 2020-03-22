@@ -299,12 +299,14 @@ class GCodeFile(MakesmithInitFuncs):
         drawToolChange draws a circle indicating a tool change.
 
         """
-        code = mString[1:2] #just the number?
+        #print(mString)
+        code = self.getMCommand(mString)
+        #print(code)
+        #code = mString[1:2] #just the number?
         circleSize = 0
-        print(code)
         arg = 0
         command = None
-        if code == "3":
+        if code == 3:
             arg = self.getSpindleSpeed(mString)
             if arg == 0:
                 circleSize = 5
@@ -312,7 +314,7 @@ class GCodeFile(MakesmithInitFuncs):
             else:
                 circleSize = 3
                 command = "SpindleOnCW"
-        if code == "4":
+        if code == 4:
             arg = self.getSpindleSpeed(mString)
             if arg == 0:
                 circleSize = 5
@@ -320,13 +322,13 @@ class GCodeFile(MakesmithInitFuncs):
             else:
                 circleSize = 4
                 command = "SpindleOnCCW"
-        if code == "5": # Spindle Stop
+        if code == 5: # Spindle Stop
             circleSize = 5
-        if code == "6":  # Tool Change
+            command = "SpindleOff"
+        if code == 6:  # Tool Change
             circleSize = 6
             command = "ToolChange"
-            arg = self.getToolNumber(mString)
-
+            arg = self.currentDrawTool
 
         self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
         self.line3D[-1].type = "circle"
@@ -343,7 +345,25 @@ class GCodeFile(MakesmithInitFuncs):
             return 0
 
     def getToolNumber(self, mString):
-        code = mString[mString.find("T")+1:]
+        code0 = mString.find("T")
+        code1 = mString.find("M")
+        code = mString[code0+1:code1-code0]
+        #print(mString)
+        #print(code)
+        if code!="":
+            return int(code)
+        else:
+            return 0
+
+    def getMCommand(self, mString):
+        code0 = mString.find("M")
+        code1 = mString.find(" ", code0)
+        if code1 == -1:
+            code1 = mString.find("T", code0)
+            if code1 == -1:
+                code = mString[code0+1:]
+        else:
+            code = mString[code0+1: code1-code0]
         if code!="":
             return int(code)
         else:
@@ -642,9 +662,10 @@ class GCodeFile(MakesmithInitFuncs):
         if gString == "G91":
             self.absoluteFlag = 1
 
-        tString = fullString[fullString.find("T") : fullString.find("T") + 2]
+        #tString = fullString[fullString.find("T") : fullString.find("T") + 2]
+        tString = fullString[fullString.find("T") :]
         if tString.find("T") != -1:
-            self.currentDrawTool = tString[1:]
+            self.currentDrawTool = self.getToolNumber(tString)
 
         mString = fullString[fullString.find("M") : ]
         if mString.find("M") != -1:
