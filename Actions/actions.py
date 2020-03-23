@@ -668,6 +668,49 @@ class Actions(MakesmithInitFuncs):
             self._logException(e, "Error with initiating Z-Axis move.")
             return False
 
+    def moveZabsolute(self, height, units = "MM"):
+        try:
+            if units == "MM" or units == "INCHES":
+                orgUnits = self.data.units
+                orgPositioningMode = self.data.positioningMode
+
+                # Set movement units if needed.
+                if orgUnits != units:
+                    if units == "MM":
+                        self.data.gcode_queue.put("G21 ")
+                    else:
+                        self.data.gcode_queue.put("G20 ")
+
+                # Set positioning mode to absolute if needed.
+                if orgPositioningMode == 1:
+                    self.data.gcode_queue.put("G90 ")
+
+                # Move to speficied height.
+                self.data.gcode_queue.put("G00 Z" + str(float(height)) + " ")
+
+                # Set units back to what they were.
+                if orgUnits != units:
+                    if orgUnits == "MM":
+                        self.data.gcode_queue.put("G21 ")
+                    else:
+                        self.data.gcode_queue.put("G20 ")
+
+                # Set positioning mode back to what it was.
+                if orgPositioningMode == 1:
+                    self.data.gcode_queue.put("G91 ")
+
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def moveZzero(self):
+        return self.moveZabsolute(0)
+
+    def moveZsafe(self):
+        height = self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
+        return self.moveZabsolute(height)
+
     def touchZ(self):
         """
         Sends a gcode line to set z axis depth using touch plate.  I've not personally tested this.
