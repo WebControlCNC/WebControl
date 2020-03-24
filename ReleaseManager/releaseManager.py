@@ -78,6 +78,7 @@ class ReleaseManager(MakesmithInitFuncs):
                 except:
                     print("error cleaning download directory: ", filePath)
                     print("---")
+            print("downloading")
             if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
                 filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "\\.WebControl\\downloads")
             else:

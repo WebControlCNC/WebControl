@@ -1423,7 +1423,7 @@ class Actions(MakesmithInitFuncs):
                     # close off the modals and put away the spinner.
                     self.data.ui_queue1.put("Action", "closeModals", "Notification:")
                     if version==2:
-                        self.setFakeServo(false)
+                        self.setFakeServo(False)
                     return True
             else:
                 self.data.ui_queue1.put("Action", "closeModals", "Notification:")
