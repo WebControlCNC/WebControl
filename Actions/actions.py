@@ -89,19 +89,20 @@ class Actions(MakesmithInitFuncs):
             else:
                 scaleFactor = 1.0
             # if posX and posY have values, use them, else use the sled's position.
+            print(posX)
             if posX != None and posY != None:
                 homeX = round(posX * scaleFactor, 4)
                 homeY = round(posY * scaleFactor, 4)
-
-                # Send update to UI client with new home position only if they were specified.
-                position = {"xval": homeX, "yval": homeY}
-                self.data.ui_queue1.put("Action", "homePositionMessage", position)
             else:
                 homeX = round(self.data.xval, 4)
                 homeY = round(self.data.yval, 4)
 
             self.data.config.setValue("Advanced Settings", "homeX", str(homeX))
             self.data.config.setValue("Advanced Settings", "homeY", str(homeY))
+
+            # Send update to UI client with new home position.
+            position = {"xval": homeX, "yval": homeY}
+            self.data.ui_queue1.put("Action", "homePositionMessage", position)
 
             # The moveLine function of gcodeFile is still used (though its called directly by serialThread)
             # so I still track the home coordinates in gcodeShift.
@@ -1421,6 +1422,8 @@ class Actions(MakesmithInitFuncs):
                     # print("closing modals")
                     # close off the modals and put away the spinner.
                     self.data.ui_queue1.put("Action", "closeModals", "Notification:")
+                    if version==2:
+                        self.setFakeServo(false)
                     return True
             else:
                 self.data.ui_queue1.put("Action", "closeModals", "Notification:")
