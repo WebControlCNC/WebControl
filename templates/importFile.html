@@ -4,7 +4,7 @@
   <form id="importForm" method="post" enctype=multipart/form-data>
     <div class="form-group">
       <label for="importFile">Import File</label>
-      <input type="file" class="form-control-file" name="file" id="importFile">
+      <input type="file" class="form-control-file" name="file" id="importFile" {{ 'accept=' ~ mimetypes + '' if mimetypes is defined }}>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
