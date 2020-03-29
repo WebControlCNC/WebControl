@@ -110,34 +110,34 @@ class WiiPendant():
   '''
   if mode == 0: # start up heartbeat = 2 quick rumbles / prompt for confirmation
     self.wm.rumble=True
-    time.sleep(.3)
+    time.sleep(.2)
     self.wm.rumble = False
-    time.sleep(0.2)
+    time.sleep(0.1)
     self.wm.rumble=True
-    time.sleep(.3)
+    time.sleep(.2)
     self.wm.rumble = False
 
   if mode == 1: # shutdown or timeout
     self.wm.rumble=True
-    time.sleep(.2)
+    time.sleep(.1)
     self.wm.rumble = False
-    time.sleep(0.2)
+    time.sleep(0.1)
     self.wm.rumble=True
-    time.sleep(.6)
+    time.sleep(.2)
     self.wm.rumble = False
 
   if mode == 2: # shutdown or timeout
     self.wm.rumble=True
-    time.sleep(.6)
+    time.sleep(.3)
     self.wm.rumble = False
-    time.sleep(0.2)
+    time.sleep(0.1)
     self.wm.rumble=True
-    time.sleep(.2)
+    time.sleep(.3)
     self.wm.rumble = False
 
   if mode >= 30: # shutdown or timeout
     self.wm.rumble=True
-    time.sleep(.8)
+    time.sleep(.5)
     self.wm.rumble = False
 #end rumble
 
@@ -239,7 +239,6 @@ class WiiPendant():
             print("Wiimote SET NEW HOME")
             self.rumble(1)
             self.TRIGGER = 1
-            self.rumble(0)
             self.CONFIRM = 500
             self.startTime = time.clock()
       else:
