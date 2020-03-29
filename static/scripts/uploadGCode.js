@@ -39,11 +39,11 @@ $(document).ready(function () {
     });*/
 });
 
-$("#gcodeFile").on("change",function(){
+/*$("#gcodeFile").on("change",function(){
   var fileName = $(this).val().split("\\").pop();
   $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 });
-
+*/
 function onFooterSubmit(){
     var formdata = new FormData($('#gcodeForm')[0]);
     //var formdata = $("#gcodeForm").serialize();

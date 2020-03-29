@@ -10,6 +10,7 @@
   <script src="{{ url_for('static',filename='scripts/bootstrap.bundle.min.js', version='11102018a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018t') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/base.js', version='11102018t') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/touch.js', version='11102018t') }}" crossorigin="anonymous"></script>
 
   <script type="text/javascript" charset="utf-8">
   </script>
@@ -41,6 +42,7 @@
             <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
             <a class="dropdown-item" href="#" onclick="requestPage('editGCode');">View/Edit</a>
             <a class="dropdown-item" href="#" onclick="requestPage('sendGCode');">Send Custom GCode</a>
+            <!--<a class="dropdown-item" href="#" onclick="action('optimizeGCode');">Optimize GCode</a>-->
           </div>
         </li>
         <li class="nav-item" id="actionsNavItem">

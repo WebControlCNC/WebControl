@@ -35,8 +35,6 @@ class ReleaseManager(MakesmithInitFuncs):
                 self.releases = repo.get_releases()
                 latestVersionGithub = 0
                 self.latestRelease = None
-                # type = self.data.pyInstallType
-                platform = self.data.pyInstallPlatform
                 for release in self.releases:
                     tag_name = re.sub(r'[v]', r'', release.tag_name)
                     tag_float = float(tag_name)
@@ -50,7 +48,7 @@ class ReleaseManager(MakesmithInitFuncs):
                     print("Latest release tag: " + self.latestRelease.tag_name)
                     assets = self.latestRelease.get_assets()
                     for asset in assets:
-                        if asset.name.find(type) != -1 and asset.name.find(platform) != -1:
+                        if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
                             print(asset.name)
                             print(asset.url)
                             self.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
@@ -127,17 +125,16 @@ class ReleaseManager(MakesmithInitFuncs):
         else:
             print("downgrade to ")
             print(version)
-            type = self.data.pyInstallType
-            platform = self.data.pyInstallPlatform
             for release in self.releases:
                 if release.tag_name == version:
                     assets = release.get_assets()
                     for asset in assets:
-                        if asset.name.find(type) != -1 and asset.name.find(platform) != -1:
+                        if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
                             print(asset.name)
                             print(asset.url)
                             self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                             print(self.data.pyInstallUpdateBrowserUrl)
                             return self.updatePyInstaller(True)
+            print("hmmm.. issue")
 
 

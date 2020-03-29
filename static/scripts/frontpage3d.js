@@ -1,35 +1,52 @@
 //checkForGCodeUpdate();
+//checkForGCodeUpdate();
 
 //setInterval(function(){ alert("Hello"); }, 3000);
 
 var cutSquareGroup = new THREE.Group();
-var showBoard = true;
+var showBoard = false;
+var showLabels = false;
 var homeX = 0;
 var homeY = 0;
 
 var renderer = new THREE.WebGLRenderer();
-var w = $("#workarea").width()-20;
-var h = $("#workarea").height()-20;
+var w = $("#workarea").width();//-20;
+var h = $("#workarea").height();//-20;
 renderer.setSize( w, h );
+//console.log("w="+w+", h="+h);
 
 container = document.getElementById('workarea');
 container.appendChild(renderer.domElement);
 var imageShowing = 1
 
 var gcode = new THREE.Group();
+var textLabels = new THREE.Group();
 //var cutTrailGroup = new THREE.Group();
 
-var camera = new THREE.PerspectiveCamera(45, w/h, 1, 500);
-//var camera = new THREE.OrthographicCamera(w/-2, w/2, h/2, h/-2, 1, 500);
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.screenSpacePanning = true;
+var cameraPerspective = 0; // 0 = Orthographic, 1 = Perspective
+var scale = .07
+var cameraO;
+var cameraP;
 
-camera.position.set(0, 0, 100);
-camera.lookAt(0,0,0);
+var cameraO = new THREE.OrthographicCamera(w/-2*scale, w/2*scale, h/2*scale, h/-2*scale, 1, 100*500/380);
+cameraO.position.set(0, 0, 100); //380
+cameraO.lookAt(0,0,0);
+var cameraP = new THREE.PerspectiveCamera(45, w/h, 1, 500);
+cameraP.position.set(0, 0, 100);
+cameraP.lookAt(0,0,0);
+
+
+//setCameraPerspective(true); // true indicates initial setting
+var controlsO = new THREE.OrbitControls(cameraO, renderer.domElement);
+var controlsP = new THREE.OrbitControls(cameraP, renderer.domElement);
+controlsO.screenSpacePanning = true;
+controlsP.screenSpacePanning = true;
+
 var view3D = true;
 toggle3DView(); // makes it not true and applies appropriate settings
 //controls.update();
-controls.saveState();
+controlsO.saveState();
+controlsP.saveState();
 
 var scene = new THREE.Scene();
 scene.background= new THREE.Color(0xeeeeee);
@@ -209,10 +226,11 @@ boardGroup.add(boardOutlineOutline);
 
 boardGroup.position.set(0,0,-0.75/2);
 
-scene.add(cutSquareGroup);
-scene.add(boardGroup);
-
-
+if (showBoard)
+{
+    scene.add(cutSquareGroup);
+    scene.add(boardGroup);
+}
 scene.add(sled);
 scene.add(home);
 scene.add(gcodePos);
@@ -228,18 +246,36 @@ window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    //w=window.innerWidth;
+    //h=window.innerHeight;
+    //console.log("wr="+w+", hr="+h);
+    we = $("#workarea").width(); //-20;
+    he = $("#workarea").height(); //-20;
+    //console.log("we="+we+", he="+he);
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    //cameraO.aspect = window.innerWidth / window.innerHeight;
+    cameraO.left = we/-2*scale;
+    cameraO.right = we/2*scale;
+    cameraO.top = he/2*scale;
+    cameraO.bottom = he/-2*scale;
+    cameraO.updateProjectionMatrix();
+    //cameraP.aspect = window.innerWidth / window.innerHeight;
+    cameraP.aspect = we / he;
+    cameraP.updateProjectionMatrix();
+
+    renderer.setSize( we, he );
 
 }
 
 
 function animate() {
     requestAnimationFrame(animate);
-    controls.update();
-    renderer.render( scene, camera );
+    controlsO.update();
+    controlsP.update();
+    if (cameraPerspective == 0)
+        renderer.render( scene, cameraO );
+    else
+        renderer.render( scene, cameraP );
 }
 
 function positionUpdate(x,y,z){
@@ -332,6 +368,11 @@ function gcodeUpdateCompressed(data){
         gcode.remove(gcode.children[i]);
     }
   }
+  if (textLabels.children.length!=0) {
+    for (var i = textLabels.children.length -1; i>=0; i--){
+        textLabels.remove(textLabels.children[i]);
+    }
+  }
 
   var gcodeLineSegments = new THREE.Geometry();
   var gcodeDashedLineSegments = new THREE.Geometry();
@@ -364,12 +405,80 @@ function gcodeUpdateCompressed(data){
           gcode.add(gcodeUndashed);
 
         }
-      } else {
-        var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
-        var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
-        var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,greenLineMaterial);
-        gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
-        gcode.add(gcodeCircle);
+      }
+      else
+      {
+        if ( (line.command == "SpindleOnCW") || (line.command=="SpindlenOnCCW") || (line.command=="SpindleOff") ) //(line.points[1][0]>=3) && (line.points[1][0]<=5) )
+        {
+            //spindle
+            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
+            var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+            var circleMaterial = redLineMaterial;
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+            gcode.add(gcodeCircle);
+            var gcodeLineSegments = new THREE.Geometry();
+            var xFactor = 3.25;
+            var yFactor = 3.25;
+            if (line.command == "SpindleOff") //(line.points[1][0]==5)
+            {
+                xFactor = .707107*2.25;
+                yFactor = .707107*2.25;
+            }
+            if (line.command == "SpindleOnCCW") // (line.points[1][0]==4)
+            {
+                xFactor = 3.25;
+                yFactor = 3.25;
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+            }
+            else
+            {
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
+                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+            }
+            gcodeUndashed = new THREE.Line(gcodeLineSegments, redLineMaterial)
+            gcode.add(gcodeUndashed);
+            if (line.command != "SpindleOff")
+            {
+                text = new SpriteText('S'+line.points[1][1].toString(),.1, 'red');
+                text.position.x = line.points[0][0];
+                text.position.y = line.points[0][1];
+                text.position.z = line.points[0][2];
+                textLabels.add(text);
+            }
+        }
+        else if (line.command == "ToolChange")
+        {
+            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
+            var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+            circleMaterial = redLineMaterial;
+            text = new SpriteText('T'+line.points[1][1].toString(),.1, 'red');
+            text.position.x = line.points[0][0];
+            text.position.y = line.points[0][1];
+            text.position.z = line.points[0][2];
+            textLabels.add(text);
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+            gcode.add(gcodeCircle);
+        }
+        else
+        {
+            var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
+            var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
+            var circleMaterial = greenLineMaterial;
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
+            gcode.add(gcodeCircle);
+        }
 
         var gcodeLineSegments = new THREE.Geometry();
         gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
@@ -377,16 +486,33 @@ function gcodeUpdateCompressed(data){
         gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
         gcode.add(gcodeUndashed);
 
-
       }
     });
     scene.add(gcode);
+    if (showLabels)
+        scene.add(textLabels);
   }
   else{
     scene.remove(gcode);
+    scene.remove(textLabels);
   }
   $("#fpCircle").hide();
 
+}
+
+function toggleLabels()
+{
+    if (showLabels)
+    {
+        scene.remove(textLabels);
+        $("#labelsID").removeClass('btn-primary').addClass('btn-secondary');
+    }
+    else
+    {
+        scene.add(textLabels);
+        $("#labelsID").removeClass('btn-secondary').addClass('btn-primary');
+    }
+    showLabels = !showLabels;
 }
 
 function ab2str(buf) {
@@ -402,16 +528,24 @@ function showFPSpinner(msg){
     $("#fpCircle").show();
 }
 
+
 function toggle3DView()
 {
     console.log("toggling");
     if (view3D){
-        controls.enableRotate = false;
-        controls.mouseButtons = {
+        controlsO.enableRotate = false;
+        controlsO.mouseButtons = {
             LEFT: THREE.MOUSE.RIGHT,
             MIDDLE: THREE.MOUSE.MIDDLE,
             RIGHT: THREE.MOUSE.LEFT
         }
+        controlsP.enableRotate = false;
+        controlsP.mouseButtons = {
+            LEFT: THREE.MOUSE.RIGHT,
+            MIDDLE: THREE.MOUSE.MIDDLE,
+            RIGHT: THREE.MOUSE.LEFT
+        }
+
         view3D=false;
         if (isMobile)
         {
@@ -423,12 +557,19 @@ function toggle3DView()
         }
         console.log("toggled off");
     } else {
-        controls.enableRotate = true;
-        controls.mouseButtons = {
+        controlsO.enableRotate = true;
+        controlsO.mouseButtons = {
             LEFT: THREE.MOUSE.RIGHT,
             MIDDLE: THREE.MOUSE.MIDDLE,
             RIGHT: THREE.MOUSE.LEFT
         }
+        controlsP.enableRotate = true;
+        controlsP.mouseButtons = {
+            LEFT: THREE.MOUSE.RIGHT,
+            MIDDLE: THREE.MOUSE.MIDDLE,
+            RIGHT: THREE.MOUSE.LEFT
+        }
+
         view3D=true;
         if (isMobile)
         {
@@ -440,11 +581,13 @@ function toggle3DView()
         }
         console.log("toggled on");
     }
-    controls.update();
+    controlsO.update();
+    controlsP.update();
 }
 
 function resetView(){
-    controls.reset();
+    controlsO.reset();
+    controlsP.reset();
 }
 
 function cursorPosition(){
@@ -456,13 +599,20 @@ function cursorPosition(){
         - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
         0.5 );
 
-    vec.unproject( camera );
-
-    vec.sub( camera.position ).normalize();
-
-    var distance = - camera.position.z / vec.z;
-
-    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    if (cameraPerspective == 0)
+    {
+        vec.unproject( cameraO );
+        vec.sub( cameraO.position ).normalize();
+        var distance = - cameraO.position.z / vec.z;
+        pos.copy( cameraO.position ).add( vec.multiplyScalar( distance ) );
+    }
+    else
+    {
+        vec.unproject( cameraP );
+        vec.sub( cameraP.position ).normalize();
+        var distance = - cameraP.position.z / vec.z;
+        pos.copy( cameraP.position ).add( vec.multiplyScalar( distance ) );
+    }
     //console.log(pos);
     return(pos);
 }
@@ -640,6 +790,20 @@ function toggleBoard(){
         scene.add(cutSquareGroup);
         scene.add(boardGroup);
         $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
+    }
+}
+
+function toggle3DPO(){
+    cameraPerspective = !cameraPerspective;
+    if (cameraPerspective == 0){
+        $("#buttonPO").text("Ortho");
+        $("#mobilebuttonPO").text("Ortho");
+        renderer.render(scene, cameraO)
+    }
+    else {
+        $("#buttonPO").text("Persp");
+        $("#mobilebuttonPO").text("Persp");
+        renderer.render(scene, cameraP)
     }
 }
 

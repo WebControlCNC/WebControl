@@ -27,6 +27,11 @@ class Actions(MakesmithInitFuncs):
         :param msg: json of message from UI client
         :return:
         '''
+        '''
+        if msg["data"]["command"] == "optimizeGCode":
+            if not self.data.gcodeOptimizer.optimize():
+                self.data.ui_queue1.put("Alert", "Alert", "Error with optimizing gcode")
+        '''
         try:
             # Commands allowed during sending gcode.  These commands won't screw something up.
             if msg["data"]["command"] == "createDirectory":
@@ -276,6 +281,9 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Action", "gcodeUpdate", "")
                 else:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resetting home to center")
+            #elif msg["data"]["command"] == "optimizeGCode":
+            #    if not self.data.gcodeOptimizer.optimize():
+            #        self.data.ui_queue1.put("Alert", "Alert", "Error with optimizing gcode")
             else:
                 response = "Function not currently implemented.. Sorry."
                 response = response + "["+msg["data"]["command"]+"]"

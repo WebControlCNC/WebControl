@@ -13,8 +13,9 @@
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019u') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102019t') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/sprite3D.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019w') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102019w') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -212,10 +213,12 @@
         </div>-->
         <div id="button3DResetGroup"><!-- class="btn-toolbar" role="toolbar">-->
             <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="buttonPO" onclick="toggle3DPO()">Ortho</button>
             <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
             <!--<button class="btn btn-secondary btn-sm" type="button" id="cursorPosition">Cursor Position</button>-->
             <span id="cursorPosition" class="btn btn-secondary btn-sm">Cursor Position</span>
-            <button id="boardID" class="btn btn-primary btn-sm" onclick="toggleBoard()">...</button>
+            <button id="boardID" class="btn btn-secondary btn-sm" onclick="toggleBoard()">...</button>
+            <button id="labelsID" class="btn btn-secondary btn-sm" onclick="toggleLabels()">Labels</button>
         </div>
       <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
       <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>

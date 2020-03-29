@@ -11,6 +11,8 @@ import sys
 #monkey.patch_all(thread = False, threading = False) 
 monkey.patch_all()
     
+
+
 import schedule
 import time
 import threading
@@ -53,6 +55,15 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")),
     float(app.data.config.getValue("Advanced Settings", "homeY")),
 ]
+
+version = sys.version_info
+
+if version[:2] > (3, 5):
+    app.data.pythonVersion35 = False
+    print("Using routines for Python > 3.5")
+else:
+    app.data.pythonVersion35 = True
+    print("Using routines for Python == 3.5")
 
 app.data.firstRun = False
 # app.previousPosX = 0.0
@@ -408,17 +419,29 @@ def uploadGCode():
         result = request.form
         directory = result["selectedDirectory"]
         #print(directory)
-        f = request.files["file"]
+        f = request.files.getlist("file[]")
+        print(f)
         home = app.data.config.getHome()
         app.data.config.setValue("Computed Settings", "lastSelectedDirectory", directory)
-        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory+"/"+secure_filename(f.filename)
-        f.save(app.data.gcodeFile.filename)
-        returnVal = app.data.gcodeFile.loadUpdateFile()
-        if returnVal:
-            message = {"status": 200}
-            resp = jsonify(message)
-            resp.status_code = 200
-            return resp
+
+        if len(f) > 0:
+            firstFile = f[0]
+            for file in f:
+                app.data.gcodeFile.filename = home + "/.WebControl/gcode/" + directory + "/" + secure_filename(
+                    file.filename)
+                file.save(app.data.gcodeFile.filename)
+            app.data.gcodeFile.filename = home + "/.WebControl/gcode/" + directory + "/" + secure_filename(firstFile.filename)
+            returnVal = app.data.gcodeFile.loadUpdateFile()
+            if returnVal:
+                message = {"status": 200}
+                resp = jsonify(message)
+                resp.status_code = 200
+                return resp
+            else:
+                message = {"status": 500}
+                resp = jsonify(message)
+                resp.status_code = 500
+                return resp
         else:
             message = {"status": 500}
             resp = jsonify(message)
