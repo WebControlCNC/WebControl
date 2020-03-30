@@ -159,9 +159,7 @@ class WiiPendant():
           if self.TRIGGER == 1:
             if self.CONFIRM > 0:
               self.TRIGGER = 0
-              print("HOME POSITION CONFIRMED")
-              self.rumble(1)
-              self.Send("sled:defineHome")
+              
           elif self.ZTRIGGER == 1:
             self.ZTRIGGER = 0
             if self.CONFIRM > 0:
@@ -236,11 +234,14 @@ class WiiPendant():
             self.DOWN = 0
             self.Send("sled:down:" + str(self.DISTANCE[self.LED_ON]))
           if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-            print("Wiimote SET NEW HOME")
+            print("Wiimote SET NEW HOME POSITION")
             self.rumble(1)
             self.TRIGGER = 1
-            self.CONFIRM = 500
-            self.startTime = time.clock()
+            #self.CONFIRM = 500
+            #self.startTime = time.clock()
+            #print("HOME POSITION CONFIRMED")
+            #self.rumble(1)
+            self.Send("sled:defineHome")
       else:
         self.TRIGGER = 0
 
@@ -266,9 +267,11 @@ class WiiPendant():
             print("Wiimote Reset Z AXIS to 0")
             self.rumble(2)
             self.ZTRIGGER = 1
-            self.rumble(0)
-            self.CONFIRM = 200
-            self.startTime = time.clock()
+            #self.rumble(0)
+            self.rumble(2)
+            self.Send("zAxis:defineZ0")
+            #self.CONFIRM = 200
+            #self.startTime = time.clock()
       else:
         self.ZTRIGGER = 0
         if (self.wm.state['buttons'] & cwiid.BTN_HOME):

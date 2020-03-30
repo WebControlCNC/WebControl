@@ -266,7 +266,7 @@ def WiiMoteInput():
             message = {"data":{"sled":"movetoHome"}}
         if('defineHome' in resultlist):
             print ('new home set')
-            app.data.actions.processAction({"data":{"command":"defineHome","arg":"","arg1":""}})
+            app.data.actions.processAction({"data":{"command":"defineHome","arg":app.data.xval,"arg1":app.data.yval}})
             message = {"data":{"sled":"NewHome"}}
     if ('gcode' in resultlist): # this command set will start, pause, stop the execution of gcode files
         if (resultlist[1] == 'startRun'):
