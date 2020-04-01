@@ -599,9 +599,9 @@ class GCodeFile(MakesmithInitFuncs):
                     e = re.search(".*e-", q )
                     if (self.data.pythonVersion35 == False):
                         if e:
-                            fmtY = "%0%.%sf" % eNtnY
+                            fmtY = "%0.{0}f".format(eNtnY)
                         else:
-                            fmtY = "%0%.%sf" % len(eNtnY)
+                            fmtY = "%0.{0}f".format(len(eNtnY))
                     else:    #deprecated python 3.6
                         if e:
                             fmtY = ("%0%.%sf" % eNtnY)  # if e-notation, use the exponent from the e notation
@@ -617,6 +617,7 @@ class GCodeFile(MakesmithInitFuncs):
                 return gCodeLine
             except ValueError:
                 self.data.console_queue.put("line could not be moved:")
+                print(originalLine)
                 self.data.console_queue.put(originalLine)
                 return originalLine
         return originalLine
