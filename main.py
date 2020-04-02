@@ -103,6 +103,105 @@ app.mcpthread = None
 ## logstreamerthread set to None.. will be activated upon first websocket connection from log streamer browser
 app.logstreamerthread = None
 
+def web_input_command(cmd, source):
+    if (len(cmd) > 2):  # pull off the distance if it is there
+        distance = cmd[2]  # distance is the third list element
+    else:
+        distance = 0  # if it isn't then put a 0 value in so no error is thrown
+    message = 'none'
+    if ('gcode' in cmd):  # gcode commands found in gpioactions like start the gcode file cut, pause current cut, resume from pause, stop the cut, move sled home
+        print ('gcode selected')
+        message = {"data":{"gcode":"selected"}}
+        if ('startRun' in cmd):
+            print ('start gcode ',source, ' requested')
+            app.data.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
+            message = {"data":{source:"started"}}
+        if ('pauseRun' in cmd):
+            if (app.data.uploadFlag == 1):
+                print ('pause gcode ',source, ' requested')
+                app.data.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
+                message = {"data":{source:"paused"}}
+            elif (app.data.uploadFlag == 2):
+                print ('continue gcode ', source, ' requested')
+                app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+                message = {"data":{source:"resumed"}}
+        if (cmd[1] == 'resumeRun'):
+            print ('continue gcode ',source, ' requested')
+            app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
+            message = {"data":{source:"resumed"}}
+        if (cmd[1] == 'stopRun'):
+            print ('stop gcode', source, ' requested')
+            app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+            message = {"data":{source:"stopped"}}
+        if('home' in cmd):
+            print (source, ' says go home')
+            app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
+            message = {"data":{source:"movetoHome"}}
+    if ('zAxis' in cmd):  # this command set works with the z axis
+        print ('zaxis selected ', source)
+        message = {"data":{source:"selected"}}
+        if('raise' in cmd):
+            print (source, ' zaxis', distance, 'raise')
+            app.data.actions.processAction({"data":{"command":"moveZ","arg":"raise","arg1":distance}})
+            message = {"data":{source:"raise"}}
+        if('lower' in cmd):
+            print (source, ' zaxis', distance, 'lower')
+            app.data.actions.processAction({"data":{"command":"moveZ","arg":"lower","arg1":distance}})
+            message = {"data":{source:"Lower"}}
+        if('stopZ' in cmd ):
+            print (source, ' zaxis stop ', source)
+            app.data.actions.processAction({"data":{"command":"stopZ","arg":"","arg1":""}})
+            message = {"data":{source:"stopZ"}}
+        if('defineZ0' in cmd):
+            print ('new Z axis zero point via ', source)
+            app.data.actions.processAction({"data":{"command":"defineZ0","arg":"","arg1":""}})
+            message = {"data":{source:"defineZ"}}  # this command set will move or change the sled
+    if ('sled' in cmd):    
+        message = {"data":{"sled":"selected"}}
+        if('up' in cmd):
+            print (source, ' move', distance, 'up')
+            app.data.actions.processAction({"data":{"command":"move","arg":"up","arg1":distance}})
+            message = {"data":{source:"up"}}
+        if('down' in cmd):
+            print (source, ' move', distance, 'down')
+            app.data.actions.processAction({"data":{"command":"move","arg":"down","arg1":distance}})
+            message = {"data":{source:"down"}}
+        if('left' in cmd):
+            print (source, ' move', distance, 'left')
+            app.data.actions.processAction({"data":{"command":"move","arg":"left","arg1":distance}})
+            message = {"data":{source:"left"}}
+        if('right' in cmd):
+            print (source, ' move', distance, 'right')
+            app.data.actions.processAction({"data":{"command":"move","arg":"right","arg1":distance}})
+            message = {"data":{source:"right"}}
+        if('home' in cmd):
+            print ('go home via ', source)
+            app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
+            message = {"data":{source:"movetoHome"}}
+        if('defineHome' in cmd):
+            print ('new home set via ', source, ' to ', app.data.xval ,', ', app.data.yval)
+            app.data.actions.processAction({"data":{"command":"defineHome","arg":app.data.xval,"arg1":app.data.yval}})
+            message = {"data":{source:"NewHome"}}
+    if ('system' in cmd): # this command set will adjust the system including pendant connection status and system power
+        print ('system selected via ', source)
+        message = {"data":{"system":"selected"}}
+        if ('exit' in cmd):
+            print("system shutdown requested")
+            if (app.data.uploadFlag == 0):
+                os._exit(0)
+            else:
+                app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
+                print("denied: running code.  Code stopped near try again")
+                message = {"data":{"system":"shutdownAttempt"}}
+        if ('connected' in cmd):
+            print("wiimote connected")
+            message = {"data":{"system":"Connect"}}
+            app.data.wiiPendantConnected = True
+        if ('disconnect' in cmd):
+            print("wiimote disconnect")
+            app.data.wiiPendantConnected = False    
+            message = {"data":{"system":"Disconnect"}}
+    return(message)
 
 @app.route("/")
 @mobile_template("{mobile/}")
@@ -129,36 +228,7 @@ def remote_function_call():
         result = result.decode('utf-8')
         resultlist = result.split(':')
         print ('resultlist', resultlist)
-                
-        if ('gcode' in resultlist):  # gcode commands found in gpioactions like start the gcode file cut, pause current cut, resume from pause, stop the cut, move sled home
-            print ('gcode selected')
-            message = {"data":{"gcode":"selected"}}
-            if ('startRun' in resultlist):
-                print ('start gcode requested')
-                app.data.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
-                message = {"data":{"buttonrun":"started"}}
-            if ('pauseRun' in resultlist):
-                if (app.data.uploadFlag == 1):
-                    print ('pause gcode requested')
-                    app.data.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
-                    message = {"data":{"buttonrun":"paused"}}
-                elif (app.data.uploadFlag == 2):
-                    print ('continue gcode requested')
-                    app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
-                    message = {"data":{"buttonrun":"resumed"}}
-            if (resultlist[1] == 'resumeRun'):
-                print ('continue gcode requested')
-                app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
-                message = {"data":{"buttonrun":"resumed"}}
-            if (resultlist[1] == 'stopRun'):
-                print ('stop gcode requested')
-                app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
-                message = {"data":{"butttonrun":"stopped"}}
-            if('home' in resultlist):
-                print ('go home')
-                app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
-                message = {"data":{"buttonmove":"movetoHome"}}
-        
+        message = web_input_command(resultlist, "button")                
         resp = jsonify(message)
         resp.status_code = 200 # or whatever the correct number should be
         return (resp)
@@ -189,12 +259,15 @@ def getLEDinfo():
                 "sled_location_X": str(app.data.computedX), \
                 "sled_location_y": str(app.data.computedY), \
                 #"sled_location_z": str(app.data.zval), \
+                #This part works
                 "home_location_x": str(app.data.config.getValue("Advanced Settings","homeX")), \
                 "home_location_y": str(app.data.config.getValue("Advanced Settings","homeY")), \
+                #this part does not work
                 "gcode_max_x": str(app.data.gcode_x_max), \
                 "gcode_min_x": str(app.data.gcode_x_min), \
                 "gcode_max_y": str(app.data.gcode_y_max), \
                 "gcode_min_y": str(app.data.gcode_y_min)}}  #assemble json string
+            #print(message)
             resp = jsonify(message) # java script object notation convrsion of the message
             resp.status_code = 200
             return (resp) # send the message
@@ -219,96 +292,7 @@ def WiiMoteInput():
     resultlist = result.split(':')  #take the input and cut it up into list pieces
     print (resultlist)
     message = {"data":{"pendant:selected"}}
-    if (len(resultlist) > 2):  # pull off the distance if it is there
-        distance = resultlist[2]  # distance is the third list element
-    else:
-        distance = 0  # if it isn't then put a 0 value in so no error is thrown
-    if ('zAxis' in resultlist):  # this command set works with the z axis
-        print ('zaxis selected')
-        message = {"data":{"z:selected"}}
-        if('raise' in resultlist):
-            print ('zaxis', distance, 'raise')
-            app.data.actions.processAction({"data":{"command":"moveZ","arg":"raise","arg1":distance}})
-            message = {"data":{"Z":"raise"}}
-        if('lower' in resultlist):
-            print ('zaxis', distance, 'lower')
-            app.data.actions.processAction({"data":{"command":"moveZ","arg":"lower","arg1":distance}})
-            message = {"data":{"Z":"Lower"}}
-        if('stopZ' in resultlist):
-            print ('zaxis stop')
-            app.data.actions.processAction({"data":{"command":"stopZ","arg":"","arg1":""}})
-            message = {"data":{"Z":"stopZ"}}
-        if('defineZ0' in resultlist):
-            print ('new Z axis zero point')
-            app.data.actions.processAction({"data":{"command":"defineZ0","arg":"","arg1":""}})
-            message = {"data":{"Z":"defineZ"}}  # this command set will move or change the sled
-    if ('sled' in resultlist):    
-        message = {"data":{"sled":"selected"}}
-        if('up' in resultlist):
-            print ('move', distance, 'up')
-            app.data.actions.processAction({"data":{"command":"move","arg":"up","arg1":distance}})
-            message = {"data":{"move":"up"}}
-        if('down' in resultlist):
-            print ('move', distance, 'down')
-            app.data.actions.processAction({"data":{"command":"move","arg":"down","arg1":distance}})
-            message = {"data":{"move":"down"}}
-        if('left' in resultlist):
-            print ('move', distance, 'left')
-            app.data.actions.processAction({"data":{"command":"move","arg":"left","arg1":distance}})
-            message = {"data":{"move":"left"}}
-        if('right' in resultlist):
-            print ('move', distance, 'right')
-            app.data.actions.processAction({"data":{"command":"move","arg":"right","arg1":distance}})
-            message = {"data":{"move":"right"}}
-        if('home' in resultlist):
-            print ('go home')
-            app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
-            message = {"data":{"sled":"movetoHome"}}
-        if('defineHome' in resultlist):
-            print ('new home set')
-            app.data.actions.processAction({"data":{"command":"defineHome","arg":app.data.xval,"arg1":app.data.yval}})
-            message = {"data":{"sled":"NewHome"}}
-    if ('gcode' in resultlist): # this command set will start, pause, stop the execution of gcode files
-        if (resultlist[1] == 'startRun'):
-                print ('start gcode requested')
-                app.data.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
-                message = {"data":{"pendantrun":"started"}}
-        if (resultlist[1] == 'pauseRun'):
-            if (app.data.uploadFlag == 1):
-                print ('pause gcode requested')
-                app.data.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
-                message = {"data":{"pendantrun":"paused"}}
-            elif (app.data.uploadFlag == 2):
-                print ('continue gcode requested')
-                app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
-                message = {"data":{"pendantrun":"resumed"}}
-        if (resultlist[1] == 'resumeRun'):
-            print ('continue gcode requested')
-            app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
-            message = {"data":{"pendantrun":"resumed"}}
-        if (resultlist[1] == 'stopRun'):
-            print ('stop gcode requested')
-            app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
-            message = {"data":{"pendantrun":"stopped"}} 
-    if ('system' in resultlist): # this command set will adjust the system including pendant connection status and system power
-        print ('system selected')
-        message = {"data":{"system":"selected"}}
-        if ('exit' in resultlist):
-            print("system shutdown requested")
-            if (app.data.uploadFlag == 0):
-                os._exit(0)
-            else:
-                app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
-                print("denied: running code.  Code stopped near try again")
-                message = {"data":{"system":"shutdownAttempt"}}
-        if ('connected' in resultlist):
-            print("wiimote connected")
-            message = {"data":{"system":"Connect"}}
-            app.data.wiiPendantConnected = True
-        if ('disconnect' in resultlist):
-            print("wiimote disconnect")
-            app.data.wiiPendantConnected = False    
-            message = {"data":{"system":"Disconnect"}}
+    message = web_input_command(resultlist, "wii")                
     resp = jsonify(message)
     resp.status_code = 200
     return (resp)   

@@ -42,7 +42,7 @@ def getActionList(self):
 
 def Start():
     print ("start press")
-    Send("gcode:playRun")
+    Send("gcode:startRun")
     print
 
 def Stop():
@@ -281,7 +281,7 @@ while True:
                 if (wiiconnected == True):
                     print("wiimote: attached")
                 else:
-                    print("wiimote: none")                
+                    print("wiimote: disconnected")                
             print("Sled: {:.2f},{:.2f}".format(sledX,sledY))
             print("")
             print("Home: {:.2f},{:.2f}".format(homeX,homeY))
