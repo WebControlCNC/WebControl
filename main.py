@@ -111,12 +111,11 @@ def web_input_command(cmd, source):
     message = 'none'
     if ('gcode' in cmd):  # gcode commands found in gpioactions like start the gcode file cut, pause current cut, resume from pause, stop the cut, move sled home
         print ('gcode selected')
-        message = {"data":{"gcode":"selected"}}
         if ('startRun' in cmd):
             print ('start gcode ',source, ' requested')
             app.data.actions.processAction({"data":{"command":"startRun","arg":"","arg1":""}})
             message = {"data":{source:"started"}}
-        if ('pauseRun' in cmd):
+        elif ('pauseRun' in cmd):
             if (app.data.uploadFlag == 1):
                 print ('pause gcode ',source, ' requested')
                 app.data.actions.processAction({"data":{"command":"pauseRun","arg":"","arg1":""}})
@@ -125,66 +124,75 @@ def web_input_command(cmd, source):
                 print ('continue gcode ', source, ' requested')
                 app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
                 message = {"data":{source:"resumed"}}
-        if (cmd[1] == 'resumeRun'):
+            else:
+                print("not running - no pause")
+                message = {"data":{source:"No Pause - not running"}}
+        elif (cmd[1] == 'resumeRun'):
             print ('continue gcode ',source, ' requested')
             app.data.actions.processAction({"data":{"command":"resumeRun","arg":"","arg1":""}})
             message = {"data":{source:"resumed"}}
-        if (cmd[1] == 'stopRun'):
+        elif (cmd[1] == 'stopRun'):
             print ('stop gcode', source, ' requested')
             app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
             message = {"data":{source:"stopped"}}
-        if('home' in cmd):
+        elif('home' in cmd):
             print (source, ' says go home')
             app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
             message = {"data":{source:"movetoHome"}}
+        else:
+            print(cmd, " Invalid command")
+            message = {"data":{"gcode":"NONE selected"}}
     if ('zAxis' in cmd):  # this command set works with the z axis
         print ('zaxis selected ', source)
-        message = {"data":{source:"selected"}}
         if('raise' in cmd):
             print (source, ' zaxis', distance, 'raise')
             app.data.actions.processAction({"data":{"command":"moveZ","arg":"raise","arg1":distance}})
             message = {"data":{source:"raise"}}
-        if('lower' in cmd):
+        elif('lower' in cmd):
             print (source, ' zaxis', distance, 'lower')
             app.data.actions.processAction({"data":{"command":"moveZ","arg":"lower","arg1":distance}})
             message = {"data":{source:"Lower"}}
-        if('stopZ' in cmd ):
+        elif('stopZ' in cmd ):
             print (source, ' zaxis stop ', source)
             app.data.actions.processAction({"data":{"command":"stopZ","arg":"","arg1":""}})
             message = {"data":{source:"stopZ"}}
-        if('defineZ0' in cmd):
+        elif('defineZ0' in cmd):
             print ('new Z axis zero point via ', source)
             app.data.actions.processAction({"data":{"command":"defineZ0","arg":"","arg1":""}})
             message = {"data":{source:"defineZ"}}  # this command set will move or change the sled
-    if ('sled' in cmd):    
-        message = {"data":{"sled":"selected"}}
+        else:
+            print(cmd, " Invalid command")
+            message = {"data":{source:" NONE selected"}}
+    if ('sled' in cmd or 'move' in cmd):    
         if('up' in cmd):
             print (source, ' move', distance, 'up')
             app.data.actions.processAction({"data":{"command":"move","arg":"up","arg1":distance}})
             message = {"data":{source:"up"}}
-        if('down' in cmd):
+        elif('down' in cmd):
             print (source, ' move', distance, 'down')
             app.data.actions.processAction({"data":{"command":"move","arg":"down","arg1":distance}})
             message = {"data":{source:"down"}}
-        if('left' in cmd):
+        elif('left' in cmd):
             print (source, ' move', distance, 'left')
             app.data.actions.processAction({"data":{"command":"move","arg":"left","arg1":distance}})
             message = {"data":{source:"left"}}
-        if('right' in cmd):
+        elif('right' in cmd):
             print (source, ' move', distance, 'right')
             app.data.actions.processAction({"data":{"command":"move","arg":"right","arg1":distance}})
             message = {"data":{source:"right"}}
-        if('home' in cmd):
+        elif('home' in cmd):
             print ('go home via ', source)
             app.data.actions.processAction({"data":{"command":"home","arg":"","arg1":""}})
             message = {"data":{source:"movetoHome"}}
-        if('defineHome' in cmd):
+        elif('defineHome' in cmd):
             print ('new home set via ', source, ' to ', app.data.xval ,', ', app.data.yval)
             app.data.actions.processAction({"data":{"command":"defineHome","arg":app.data.xval,"arg1":app.data.yval}})
             message = {"data":{source:"NewHome"}}
+        else:
+            print(cmd, " Invalid command")
+            message = {"data":{"sled":"NONE selected"}}
     if ('system' in cmd): # this command set will adjust the system including pendant connection status and system power
         print ('system selected via ', source)
-        message = {"data":{"system":"selected"}}
         if ('exit' in cmd):
             print("system shutdown requested")
             if (app.data.uploadFlag == 0):
@@ -193,14 +201,17 @@ def web_input_command(cmd, source):
                 app.data.actions.processAction({"data":{"command":"stopRun","arg":"","arg1":""}})
                 print("denied: running code.  Code stopped near try again")
                 message = {"data":{"system":"shutdownAttempt"}}
-        if ('connected' in cmd):
+        elif ('connected' in cmd):
             print("wiimote connected")
             message = {"data":{"system":"Connect"}}
             app.data.wiiPendantConnected = True
-        if ('disconnect' in cmd):
+        elif ('disconnect' in cmd):
             print("wiimote disconnect")
             app.data.wiiPendantConnected = False    
             message = {"data":{"system":"Disconnect"}}
+        else:
+            print(cmd, " Invalid command")
+            message = {"data":{"system":"NONE selected"}}
     return(message)
 
 @app.route("/")
@@ -229,6 +240,7 @@ def remote_function_call():
         resultlist = result.split(':')
         print ('resultlist', resultlist)
         message = web_input_command(resultlist, "button")                
+        print(message)
         resp = jsonify(message)
         resp.status_code = 200 # or whatever the correct number should be
         return (resp)
@@ -291,8 +303,8 @@ def WiiMoteInput():
     result = result.decode('utf-8') # convert the binary data into text
     resultlist = result.split(':')  #take the input and cut it up into list pieces
     print (resultlist)
-    message = {"data":{"pendant:selected"}}
     message = web_input_command(resultlist, "wii")                
+    print(message)
     resp = jsonify(message)
     resp.status_code = 200
     return (resp)   
