@@ -150,21 +150,22 @@ class ReleaseManager(MakesmithInitFuncs):
 
 
     def update(self, version):
-        if version == self.latestRelease.tag_name:
-            return self.updatePyInstaller()
-        else:
-            print("downgrade to ")
-            print(version)
-            for release in self.releases:
-                if release.tag_name == version:
-                    assets = release.get_assets()
-                    for asset in assets:
-                        if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
-                            print(asset.name)
-                            print(asset.url)
-                            self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
-                            print(self.data.pyInstallUpdateBrowserUrl)
-                            return self.updatePyInstaller(True)
-            print("hmmm.. issue")
+        '''
+        Need to clean this up.
+        :param version:
+        :return:
+        '''
+        for release in self.releases:
+            if release.tag_name == version:
+                assets = release.get_assets()
+                for asset in assets:
+                    if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
+                        print(asset.name)
+                        print(asset.url)
+                        self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
+                        print(self.data.pyInstallUpdateBrowserUrl)
+                        return self.updatePyInstaller(True)
+        print("hmmm.. issue")
+        return False
 
 
