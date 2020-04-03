@@ -975,13 +975,13 @@
             "value": ".nc, .ngc, .text, .gcode"
         },
         {
-            "default": "0",
+            "default": 0,
             "desc": "Use 3D render with orbital controls in lieu of standard 2D rendering with pan/zoom\ndefault setting: False",
             "key": "enable3D",
             "section": "WebControl Settings",
             "title": "Enable 3D Display",
             "type": "bool",
-            "value": "0"
+            "value": 0
         },
         {
             "default": 5000,
@@ -991,6 +991,15 @@
             "title": "Web Port Number",
             "type": "int",
             "value": 5000
+        },
+        {
+            "default": 0,
+            "desc": "Enable experimental releases to appear in release list\ndefault setting: No",
+            "key": "experimentalReleases",
+            "section": "WebControl Settings",
+            "title": "Enable Experimental Releases",
+            "type": "bool",
+            "value": 0
         }
     ],
     "Camera Settings": [
@@ -1261,15 +1270,6 @@
             "type": "options",
             "value": ""
        }
-
-
-
-
-
-
-
-
-
 
     ]
 }
