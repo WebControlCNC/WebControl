@@ -586,7 +586,7 @@ class GCodeFile(MakesmithInitFuncs):
                         + gCodeLine[x.end() :]
                     )
                     if (self.data.clidisplay):
-                        self.displayX(xTarget)
+                        self.displayX(fmtX % (float(x.groups()[0]) + shiftX))
 
                 y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if y:
@@ -615,7 +615,7 @@ class GCodeFile(MakesmithInitFuncs):
                         + gCodeLine[y.end() :]
                     )
                     if (self.data.clidisplay):
-                        self.displayY(yTarget)
+                        self.displayY(fmtY % (float(y.groups()[0]) + shiftY))
                 #now, put any comment back.
                 gCodeLine = gCodeLine+comment
                 return gCodeLine
