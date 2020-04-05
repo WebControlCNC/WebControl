@@ -274,7 +274,8 @@ while True:
             clear()
             print("")
             if (flag == '1'):
-                print("STATUS - run time: {}".format(hms_string(end_time - start_time)))
+                thetime = hms_string(end_time - start_time)
+                print(f"STATUS - run time: {thetime.d}")
                 print("")
             else:
                 print("STATUS - not running")
@@ -289,8 +290,14 @@ while True:
             print(f"Home: {homeX:.2f},{homeY:.2f}")
             print("")
             print("Bound box from sled (inches)")
-            upper = (ymax - sledY)/25.4
-            right = (xmax - sledX)/25.4
+            upper = (ymax + sledY)/25.4
+            right = (xmax + sledX)/25.4
+            print(f"Top: {upper:.2f}")
+            print(f"Right: {right:.2f}")
+            print("Bound box from homw (mm)")
+            upper = (ymax + homeY)
+            right = (xmax + homeX)
+            print("")
             print(f"Top: {upper:.2f}")
             print(f"Right: {right:.2f}")
             print("")

@@ -86,8 +86,12 @@ class GCodeFile(MakesmithInitFuncs):
             gcodeLoad = True
         if self.data.units == "MM":
             self.canvasScaleFactor = self.MILLIMETERS
+            print("units in mm")
         else:
             self.canvasScaleFactor = self.INCHES
+            print("units inches")
+        self.data.clidisplay = self.data.config.getValue("Maslow Settings", "clidisplay")
+        print ("clidisplay is ", self.data.clidisplay)    
         if (self.data.clidisplay):
             self.data.gcode_x_min = 2000
             self.data.gcode_x_max = -2000
@@ -95,6 +99,7 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.gcode_y_max = -1000
             self.data.gcode_z_min = 20
             self.data.gcode_z_max = -20
+            print("reset gcode coordinates")
         if gcode == "":
             filename = self.data.gcodeFile.filename
             self.data.gcodeShift[0] = round(float(self.data.config.getValue("Advanced Settings", "homeX")),4)
@@ -196,19 +201,25 @@ class GCodeFile(MakesmithInitFuncs):
         '''
         get max and min X then offset from defined home position
         '''
-        if (x < self.data.gcode_x_min):
-            self.data.gcode_x_min = x
-        if (x > self.data.gcode_x_max):
-            self.data.gcode_x_max = x
+        newm = x/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeX"))
+        if (newm < self.data.gcode_x_min):
+            print("old min is ", self.data.gcode_x_min, " new min is ",newm)
+            self.data.gcode_x_min = newm
+        
+        if (newm > self.data.gcode_x_max):
+            self.data.gcode_x_max = newm
+        #print("calculating X ", x)
         
     def displayY(self,y):
         '''
         check min and max Y values against each Y point for line draw or arc draw
         '''
-        if (y < self.data.gcode_y_min):
-            self.data.gcode_y_min = y
+        newm = y/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeY"))
         if (y > self.data.gcode_y_max):
-            self.data.gcode_y_max = y
+            self.data.gcode_y_max = newm
+        if (y < self.data.gcode_y_min):
+            self.data.gcode_y_min = newm
+        #print("calculating Y ", y)
     
     def displayZ(self,z):
         '''
@@ -267,6 +278,7 @@ class GCodeFile(MakesmithInitFuncs):
                 xTarget = float(x.groups()[0]) * self.canvasScaleFactor
                 if self.absoluteFlag == 1:
                     xTarget = self.xPosition + xTarget
+                #print("x ", self.xPosition, " x target ", xTarget)
                 if (self.data.clidisplay):
                     self.displayX(xTarget)
 
@@ -275,6 +287,7 @@ class GCodeFile(MakesmithInitFuncs):
                 yTarget = float(y.groups()[0]) * self.canvasScaleFactor
                 if self.absoluteFlag == 1:
                     yTarget = self.yPosition + yTarget
+                #print("y ", self.yPosition, " y Target ", yTarget)
                 if (self.data.clidisplay):
                     self.displayY(yTarget)
                 
@@ -325,7 +338,11 @@ class GCodeFile(MakesmithInitFuncs):
                     self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                     self.addPoint3D(radius, 0, zTarget)  #targetOut
                     self.line3D[-1].dashed = False
-
+            #print("cli display",self.data.clidisplay)
+            if (self.data.clidisplay):
+                self.displayX(self.xPosition)
+            if (self.data.clidisplay):
+                self.displayY(self.yPosition)
             self.xPosition = xTarget
             self.yPosition = yTarget
             self.zPosition = zTarget
@@ -433,14 +450,14 @@ class GCodeFile(MakesmithInitFuncs):
             if x:
                 xTarget = float(x.groups()[0]) * self.canvasScaleFactor
                 if (self.data.clidisplay):
-                    self.checkX(xTarget)
-                
+                    self.displayX(xTarget)
+               
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
                 yTarget = float(y.groups()[0]) * self.canvasScaleFactor
                 if (self.data.clidisplay):
-                    self.checkY(yTarget)
-                
+                    self.displayY(yTarget)
+                    
             i = re.search("I(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if i:
                 iTarget = float(i.groups()[0]) * self.canvasScaleFactor
@@ -452,9 +469,7 @@ class GCodeFile(MakesmithInitFuncs):
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
-                if (self.data.clidisplay):
-                    self.displayZ(zTarget)
-                    
+                  
             radius = math.sqrt(iTarget ** 2 + jTarget ** 2)
             centerX = self.xPosition + iTarget
             centerY = self.yPosition + jTarget
@@ -501,9 +516,7 @@ class GCodeFile(MakesmithInitFuncs):
                 self.addPoint3D(xPosOnLine, yPosOnLine, zPosOnLine)
                 i = i + 0.1 * direction  # this is going to need to be a direction
                 counter+=1
-
             self.addPoint3D(xTarget, yTarget, zTarget)
-
             self.xPosition = xTarget
             self.yPosition = yTarget
             self.zPosition = zTarget

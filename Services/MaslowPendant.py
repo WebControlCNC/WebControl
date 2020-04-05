@@ -156,27 +156,22 @@ class WiiPendant():
           self.CONFIRM = - 10 # go back to normal
 
       if (self.wm.state['buttons'] & cwiid.BTN_A):
-          if self.TRIGGER == 1:
-            if self.CONFIRM > 0:
-              self.TRIGGER = 0
-              
-          elif self.ZTRIGGER == 1:
-            self.ZTRIGGER = 0
-            if self.CONFIRM > 0:
-              print("Z PLUNGE RESET CONFIRMED")
-              self.rumble(2)
-              self.Send("zAxis:defineZ0")
-          elif (self.wm.state['buttons'] & cwiid.BTN_B):
+        if (self.A == 0):
+            if (self.wm.state['buttons'] & cwiid.BTN_HOME):
+                print ("Wiimote MOVE SLED TO HOME")
+                self.Send("sled:home")
+                self.rumble(1)
+                self.A = 1
+            if (self.wm.state['buttons'] & cwiid.BTN_B):
                 print("Wii Remote Disconnect")
                 self.Send("system:disconnect")
                 self.wiiPendantConnected = False
                 self.rumble(0)
                 self.wm = None
                 return
-          else:
-            self.A = 1
-      else:
-        self.A = 0
+        else:
+          self.A = 0
+        
       if (self.wm.state['buttons'] & cwiid.BTN_B):
         if (self.B == 0):
             if (self.wm.state['buttons'] & cwiid.BTN_RIGHT):
@@ -208,6 +203,7 @@ class WiiPendant():
                 return
         else:
           self.B = 0
+          
       if (self.wm.state['buttons'] & cwiid.BTN_1):
         if self.TRIGGER == 0:
           if (self.wm.state['buttons'] & cwiid.BTN_UP):
@@ -237,10 +233,6 @@ class WiiPendant():
             print("Wiimote SET NEW HOME POSITION")
             self.rumble(1)
             self.TRIGGER = 1
-            #self.CONFIRM = 500
-            #self.startTime = time.clock()
-            #print("HOME POSITION CONFIRMED")
-            #self.rumble(1)
             self.Send("sled:defineHome")
       else:
         self.TRIGGER = 0
@@ -267,21 +259,9 @@ class WiiPendant():
             print("Wiimote Reset Z AXIS to 0")
             self.rumble(2)
             self.ZTRIGGER = 1
-            #self.rumble(0)
-            self.rumble(2)
             self.Send("zAxis:defineZ0")
-            #self.CONFIRM = 200
-            #self.startTime = time.clock()
       else:
         self.ZTRIGGER = 0
-        if (self.wm.state['buttons'] & cwiid.BTN_HOME):
-          if self.HOME == 0:
-            self.HOME = 1
-            print ("Wiimote MOVE SLED TO HOME")
-            self.Send("sled:home")
-            self.rumble(1)
-        else:
-          self.HOME = 0
 
       if (self.wm.state['buttons'] & cwiid.BTN_MINUS):
         if self.MINUS == 0:
