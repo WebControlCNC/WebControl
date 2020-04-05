@@ -233,16 +233,18 @@ while True:
             moving = items["data"]["moving"]
             zMove = items["data"]["zMove"]
             wiiPendantPresent = bool(items["data"]["wiiPendantPresent"])
+            print ("wii pendant : ", wiiPendantPresent)
             wiiconnected = bool(items["data"]["wiiconnected"])
+            print ("wii connected : ", wiiconnected)
             clidisplay = bool(items["data"]["clidisplay"])
             sledX = float(items["data"]["sled_location_X"])
             sledY = float(items["data"]["sled_location_y"])
                 #"sled_location_z": str(app.data.zval), \
             homeX = float(items["data"]["home_location_x"])
             homeY = float(items["data"]["home_location_y"])
-            xmin = items["data"]["gcode_min_x"]
+            xmin = float(items["data"]["gcode_min_x"])
             xmax = float(items["data"]["gcode_max_x"])
-            ymin = items["data"]["gcode_min_y"]
+            ymin = float(items["data"]["gcode_min_y"])
             ymax = float(items["data"]["gcode_max_y"])
             #print (index)
             #print (moving)
@@ -282,19 +284,19 @@ while True:
                     print("wiimote: attached")
                 else:
                     print("wiimote: disconnected")                
-            print("Sled: {:.2f},{:.2f}".format(sledX,sledY))
+            print(f"Sled: {sledX:.2f},{sledY:.2f}")
             print("")
-            print("Home: {:.2f},{:.2f}".format(homeX,homeY))
+            print(f"Home: {homeX:.2f},{homeY:.2f}")
             print("")
             print("Bound box from sled (inches)")
             upper = (ymax - sledY)/25.4
             right = (xmax - sledX)/25.4
-            print("Top: {:.2f}".format(upper))
-            print("Right: {:.2f}".format(right))
+            print(f"Top: {upper:.2f}")
+            print(f"Right: {right:.2f}")
             print("")
             print ("Absolute bounds")
-            print("Upper Right: {:.2f}, {:.2f}".format(xmax, ymax))
-            print("Lower Left: {:.2f}, {:.2f}".format(xmin,ymin))
+            print(f"Upper Right: {xmax:.2f}, {ymax:.2f}")
+            print(f"Lower Left: {xmin:.2f}, {ymin:.2f}")
             #moving or other temp step, then mention?        
     except:
        # pass

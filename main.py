@@ -266,10 +266,10 @@ def getLEDinfo():
                 "moving": str(app.data.sledMoving), \
                 "zMove": str(app.data.zMoving), \
                 "wiiPendantPresent": str(app.data.config.getValue("Maslow Settings","wiiPendantPresent")), \
-                "wiiconnected" : str(app.data.wiiPendantConnected), \
+                "wiiconnected" : str(int(app.data.wiiPendantConnected)), \
                 "clidisplay" : str(app.data.config.getValue("Maslow Settings","clidisplay")), \
-                "sled_location_X": str(app.data.computedX), \
-                "sled_location_y": str(app.data.computedY), \
+                "sled_location_X": str(app.data.xval), \
+                "sled_location_y": str(app.data.yval), \
                 #"sled_location_z": str(app.data.zval), \
                 #This part works
                 "home_location_x": str(app.data.config.getValue("Advanced Settings","homeX")), \
