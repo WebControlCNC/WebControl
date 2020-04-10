@@ -339,10 +339,13 @@ class GCodeFile(MakesmithInitFuncs):
 
     def getSpindleSpeed(self, mString):
         code = mString[mString.find("S")+1:]
-        if code!="":
-            return float(code)
-        else:
-            return 0
+        try:
+            if code!="":
+                return float(code)
+            else:
+                return 0
+        except:
+            return -1
 
     def getToolNumber(self, mString):
         code0 = mString.find("T")
@@ -350,10 +353,13 @@ class GCodeFile(MakesmithInitFuncs):
         code = mString[code0+1:code1-code0]
         #print(mString)
         #print(code)
-        if code!="":
-            return int(code)
-        else:
-            return 0
+        try:
+            if code!="":
+                return int(code)
+            else:
+                return 0
+        except:
+            return -1
 
     def getMCommand(self, mString):
         code0 = mString.find("M")
