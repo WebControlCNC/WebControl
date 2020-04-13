@@ -338,14 +338,14 @@ class GCodeFile(MakesmithInitFuncs):
         self.line3D[-1].dashed = False
 
     def getSpindleSpeed(self, mString):
-        code = mString[mString.find("S")+1:]
-        try:
-            if code!="":
-                return float(code)
-            else:
-                return 0
-        except:
-            return -1
+        sPos = mString.find("S")
+        speed = ""
+        if sPos != -1:
+            speed = mString[sPos+1:]
+        if speed != "":
+            return float(speed)
+        else:
+            return 0
 
     def getToolNumber(self, mString):
         code0 = mString.find("T")
