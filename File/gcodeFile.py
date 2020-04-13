@@ -77,8 +77,6 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         return True
 
-
-
     def loadUpdateFile(self, gcode=""):
         print("At loadUpdateFile")
         gcodeLoad = False
@@ -123,7 +121,8 @@ class GCodeFile(MakesmithInitFuncs):
             del self.line3D[:]
             rawfilters = gcode
 
-        try:
+        #try:
+        if True:  #this is just for testing R removal
             filtersparsed = rawfilters #get rid of this if above is uncommented)
             '''
             filtersparsed = re.sub(
@@ -133,7 +132,7 @@ class GCodeFile(MakesmithInitFuncs):
             #print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
-                r"([0-9])([GXYZIJFTM]) *", "\\1 \\2", filtersparsed
+                r"([0-9])([GXYZIJFTMR]) *", "\\1 \\2", filtersparsed
             )  # put spaces between gcodes
             filtersparsed = re.sub(r"  +", " ", filtersparsed)  # condense space runs
             value = self.data.config.getValue("Advanced Settings", "truncate")
@@ -146,23 +145,37 @@ class GCodeFile(MakesmithInitFuncs):
                 self.truncate = int(digits)
             else:
                 self.truncate = -1
-            filtersparsed = re.split(
-                "\n", filtersparsed
-            )  # splits the gcode into elements to be added to the list
+            filtersparsed = re.split("\n", filtersparsed)  # splits the gcode into elements to be added to the list
             filtersparsed = [x.lstrip() for x in filtersparsed] # remove leading spaces
-            filtersparsed = [
-                x + " " for x in filtersparsed
-            ]  # adds a space to the end of each line
+            filtersparsed = [x + " " for x in filtersparsed]  # adds a space to the end of each line
             filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
             filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
             filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
             filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
             filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
+            filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
+            #print (filtersparsed)
+            for index, line in enumerate(filtersparsed):
+                R = re.search("R(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
+                if R:                 #R will crash the arduino, so change the G02 G03 to G01
+                    piece = line
+                    print("line: ", line)
+                    if (line.find("G03")!=-1):
+                        newpiece = piece.replace("G03","G01")
+                        Index1 = newpiece.split("R") #remove after R
+                        newpiece = Index1[0]
+                        print ("G3 replace",newpiece)
+                        filtersparsed[index] = newpiece
+                    if (line.find("G02")!=-1):
+                        cut2line = piece.replace("G02","G01")
+                        Index1 = cut2line.split("R") #remove after R
+                        cut2line = Index1[0]
+                        print ("G03 replace", cut2line)
+                        filtersparsed[index] = cut2line
+                #print ("took out the G02 and G03: ", filtersparsed)
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
-
-
             # Find gcode indicies of z moves
             self.data.zMoves = [0]
             zList = []
@@ -186,17 +199,18 @@ class GCodeFile(MakesmithInitFuncs):
                                 self.data.zMoves.append(index)  # - 1)
                         else:
                             self.data.zMoves.append(index)
-        except Exception as e:
-            self.data.console_queue.put(str(e))
-            self.data.console_queue.put("Gcode File Error")
-            self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
-            self.data.gcodeFile.filename = ""
-            return False
+        pass
+        #except Exception as e:
+        #    self.data.console_queue.put(str(e))
+        #    self.data.console_queue.put("Gcode File Error")
+        #    self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
+        #    self.data.gcodeFile.filename = ""
+        #    return False
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
         self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
         return True
-
+      
     def displayX(self,x):
         '''
         get max and min X then offset from defined home position
