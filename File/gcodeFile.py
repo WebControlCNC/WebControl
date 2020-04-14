@@ -174,6 +174,16 @@ class GCodeFile(MakesmithInitFuncs):
                         print ("G03 replace", cut2line)
                         filtersparsed[index] = cut2line
                 #print ("took out the G02 and G03: ", filtersparsed)
+                X = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
+                Y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
+                if X:  # find min and max of X values
+                    q = abs(float(X.groups()[0]))
+                    if (self.data.clidisplay):
+                        self.displayX(q)
+                if Y: # find min and max of Y values
+                    q = abs(float(Y.groups()[0]))
+                    if (self.data.clidisplay):
+                        self.displayY(q)
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
             # Find gcode indicies of z moves
@@ -217,11 +227,12 @@ class GCodeFile(MakesmithInitFuncs):
         '''
         newm = x/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeX"))
         if (newm < self.data.gcode_x_min):
-            print("old min is ", self.data.gcode_x_min, " new min is ",newm)
             self.data.gcode_x_min = newm
+            print("calculating new max X ", x)
         
         if (newm > self.data.gcode_x_max):
             self.data.gcode_x_max = newm
+            print("calculating new max X ", x)
         #print("calculating X ", x)
         
     def displayY(self,y):
@@ -231,9 +242,10 @@ class GCodeFile(MakesmithInitFuncs):
         newm = y/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeY"))
         if (y > self.data.gcode_y_max):
             self.data.gcode_y_max = newm
+            print("calculating new max Y ", y)
         if (y < self.data.gcode_y_min):
             self.data.gcode_y_min = newm
-        #print("calculating Y ", y)
+            print("calculating new min Y ", y)
     
     def displayZ(self,z):
         '''
@@ -293,8 +305,8 @@ class GCodeFile(MakesmithInitFuncs):
                 if self.absoluteFlag == 1:
                     xTarget = self.xPosition + xTarget
                 #print("x ", self.xPosition, " x target ", xTarget)
-                if (self.data.clidisplay):
-                    self.displayX(xTarget)
+                #if (self.data.clidisplay):
+                #    self.displayX(xTarget)
 
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
@@ -302,14 +314,14 @@ class GCodeFile(MakesmithInitFuncs):
                 if self.absoluteFlag == 1:
                     yTarget = self.yPosition + yTarget
                 #print("y ", self.yPosition, " y Target ", yTarget)
-                if (self.data.clidisplay):
-                    self.displayY(yTarget)
+                #if (self.data.clidisplay):
+                #    self.displayY(yTarget)
                 
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
-                if (self.data.clidisplay):
-                    self.displayZ(zTarget)
+                #if (self.data.clidisplay):
+                #    self.displayZ(zTarget)
             if self.isNotReallyClose(self.xPosition, xTarget) or self.isNotReallyClose(
                 self.yPosition, yTarget
             ):
@@ -353,10 +365,10 @@ class GCodeFile(MakesmithInitFuncs):
                     self.addPoint3D(radius, 0, zTarget)  #targetOut
                     self.line3D[-1].dashed = False
             #print("cli display",self.data.clidisplay)
-            if (self.data.clidisplay):
-                self.displayX(self.xPosition)
-            if (self.data.clidisplay):
-                self.displayY(self.yPosition)
+            #if (self.data.clidisplay):
+            #    self.displayX(self.xPosition)
+            #if (self.data.clidisplay):
+            #    self.displayY(self.yPosition)
             self.xPosition = xTarget
             self.yPosition = yTarget
             self.zPosition = zTarget
@@ -463,14 +475,14 @@ class GCodeFile(MakesmithInitFuncs):
             x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if x:
                 xTarget = float(x.groups()[0]) * self.canvasScaleFactor
-                if (self.data.clidisplay):
-                    self.displayX(xTarget)
+                #if (self.data.clidisplay):
+                #    self.displayX(xTarget)
                
             y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if y:
                 yTarget = float(y.groups()[0]) * self.canvasScaleFactor
-                if (self.data.clidisplay):
-                    self.displayY(yTarget)
+                #if (self.data.clidisplay):
+                #    self.displayY(yTarget)
                     
             i = re.search("I(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if i:
@@ -612,8 +624,8 @@ class GCodeFile(MakesmithInitFuncs):
                         + (fmtX % (float(x.groups()[0]) + shiftX))
                         + gCodeLine[x.end() :]
                     )
-                    if (self.data.clidisplay):
-                        self.displayX(fmtX % (float(x.groups()[0]) + shiftX))
+                    #if (self.data.clidisplay):
+                    #    self.displayX(fmtX % (float(x.groups()[0]) + shiftX))
 
                 y = re.search("Y(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if y:
@@ -641,8 +653,8 @@ class GCodeFile(MakesmithInitFuncs):
                         + (fmtY % (float(y.groups()[0]) + shiftY))
                         + gCodeLine[y.end() :]
                     )
-                    if (self.data.clidisplay):
-                        self.displayY(fmtY % (float(y.groups()[0]) + shiftY))
+                    #if (self.data.clidisplay):
+                    #    self.displayY(fmtY % (float(y.groups()[0]) + shiftY))
                 #now, put any comment back.
                 gCodeLine = gCodeLine+comment
                 return gCodeLine

@@ -274,12 +274,13 @@ while True:
             clear()
             print("")
             if (flag == '1'):
-                thetime = hms_string(end_time - start_time)
+                thetime = time.time() - start_time
+                
                 print(f"STATUS - run time: {thetime.d}")
                 print("")
             else:
                 print("STATUS - not running")
-                print("")
+                print(f"last job: {thetime.d}")
             if (wiiPendantPresent == True):
                 if (wiiconnected == True):
                     print("wiimote: attached")
@@ -294,7 +295,7 @@ while True:
             right = (xmax + sledX)/25.4
             print(f"Top: {upper:.2f}")
             print(f"Right: {right:.2f}")
-            print("Bound box from homw (mm)")
+            print("Bound box from home (mm)")
             upper = (ymax + homeY)
             right = (xmax + homeX)
             print("")
