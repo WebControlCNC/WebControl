@@ -110,6 +110,10 @@
   margin-left: 1rem;
 }
 
+body {
+  padding-top: 70px;
+}
+
 .dropdown-menu {
   margin-top: .75rem;
 }

@@ -522,8 +522,8 @@ class UIProcessor:
             elif msg["message"] == "distToMoveUpdateZ":
                 self.distToMoveUpdateZ()
             elif msg["message"] == "updateTimer":
-                # TODO: clean this up .. edit: sendCalibrationMessage got deleted somewhere.
-                # self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
+                # Todo: clean this up .. edit: sendCalibrationMessage got deleted somewhere.
+                #self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
                 pass
             elif msg["message"] == "updateCamera":
                 self.sendCameraMessage("updateCamera", json.loads(msg["data"]))

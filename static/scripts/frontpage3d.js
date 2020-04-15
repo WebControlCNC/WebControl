@@ -11,7 +11,7 @@ var homeY = 0;
 
 var renderer = new THREE.WebGLRenderer();
 var w = $("#workarea").width();//-20;
-var h = $("#workarea").height()- 10;//-20;
+var h = $("#workarea").height();//-20;
 renderer.setSize( w, h );
 //console.log("w="+w+", h="+h);
 
@@ -245,25 +245,26 @@ animate();
 window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
-    // Make canvas tiny so the container can shrink.
-    renderer.setSize( 10, 10 );
-    // Get new size of fluid container.
-    we = $("#workarea").width();
-    // Can't find the source of this 10px offset.
-    // Needed to stop unneccesary scrool bar on main window.
-    he = $("#workarea").height() - 10;
+
+    //w=window.innerWidth;
+    //h=window.innerHeight;
+    //console.log("wr="+w+", hr="+h);
+    we = $("#workarea").width(); //-20;
+    he = $("#workarea").height(); //-20;
     //console.log("we="+we+", he="+he);
 
+    //cameraO.aspect = window.innerWidth / window.innerHeight;
     cameraO.left = we/-2*scale;
     cameraO.right = we/2*scale;
     cameraO.top = he/2*scale;
     cameraO.bottom = he/-2*scale;
     cameraO.updateProjectionMatrix();
-
+    //cameraP.aspect = window.innerWidth / window.innerHeight;
     cameraP.aspect = we / he;
     cameraP.updateProjectionMatrix();
-    // Finally resize the canvas.
+
     renderer.setSize( we, he );
+
 }
 
 

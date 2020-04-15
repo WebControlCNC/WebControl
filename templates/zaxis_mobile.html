@@ -1,59 +1,42 @@
+
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <div class="col mb-2">
-      <input class="form-control m-1 p-2" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" id="distToMoveZ" value="{{distToMoveZ}}">
-    </div>
-    <div class="col mb-2">
-      <button type="button" class="btn btn-lg btn-block btn-dark" onclick="action('moveZ','raise',$('#distToMoveZ').val())">
-        <i data-feather="arrow-up">Raise</i>
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col mb-2">
-      <button id="unitsZ" type="button" class="btn btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">{{unitsZ}}</button>
-    </div>
-    <div class="col mb-2">
-      <button type="button" class="btn btn-lg btn-block btn-dark" onclick="action('moveZ','lower',$('#distToMoveZ').val())">
-        <i data-feather="arrow-down">Lower</i>
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col mb-2">
-      <button type="button" class="btn btn-lg btn-block btn-primary" onclick="action('defineZ0');">
-        <i data-feather="save">Def.</i> Zero
-      </button>
-    </div>
-    <div class="col mb-2">
-      <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveZzero')">
-        <i data-feather="chevrons-right">Goto</i> Zero
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col mb-2">
-      <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('touchZ')" {{ 'disabled' if not touchPlate }} >
-        <i data-feather="target">Touch</i> Zero
-      </button>
-    </div>
-    <div class="col mb-2">
-      <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveZsafe')">
-        <i data-feather="chevrons-right">Goto</i> Safe
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopZ');">
-        <i data-feather="alert-octagon"></i> Stop
-      </button>
+    <div class = "col">
+      <div class="row">
+        <div class="col-6 mb-1">
+          <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$"  id="distToMoveZ" value="{{distToMoveZ}}">
+        </div>
+        <div class="col-6 mb-1">
+          <button id="unitsZ" type="button" class="btn  btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">{{unitsZ}}</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 mb-1">
+          <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('moveZ','raise',$('#distToMoveZ').val())"><i data-feather="arrow-up">Raise</i></button>
+        </div>
+        <div class="col-6 mb-1">
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('touchZ')" {{'' if touchPlate else 'disabled'}} >Touch</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 mb-1">
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('moveZ','lower',$('#distToMoveZ').val())"><i data-feather="arrow-down">Lower</i></button>
+        </div>
+        <div class="col-6 mb-1">
+          <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('defineZ0');"><i data-feather="save">Def.</i> Zero</button>
+        </div>
+      </div>
+      <div class="col mb-1">
+        <button type="button" class="btn  btn-lg btn-block btn-danger" style="height:100%" onclick="action('stopZ');"><i data-feather="alert-octagon"></i> Stop</button>
+      </div>
     </div>
   </div>
 </div>
-{% endblock %} {% block javascript %}
+{% endblock %}
+
+{% block javascript %}
   <script src="{{ url_for('static',filename='scripts/zAxis.js', version='10262019c') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script>feather.replace()</script>
+  <script> feather.replace() </script>
 {% endblock %}

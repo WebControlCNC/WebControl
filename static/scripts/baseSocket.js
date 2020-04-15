@@ -252,19 +252,26 @@ function setListeners(){
 
 }
 
-function action() {
-  var msg = {"command": arguments[0]};
-  if (arguments.length > 1 ) {
-    var args = new Array()
-    for (var i=1; i < arguments.length; i++) {
-      args[i-1] = arguments[i];
-    }
-    msg["args"] = args;
-  }
-  console.log("action=" + arguments[0]);
-  socket.emit('action', msg);
+function action(command, arg, arg1){
+    if (arg==null)
+      arg = "";
+    if (arg1==null)
+      arg1 = "";
+    console.log("action="+command);
+    socket.emit('action',{data:{command:command,arg:arg, arg1:arg1}});
 }
 
+function move(direction){
+  distToMove = $("#distToMove").val();
+  console.log(distToMove)
+  socket.emit('move',{data:{direction:direction,distToMove:distToMove}});
+}
+
+function moveZ(direction){
+  distToMoveZ = $("#distToMoveZ").val();
+  console.log(distToMoveZ)
+  socket.emit('moveZ',{data:{direction:direction,distToMoveZ:distToMoveZ}});
+}
 
 function settingRequest(section,setting){
   console.log("requesting..")

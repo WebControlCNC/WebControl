@@ -1,7 +1,7 @@
-.modalxlg>.modal-dialog {
-  max-width: 90% !important;
-  width: 90% !important;
-}
+ .modalxlg > .modal-dialog {
+       max-width: 90% !important;
+      width: 90% !important;
+ }
 
 .disabler {
 }
@@ -9,92 +9,93 @@
 .alert {
   margin-bottom: 1px;
   height: 30px;
-  line-height: 30px;
-  padding: 0px 15px;
+  line-height:30px;
+  padding:0px 15px;
 }
 
+ 
 #contentModalText {
-  max-height: 70vh;
-  overflow-y: auto;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 #fpCircle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 150px;
-  height: 150px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+	width: 150px;
+    height: 150px;
 }
-
 #gcCircle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 150px;
-  height: 150px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+	width: 150px;
+    height: 150px;
 }
-
 #notificationCircle {
-  position: absolute;
-  top: 70%;
-  left: 50%;
-  transform: translate(-50%, -30%);
-  width: 80px;
-  height: 80px;
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%,-30%);
+	width: 80px;
+    height: 80px;
 }
 
 #notificationModal {
-  z-index: 1051;
+    z-index: 1051;
 }
 
+
 .loader {
-  width: calc(100% - 0px);
-  height: calc(100% - 0px);
-  border: 8px solid #162534;
-  border-top: 8px solid #09f;
-  border-radius: 50%;
-  animation: rotate 5s linear infinite;
+    width: calc(100% - 0px);
+	height: calc(100% - 0px);
+	border: 8px solid #162534;
+	border-top: 8px solid #09f;
+	border-radius: 50%;
+	animation: rotate 5s linear infinite;
 }
 
 @keyframes rotate {
 100% {transform: rotate(360deg);}
 }
 
-#editor {
-  margin: 0;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60vh;
-}
+ #editor {
+        margin: 0;
+        position: relative;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60vh;
+    }
 
 .alert-circle.alert-sm {
-  width: 16px;
-  height: 16px;
-  padding: 6px 0px;
-  border-radius: 8px;
-  font-size: 8px;
-  text-align: center;
+    width: 16px;
+    height: 16px;
+    padding: 6px 0px;
+    border-radius: 8px;
+    font-size: 8px;
+    text-align: center;
 }
 
 .dot {
-  height: 15px;
-  width: 15px;
-  background-color: red;
-  border-radius: 50%;
-  display: inline-block;
-}
+    height: 15px;
+    width: 15px;
+    background-color: red;
+    border-radius: 50%;
+    display: inline-block;
+  }
 
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-  /* display: none; <- Crashes Chrome on hover */
-  -webkit-appearance: none;
-  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
 input[type=number] {
-  -moz-appearance: textfield; /* Firefox */
+    -moz-appearance:textfield; /* Firefox */
 }
