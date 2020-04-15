@@ -13,6 +13,7 @@ import webbrowser
 import socket
 from github import Github
 import markdown
+import mimetypes
 
 
 class WebPageProcessor:
@@ -226,15 +227,15 @@ class WebPageProcessor:
             return page, "Upload GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "importGCini":
             url = "importFile"
-            page = render_template("importFile.html", url=url)
+            page = render_template("importFile.html", url=url, mimetypes=".ini")
             return page, "Import groundcontrol.ini", False, "medium", "content", False
         elif pageID == "importWCJSON":
             url = "importFileWCJSON"
-            page = render_template("importFile.html", url=url)
-            return page, "Import webcontrol.json", False, "medium", "content", False
+            page = render_template("importFile.html", url=url, mimetypes=".json")
+            return page, "Import WebControl.json", False, "medium", "content", False
         elif pageID == "restoreWebControl":
             url = "importRestoreWebControl"
-            page = render_template("importFile.html", url=url)
+            page = render_template("importFile.html", url=url, mimetypes=".zip")
             return page, "Restore WebControl", False, "medium", "content", False
         elif pageID == "actions":
             if self.data.controllerFirmwareVersion < 100:

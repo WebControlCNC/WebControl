@@ -532,13 +532,11 @@ def backupWebControl():
     if request.method == "GET":
         returnVal = app.data.actions.backupWebControl()
         if returnVal != False:
-            print(returnVal)
-            return send_file(returnVal)
+            return send_file(returnVal, as_attachment=True)
         else:
             resp = jsonify("failed")
             resp.status_code = 500
             return resp
-
 
 @app.route("/editBoard", methods=["POST"])
 def editBoard():
