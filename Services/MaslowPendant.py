@@ -168,7 +168,7 @@ class WiiPendant():
                 self.wiiPendantConnected = False
                 self.rumble(0)
                 self.wm = None
-                return
+                return # this should kill the process... if not how to do it?
         else:
           self.A = 0
         
