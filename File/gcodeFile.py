@@ -229,8 +229,10 @@ class GCodeFile(MakesmithInitFuncs):
         bedwidth = round(float(self.data.config.getValue("Maslow Settings", "bedWidth")),4)
         if (newm > bedwidth):
             newm = bedwidth
+            print("Off Right")
         if (newm < (0-bedwidth)):
-            newm = 0 - bedwidth    
+            newm = 0 - bedwidth 
+            print("Off Left")   
         if (newm < self.data.gcode_x_min):
             self.data.gcode_x_min = newm
             print("calculating new min X ", newm)
@@ -247,8 +249,10 @@ class GCodeFile(MakesmithInitFuncs):
         height = round(float(self.data.config.getValue("Maslow Settings", "bedHeight")),4)
         if (newm > height):
             newm = height
+            print("overheight")
         if (newm < (0-height)):
             newm = 0 - height
+            print("Underbound")
         if (newm > self.data.gcode_y_max):
             self.data.gcode_y_max = newm
             print("calculating new max Y ", newm)
