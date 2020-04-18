@@ -24,3 +24,5 @@ __pycache__/
 *$py.class
 Services/tp.py
 Services/tr.py
+Services/pijson.txt
+Services/pijsonRT.txt

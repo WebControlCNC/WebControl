@@ -225,7 +225,7 @@ class GCodeFile(MakesmithInitFuncs):
         '''
         get max and min X then offset from defined home position
         '''
-        newm = x/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeX"))
+        newm = x*self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeX"))
         bedwidth = round(float(self.data.config.getValue("Maslow Settings", "bedWidth")),4)
         if (newm > bedwidth):
             newm = bedwidth
@@ -243,7 +243,7 @@ class GCodeFile(MakesmithInitFuncs):
         '''
         check min and max Y values against each Y point for line draw or arc draw
         '''
-        newm = y/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeY"))
+        newm = y*self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeY"))
         height = round(float(self.data.config.getValue("Maslow Settings", "bedHeight")),4)
         if (newm > height):
             newm = height
