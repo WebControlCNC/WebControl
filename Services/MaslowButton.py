@@ -109,7 +109,7 @@ def startPendant():
     if (wiiPendantPresent):
         print("kickstart pendant process (TOTALLY SEPARATE)")
         try:
-            subprocess.run(['sudo','/usr/local/etc/MaslowPendantStart.sh'])
+            subprocess.run(['sudo','/usr/local/etc/MPStart.sh'])  #MP is short for MaslowPendant
             print ('subprocess started Pendant service')
         except:
             print ('error starting pendant sub process')

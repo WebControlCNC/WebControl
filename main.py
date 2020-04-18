@@ -992,7 +992,7 @@ if __name__ == "__main__":
     # start button service next to last
     if (app.data.GPIOButtonService):
         print("starting Maslow GPIO button service")
-        subprocess.run('/usr/local/etc/MaslowButtonStart.sh')
+        subprocess.run('/usr/local/etc/MBStart.sh') # MB is short for MaslowButon
     
     #app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
