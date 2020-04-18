@@ -21,7 +21,16 @@ class ReleaseManager(MakesmithInitFuncs):
     latestRelease = None
 
     def getReleases(self):
-        return self.releases
+        tempReleases = []
+        enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
+        for release in self.releases:
+            if not enableExperimental:
+                if not self.isExperimental(re.sub(r'[v]', r'', release.tag_name)):
+                    tempReleases.append(release)
+            else:
+                tempReleases.append(release)
+        return tempReleases
+
 
     def getLatestRelease(self):
         return self.latestRelease
@@ -30,6 +39,7 @@ class ReleaseManager(MakesmithInitFuncs):
         if True:  # self.data.platform=="PYINSTALLER":
             print("Checking latest pyrelease.")
             try:
+                enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
                 g = Github()
                 repo = g.get_repo("madgrizzle/WebControl")
                 self.releases = repo.get_releases()
@@ -38,8 +48,14 @@ class ReleaseManager(MakesmithInitFuncs):
                 for release in self.releases:
                     tag_name = re.sub(r'[v]', r'', release.tag_name)
                     tag_float = float(tag_name)
-                    # print(tag_name)
-                    if tag_float > latestVersionGithub:
+                    eligible = False
+                    if not enableExperimental:
+                        if not self.isExperimental(tag_name):
+                            eligible = True
+                    else:
+                        eligible = True
+                    #print("tag:"+tag_name+", eligible:"+str(eligible))
+                    if eligible and tag_float > latestVersionGithub:
                         latestVersionGithub = tag_float
                         self.latestRelease = release
 
@@ -57,6 +73,20 @@ class ReleaseManager(MakesmithInitFuncs):
                             self.data.pyInstallUpdateVersion = self.latestRelease
             except Exception as e:
                 print("Error checking pyrelease: " + str(e))
+
+    def isExperimental(self, tag):
+        '''
+        Deternmines if release is experimental.  All even releases are stable, odd releases are experimental
+        :param tag:
+        :return:
+        '''
+        if float(tag) <= 0.931: # all releases before now are 'stable'
+            return False
+        lastDigit = tag[-1]
+        if (int(lastDigit) % 2) == 0: # only even releases are 'stable'
+            return False
+        else:
+            return True
 
     def processAbsolutePath(self, path):
         index = path.find("main.py")
@@ -120,21 +150,22 @@ class ReleaseManager(MakesmithInitFuncs):
 
 
     def update(self, version):
-        if version == self.latestRelease.tag_name:
-            return self.updatePyInstaller()
-        else:
-            print("downgrade to ")
-            print(version)
-            for release in self.releases:
-                if release.tag_name == version:
-                    assets = release.get_assets()
-                    for asset in assets:
-                        if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
-                            print(asset.name)
-                            print(asset.url)
-                            self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
-                            print(self.data.pyInstallUpdateBrowserUrl)
-                            return self.updatePyInstaller(True)
-            print("hmmm.. issue")
+        '''
+        Need to clean this up.
+        :param version:
+        :return:
+        '''
+        for release in self.releases:
+            if release.tag_name == version:
+                assets = release.get_assets()
+                for asset in assets:
+                    if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
+                        print(asset.name)
+                        print(asset.url)
+                        self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
+                        print(self.data.pyInstallUpdateBrowserUrl)
+                        return self.updatePyInstaller(True)
+        print("hmmm.. issue")
+        return False
 
 

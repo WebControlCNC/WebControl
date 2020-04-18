@@ -8,7 +8,6 @@ import os
 import subprocess
 import sys
 
-#monkey.patch_all(thread = False, threading = False) 
 monkey.patch_all()
     
 
