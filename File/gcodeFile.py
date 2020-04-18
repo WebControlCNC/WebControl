@@ -226,13 +226,17 @@ class GCodeFile(MakesmithInitFuncs):
         get max and min X then offset from defined home position
         '''
         newm = x/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeX"))
+        bedwidth = round(float(self.data.config.getValue("Maslow Settings", "bedWidth")),4)
+        if (newm > bedwidth):
+            newm = bedwidth
+        if (newm < (0-bedwidth)):
+            newm = 0 - bedwidth    
         if (newm < self.data.gcode_x_min):
             self.data.gcode_x_min = newm
-            print("calculating new max X ", x)
-        
+            print("calculating new min X ", newm)
         if (newm > self.data.gcode_x_max):
             self.data.gcode_x_max = newm
-            print("calculating new max X ", x)
+            print("calculating new max X ", newm)
         #print("calculating X ", x)
         
     def displayY(self,y):
@@ -240,12 +244,17 @@ class GCodeFile(MakesmithInitFuncs):
         check min and max Y values against each Y point for line draw or arc draw
         '''
         newm = y/self.canvasScaleFactor #+ float(self.data.config.getValue("Advanced Settings", "homeY"))
-        if (y > self.data.gcode_y_max):
+        height = round(float(self.data.config.getValue("Maslow Settings", "bedHeight")),4)
+        if (newm > height):
+            newm = height
+        if (newm < (0-height)):
+            newm = 0 - height
+        if (newm > self.data.gcode_y_max):
             self.data.gcode_y_max = newm
-            print("calculating new max Y ", y)
-        if (y < self.data.gcode_y_min):
+            print("calculating new max Y ", newm)
+        if (newm < self.data.gcode_y_min):
             self.data.gcode_y_min = newm
-            print("calculating new min Y ", y)
+            print("calculating new min Y ", newm)
     
     def displayZ(self,z):
         '''

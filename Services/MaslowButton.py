@@ -30,6 +30,13 @@ maxY = 0.00
 actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 start_time = time.time()
 end_time = time.time()
+curtime = "none"
+thetime = time.time()
+
+def timer(start,end):
+    hours, rem = divmod(end-start, 3600)
+    minutes, seconds = divmod(rem, 60)
+    return("{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds))
 
 def getpause():
     return runpause
@@ -152,6 +159,7 @@ def setGPIOAction(pin, action):
         LEDs.append(led)
         print("set LED with action: " + action)
     #pause()
+
 def getAction(action):
     #print(action)
     if action == "Stop":
@@ -274,18 +282,19 @@ while True:
             clear()
             print("")
             if (flag == '1'):
-                thetime = time.time() - start_time
-                
-                print(f"STATUS - run time: {thetime.d}")
+                end_time = time.time()
+                curtime = timer(start_time,end_time)
+                print(f"STATUS - run time: ", curtime)
                 print("")
             else:
                 print("STATUS - not running")
-                print(f"last job: {thetime.d}")
+                print(f"last job: ", curtime)
             if (wiiPendantPresent == True):
                 if (wiiconnected == True):
                     print("wiimote: attached")
                 else:
                     print("wiimote: disconnected")                
+            print("")
             print(f"Sled: {sledX:.2f},{sledY:.2f}")
             print("")
             print(f"Home: {homeX:.2f},{homeY:.2f}")
