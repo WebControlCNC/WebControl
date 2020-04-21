@@ -11,6 +11,8 @@ import time
 import re
 import zipfile
 import threading
+import platform
+from subprocess import call
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
 
@@ -62,6 +64,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
+            elif msg["data"]["command"] == "TurnOffRPI":
+                if not self.turnOff():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with system shutting down.")
             elif self.data.uploadFlag == 1:
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
             # Commands not allowed during sending gcode.. if you did these commands, something could screw up.
@@ -295,7 +300,27 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    
+    def turnOff(self):
+        ''' this is the rpi soft power button function'''
+        try:
+            oname = os.name
+            print ("OS is ", oname)
+            if oname == "posix":
+                print(os.system("uname -a"))
+            # insert other possible OSes here
+            # ... NEED ARE YOU SURE YOU WANT POWER DOWN?
+                call("sudo --non-interactive shutdown -h now", shell=True)
+                return(True) #this should never run
+            else:
+                print("unknown OS")
+                print(self.data.platform)
+                #print(os.uname)
+                return(False)
+        except:
+            print("shutdown failure")
+            return(False)  
+                  
     def defineHome(self, posX="", posY=""):
         '''
         Redefines the home location and sends message to update the UI client.  In a break from ground control, this
