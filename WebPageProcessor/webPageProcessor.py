@@ -245,7 +245,7 @@ class WebPageProcessor:
                 enableHoley = False
             else:
                 enableHoley = True
-            if self.data.platform == "RPI":
+            if ((self.data.platform == "RPI")or(self.data.platform == "PYINSTALLER")):
                 docker = True
                 enableRPIshutdown = True
                 #print("RPI shutdown is TRUE")
