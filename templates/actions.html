@@ -22,7 +22,7 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('restoreWebControl');$('#contentModal').modal('hide');">Restore WebControl</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
 				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('TurnOffRPI');$('#contentModal').modal('hide');">{{'Turn Off RPI'}}</button>
+				<button type="button" class="btn btn-lg btn-block btn-danger" {{'' if enableRPIshutdown else 'data-toggle="tooltip" title="Raspberry Pi System Shutdown"' | safe}} onclick="action('TurnOffRPI');$('#contentModal').modal('hide');"{{'' if enableRPIshutdown else 'hidden'}}>Turn off RPI</button>
 			</div>
 		</div>
 	</div>

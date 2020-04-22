@@ -247,15 +247,19 @@ class WebPageProcessor:
                 enableHoley = True
             if self.data.platform == "RPI":
                 docker = True
+                enableRPIshutdown = True
+                #print("RPI shutdown is TRUE")
             else:
                 docker = False
+                enableRPIshutdown = False
+                #print ("RPI shutdown is FALSE")
             if self.data.pyInstallUpdateAvailable:
                 updateAvailable = True
                 updateRelease = self.data.pyInstallUpdateVersion
             else:
                 updateAvailable = False
                 updateRelease = "N/A"
-            page = render_template("actions.html", updateAvailable=updateAvailable, updateRelease=updateRelease, docker=docker, customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley)
+            page = render_template("actions.html", updateAvailable=updateAvailable, updateRelease=updateRelease, docker=docker, customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley, enableRPIshutdown = enableRPIshutdown)
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
