@@ -11,6 +11,7 @@ import time
 import re
 import zipfile
 import threading
+import subprocess
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
 
