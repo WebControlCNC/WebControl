@@ -81,6 +81,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveZ":
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "touchZ":
+                if not self.touchZ():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis touch.")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
             elif msg["data"]["command"] == "home":
