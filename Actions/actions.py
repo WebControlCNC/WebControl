@@ -89,6 +89,9 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "defineZ0":
                 if not self.data.actions.defineZ0():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with defining Z-Axis zero.")
+            elif msg["data"]["command"] == "touchZ":
+                if not self.touchZ():
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with touching.")
             elif msg["data"]["command"] == "moveToDefault":
                 if not self.moveToDefault():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with moving to default chain lengths")
