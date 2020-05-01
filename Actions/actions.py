@@ -1700,6 +1700,7 @@ class Actions(MakesmithInitFuncs):
         xpos = 0
         ypos = 0
         zpos = 0
+        positioning = "G90 "
         for x in range(index):
             filtersparsed = re.sub(r'\(([^)]*)\)', '', self.data.gcode[x])  # replace mach3 style gcode comments with newline
             filtersparsed = re.sub(r';([^\n]*)?', '\n', filtersparsed)  # replace standard ; initiated gcode comments with ""
