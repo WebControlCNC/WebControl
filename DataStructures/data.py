@@ -187,7 +187,7 @@ class Data:
     """
     bufferSize = 127
 
-    pausedzval = 0.0
+    pausedzval = None
     pausedPositioningMode = 0
     pausedUnits = "INCHES"
 
