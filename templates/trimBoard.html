@@ -1,4 +1,4 @@
-
+{% import 'macros.html' as macros %}
 {% block content %}
 <div class="container-fluid">
   <form id="trimBoardForm">
@@ -7,26 +7,26 @@
       <div class="row justify-content-center">
           <div class="form-group col-6">
             <label for="trimTop">Trim Top</label>
-            <input id="trimTop" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="trimTop" value="0">
+            {{ macros.input_decimal("trimTop", True, "0") }}
             <small class="form-text text-muted">Enter value in {{units}} only</small>
           </div>
       </div>
       <div class="row">
         <div class="form-group col-6">
             <label for="trimLeft">Trim Left</label>
-            <input id="trimLeft" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="trimLeft" value="0">
+            {{ macros.input_decimal("trimLeft", True, "0") }}
             <small class="form-text text-muted">Enter value in {{units}} only</small>
         </div>
         <div class="form-group col-6">
             <label for="trimRight">Trim Right</label>
-            <input id="trimRight" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="trimRight" value="0">
+            {{ macros.input_decimal("trimRight", True, "0") }}
             <small class="form-text text-muted">Enter value in {{units}} only</small>
         </div>
       </div>
       <div class="row justify-content-center">
           <div class="form-group col-6">
             <label for="trimBottom">Trim Bottom</label>
-            <input id="trimBottom" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="trimBottom" value="0">
+            {{ macros.input_decimal("trimBottom", True, "0") }}
             <small class="form-text text-muted">Enter value in {{units}} only</small>
           </div>
       </div>

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% import 'macros.html' as macros %}
 {% block header %}
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='10262019a') }}" crossorigin="anonymous">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -83,7 +83,7 @@
     </div>
     <div class="row">
       <div class="col-4  mb-1">
-        <form onsubmit="return false;"><input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,3})?$" id="distToMove" title="Positive number with maximum 3 decimal places"></form>
+        <form id="distInput" onsubmit="return false;">{{ macros.input_decimal("distToMove", True) }}</form>
       </div>
       <div class="col-4  mb-1">
         <button id="units" type="button" class="btn btn-lg btn-secondary" onclick="unitSwitch()">--</button>

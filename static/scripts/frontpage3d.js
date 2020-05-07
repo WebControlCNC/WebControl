@@ -807,3 +807,24 @@ function toggle3DPO(){
     }
 }
 
+function onFooterSubmit(){
+  var form = $("#settingsForm")
+  // JQuery returns list of forms so must select first [0].
+  isValid = form[0].checkValidity();
+  if (isValid) {
+    var url = $("#pageID").val()
+    $.ajax({
+      url : '/'+url,
+      type: "POST",
+      data: form.serialize(),
+      success: function (data) {
+        console.log("success");
+        $('#contentModal').modal('toggle')
+      },
+      error: function (jXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+      }
+    });
+  }
+}
+
