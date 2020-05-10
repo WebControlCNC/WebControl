@@ -121,8 +121,8 @@ class GCodeFile(MakesmithInitFuncs):
             del self.line3D[:]
             rawfilters = gcode
 
-        #try:
-        if True:  #this is just for testing R removal
+        try:
+         if True:  #this is just for testing R removal
             filtersparsed = rawfilters #get rid of this if above is uncommented)
             '''
             filtersparsed = re.sub(
@@ -156,6 +156,7 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
             filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
             #print (filtersparsed)
+            #((\%)|((?P<linenumber>N\s*\d{1,5})?\s*(?P<word>[ABCDFGHIJKLMNPRSTXYZ]\s*[+-]?(\d|\s)*\.?(\d|\s)*\s*)|(?P<comment>\(.*?\)\s*)))
             for index, line in enumerate(filtersparsed):
                 R = re.search("R(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
                 if R:                 #R will crash the arduino, so change the G02 G03 to G01
@@ -174,16 +175,17 @@ class GCodeFile(MakesmithInitFuncs):
                         print ("G03 replace", cut2line)
                         filtersparsed[index] = cut2line
                 #print ("took out the G02 and G03: ", filtersparsed)
-                X = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
-                Y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
-                if X:  # find min and max of X values
-                    q = abs(float(X.groups()[0]))
-                    if (self.data.clidisplay):
-                        self.displayX(q)
-                if Y: # find min and max of Y values
-                    q = abs(float(Y.groups()[0]))
-                    if (self.data.clidisplay):
-                        self.displayY(q)
+                if (self.data.clidisplay):
+                    X = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
+                    Y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
+                    if (type(X) != None):
+                        if X:  # find min and max of X values
+                            q = abs(float(X.groups()[0]))
+                            self.displayX(q)
+                    if (type(Y) != None):
+                        if Y: # find min and max of Y values
+                            q = abs(float(Y.groups()[0]))
+                            self.displayY(q)
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
             # Find gcode indicies of z moves
@@ -209,13 +211,13 @@ class GCodeFile(MakesmithInitFuncs):
                                 self.data.zMoves.append(index)  # - 1)
                         else:
                             self.data.zMoves.append(index)
-        pass
-        #except Exception as e:
-        #    self.data.console_queue.put(str(e))
-        #    self.data.console_queue.put("Gcode File Error")
-        #    self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
-        #    self.data.gcodeFile.filename = ""
-        #    return False
+         pass
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            self.data.console_queue.put("Gcode File Error")
+            self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
+            self.data.gcodeFile.filename = ""
+            return False
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
         self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
