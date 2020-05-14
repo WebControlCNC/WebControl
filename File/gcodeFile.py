@@ -412,6 +412,36 @@ class GCodeFile(MakesmithInitFuncs):
             centerX = self.xPosition + iTarget
             centerY = self.yPosition + jTarget
 
+            # If radius R is provided in gcode then work out centerpoint ignoring I J.
+            r = re.search("R(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+            if r:
+                x1 = self.xPosition
+                x2 = xTarget
+                y1 = self.yPosition
+                y2 = yTarget
+
+                radius = float(r.groups()[0]) * self.canvasScaleFactor
+                # e: clockwise -1, counterclockwise 1
+                e = 1
+                if ((int(command[1:]) == 2)):
+                    e = -1
+                # X and Y differences
+                dx = x2 - x1
+                dy = y2 - y1
+                # Linear distance between the points.
+                d = math.hypot(dx, dy)
+                # Distance to the arc pivot-point.
+                h = math.sqrt(math.pow(radius, 2) - math.pow(d * 0.5, 2))
+                # Point between the two points.
+                mx = (x1 + x2) * 0.5
+                my = (y1 + y2) * 0.5
+                # Slope of the perpendicular bisector.
+                sx = -dy / d
+                sy = dx / d
+                # Pivot-point of the arc.
+                centerX = mx + e * h * sx
+                centerY = my + e * h * sy
+
             angle1 = math.atan2(self.yPosition - centerY, self.xPosition - centerX)
             angle2 = math.atan2(yTarget - centerY, xTarget - centerX)
 
