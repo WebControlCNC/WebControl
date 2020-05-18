@@ -371,7 +371,11 @@ class GCodeFile(MakesmithInitFuncs):
         else:
             code = mString[code0+1: code1-code0]
         if code!="":
-            return int(code)
+            try:
+                code = int(code)
+                return int(code)
+            except:
+                return 0
         else:
             return 0
 
