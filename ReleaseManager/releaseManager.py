@@ -41,7 +41,7 @@ class ReleaseManager(MakesmithInitFuncs):
             try:
                 enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
                 g = Github()
-                repo = g.get_repo("madgrizzle/WebControl")
+                repo = g.get_repo("WebControlCNC/WebControl")
                 self.releases = repo.get_releases()
                 latestVersionGithub = 0
                 self.latestRelease = None
