@@ -9,7 +9,6 @@ import sys
 
 monkey.patch_all()
 
-
 import schedule
 import time
 import threading
