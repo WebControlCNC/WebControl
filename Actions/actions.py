@@ -81,6 +81,15 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveZ":
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "SetMaxZ":
+                if not self.SetMaxZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Maximum")
+            elif msg["data"]["command"] == "SetMinZ":
+                if not self.SetMinZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Minimum")
+            elif msg["data"]["command"] == "ClearZ":
+                if not self.ClearZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
             elif msg["data"]["command"] == "home":
@@ -436,7 +445,54 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    def SetMinZ(self):
+        '''
+        Arduino command to set minimum z axis travel position to prevent z axis motor damage
+        B17
+        '''
+        try:
+            self.data.gcode_queue.put("B17")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def SetMaxZ(self):
+        '''
+        Arduino command to set maximum z axis travel position to prevent z axis motor damage
+        B18
+        '''
+        try:
+            self.data.gcode_queue.put("B18")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def ClearZ(self):
+        '''
+        Arduino command to clear z axis minimum and maximum
+        B19
+        '''
+        try:
+            self.data.gcode_queue.put("B19")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def getZlimits(self):
+        '''
+        Arduino command to echo z axis minimum and maximum values
+        B20
+        '''
+        try:
+            self.data.gcode_queue.put("B20")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
     def startRun(self):
         '''
         Starts the process of sending the gcode to the controller.
