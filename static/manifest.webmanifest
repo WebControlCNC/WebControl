@@ -1,0 +1,22 @@
+{
+  "short_name": "WebControl",
+  "name": "Web-based Ground Control",
+  "description": "Web interface for the Maslow CNC router",
+  "icons": [
+    {
+      "src": "/static/images/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/static/images/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#53B3ED",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#53B3ED"
+}
