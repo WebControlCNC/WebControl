@@ -82,13 +82,13 @@ class Actions(MakesmithInitFuncs):
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
             elif msg["data"]["command"] == "SetMaxZ":
-                if not self.SetMaxZ():
+                if not self.setMaxZ():
                     self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Maximum")
             elif msg["data"]["command"] == "SetMinZ":
-                if not self.SetMinZ():
+                if not self.setMinZ():
                     self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Minimum")
             elif msg["data"]["command"] == "ClearZ":
-                if not self.ClearZ():
+                if not self.clearZ():
                     self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
@@ -445,21 +445,10 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-    def SetMinZ(self):
+        
+    def setMinZ(self):
         '''
         Arduino command to set minimum z axis travel position to prevent z axis motor damage
-        B17
-        '''
-        try:
-            self.data.gcode_queue.put("B17")
-            return True
-        except Exception as e:
-            self.data.console_queue.put(str(e))
-            return False
-        
-    def SetMaxZ(self):
-        '''
-        Arduino command to set maximum z axis travel position to prevent z axis motor damage
         B18
         '''
         try:
@@ -469,7 +458,19 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
         
-    def ClearZ(self):
+    def setMaxZ(self):
+        '''
+        Arduino command to set maximum z axis travel position to prevent z axis motor damage
+        B17
+        '''
+        try:
+            self.data.gcode_queue.put("B17")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def clearZ(self):
         '''
         Arduino command to clear z axis minimum and maximum
         B19
