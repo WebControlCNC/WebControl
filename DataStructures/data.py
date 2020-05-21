@@ -38,7 +38,7 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.9335
+    pyInstallCurrentVersion = 0.94
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
@@ -187,7 +187,7 @@ class Data:
     """
     bufferSize = 127
 
-    pausedzval = 0.0
+    pausedzval = None
     pausedPositioningMode = 0
     pausedUnits = "INCHES"
 
