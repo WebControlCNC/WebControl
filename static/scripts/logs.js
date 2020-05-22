@@ -9,7 +9,7 @@ $(document).ready(function(){
   namespace = '/MaslowCNCLogs'; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
-  socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {'forceNew':true});
+  socket = io.connect('//' + document.domain + ':' + location.port + namespace, {'forceNew':true});
   setListeners();
 
   $("#enablealog").change(function(){
