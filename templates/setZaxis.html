@@ -5,11 +5,14 @@
         <h2 class="card-title">Configure Software Z-Axis Endstops</h2>
         <p> Router limits help Maslow avoid potential damage from plunging too deep or retracting too far.  Follow the steps below to set the z axis limits.</p>
         <h4 class="card-title">Step 1: Clear Z-Axis upper and lower limits</h4>
+        <br>
         <p>Press the button to clear previously set limits if moving beyond them is desired, otherwise skip to step 2</p>
         <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearZ');"">Clear Z</button>
+        <br>
         <h4 class="card-title">Step 2:  Set Z-Axis Upper Limit</h4>
         <p>Move your sled to the extreme upper limit and press the button to save the new position.</p>
         <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMaxZ');"<i data-feather="save">Set Max Z</i></button>
+        <br>
         <h4 class="card-title">Step 3:  Z-Axis Lower Limit</h4>
         <p>Move your sled to the extreme lower limit and press the button to save the new position.</p>
         <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMinZ');"<i data-feather="save">Set Min Z</i></button>
