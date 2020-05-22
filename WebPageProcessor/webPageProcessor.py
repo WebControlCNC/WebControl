@@ -271,6 +271,15 @@ class WebPageProcessor:
             else:
                 page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
+        elif pageID == "setZaxis":
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            minZlimit = 0 #self.data.config.getValue("Advanced Settings", "minZlimit")
+            maxZlimit = 0 #self.data.config.getValue("Advanced Settings", "maxZlimit")
+            #if isMobile:
+            #    page = render_template("zaxis_mobile.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+            #else:
+            page = render_template("setZaxis.html", minZlimit = minZlimit, maxZlimit = maxZlimit)
+            return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setSprockets":
             if self.data.controllerFirmwareVersion < 100:
                 fourMotor = False

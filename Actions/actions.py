@@ -81,14 +81,17 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveZ":
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
-            elif msg["data"]["command"] == "SetMaxZ":
+            elif msg["data"]["command"] == "setMaxZ":
                 if not self.setMaxZ():
                     self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Maximum")
-            elif msg["data"]["command"] == "SetMinZ":
+            elif msg["data"]["command"] == "setMinZ":
                 if not self.setMinZ():
                     self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Minimum")
-            elif msg["data"]["command"] == "ClearZ":
+            elif msg["data"]["command"] == "clearZ":
                 if not self.clearZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
+            elif msg["data"]["command"] == "getZlimits":
+                if not self.getZlimits():
                     self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
