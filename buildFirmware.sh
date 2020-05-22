@@ -17,7 +17,7 @@ git checkout $madgrizzle_firmware_sha
 pio lib install "Servo"
 pio run -e megaatmega2560
 
-mv .pio/build/megaatmega2560/firmware.hex ~/WebControl/firmware/madgrizzle/madgrizzle-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+mv .pio/build/megaatmega2560/firmware.hex ./madgrizzle-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 
 cd ../..
 
@@ -28,7 +28,7 @@ cd firmware/maslowcnc
 git checkout $maslowcnc_firmware_sha
 pio lib install "Servo"
 pio run -e megaatmega2560
-mv .pio/build/megaatmega2560/firmware.hex ~/WebControl/firmware/maslowcnc/maslowcnc-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+mv .pio/build/megaatmega2560/firmware.hex ./maslowcnc-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 
 cd ../..
 
@@ -38,4 +38,4 @@ git clone $holey_firmware_repo firmware/holey
 cd firmware/holey
 git checkout $holey_firmware_sha
 pio run -e megaatmega2560
-mv .pio/build/megaatmega2560/firmware.hex ~/WebControl/firmware/holey/holey-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
+mv .pio/build/megaatmega2560/firmware.hex ./holey-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
