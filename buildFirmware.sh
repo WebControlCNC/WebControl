@@ -14,6 +14,7 @@ madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
 git clone $madgrizzle_firmware_repo firmware/madgrizzle
 cd firmware/madgrizzle
 git checkout $madgrizzle_firmware_sha
+pio lib install "Servo"
 pio run -e megaatmega2560
 
 mv .pio/build/megaatmega2560/firmware.hex ~/WebControl/firmware/madgrizzle/madgrizzle-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
