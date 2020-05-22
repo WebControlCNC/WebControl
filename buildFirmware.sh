@@ -26,6 +26,7 @@ maslowcnc_firmware_sha=e1e0d020fff1f4f7c6b403a26a85a16546b7e15b
 git clone $maslowcnc_firmware_repo firmware/maslowcnc
 cd firmware/maslowcnc
 git checkout $maslowcnc_firmware_sha
+pio lib install "Servo"
 pio run -e megaatmega2560
 mv .pio/build/megaatmega2560/firmware.hex ~/WebControl/firmware/maslowcnc/maslowcnc-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 
