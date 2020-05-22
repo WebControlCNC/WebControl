@@ -7,8 +7,8 @@ import math
 import os
 import sys
 
-monkey.patch_all()
 
+monkey.patch_all()
 
 import schedule
 import time
