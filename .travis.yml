@@ -1,11 +1,13 @@
 os:
   - linux
-  - windows
+  # - windows
 
 language: python
 install:
   - pip install -r requirements.txt
+  - pip install -U platformio
   - pip install pyinstaller
 
 script:
+  - ./buildFirmware.sh
   - pyinstaller main-onedir.spec
