@@ -9,5 +9,5 @@ install:
   - pip install pyinstaller
 
 script:
-  - ./buildFirmware.sh
+  - bash buildFirmware.sh
   - pyinstaller main-onedir.spec
