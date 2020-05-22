@@ -1,0 +1,11 @@
+os:
+  - linux
+  - windows
+
+language: python
+install:
+  - pip install -r requirements.txt
+  - pip install pyinstaller
+
+script:
+  - pyinstaller main-onedir.spec
