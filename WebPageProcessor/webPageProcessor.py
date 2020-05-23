@@ -260,10 +260,10 @@ class WebPageProcessor:
                 updateAvailable = False
                 updateRelease = "N/A"
             if (float(self.data.controllerFirmwareVersion) > 1.26):
-                firmwareVersionNewEnough = True
+                firmwareSupportsZaxisLimit = True
             else:
-                firmwareVersionNewEnough = False
-            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so: ", firmwareVersionNewEnough)
+                firmwareSupportsZaxisLimit = False
+            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so: ", firmwareSupportsZaxisLimit)
             page = render_template("actions.html", 
                                    updateAvailable=updateAvailable, 
                                    updateRelease=updateRelease, 
@@ -274,7 +274,7 @@ class WebPageProcessor:
                                    enableCustom=enableCustom, 
                                    enableHoley=enableHoley, 
                                    enableRPIshutdown = enableRPIshutdown,
-                                   firmwareVersionNewEnough = firmwareVersionNewEnough
+                                   firmwareSupportsZaxisLimit = firmwareSupportsZaxisLimit
                                    )
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
