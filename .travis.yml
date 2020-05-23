@@ -14,6 +14,7 @@ script:
   - cd dist && mv main webcontrol && cd webcontrol
   - touch webcontrol-linux-singledirectory.tar.gz
   - tar -zcvf webcontrol-linux-singledirectory.tar.gz --exclude=webcontrol-linux-singledirectory.tar.gz .
+  - cd ../..
 
 
 before_deploy:
