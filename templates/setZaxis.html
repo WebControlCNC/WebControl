@@ -2,27 +2,54 @@
   <div class="container-fluid">
     <div class="card">
 			<div class="card-body">
-        <h2 class="card-title">Configure Software Z-Axis Endstops</h2>
-        <p> Router limits help Maslow avoid potential damage from plunging too deep or retracting too far.  Follow the steps below to set the z axis limits.</p>
-        <h4 class="card-title">Step 1: Clear Z-Axis upper and lower limits</h4>
-        <br>
-        <p>Press the button to clear previously set limits if moving beyond them is desired, otherwise skip to step 2</p>
+        <p>Router Z limits help Maslow avoid potential damage from plunging too deep or retracting too far.</p>
+        <h5 class="card-title">Step 1: Clear Z-Axis Upper and Lower Limits if Previously Set</h5>
         <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearZ');"">Clear Z</button>
-        <br>
-        <h4 class="card-title">Step 2:  Set Z-Axis Upper Limit</h4>
-        <p>Move your sled to the extreme upper limit and press the button to save the new position.</p>
-        <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMaxZ');"<i data-feather="save">Set Max Z</i></button>
-        <br>
-        <h4 class="card-title">Step 3:  Z-Axis Lower Limit</h4>
-        <p>Move your sled to the extreme lower limit and press the button to save the new position.</p>
-        <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMinZ');"<i data-feather="save">Set Min Z</i></button>
-        
+        <h5 class="card-title">Step 2: Move Z-Axis to Upper Limit and press Set Z Max</h5>
+        <h5 class="card-title">Step 3: Move Z-Axis to Lower Limit and press Set Z Min</h5>
+        </div>
+         <div class="row">
+          <div class = "col-9">
+            <div class="row">
+              <div class="col-4 mb-1">
+                <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" id="distToMoveZ" value="{{distToMoveZ}}">
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('moveZ','raise',$('#distToMoveZ').val())"><i data-feather="arrow-up">Raise</i></button>
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMaxZ');"><i data-feather="save">Save</i>Set Z Max</button>  
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-4 mb-1">
+                <button id="unitsZ" type="button" class="btn  btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">{{unitsZ}}</button>
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('moveZ','lower',$('#distToMoveZ').val())"><i data-feather="arrow-down">Lower</i></button>
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMinZ');"><i data-feather="save">Set</i>Set Z Min</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn  btn-lg btn-block btn-danger" style="height:100%" onclick="action('stopZ');"><i data-feather="alert-octagon"></i> Stop</button>
+          </div>
+        </div>
+      <br>
+        <div class = "row">
+          <div class = "col-5 mb-1">
+            
+          </div>
+          <div class = "col-5 mb-1">
+           
+          </div>
+        </div>
       </div>
     </div>
   </div>
 {% endblock %}
-
-
 
 {% block javascript %}
 <script src="{{ url_for('static',filename='scripts/setZaxis.js', version='10262018a') }}" crossorigin="anonymous"></script> 
