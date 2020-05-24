@@ -169,17 +169,17 @@ docker run -it -v $HOME/.WebControl:/root/.WebControl -p 5000:5000 --privileged 
 You can use virtualenv to set up a local development environment for running the code without installing packages in the system Python installation.
 
     # Create a virtual environment
-    `virtualenv -p python3 .venv`
+    virtualenv -p python3 .venv
     # Activate the virtual environment
-    `source .venv/bin/activate`
+    source .venv/bin/activate
     # Install the prerequisites
-    `pip install -r requirements.txt`
+    pip install -r requirements.txt
 
 When running on the Pi, you'll also need some extra dependencies and will need to build OpenCV from source. See the Dockerfile for details. (TODO: add instructions here)
 
 Then you can run the code with.
 
-    `python main.py`
+    python main.py
 
 The server will then be available at http://localhost:5000
 
