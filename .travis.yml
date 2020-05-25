@@ -5,6 +5,7 @@ python: "3.7"
 jobs:
   include:
     - stage: Build
+      name: Linux
       os: linux
       install: &base_install
         - pip install -r requirements.txt
@@ -22,6 +23,17 @@ jobs:
           tags: true
 
     - stage: Build
+      name: macOS
+      os: osx
+      install:
+        - *base_install
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_release.sh rpi
+      deploy:
+        <<: *base_deploy
+    - stage: Build
+      name: Raspberry Pi
       os: linux
       arch: arm64
       before_install:
