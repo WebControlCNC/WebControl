@@ -28,7 +28,6 @@ jobs:
       language: generic
       addons:
         homebrew:
-          update: true
           packages: python3
       before_install:
         - pip3 install virtualenv
@@ -39,6 +38,22 @@ jobs:
       script:
         - tools/download_firmware_release.sh
         - tools/build_release.sh osx
+      deploy:
+        <<: *base_deploy
+    - stage: Build
+      name: Windows
+      os: windows
+      language: generic
+      before_install:
+        - choco install python
+        - pip install virtualenv
+        - virtualenv -p python3 ~/venv
+        - source ~/venv/bin/activate
+      install:
+        - *base_install
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_release.sh windows
       deploy:
         <<: *base_deploy
     # - stage: Build
