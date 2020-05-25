@@ -32,16 +32,16 @@ jobs:
         - tools/build_release.sh osx
       deploy:
         <<: *base_deploy
-    - stage: Build
-      name: Raspberry Pi
-      os: linux
-      arch: arm64
-      before_install:
-        - sudo apt-get -y install liblapack-dev libblas-dev gfortran
-      install:
-        - *base_install
-      script:
-        - tools/download_firmware_release.sh
-        - tools/build_release.sh rpi
-      deploy:
-        <<: *base_deploy
+    # - stage: Build
+    #   name: Raspberry Pi
+    #   os: linux
+    #   arch: arm64
+    #   before_install:
+    #     - sudo apt-get -y install liblapack-dev libblas-dev gfortran
+    #   install:
+    #     - *base_install
+    #   script:
+    #     - tools/download_firmware_release.sh
+    #     - tools/build_release.sh rpi
+    #   deploy:
+    #     <<: *base_deploy
