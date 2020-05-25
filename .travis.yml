@@ -43,7 +43,7 @@ jobs:
     - stage: Build
       name: Windows
       os: windows
-      language: generic
+      language: shell
       before_install:
         - choco install python
         - pip install virtualenv
