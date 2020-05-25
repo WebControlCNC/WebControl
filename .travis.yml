@@ -6,24 +6,43 @@ os:
   # - windows
 
 language: python
-install:
-  - pip install -r requirements.txt
-  - pip install pyinstaller
 
-script:
-  - tools/download_firmware_release.sh
-  - pyinstaller main-onedir.spec
-  - cd dist && mv main webcontrol && cd webcontrol
-  - touch webcontrol-linux-singledirectory.tar.gz
-  - tar -zcvf webcontrol-linux-singledirectory.tar.gz --exclude=webcontrol-linux-singledirectory.tar.gz .
-  - cd ../..
+jobs:
+  include:
+    - stage: Linux Build
+      os: linux
+      install: &base_install
+        - pip install -r requirements.txt
+        - pip install pyinstaller
+      script:
+        - tools/download_firmware_release.sh
+        - pyinstaller main-onedir.spec
+        - cd dist && mv main webcontrol && cd webcontrol
+        - touch webcontrol-linux-singledirectory.tar.gz
+        - tar -zcvf webcontrol-linux-singledirectory.tar.gz --exclude=webcontrol-linux-singledirectory.tar.gz .
+        - ls -l
+        - cd ../..
+      deploy: &base_deploy
+        provider: releases
+        token: $GITHUB_TOKEN
+        file: dist/webcontrol/*.tar.gz
+        skip_cleanup: true
+        draft: true
+        on:
+          tags: true
 
-
-deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file: dist/webcontrol/webcontrol-linux-singledirectory.tar.gz
-  skip_cleanup: true
-  draft: true
-  on:
-    tags: true
+    - stage: Raspberry Pi build
+      os: linux
+      arch: arm64
+      install:
+        <<: *base_install
+      script:
+        - tools/download_firmware_release.sh
+        - pyinstaller main-onedir.spec
+        - cd dist && mv main webcontrol && cd webcontrol
+        - touch webcontrol-rpi-singledirectory.tar.gz
+        - tar -zcvf webcontrol-rpi-singledirectory.tar.gz --exclude=webcontrol-rpi-singledirectory.tar.gz .
+        - ls -l
+        - cd ../..
+      deploy:
+        <<: *base_deploy
