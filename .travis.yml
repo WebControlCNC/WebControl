@@ -46,6 +46,7 @@ jobs:
       language: shell
       before_install:
         - choco install python
+        - choco install pip
         - pip install virtualenv
         - virtualenv -p python3 ~/venv
         - source ~/venv/bin/activate
