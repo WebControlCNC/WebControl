@@ -8,11 +8,10 @@ os:
 language: python
 install:
   - pip install -r requirements.txt
-  - pip install -U platformio
   - pip install pyinstaller
 
 script:
-  - bash buildFirmware.sh
+  - tools/download_firmware_release.sh
   - pyinstaller main-onedir.spec
   - cd dist && mv main webcontrol && cd webcontrol
   - touch webcontrol-linux-singledirectory.tar.gz
@@ -20,15 +19,11 @@ script:
   - cd ../..
 
 
-before_deploy:
-  # Set up git user name and tag this commit
-  - git config --local user.name "Emile Cantin"
-  - git config --local user.email "emile.cantin@gmail.com"
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
-  - git tag $TRAVIS_TAG
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
   file: dist/webcontrol/webcontrol-linux-singledirectory.tar.gz
   skip_cleanup: true
   draft: true
+  on:
+    tags: true
