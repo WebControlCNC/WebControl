@@ -3,7 +3,7 @@ language: python
 
 jobs:
   include:
-    - stage: Linux Build
+    - stage: Build
       os: linux
       install: &base_install
         - pip install -r requirements.txt
@@ -20,8 +20,9 @@ jobs:
         on:
           tags: true
 
-    - stage: Raspberry Pi build
+    - stage: Build
       os: linux
+      arch: arm64
       before_install:
         - sudo apt-get -y install liblapack-dev libblas-dev gfortran
       install:
