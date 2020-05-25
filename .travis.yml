@@ -1,6 +1,6 @@
 
 language: python
-python: "3.7"
+# python: "3.7"
 
 jobs:
   include:
@@ -29,7 +29,7 @@ jobs:
         - *base_install
       script:
         - tools/download_firmware_release.sh
-        - tools/build_release.sh rpi
+        - tools/build_release.sh osx
       deploy:
         <<: *base_deploy
     - stage: Build
