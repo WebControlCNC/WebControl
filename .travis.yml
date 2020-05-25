@@ -48,7 +48,6 @@ jobs:
       before_install:
         - choco install python --version=3.7.7
         - python -m pip install -U pip setuptools
-        - choco install pip
         - pip install virtualenv
         - virtualenv -p python3 ~/venv
         - source ~/venv/bin/activate
