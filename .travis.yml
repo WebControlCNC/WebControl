@@ -64,7 +64,7 @@ jobs:
         - tools/build_release.sh windows
       deploy:
         <<: *base_deploy
-      - stage: Deploy
-        deploy:
-          <<: *base_deploy
-          draft: false
+    - stage: Deploy
+      deploy:
+        <<: *base_deploy
+        draft: false
