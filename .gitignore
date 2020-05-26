@@ -11,6 +11,9 @@ venv.bak/
 build
 dist
 
+# compiled firmware
+firmware
+
 #logs
 log.txt
 alog.txt

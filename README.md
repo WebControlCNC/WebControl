@@ -17,11 +17,17 @@ For Windows 10 and Linux (Debian-based, such as Ubuntu) machines, users can down
 For Linux/RPI users, make a new subdirectory,and then issue the untar:
 
 **For RPI:**
->cd ~</br>
->mkdir webcontrol</br>
->cd webcontrol</br>
->wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz</br>
->tar -zxvf webcontrol-0.920-rpi-singledirectory.tar.gz</br>
+
+```
+cd ~
+wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz
+mkdir webcontrol
+tar -zxvf webcontrol-0.920-rpi-singledirectory.tar.gz -C webcontrol
+cd webcontrol
+sudo tools/install_dependencies.sh
+python3 main.py
+```
+
 
 **For Linux:**
 >cd ~</br>
