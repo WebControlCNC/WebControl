@@ -5,14 +5,11 @@ language: python
 jobs:
   include:
     - stage: Build
-      name: Linux
+      name: Base
       os: linux
-      install: &base_install
-        - pip install -r requirements.txt
-        - pip install pyinstaller
       script:
         - tools/download_firmware_release.sh
-        - tools/build_release.sh linux
+        - tools/build_base_release.sh
       deploy: &base_deploy
         provider: releases
         token: $GITHUB_TOKEN
@@ -22,6 +19,17 @@ jobs:
         on:
           tags: true
 
+    - stage: Build
+      name: Linux
+      os: linux
+      install: &base_install
+        - pip install -r requirements.txt
+        - pip install pyinstaller
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_release.sh linux
+      deploy:
+        <<: *base_deploy
     - stage: Build
       name: macOS
       os: osx
