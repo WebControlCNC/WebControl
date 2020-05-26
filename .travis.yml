@@ -15,6 +15,7 @@ jobs:
         token: $GITHUB_TOKEN
         file: dist/webcontrol/*.tar.gz
         skip_cleanup: true
+        pre-release: true
         draft: true
         on:
           tags: true
@@ -56,9 +57,6 @@ jobs:
       before_install:
         - choco install python --version=3.7.7
         - python -m pip install -U pip setuptools
-        # - pip install virtualenv
-        # - virtualenv -p python3 ~/venv
-        # - source ~/venv/bin/activate
       install:
         - *base_install
       script:
@@ -66,16 +64,7 @@ jobs:
         - tools/build_release.sh windows
       deploy:
         <<: *base_deploy
-    # - stage: Build
-    #   name: Raspberry Pi
-    #   os: linux
-    #   arch: arm64
-    #   before_install:
-    #     - sudo apt-get -y install liblapack-dev libblas-dev gfortran
-    #   install:
-    #     - *base_install
-    #   script:
-    #     - tools/download_firmware_release.sh
-    #     - tools/build_release.sh rpi
-    #   deploy:
-    #     <<: *base_deploy
+      - stage: Deploy
+        deploy:
+          <<: *base_deploy
+          draft: false
