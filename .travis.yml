@@ -9,7 +9,7 @@ jobs:
       os: linux
       script:
         - tools/download_firmware_release.sh
-        - tools/build_base_release.sh
+        - tools/build_universal_release.sh
       deploy: &base_deploy
         provider: releases
         token: $GITHUB_TOKEN
