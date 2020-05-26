@@ -15,7 +15,7 @@ jobs:
         token: $GITHUB_TOKEN
         file: dist/*.tar.gz
         skip_cleanup: true
-        pre-release: true
+        prerelease: true
         draft: true
         on:
           tags: true
