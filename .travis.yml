@@ -65,7 +65,11 @@ jobs:
         - tools/build_release.sh windows
       deploy:
         <<: *base_deploy
-    - stage: Deploy
+    - stage: Publish
+      install:
+       - echo install
+      script:
+        - echo script
       deploy:
         <<: *base_deploy
         draft: false
