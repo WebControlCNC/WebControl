@@ -13,7 +13,7 @@ jobs:
       deploy: &base_deploy
         provider: releases
         token: $GITHUB_TOKEN
-        file: dist/webcontrol/*.tar.gz
+        file: dist/*.tar.gz
         skip_cleanup: true
         pre-release: true
         draft: true
