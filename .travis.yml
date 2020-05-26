@@ -13,6 +13,7 @@ jobs:
       deploy: &base_deploy
         provider: releases
         token: $GITHUB_TOKEN
+        file_glob: true
         file: dist/*.tar.gz
         skip_cleanup: true
         prerelease: true
