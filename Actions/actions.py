@@ -9,6 +9,9 @@ import json
 import time
 import re
 import zipfile
+import threading
+import platform
+from subprocess import call
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
 
@@ -45,6 +48,7 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Cannot issue command while sending gcode.")
                     return False
                 return command(*args)
+
             else:
                 response = "Function not implemented: " + "[" + msg["command"] + "]"
                 self.data.ui_queue1.put("Alert", "Alert", response)
@@ -71,6 +75,26 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self._logException(e, "Error with shutting down.")
             return False
+
+    def turnOff(self):
+        ''' this is the rpi soft power button function'''
+        try:
+            oname = os.name
+            print ("OS is ", oname)
+            if oname == "posix":
+                print(os.system("uname -a"))
+            # insert other possible OSes here
+            # ... NEED ARE YOU SURE YOU WANT POWER DOWN?
+                call("sudo --non-interactive shutdown -h now", shell=True)
+                return(True) #this should never run
+            else:
+                print("unknown OS")
+                print(self.data.platform)
+                #print(os.uname)
+                return(False)
+        except:
+            print("shutdown failure")
+            return(False)  
 
     def defineHome(self, posX = None, posY = None):
         """
@@ -1877,6 +1901,7 @@ class Actions(MakesmithInitFuncs):
         xpos = 0
         ypos = 0
         zpos = 0
+        positioning = "G90 "
         for x in range(index):
             filtersparsed = re.sub(
                 r"\(([^)]*)\)", "", self.data.gcode[x]

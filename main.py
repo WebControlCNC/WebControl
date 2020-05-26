@@ -7,8 +7,8 @@ import math
 import os
 import sys
 
-monkey.patch_all()
 
+monkey.patch_all()
 
 import schedule
 import time
@@ -195,7 +195,7 @@ def gpioSettings():
         resp = jsonify(message)
         resp.status_code = 200
         return resp
-        
+
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
     app.data.logger.resetIdler()
@@ -685,7 +685,9 @@ def command(msg):
         print("Shutting Down")
         socketio.stop()
         print("Shutdown")
-
+    if (retval == "TurnOffRPI"):
+        print("Turning off RPI")
+        os.system('sudo poweroff')
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
 def settingRequest(msg):
@@ -741,7 +743,7 @@ def isnumber(s):
         return True
     except ValueError:
         return False
-        
+
 #def shutdown():
 #    print("Shutdown")
 
@@ -769,11 +771,11 @@ if __name__ == "__main__":
 
     print("opening browser")
     webPortStr = str(webPortInt)
-    webbrowser.open_new_tab("http://localhost:"+webPortStr)
+    webbrowser.open_new_tab("//localhost:"+webPortStr)
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
-    
+
     #app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
     # socketio.run(app, host='0.0.0.0')

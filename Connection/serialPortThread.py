@@ -177,6 +177,8 @@ class SerialPortThread(MakesmithInitFuncs):
             self.data.uploadFlag = -1
             self.data.pausedUnits = self.data.units
             self.data.ui_queue1.put("Action", "setAsResume", "")
+            # clear machine out of pause mode
+            self.data.quick_queue.put("~")
 
     def manageToolChange(self, line):
         if line.find("M6 ") != -1 or line.find("M06") != -1:

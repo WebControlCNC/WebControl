@@ -32,27 +32,42 @@
         <ul class="navbar-nav mr-auto">
           <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> G-Code </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
-              <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a> <a class="dropdown-item" href="#" onclick="requestPage('saveGCode');">Save</a> <a class="dropdown-item" href="#" onclick="requestPage('uploadGCode');">Upload</a> <a class="dropdown-item" href="#"
-                onclick="action('clearGCode');">Clear GCode</a> <a class="dropdown-item" href="#" onclick="requestPage('editGCode');">View/Edit</a> <a class="dropdown-item" href="#" onclick="requestPage('sendGCode');">Send Custom GCode</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('saveGCode');">Save</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('uploadGCode');">Upload</a>
+              <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('editGCode');">View/Edit</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('sendGCode');">Send Custom GCode</a>
               <!--<a class="dropdown-item" href="#" onclick="action('optimizeGCode');">Optimize GCode</a>-->
             </div></li>
           <li class="nav-item" id="actionsNavItem"><a class="nav-link" href="#" onclick="requestPage('actions');">Actions</a></li>
           <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Settings </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-              <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Settings</a> <a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a> <a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl
-                Settings</a> <a class="dropdown-item" href="#" onclick="requestPage('cameraSettings');">Camera Settings</a> <a class="dropdown-item" href="#" onclick="requestPage('gpioSettings');">GPIO Settings</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Settings</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl Settings</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('cameraSettings');">Camera Settings</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('gpioSettings');">GPIO Settings</a>
             </div></li>
           <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Boards </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
-              <a class="dropdown-item" href="#" onclick="requestPage('openBoard');">Open Board</a> <a class="dropdown-item" href="#" onclick="requestPage('saveBoard');">Save Board</a> <a class="dropdown-item" href="#" onclick="requestPage('editBoard');">Create/Edit Board</a> <a class="dropdown-item"
-                href="#" onclick="requestPage('trimBoard');">Trim Board</a> <a class="dropdown-item" href="#" onclick="action('boardProcessGCode');">Process GCode</a> <a class="dropdown-item" href="#" onclick="action('boardClearBoard');">Clear Board</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('openBoard');">Open Board</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('saveBoard');">Save Board</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('editBoard');">Create/Edit Board</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('trimBoard');">Trim Board</a>
+              <a class="dropdown-item" href="#" onclick="action('boardProcessGCode');">Process GCode</a>
+              <a class="dropdown-item" href="#" onclick="action('boardClearBoard');">Clear Board</a>
             </div></li>
           <li class="nav-item dropdown"><span id="helpBadge" class="badge badge-pill badge-primary" style="float: left; margin-bottom: -10px;"></span> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false"> Help </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
-              <a class="dropdown-item" href="#" onclick="requestPage('gettingStarted');">Getting Started</a> <a class="dropdown-item" href="https://madgrizzle.github.io/WebControl/" target="_blank">Online Help</a> <a class="dropdown-item" href="#" onclick="requestPage('help');">Offline Help</a> <a
-                class="dropdown-item" href="#" onclick="requestPage('about');">About</a> <span id="updateBadge" class="badge badge-pill badge-primary" style="float: left; margin-bottom: -10px;"></span> <a class="dropdown-item" href="#" onclick="requestPage('releases');">Update</a> <a
-                class="dropdown-item" href="logs" target="_blank">Logs</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('gettingStarted');">Getting Started</a>
+              <a class="dropdown-item" href="https://webcontrolcnc.github.io/WebControl/" target="_blank">Online Help</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('help');">Offline Help</a>
+              <a class="dropdown-item" href="#" onclick="requestPage('about');">About</a>
+              <span id="updateBadge" class="badge badge-pill badge-primary" style="float: left; margin-bottom: -10px;"></span>
+              <a class="dropdown-item" href="#" onclick="requestPage('releases');">Update</a>
+              <a class="dropdown-item" href="logs" target="_blank">Logs</a>
             </div></li>
         </ul>
         <div id="clientStatus" class="alert alert-danger">Not Connect</div>
