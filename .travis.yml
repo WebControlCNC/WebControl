@@ -5,7 +5,7 @@ language: python
 jobs:
   include:
     - stage: Build
-      name: Base
+      name: Universal
       os: linux
       script:
         - tools/download_firmware_release.sh

@@ -25,3 +25,6 @@ alog.txt
 __pycache__/
 *.py[cod]
 *$py.class
+
+# macOS junk
+.DS_Store
