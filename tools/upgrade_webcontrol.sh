@@ -9,7 +9,9 @@ tar -zxvf $1
 IS_RASPBIAN=$(cat /etc/os-release | grep "Raspbian")
 if [ -n "${IS_RASPBIAN}" ]
 then
+  echo "We are on Raspbian, installing dependencies"
   sudo tools/install_dependencies.sh
 fi
 
+echo "Starting WebControl"
 ./webcontrol
