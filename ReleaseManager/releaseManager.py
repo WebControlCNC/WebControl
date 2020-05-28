@@ -9,7 +9,7 @@ import re
 from github import Github
 import wget
 import subprocess
-from shutil import copyfile
+import shutil
 
 
 class ReleaseManager(MakesmithInitFuncs):
@@ -50,7 +50,7 @@ class ReleaseManager(MakesmithInitFuncs):
                     tag_float = float(tag_name)
                     eligible = False
                     if not enableExperimental:
-                        if not self.isExperimental(tag_name):
+                        if not self.isExperimental(release):
                             eligible = True
                     else:
                         eligible = True
@@ -74,19 +74,16 @@ class ReleaseManager(MakesmithInitFuncs):
             except Exception as e:
                 print("Error checking pyrelease: " + str(e))
 
-    def isExperimental(self, tag):
+    def isExperimental(self, release):
         '''
-        Deternmines if release is experimental.  All even releases are stable, odd releases are experimental
+        Deternmines if release is experimental. Pre-Releases are experimental.
         :param tag:
         :return:
         '''
-        if float(tag) <= 0.931: # all releases before now are 'stable'
-            return False
-        lastDigit = tag[-1]
-        if (int(lastDigit) % 2) == 0: # only even releases are 'stable'
-            return False
-        else:
+        if release.prerelease:
             return True
+        else:
+            return False
 
     def processAbsolutePath(self, path):
         index = path.find("main.py")
@@ -106,36 +103,78 @@ class ReleaseManager(MakesmithInitFuncs):
                 except:
                     print("error cleaning download directory: ", filePath)
                     print("---")
+            print("Downloading new WebControl release...")
             if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
                 filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "\\.WebControl\\downloads")
             else:
                 filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "/.WebControl/downloads")
-            print(filename)
+            print("Successfully downloaded new release to:" + filename)
 
             if self.data.platform == "PYINSTALLER":
                 lhome = os.path.join(self.data.platformHome)
             else:
                 lhome = "."
-            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
-                path = lhome + "/tools/upgrade_webcontrol_win.bat"
-                copyfile(path, home + "/.WebControl/downloads/upgrade_webcontrol_win.bat")
-                path = lhome + "/tools/7za.exe"
-                copyfile(path, home + "/.WebControl/downloads/7za.exe")
-                self.data.pyInstallInstalledPath = self.data.pyInstallInstalledPath.replace('/', '\\')
-                program_name = home + "\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
 
+            print("Creating target version directory...")
+            target_dir = self.data.pyInstallInstalledPath + '_next'
+            if os.path.exists(target_dir):
+                print("New release directory already exists, removing it")
+                shutil.rmtree(target_dir)
+            os.mkdir(target_dir)
+            print("Creating target version directory DONE")
+
+            print("Unzipping new release...")
+            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
+                command = [
+                    lhome + "/tools/7za.exe",
+                    "x",
+                    "-y",
+                    filename,
+                    "-o",
+                    target_dir
+                ]
+                print(command)
+                subprocess.run(command)
             else:
-                path = lhome + "/tools/upgrade_webcontrol.sh"
-                copyfile(path, home + "/.WebControl/downloads/upgrade_webcontrol.sh")
-                program_name = home + "/.WebControl/downloads/upgrade_webcontrol.sh"
-                self.make_executable(home + "/.WebControl/downloads/upgrade_webcontrol.sh")
-            tool_path = home + "\\.WebControl\\downloads\\7za.exe"
-            arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
-            command = [program_name]
-            command.extend(arguments)
-            print("popening")
-            print(command)
-            subprocess.Popen(command)
+                command = [
+                    "tar",
+                    "-zxf",
+                    filename,
+                    "-C",
+                    target_dir
+                ]
+                print(command)
+                subprocess.run(command)
+            print("Unzipping new release DONE")
+
+            print("Upgrade script...")
+            print("Checking if it needs to be run for platform: " + self.data.pyInstallPlatform)
+            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
+                upgrade_script_path = target_dir + "\\tools\\upgrade_" + self.data.pyInstallPlatform + ".bat"
+            else:
+                upgrade_script_path = target_dir + "/tools/upgrade_" + self.data.pyInstallPlatform + ".sh"
+            if os.path.exists(upgrade_script_path):
+                print("Yes, running it")
+                self.make_executable(upgrade_script_path)
+                subprocess.run([upgrade_script_path])
+            else:
+                print("No upgrade script needed.")
+            print("Upgrade script DONE")
+
+            print("Backing up the current install...")
+            backup_path = self.data.pyInstallInstalledPath + '_old'
+            print("Backup location: " + backup_path)
+            if os.path.exists(backup_path):
+                print("Old backup found, removing it")
+                shutil.rmtree(backup_path)
+            os.rename(self.data.pyInstallInstalledPath, self.data.pyInstallInstalledPath + '_old')
+            print("Backing up the current install DONE")
+
+            print("Moving the target version in place...")
+            os.rename(target_dir, self.data.pyInstallInstalledPath)
+            print("Moving the target version in place DONE")
+
+            print("WebControl upgrade complete, shutting down to make way to the target version")
             return True
         return False
 
@@ -165,7 +204,7 @@ class ReleaseManager(MakesmithInitFuncs):
                         self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                         print(self.data.pyInstallUpdateBrowserUrl)
                         return self.updatePyInstaller(True)
-        print("hmmm.. issue")
+        print("Couldn't find a suitable file for the current platform and target version: " + version)
         return False
 
 
