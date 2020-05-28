@@ -773,7 +773,7 @@ if __name__ == "__main__":
 
     print("opening browser")
     webPortStr = str(webPortInt)
-    webbrowser.open_new_tab("//localhost:"+webPortStr)
+    webbrowser.open_new_tab("http://localhost:"+webPortStr)
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
