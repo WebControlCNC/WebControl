@@ -1,31 +1,75 @@
-os:
-  - linux
-  # - windows
 
 language: python
-install:
-  - pip install -r requirements.txt
-  - pip install -U platformio
-  - pip install pyinstaller
+# python: "3.7"
 
-script:
-  - bash buildFirmware.sh
-  - pyinstaller main-onedir.spec
-  - cd dist && mv main webcontrol && cd webcontrol
-  - touch webcontrol-linux-singledirectory.tar.gz
-  - tar -zcvf webcontrol-linux-singledirectory.tar.gz --exclude=webcontrol-linux-singledirectory.tar.gz .
-  - cd ../..
+jobs:
+  include:
+    - stage: Build
+      name: Universal
+      os: linux
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_universal_release.sh
+      deploy: &base_deploy
+        provider: releases
+        token: $GITHUB_TOKEN
+        file_glob: true
+        file: dist/*.tar.gz
+        skip_cleanup: true
+        prerelease: true
+        draft: true
+        on:
+          tags: true
 
-
-before_deploy:
-  # Set up git user name and tag this commit
-  - git config --local user.name "Emile Cantin"
-  - git config --local user.email "emile.cantin@gmail.com"
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
-  - git tag $TRAVIS_TAG
-deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file: dist/webcontrol/webcontrol-linux-singledirectory.tar.gz
-  skip_cleanup: true
-  draft: true
+    - stage: Build
+      name: Linux
+      os: linux
+      install: &base_install
+        - pip install -r requirements.txt
+        - pip install pyinstaller
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_release.sh linux
+      deploy:
+        <<: *base_deploy
+    - stage: Build
+      name: macOS
+      os: osx
+      language: generic
+      addons:
+        homebrew:
+          packages: python3
+      before_install:
+        - pip3 install virtualenv
+        - virtualenv -p python3 ~/venv
+        - source ~/venv/bin/activate
+      install:
+        - *base_install
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_release.sh osx
+      deploy:
+        <<: *base_deploy
+    - stage: Build
+      name: Windows
+      os: windows
+      language: shell
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+      before_install:
+        - choco install python --version=3.7.7
+        - python -m pip install -U pip setuptools
+      install:
+        - *base_install
+      script:
+        - tools/download_firmware_release.sh
+        - tools/build_release.sh windows
+      deploy:
+        <<: *base_deploy
+    - stage: Publish
+      install:
+       - echo install
+      script:
+        - echo script
+      deploy:
+        <<: *base_deploy
+        draft: false

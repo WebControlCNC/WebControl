@@ -11,6 +11,9 @@ venv.bak/
 build
 dist
 
+# compiled firmware
+firmware
+
 #logs
 log.txt
 alog.txt
@@ -22,3 +25,6 @@ alog.txt
 __pycache__/
 *.py[cod]
 *$py.class
+
+# macOS junk
+.DS_Store
