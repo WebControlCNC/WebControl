@@ -1989,7 +1989,7 @@ class Actions(MakesmithInitFuncs):
                 except:
                     print("error parsing tagname")
             print(latest)
-            if latest>self.data.pyInstallCurrentVersion:
+            if latest>self.data.pyInstallCurrentVersionNumber:
                 if latestRelease is not None:
                     print(latestRelease.tag_name)
                     assets = latestRelease.get_assets()

@@ -10,7 +10,7 @@ from github import Github
 import wget
 import subprocess
 import shutil
-
+import datetime
 
 class ReleaseManager(MakesmithInitFuncs):
 
@@ -20,48 +20,84 @@ class ReleaseManager(MakesmithInitFuncs):
     releases = None
     latestRelease = None
 
-    def getReleases(self):
-        tempReleases = []
-        enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
-        for release in self.releases:
-            if not enableExperimental:
-                if not self.isExperimental(re.sub(r'[v]', r'', release.tag_name)):
+    def fetchReleases(self):
+        try:
+            print("Fetching GitHub releases.")
+            g = Github()
+            repo = g.get_repo("WebControlCNC/WebControl")
+            self.releases = repo.get_releases()
+            for release in self.releases:
+                release.tag_version = 0
+                release.tag_date = None
+
+                versionPattern = re.compile(r"^v?([0-9.]+)_?([0-9]{4}-[0-9]{2}-[0-9]{2})?$")
+                versionInfo = versionPattern.match(release.tag_name)
+                if (versionInfo):
+                    release.tag_version = float(versionInfo.group(1))
+                    if (versionInfo.group(2)):
+                        release.tag_date = datetime.datetime.strptime("%Y-%m-%d", versionInfo.group(2))
+                    else:
+                        release.tag_date = release.published_at()
+                else:
+                    # This release tage name is not valid.
+                    print("Release tag invlaid: " + release.tag_name)
+                    # For testing of temp release.
+                    if (release.tag_name == "2020-05-26-2021"):
+                        release.tag_version = 0.94
+                        release.tag_date = datetime.datetime(2020, 5, 26)
+
+        except Exception as e:
+            print("Error fetching github releases: " + str(e))
+
+    def getValidReleases(self, refresh = False):
+        if (self.releases is None or refresh):
+            self.fetchReleases()
+
+        try:
+            print("Getting valid releases.")
+            enablePreRelease = self.data.config.getValue("WebControl Settings", "experimentalReleases")
+            tempReleases = []
+            for release in self.releases:
+                if release.prerelease:
+                    if enablePreRelease:
+                        # Add experimental releases is setting enabled.
+                        tempReleases.append(release)
+                else:
+                    # Add stable releases.
                     tempReleases.append(release)
-            else:
-                tempReleases.append(release)
-        return tempReleases
+            return tempReleases
 
+        except Exception as e:
+            print("Error getting valid releases: " + str(e))
 
-    def getLatestRelease(self):
+    def getLatestValidRelease(self, refresh = False):
+        if (self.latestRelease == None or refresh):
+            self.checkLatestRelease()
+
         return self.latestRelease
 
-    def checkForLatestPyRelease(self):
+    def checkLatestRelease(self, refresh = False):
         if True:  # self.data.platform=="PYINSTALLER":
-            print("Checking latest pyrelease.")
             try:
-                enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
-                g = Github()
-                repo = g.get_repo("WebControlCNC/WebControl")
-                self.releases = repo.get_releases()
-                latestVersionGithub = 0
+                print("Checking latest valid release.")
+                validReleases = self.getValidReleases(refresh)
                 self.latestRelease = None
-                for release in self.releases:
-                    tag_name = re.sub(r'[v]', r'', release.tag_name)
-                    tag_float = float(tag_name)
-                    eligible = False
-                    if not enableExperimental:
-                        if not self.isExperimental(release):
-                            eligible = True
-                    else:
-                        eligible = True
-                    #print("tag:"+tag_name+", eligible:"+str(eligible))
-                    if eligible and tag_float > latestVersionGithub:
-                        latestVersionGithub = tag_float
+                latestVersionNumber = 0
+                latestVersionDate = None
+
+                for release in validReleases:
+                    if (release.tag_version > latestVersionNumber):
+                        latestVersionNumber = release.tag_version
+                        latestVersionDate = release.tag_date
+                        self.latestRelease = release
+                    elif (release.tag_version == latestVersionNumber and release.tag_date > latestVersionDate):
+                        latestVersionDate = release.tag_date
                         self.latestRelease = release
 
-                print("Latest pyrelease: " + str(latestVersionGithub))
-                if self.latestRelease is not None and latestVersionGithub > self.data.pyInstallCurrentVersion:
-                    print("Latest release tag: " + self.latestRelease.tag_name)
+                print("Latest release: " + str(self.latestRelease.tag_name))
+
+                if self.latestRelease is not None and latestVersionNumber >= self.data.pyInstallCurrentVersionNumber and latestVersionDate > self.data.pyInstallCurrentVersionDate:
+                    print("Fetching Assets for release: " + self.latestRelease.tag_name)
                     assets = self.latestRelease.get_assets()
                     for asset in assets:
                         if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
@@ -71,19 +107,9 @@ class ReleaseManager(MakesmithInitFuncs):
                             self.data.pyInstallUpdateAvailable = True
                             self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                             self.data.pyInstallUpdateVersion = self.latestRelease
-            except Exception as e:
-                print("Error checking pyrelease: " + str(e))
 
-    def isExperimental(self, release):
-        '''
-        Deternmines if release is experimental. Pre-Releases are experimental.
-        :param tag:
-        :return:
-        '''
-        if release.prerelease:
-            return True
-        else:
-            return False
+            except Exception as e:
+                print("Error checking latest valid release: " + str(e))
 
     def processAbsolutePath(self, path):
         index = path.find("main.py")
@@ -187,15 +213,14 @@ class ReleaseManager(MakesmithInitFuncs):
         os.chmod(path, mode)
         print("4")
 
-
-    def update(self, version):
+    def update(self, releaseTagName):
         '''
-        Need to clean this up.
         :param version:
         :return:
         '''
-        for release in self.releases:
-            if release.tag_name == version:
+        validReleases = self.getValidReleases()
+        for release in validReleases:
+            if release.tag_name == releaseTagName:
                 assets = release.get_assets()
                 for asset in assets:
                     if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
@@ -204,7 +229,7 @@ class ReleaseManager(MakesmithInitFuncs):
                         self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                         print(self.data.pyInstallUpdateBrowserUrl)
                         return self.updatePyInstaller(True)
-        print("Couldn't find a suitable file for the current platform and target version: " + version)
-        return False
 
+        print("Update failed for release: " + releaseTagName)
+        return False
 

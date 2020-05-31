@@ -6,7 +6,10 @@
       <li class="list-group-item">
         <div class="row align-items-center">
             <div class="col-1 align-self-start">
-                <p>{{release.tag_name}}</p>
+                <p>{{release.tag_version}}</p>
+                {% if release.tag_date %}
+                  <p>{{release.tag_date.strftime("%x")}}</p>
+                {% endif %}
             </div>
             <div class="col-8 align-self-start">
                 <h4>{{release.title}}</h4>
