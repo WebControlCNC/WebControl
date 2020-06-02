@@ -6,7 +6,6 @@ description: Help pages for WebControl
 wcversion: 0.915.001
 tags: web-control
 ---
-
 # WebControl
 
 The official tool for [Maslow CNC](https://www.maslowcnc.com/); control your Maslow with any web browser.
@@ -21,7 +20,7 @@ You can [report issues](https://github.com/WebControlCNC/WebControl/issues) to t
 
 ## Context
 
-WebControl started as a browser-based port of the original GroundControl applicaiton, but has grown to support more features:
+WebControl started as a browser-based port of the original GroundControl application, but has grown to support more features:
 
 * The calibration and setup process is better documented and easier to use.
 * It implements a flask+socketio web server, so other computers on the network may control the machine. 
