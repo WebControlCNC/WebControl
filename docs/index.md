@@ -107,8 +107,6 @@ WebControl can be run behind a front-proxy with TLS termination, such as nginx. 
 
 Open your web browser to `localhost:5000` (or use the IP address of your device).
 
-@ML1xi36LTCSSXHiCD8RsRQ Here's a good place to start onboarding peaple @
-
 ## Built With
 
 * [Flask](http://flask.pocoo.org/) - The web framework used
