@@ -23,9 +23,9 @@ You can [report issues](https://github.com/WebControlCNC/WebControl/issues) to t
 WebControl started as a browser-based port of the original GroundControl application, but has grown to support more features:
 
 * The calibration and setup process is better documented and easier to use.
-* It implements a flask+socketio web server, so other computers on the network may control the machine. 
-* It can be run on a low-cost device, like a Raspberry Pi. 
-* It can also support multiple custom firmwares developed by the community which enhance the Maslow. 
+* It implements a flask+socketio web server, so other computers on the network may control the machine.
+* It can be run on a low-cost device, like a Raspberry Pi.
+* It can also support multiple custom firmwares developed by the community which enhance the Maslow.
 
 At this point, WebControl has become the **de-facto beginner's tool for Maslow**.
 
@@ -44,13 +44,60 @@ There are both single-file (installer) and single-directory (zipped) releases av
 
 See the [releases page](https://github.com/madgrizzle/WebControl/releases) and choose the appropriate architecture and release type.
 
+### Linux Autostart (systemd)
+
+To run WebControl automatically on startup for a Linux-based machine, it is recommended to create a service:
+
+>nano webcontrol.service
+
+type the following:
+
+>[Unit]</br>
+>Description=WebControl</br>
+>After=network.target</br>
+></br>
+>[Service]</br>
+>ExecStart=/home/pi/webcontrol/webcontrol</br>
+>WorkingDirectory=/home/pi/webcontrol</br>
+>StandardOutput=inherit</br>
+>StandardError=inherit</br>
+>Restart=always</br>
+>User=pi</br>
+></br>
+>[Install]</br>
+>WantedBy=multi-user.target</br>
+
+Save file using Ctrl-X/Yes
+
+>sudo cp webcontrol.service /etc/systemd/system
+
+Test with the following:
+
+>sudo systemctl start webcontrol.service
+
+Try to reach webcontrol using your browser.
+
+To debug, try:
+
+>sudo systemctl status webcontrol
+
+Or, to. get logs:
+
+>journalctl -xe
+
+When it works, then type:
+
+>sudo systemctl enable webcontrol.service
+
+see for more details:
+https://www.raspberrypi.org/documentation/linux/usage/systemd.md
+
 ### Docker & Kubernetes
 
 * Pull the docker image from `inzania/web-control` using the `armv7` or `amd64` tag.
 * Mount a data/config volume at `/root/.WebControl`
 * Expose port `5000`
 * Run with `privileged: true` security context for USB access.
-
 
 ### Remote Access
 
@@ -84,7 +131,7 @@ Open your web browser to `localhost:5000` (or use the IP address of your device)
 You can use virtualenv to set up a local development environment for running the code without installing packages in the system Python installation.
 
     # Create a virtual environment
-    virtualenv -p python3 .venv 
+    virtualenv -p python3 .venv
     # Activate the virtual environment
     source .venv/bin/activate
     # Install the prerequisites
@@ -104,7 +151,7 @@ This project uses [black](https://github.com/ambv/black) to automatically format
 
     pip install black
 
-Subsequently, you can just run `black .` to format all files in the current directory. 
+Subsequently, you can just run `black .` to format all files in the current directory.
 
     black .
 
