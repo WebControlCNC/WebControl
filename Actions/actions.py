@@ -130,7 +130,8 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "update":
                 if not self.data.releaseManager.update(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating webcontrol.")
-                return "Shutdown"
+                else:
+                    return "Shutdown"
             elif msg["data"]["command"] == "cutTriangularCalibrationPattern":
                 if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with cutting triangular calibration pattern.")
