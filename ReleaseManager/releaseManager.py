@@ -11,6 +11,8 @@ import wget
 import subprocess
 import shutil
 import datetime
+import sys
+from app import socketio
 
 class ReleaseManager(MakesmithInitFuncs):
 
@@ -28,7 +30,7 @@ class ReleaseManager(MakesmithInitFuncs):
             self.releases = repo.get_releases()
             for release in self.releases:
                 release.tag_version = 0
-                release.tag_date = None
+                release.tag_date = datetime.datetime(1, 1, 1, 0, 0)
 
                 versionPattern = re.compile(r"^v?([0-9.]+)_?([0-9]{4}-[0-9]{2}-[0-9]{2})?$")
                 versionInfo = versionPattern.match(release.tag_name)
@@ -37,7 +39,7 @@ class ReleaseManager(MakesmithInitFuncs):
                     if (versionInfo.group(2)):
                         release.tag_date = datetime.datetime.strptime("%Y-%m-%d", versionInfo.group(2))
                     else:
-                        release.tag_date = release.published_at()
+                        release.tag_date = release.published_at
                 else:
                     # This release tage name is not valid.
                     print("Release tag invlaid: " + release.tag_name)
@@ -83,7 +85,7 @@ class ReleaseManager(MakesmithInitFuncs):
                 validReleases = self.getValidReleases(refresh)
                 self.latestRelease = None
                 latestVersionNumber = 0
-                latestVersionDate = None
+                latestVersionDate = datetime.datetime(1, 1, 1, 0, 0)
 
                 for release in validReleases:
                     if (release.tag_version > latestVersionNumber):
@@ -116,93 +118,105 @@ class ReleaseManager(MakesmithInitFuncs):
         self.data.pyInstallInstalledPath = path[0:index - 1]
         print(self.data.pyInstallInstalledPath)
 
+    def wgetBarCustom(self, current, total, width=80):
+        percentDone = int(current / total * 100)
+        data = {
+            "percent": percentDone,
+            "current" : current,
+            "total" : total,
+            }
+        socketio.emit("message", {"command": "upgradeDownload", "data": json.dumps(data), "dataFormat": "json"}, namespace="/MaslowCNC", room="modal")
+        print("Downloading: %d%% [%d / %d] bytes" % (percentDone, current, total))
+
     def updatePyInstaller(self, bypassCheck = False):
-        home = self.data.config.getHome()
-        if self.data.pyInstallUpdateAvailable == True or bypassCheck:
-            if not os.path.exists(home + "/.WebControl/downloads"):
-                print("creating downloads directory")
-                os.mkdir(home + "/.WebControl/downloads")
-            fileList = glob.glob(home + "/.WebControl/downloads/*.gz")
-            for filePath in fileList:
-                try:
+        try:
+            home = self.data.config.getHome()
+
+            if self.data.pyInstallUpdateAvailable == True or bypassCheck:
+                if not os.path.exists(home + "/.WebControl/downloads"):
+                    self.emitStatusUpdate("Creating downloads directory.")
+                    os.mkdir(home + "/.WebControl/downloads", exists_ok=True)
+
+                fileList = glob.glob(home + "/.WebControl/downloads/*.gz")
+
+                for filePath in fileList:
                     os.remove(filePath)
-                except:
-                    print("error cleaning download directory: ", filePath)
-                    print("---")
-            print("Downloading new WebControl release...")
-            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
-                filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "\\.WebControl\\downloads")
-            else:
-                filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "/.WebControl/downloads")
-            print("Successfully downloaded new release to:" + filename)
 
-            if self.data.platform == "PYINSTALLER":
-                lhome = os.path.join(self.data.platformHome)
-            else:
-                lhome = "."
+                self.emitStatusUpdate("Downloading new release.")
+                if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
+                    filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "\\.WebControl\\downloads", bar = self.wgetBarCustom)
+                else:
+                    filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "/.WebControl/downloads", bar = self.wgetBarCustom)
+                self.emitStatusUpdate("Successfully downloaded new release to:" + filename)
 
-            print("Creating target version directory...")
-            target_dir = self.data.pyInstallInstalledPath + '_next'
-            if os.path.exists(target_dir):
-                print("New release directory already exists, removing it")
-                shutil.rmtree(target_dir)
-            os.mkdir(target_dir)
-            print("Creating target version directory DONE")
+                if self.data.platform == "PYINSTALLER":
+                    lhome = os.path.join(self.data.platformHome)
+                else:
+                    lhome = "."
 
-            print("Unzipping new release...")
-            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
-                command = [
-                    lhome + "/tools/7za.exe",
-                    "x",
-                    "-y",
-                    filename,
-                    "-o",
-                    target_dir
-                ]
-                print(command)
-                subprocess.run(command)
-            else:
-                command = [
-                    "tar",
-                    "-zxf",
-                    filename,
-                    "-C",
-                    target_dir
-                ]
-                print(command)
-                subprocess.run(command)
-            print("Unzipping new release DONE")
+                self.emitStatusUpdate("Creating target version directory.")
+                target_dir = self.data.pyInstallInstalledPath + '_next'
+                if os.path.exists(target_dir):
+                    self.emitStatusUpdate("New release directory already exists, removing it.")
+                    shutil.rmtree(target_dir)
+                os.mkdir(target_dir)
 
-            print("Upgrade script...")
-            print("Checking if it needs to be run for platform: " + self.data.pyInstallPlatform)
-            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
-                upgrade_script_path = target_dir + "\\tools\\upgrade_" + self.data.pyInstallPlatform + ".bat"
-            else:
-                upgrade_script_path = target_dir + "/tools/upgrade_" + self.data.pyInstallPlatform + ".sh"
-            if os.path.exists(upgrade_script_path):
-                print("Yes, running it")
-                self.make_executable(upgrade_script_path)
-                subprocess.run([upgrade_script_path])
-            else:
-                print("No upgrade script needed.")
-            print("Upgrade script DONE")
+                self.emitStatusUpdate("Extracting new release.")
+                if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
+                    command = [
+                        lhome + "/tools/7za.exe",
+                        "x",
+                        "-y",
+                        filename,
+                        "-o",
+                        target_dir
+                    ]
+                    print(command)
+                    subprocess.run(command)
+                else:
+                    command = [
+                        "tar",
+                        "-zxf",
+                        filename,
+                        "-C",
+                        target_dir
+                    ]
+                    print(command)
+                    subprocess.run(command)
 
-            print("Backing up the current install...")
-            backup_path = self.data.pyInstallInstalledPath + '_old'
-            print("Backup location: " + backup_path)
-            if os.path.exists(backup_path):
-                print("Old backup found, removing it")
-                shutil.rmtree(backup_path)
-            os.rename(self.data.pyInstallInstalledPath, self.data.pyInstallInstalledPath + '_old')
-            print("Backing up the current install DONE")
+                self.emitStatusUpdate("Checking for upgrade script.")
+                if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
+                    upgrade_script_path = target_dir + "\\tools\\upgrade_" + self.data.pyInstallPlatform + ".bat"
+                else:
+                    upgrade_script_path = target_dir + "/tools/upgrade_" + self.data.pyInstallPlatform + ".sh"
+                if os.path.exists(upgrade_script_path):
+                    self.emitStatusUpdate("Running upgrade script.")
+                    self.make_executable(upgrade_script_path)
+                    subprocess.run([upgrade_script_path])
+                else:
+                    self.emitStatusUpdate("Upgrade script not required.")
 
-            print("Moving the target version in place...")
-            os.rename(target_dir, self.data.pyInstallInstalledPath)
-            print("Moving the target version in place DONE")
+                self.emitStatusUpdate("Backing up the current install.")
+                backup_path = self.data.pyInstallInstalledPath + '_old'
+                print("Backup location: " + backup_path)
+                if os.path.exists(backup_path):
+                    self.emitStatusUpdate("Old backup found, removing it.")
+                    shutil.rmtree(backup_path)
+                os.rename(self.data.pyInstallInstalledPath, self.data.pyInstallInstalledPath + '_old')
+                print("Backing up the current install DONE")
 
-            print("WebControl upgrade complete, shutting down to make way to the target version")
-            return True
-        return False
+                self.emitStatusUpdate("Moving the target version in place.")
+                os.rename(target_dir, self.data.pyInstallInstalledPath)
+                print("Moving the target version in place DONE")
+
+                self.emitStatusUpdate("WebControl upgrade complete.")
+                socketio.emit("message", {"command": "upgradeSuccess", "data": "success", "dataFormat": "text"}, namespace="/MaslowCNC", room="modal")
+                # Restart application terminating current.
+                return True
+
+        except Exception as e:
+            self.emitStatusUpdate("Error updating release: " + str(e))
+            return False
 
     def make_executable(self, path):
         print("1")
@@ -215,21 +229,32 @@ class ReleaseManager(MakesmithInitFuncs):
 
     def update(self, releaseTagName):
         '''
-        :param version:
+        :param releaseTagName:
         :return:
         '''
-        validReleases = self.getValidReleases()
-        for release in validReleases:
-            if release.tag_name == releaseTagName:
-                assets = release.get_assets()
-                for asset in assets:
-                    if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
-                        print(asset.name)
-                        print(asset.url)
-                        self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
-                        print(self.data.pyInstallUpdateBrowserUrl)
-                        return self.updatePyInstaller(True)
+        try:
+            validReleases = self.getValidReleases()
+            releaseAssetsFound = False
+            for release in validReleases:
+                if release.tag_name == releaseTagName:
+                    assets = release.get_assets()
+                    for asset in assets:
+                        if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
+                            print(asset.name)
+                            print(asset.url)
+                            self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
+                            print(self.data.pyInstallUpdateBrowserUrl)
+                            releaseAssetsFound = True
+                            break
+            if releaseAssetsFound:
+                return self.updatePyInstaller(True)
+            else:
+                raise Exception("Assets not found for release: " + str(releaseTagName))
 
-        print("Update failed for release: " + releaseTagName)
-        return False
+        except Exception as e:
+            print("Update error: " + str(e))
+            return False
 
+    def emitStatusUpdate(self, text):
+        print(text)
+        socketio.emit("message", {"command": "upgradeStatus", "data": text, "dataFormat": "text"}, namespace="/MaslowCNC", room="modal")
