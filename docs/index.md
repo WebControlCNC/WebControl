@@ -8,14 +8,15 @@ tags: web-control
 ---
 # WebControl
 
-The official tool for [Maslow CNC](https://www.maslowcnc.com/); control your Maslow with any web browser.
+The official tool to control your [Maslow CNC](https://www.maslowcnc.com/) using any HTML5 compatible web browser.
 
 * Browser-based, multi-platform controller software.
+* Desktop and Phone compatible user friendly interfaces.
 * Connects to Maslow's Arduino Mega (or similar) via USB.
 * Includes setup instructions (updated from [Maslow Community Garden](http://maslowcommunitygarden.org/)).
-* Runs gcode (`.nc` files) for printing cuts.
+* Runs gcode files (.nc, .ngc, .text, .gcode).
 
-You can [report issues](https://github.com/WebControlCNC/WebControl/issues) to the [volunteer team](https://github.com/WebControlCNC/WebControl/).
+You can [report issues](https://github.com/WebControlCNC/WebControl/issues) to the volunteer development community.
 
 
 ## Context
@@ -26,8 +27,6 @@ WebControl started as a browser-based port of the original GroundControl applica
 * It implements a flask+socketio web server, so other computers on the network may control the machine. 
 * It can be run on a low-cost device, like a Raspberry Pi. 
 * It can also support multiple custom firmwares developed by the community which enhance the Maslow. 
-
-At this point, WebControl has become the **de-facto beginner's tool for Maslow**.
 
 <img src="assets/Screenshot.png" alt="Screenshot" width="100%">
 
@@ -42,7 +41,7 @@ See the [dedicated repository](https://github.com/WebControlCNC/webcontrol-pi).
 
 There are both single-file (installer) and single-directory (zipped) releases available. The installer files are appropriate for faster machines, like a Windows 10 laptop where an installer executable is desired. Zipped, "single-directory" releases will unpack faster and startup quicker on devices like the Raspberry Pi.
 
-See the [releases page](https://github.com/madgrizzle/WebControl/releases) and choose the appropriate architecture and release type.
+See the [releases page](https://github.com/WebControlCNC/WebControl/releases) and choose the appropriate architecture and release type.
 
 ### Docker & Kubernetes
 
@@ -60,8 +59,6 @@ WebControl can be run behind a front-proxy with TLS termination, such as nginx. 
 
 Open your web browser to `localhost:5000` (or use the IP address of your device).
 
-@ML1xi36LTCSSXHiCD8RsRQ Here's a good place to start onboarding peaple @
-
 ## Built With
 
 * [Flask](http://flask.pocoo.org/) - The web framework used
@@ -77,7 +74,7 @@ Open your web browser to `localhost:5000` (or use the IP address of your device)
 * [Ground Control](https://github.com/maslowcnc/groundcontrol) - Much of this was adapted from the Kivy-based Ground Control
 
 
-## Developing
+## Development
 
 ### Virtualenv
 
@@ -132,8 +129,8 @@ Added to TODO list?
 * **John Boiles** - *Docker Expert* - [johnboiles](https://github.com/johnboiles)
 * **Tinker** - *UI Improvements/Bug Fixer/Etc.* - [gb0101010101](https://github.com/gb0101010101)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/WebControlCNC/WebControl/graphs/contributors) who participated in this project.
 
 ## License
 
-See [LICENSE](https://github.com/madgrizzle/WebControl/blob/master/LICENSE)
+See [LICENSE](https://github.com/WebControlCNC/WebControl/blob/master/LICENSE)
