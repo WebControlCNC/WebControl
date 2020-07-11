@@ -149,15 +149,27 @@ function moveAction(direction) {
 
 function processStatusMessage(data){
     //console.log(data)
-    if (data.uploadFlag){
-        if (!isDisabled){
+    if (data.uploadFlag==1){
+        if (isDisabled!=data.uploadFlag){
             $('.disabler').prop('disabled', true);
-            isDisabled = true;
+            $('.ndisabler').prop('disabled', false);
+            $('.gcdisabler').prop('disabled', true);
+            isDisabled =data.uploadFlag;
         }
-    } else {
-        if (isDisabled){
+    } else if (data.uploadFlag==2 || data.uploadFlag==-1 ){
+        if (isDisabled!=data.uploadFlag){
+            $('.gcdisabler').prop('disabled', true);
             $('.disabler').prop('disabled', false);
-            isDisabled = false;
+            $('.ndisabler').prop('disabled', false);
+            isDisabled = data.uploadFlag;
+            }
+        }
+    else {
+        if (isDisabled!=data.uploadFlag){
+            $('.disabler').prop('disabled', false);
+            $('.ndisabler').prop('disabled', true);
+            $('.gcdisabler').prop('disabled', false);
+            isDisabled = data.uploadFlag;
         }
     }
     $("#currentTool").text(data.currentTool.toString());
