@@ -179,6 +179,7 @@ class UIProcessor:
                 self.app.data.xval = float(valz[0])
                 self.app.data.yval = float(valz[1])
                 self.app.data.zval = float(valz[2])
+                self.app.data.time = time.time()
 
                 if math.isnan(self.app.data.xval):
                     self.sendControllerMessage("Unable to resolve x Kinematics.")
@@ -198,18 +199,25 @@ class UIProcessor:
         xdiff = abs(self.app.data.xval - self.app.data.xval_prev)
         ydiff = abs(self.app.data.yval - self.app.data.yval_prev)
         zdiff = abs(self.app.data.zval - self.app.data.zval_prev)
+        velocity = math.sqrt(xdiff*xdiff + ydiff*ydiff + zdiff*zdiff) / (self.app.data.time - self.app.data.time_prev) * 60.0
 
         # compute percentage of gcode that's been completed.
         percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
 
         # if the sled has moved more than a very, very small amount, then go ahead and send.  Cuts down on network
         # traffic.
-        if (xdiff + ydiff + zdiff) > 0.01:
+        if self.app.data.wasmoving or (xdiff + ydiff + zdiff) > 0.01:
+            if (xdiff + ydiff + zdiff) > 0.01:
+                self.app.data.wasmoving = 1
+            else:
+                self.app.data.wasmoving = 0
             # package as json
             position = {
                 "xval": self.app.data.xval,
                 "yval": self.app.data.yval,
                 "zval": self.app.data.zval,
+                "vel": velocity,
+                "rqvel": self.app.data.feedRate,
                 "pcom": percentComplete,
                 "state": state
             }
@@ -219,6 +227,7 @@ class UIProcessor:
             self.app.data.xval_prev = self.app.data.xval
             self.app.data.yval_prev = self.app.data.yval
             self.app.data.zval_prev = self.app.data.zval
+            self.app.data.time_prev = self.app.data.time;
 
     def setErrorOnScreen(self, message):
         '''

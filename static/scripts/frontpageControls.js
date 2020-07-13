@@ -62,7 +62,7 @@ function processRequestedSetting(data){
 }
 
 function processPositionMessage(data){
-  $('#positionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2));
+  $('#positionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2)+' V:'+parseFloat(data.vel).toFixed(2)+'/'+parseFloat(data.rqvel).toFixed(2));
   $('#percentComplete').html(data.pcom)
   $('#machineState').html(data.state)
   if (enable3D)
