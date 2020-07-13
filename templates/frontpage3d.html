@@ -45,7 +45,7 @@
             <button type="button" class="btn btn-dark btn-block disabler" onclick="action('home')"><i data-feather="home"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-dark btn-block disabler disabler" onclick="moveAction('right')"><i data-feather="arrow-right"></i></button>
+            <button type="button" class="btn btn-dark btn-block disabler" onclick="moveAction('right')"><i data-feather="arrow-right"></i></button>
           </div>
           <div class="col-3 mb-1">
             <button type="button" class="btn btn-primary btn-block disabler" onclick="action('macro2')">{{ macro2_title }}</button>
@@ -71,7 +71,7 @@
             <form id="distInput" onsubmit="return false;"><input class="form-control" type="text" pattern="^[0-9]*(\.[0-9]{0,3})?$" id="distToMove" title="Positive number with maximum 3 decimal places"></form>
           </div>
           <div class="col-3 mb-1">
-            <button id="units" type="button" class="btn btn-secondary" onclick="unitSwitch();">--</button>
+            <button id="units" type="button" class="btn btn-secondary disabler" onclick="unitSwitch();">--</button>
           </div>
           <div class="col-3 mb-1">
             <button id="btnDefHome" type="button" class="btn btn-primary btn-block disabler" onclick="action('defineHome')" ><i data-feather="save">Def.</i> <i data-feather="home">Home</i></button>
