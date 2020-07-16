@@ -166,6 +166,8 @@ class Data:
     yval_prev = -99990.0
     zval_prev = -99990.0
     time_prev = -99990.0
+    velocity_prev = 0
+    velocity_filter = 0.5
     wasmoving = 1
 
     leftError = 0.0
