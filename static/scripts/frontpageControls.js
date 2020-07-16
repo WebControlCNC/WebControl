@@ -63,7 +63,6 @@ function processRequestedSetting(data){
 
 function pwr2color(pwr) {
 	var r, g, b = 0;
-	var perc = (255-pwr)*100/255;//TMJ: FixThis
 
 	if(pwr < 127) {
 		g = 255;

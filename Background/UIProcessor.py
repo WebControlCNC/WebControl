@@ -210,7 +210,7 @@ class UIProcessor:
                     self.sendControllerMessage("Unable to resolve y Kinematics.")
                     self.app.data.yval = 0
                 if math.isnan(self.app.data.zval):
-                    self.sendContTrollerMessage("Unable to resolve z Kinematics.")
+                    self.sendControllerMessage("Unable to resolve z Kinematics.")
                     self.app.data.zval = 0
 
         except ValueError as err:
