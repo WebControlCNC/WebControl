@@ -1,5 +1,5 @@
 # main.py
-from app import app, socketio
+from app import app, socketio, db
 from gevent import monkey
 import webbrowser
 import socket
@@ -17,6 +17,10 @@ import json
 
 from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
 from flask_mobility.decorators import mobile_template
+from flask_migrate import Migrate
+from flask_login import (LoginManager, current_user, login_required,
+                         login_user, logout_user)
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from Background.LogStreamer import LogStreamer  # do this after socketio is declared
@@ -25,6 +29,8 @@ from Background.WebMCPProcessor import ConsoleProcessor
 from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
+from forms import LoginForm, CreateAccountForm
+from models import User, User_activity
 
 from os import listdir
 from os.path import isfile, join
@@ -97,13 +103,85 @@ app.logstreamerthread = None
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
+    login_form = LoginForm(request.form)
+    if not current_user.is_authenticated:
+        return render_template( 'login/login.html', form=login_form)
+ 
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "mobile/":
+        
         return render_template("frontpage3d_mobile.html", modalStyle="modal-lg", macro1_title=macro1Title,  macro2_title=macro2Title)
     else:
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    login_form = LoginForm(request.form)
+        
+    if 'login' in request.form:
+        
+        # read form data
+        username = request.form['username']
+        password = request.form['password']
+
+        # Locate user
+        user = User.query.filter_by(username=username).first()
+        
+        # Check the password
+        if user and verify_pass( password, user.password):
+
+            login_user(user)
+            user.activity += 1
+            db.session.commit()
+
+            return redirect(url_for('app.index'))
+
+        # Something (user or pass) is not ok
+        return render_template( 'login/login.html', msg='Wrong user or password', form=login_form)
+
+
+    if not current_user.is_authenticated:
+        return render_template( 'login/login.html',
+                                form=login_form)
+    
+    
+    return redirect(url_for('app.index'))
+
+
+@app.route('/create_user', methods=['GET', 'POST'])
+def create_user():
+    login_form = LoginForm(request.form)
+    create_account_form = CreateAccountForm(request.form)
+    if 'register' in request.form:
+
+        username  = request.form['username']
+        email     = request.form['email'   ]
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            return render_template( 'login/register.html', msg='Username already registered', form=create_account_form)
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            return render_template( 'login/register.html', msg='Email already registered', form=create_account_form)
+
+        # else we can create the user
+        user = User(**request.form)
+        db.session.add(user)
+        db.session.commit()
+
+        return render_template( 'login/register.html', msg='User created please <a href="/login">login</a>', form=create_account_form , yes='yes')
+
+    else:
+        return render_template( 'login/register.html', form=create_account_form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('app.login'))
+
 
 @app.route("/controls")
 @mobile_template("/controls/{mobile/}")
@@ -749,6 +827,7 @@ def isnumber(s):
 #def shutdown():
 #    print("Shutdown")
 
+migrate = Migrate(app, db)
 
 if __name__ == "__main__":
     app.debug = False

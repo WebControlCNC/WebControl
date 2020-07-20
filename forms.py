@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Created: 07/12/2020 Robert Lambert
+# Modified: 
+
+from flask_wtf import FlaskForm
+from wtforms import TextField, PasswordField
+from wtforms.validators import InputRequired, Email, DataRequired
+
+## login and registration
+
+class LoginForm(FlaskForm):
+    username = TextField    ('Username', id='username_login'   , validators=[DataRequired()])
+    password = PasswordField('Password', id='pwd_login'        , validators=[DataRequired()])
+
+class CreateAccountForm(FlaskForm):
+    username = TextField('Username'     , id='username_create' , validators=[DataRequired()])
+    email    = TextField('Email'        , id='email_create'    , validators=[DataRequired(), Email()])
+    password = PasswordField('Password' , id='pwd_create'      , validators=[DataRequired()])
+
