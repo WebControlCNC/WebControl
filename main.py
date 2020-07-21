@@ -15,7 +15,7 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
+from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory, redirect, url_for
 from flask_mobility.decorators import mobile_template
 from flask_migrate import Migrate
 from flask_login import (LoginManager, current_user, login_required,
@@ -30,7 +30,7 @@ from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
 from forms import LoginForm, CreateAccountForm
-from models import User, User_activity
+from models import User, User_activity, hash_pass, verify_pass
 
 from os import listdir
 from os.path import isfile, join
@@ -103,9 +103,9 @@ app.logstreamerthread = None
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
-    login_form = LoginForm(request.form)
+    
     if not current_user.is_authenticated:
-        return render_template( 'login/login.html', form=login_form)
+        return redirect( url_for('login'))
  
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
@@ -136,7 +136,7 @@ def login():
             user.activity += 1
             db.session.commit()
 
-            return redirect(url_for('app.index'))
+            return redirect(url_for('index'))
 
         # Something (user or pass) is not ok
         return render_template( 'login/login.html', msg='Wrong user or password', form=login_form)
@@ -147,7 +147,7 @@ def login():
                                 form=login_form)
     
     
-    return redirect(url_for('app.index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/create_user', methods=['GET', 'POST'])
@@ -180,7 +180,7 @@ def create_user():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('app.login'))
+    return redirect(url_for('login'))
 
 
 @app.route("/controls")

@@ -8,6 +8,7 @@ from flask_login import (LoginManager, current_user, login_required,
 
 
 import os, sys
+from os import environ, path
 from logging import DEBUG, StreamHandler, basicConfig, getLogger
 base_dir = '.'
 if hasattr(sys, '_MEIPASS'):
@@ -22,7 +23,57 @@ login_manager = LoginManager()
 md = Misaka()
 
 
+class Config(object):
+    """
+    """
+    #BASE DIR
+    basedir = path.abspath(path.dirname(__file__))
+    
+    #Sqlalchemy
+    SECRET_KEY = environ.get('KEY_SECRET', 'love_it') 
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(basedir, 'site_database.db')
+    #sqlite:///:memory'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    #theme
+    DEFAULT_THEME = None
 
+class ProductionConfig(Config):
+    """
+    """
+    #Developer
+    DEBUG = False
+
+    #Security
+    SESSION_COOKIE_HTTPPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_DURATION = 3600
+
+    #PostgreSQL
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
+        environ.get('LIGHT_DATABASE_USER', 'master'),
+        environ.get('LIGHT_DATABASE_PASSWORD', '123'),
+        environ.get('LIGHT_DATABASE_HOST', 'db'),
+        environ.get('LIGHT_DATABASE_PORT', 5433),
+        environ.get('LIGHT_DATABASE_NAME', 'master')
+    )
+
+    #OATH2 GOOGLE
+    GOOGLE_CLIENT_ID = environ.get('GOOGLE_CLIENT_ID', None)
+    GOOGLE_CLIENT_SECRET = environ.get('GOOGLE_CLIENT_SECRET', None)
+    GOOGLE_DISCOVERY_URL = (
+        "https://accounts.google.com/.well-known/openid-configuration"
+    )
+
+class DebugConfig(Config):
+    
+    DEBUG = True
+
+config_dict = {
+    'Debug': DebugConfig, 
+    'Production': ProductionConfig,
+    'Config': Config
+}
 
 
 def register_extension(app):
@@ -67,9 +118,17 @@ def configure_theme(app):
     #TODO: @app theme
     pass
 
+config_mode_get = environ.get('CONFIG_MODE', 'Debug' ).strip().replace('\'','') #Debug, Config, Production
+
+try:
+    config_mode = config_dict[config_mode_get.capitalize()]
+    print(config_mode)
+except KeyError:
+    exit('Error: Invalid CONFIG_MODE enviroment variable.')
 
 
 app = Flask(__name__, static_folder=os.path.join(base_dir, 'static'), template_folder=os.path.join(base_dir, 'templates'))
+app.config.from_object(config_mode)
 
 app.debug = True
 md.init_app(app)
