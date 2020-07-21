@@ -161,9 +161,14 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    time = 0.0
     xval_prev = -99990.0
     yval_prev = -99990.0
     zval_prev = -99990.0
+    time_prev = -99990.0
+    velocity_prev = 0
+    velocity_filter = 0.5
+    wasmoving = 1
 
     leftError = 0.0
     rightError = 0.0
