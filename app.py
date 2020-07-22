@@ -50,6 +50,8 @@ class ProductionConfig(Config):
     REMEMBER_COOKIE_DURATION = 3600
 
     #PostgreSQL
+    #TODO: configure production DB extension
+    """
     SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
         environ.get('LIGHT_DATABASE_USER', 'master'),
         environ.get('LIGHT_DATABASE_PASSWORD', '123'),
@@ -64,6 +66,7 @@ class ProductionConfig(Config):
     GOOGLE_DISCOVERY_URL = (
         "https://accounts.google.com/.well-known/openid-configuration"
     )
+    """
 
 class DebugConfig(Config):
     
