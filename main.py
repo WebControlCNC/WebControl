@@ -187,6 +187,7 @@ def create_user():
         username = request.form["username"]
         email = request.form["email"]
 
+
         user = User.query.filter_by(username=username).first()
         if user:
             return render_template(
@@ -203,13 +204,32 @@ def create_user():
                 form=create_account_form,
             )
 
-        # else we can create the user
-        user = User(**request.form)
-        db.session.add(user)
-        db.session.commit()
+        user = User.query.filter_by(id=1).first()
+        if not user:
+            # else we can create the user
+            user = User(**request.form)
+            user.accountlevel = 0
+            user.activated = 1
+            db.session.add(user)
+            db.session.commit()
+            return redirect(
+                url_for("login",
+                msg="First Admin please login and disable multi user feature",
+                ),
+            )
+            
+            
+            
+        else: 
+            # else we can create the user
+            user = User(**request.form)
+            db.session.add(user)
+            db.session.commit()
 
-        # return render_template( 'login/register.html', msg='User created please <a href="/login">login</a>', form=create_account_form )
-        return redirect(url_for("login"))
+            # return render_template( 'login/register.html', msg='User created please <a href="/login">login</a>', form=create_account_form )
+            return redirect(
+                url_for("login"),
+                )
 
     else:
         return render_template("login/register.html", form=create_account_form)
@@ -1036,6 +1056,7 @@ if __name__ == "__main__":
         app.data.console_queue.put(e)
         app.data.console_queue.put("Invalid port assignment found in webcontrol.json")
 
+    
     print("-$$$$$-")
     print(os.path.abspath(__file__))
     app.data.releaseManager.processAbsolutePath(os.path.abspath(__file__))

@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     email = Column(String, unique=True)
     password = Column(Binary)
     accountlevel = Column(Integer, default=1)
+    activated = Column(Integer, default=0)
     activity = Column(Integer, default=0)
 
     def __init__(self, **kwargs):
