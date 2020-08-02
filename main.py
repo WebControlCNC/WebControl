@@ -15,11 +15,28 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory, redirect, url_for
+from flask import (
+    Flask,
+    jsonify,
+    render_template,
+    current_app,
+    request,
+    flash,
+    Response,
+    send_file,
+    send_from_directory,
+    redirect,
+    url_for,
+)
 from flask_mobility.decorators import mobile_template
 from flask_migrate import Migrate
-from flask_login import (LoginManager, current_user, login_required,
-                         login_user, logout_user)
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
@@ -75,6 +92,7 @@ def run_schedule():
         schedule.run_pending()
         time.sleep(1)
 
+
 ## this runs the scheduler to check for connections
 app.th = threading.Thread(target=run_schedule)
 app.th.daemon = True
@@ -103,85 +121,104 @@ app.logstreamerthread = None
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
-    
+
     if not current_user.is_authenticated:
-        return redirect( url_for('login'))
- 
+        return redirect(url_for("login"))
+
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "mobile/":
-        
-        return render_template("frontpage3d_mobile.html", modalStyle="modal-lg", macro1_title=macro1Title,  macro2_title=macro2Title)
-    else:
-        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
 
-@app.route("/login", methods=['GET', 'POST'])
+        return render_template(
+            "frontpage3d_mobile.html",
+            modalStyle="modal-lg",
+            macro1_title=macro1Title,
+            macro2_title=macro2Title,
+        )
+    else:
+        return render_template(
+            "frontpage3d.html",
+            modalStyle="mw-100 w-75",
+            macro1_title=macro1Title,
+            macro2_title=macro2Title,
+        )
+
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     login_form = LoginForm(request.form)
-        
-    if 'login' in request.form:
-        
+
+    if "login" in request.form:
+
         # read form data
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form["username"]
+        password = request.form["password"]
 
         # Locate user
         user = User.query.filter_by(username=username).first()
-        
+
         # Check the password
-        if user and verify_pass( password, user.password):
+        if user and verify_pass(password, user.password):
 
             login_user(user)
             user.activity += 1
             db.session.commit()
 
-            return redirect(url_for('index'))
+            return redirect(url_for("index"))
 
         # Something (user or pass) is not ok
-        return render_template( 'login/login.html', msg='Wrong user or password', form=login_form)
-
+        return render_template(
+            "login/login.html", msg="Wrong user or password", form=login_form
+        )
 
     if not current_user.is_authenticated:
-        return render_template( 'login/login.html',
-                                form=login_form)
-    
-    
-    return redirect(url_for('index'))
+        return render_template("login/login.html", form=login_form)
+
+    return redirect(url_for("index"))
 
 
-@app.route('/create_user', methods=['GET', 'POST'])
+@app.route("/create_user", methods=["GET", "POST"])
 def create_user():
     login_form = LoginForm(request.form)
     create_account_form = CreateAccountForm(request.form)
-    if 'register' in request.form:
+    if "register" in request.form:
 
-        username  = request.form['username']
-        email     = request.form['email'   ]
+        username = request.form["username"]
+        email = request.form["email"]
 
         user = User.query.filter_by(username=username).first()
         if user:
-            return render_template( 'login/register.html', msg='Username already registered', form=create_account_form)
+            return render_template(
+                "login/register.html",
+                msg="Username already registered",
+                form=create_account_form,
+            )
 
         user = User.query.filter_by(email=email).first()
         if user:
-            return render_template( 'login/register.html', msg='Email already registered', form=create_account_form)
+            return render_template(
+                "login/register.html",
+                msg="Email already registered",
+                form=create_account_form,
+            )
 
         # else we can create the user
         user = User(**request.form)
         db.session.add(user)
         db.session.commit()
 
-        #return render_template( 'login/register.html', msg='User created please <a href="/login">login</a>', form=create_account_form )
-        return redirect( url_for('login'))
+        # return render_template( 'login/register.html', msg='User created please <a href="/login">login</a>', form=create_account_form )
+        return redirect(url_for("login"))
 
     else:
-        return render_template( 'login/register.html', form=create_account_form)
+        return render_template("login/register.html", form=create_account_form)
 
-@app.route('/logout')
+
+@app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
 
 @app.route("/controls")
@@ -191,9 +228,21 @@ def controls(template):
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "/controls/mobile/":
-        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template(
+            "frontpage3d_mobilecontrols.html",
+            modalStyle="modal-lg",
+            isControls=True,
+            macro1_title=macro1Title,
+            macro2_title=macro2Title,
+        )
     else:
-        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template(
+            "frontpage3d.html",
+            modalStyle="mw-100 w-75",
+            macro1_title=macro1Title,
+            macro2_title=macro2Title,
+        )
+
 
 @app.route("/text")
 @mobile_template("/text/{mobile/}")
@@ -203,9 +252,21 @@ def text(template):
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "/text/mobile":
-        return render_template("frontpageText_mobile.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template(
+            "frontpageText_mobile.html",
+            modalStyle="modal-lg",
+            isControls=True,
+            macro1_title=macro1Title,
+            macro2_title=macro2Title,
+        )
     else:
-        return render_template("frontpageText.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template(
+            "frontpageText.html",
+            modalStyle="mw-100 w-75",
+            macro1_title=macro1Title,
+            macro2_title=macro2Title,
+        )
+
 
 @app.route("/logs")
 @mobile_template("/logs/{mobile/}")
@@ -270,6 +331,7 @@ def cameraSettings():
         resp.status_code = 200
         return resp
 
+
 @app.route("/gpioSettings", methods=["POST"])
 @login_required
 def gpioSettings():
@@ -282,6 +344,7 @@ def gpioSettings():
         resp.status_code = 200
         return resp
 
+
 @app.route("/uploadGCode", methods=["POST"])
 @login_required
 def uploadGCode():
@@ -289,19 +352,32 @@ def uploadGCode():
     if request.method == "POST":
         result = request.form
         directory = result["selectedDirectory"]
-        #print(directory)
+        # print(directory)
         f = request.files.getlist("file[]")
         print(f)
         home = app.data.config.getHome()
-        app.data.config.setValue("Computed Settings", "lastSelectedDirectory", directory)
+        app.data.config.setValue(
+            "Computed Settings", "lastSelectedDirectory", directory
+        )
 
         if len(f) > 0:
             firstFile = f[0]
             for file in f:
-                app.data.gcodeFile.filename = home + "/.WebControl/gcode/" + directory + "/" + secure_filename(
-                    file.filename)
+                app.data.gcodeFile.filename = (
+                    home
+                    + "/.WebControl/gcode/"
+                    + directory
+                    + "/"
+                    + secure_filename(file.filename)
+                )
                 file.save(app.data.gcodeFile.filename)
-            app.data.gcodeFile.filename = home + "/.WebControl/gcode/" + directory + "/" + secure_filename(firstFile.filename)
+            app.data.gcodeFile.filename = (
+                home
+                + "/.WebControl/gcode/"
+                + directory
+                + "/"
+                + secure_filename(firstFile.filename)
+            )
             returnVal = app.data.gcodeFile.loadUpdateFile()
             if returnVal:
                 message = {"status": 200}
@@ -326,11 +402,11 @@ def openGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
         f = request.form["selectedGCode"]
-        app.data.console_queue.put("selectedGcode="+str(f))
+        app.data.console_queue.put("selectedGcode=" + str(f))
         tDir = f.split("/")
-        app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
+        app.data.config.setValue("Computed Settings", "lastSelectedDirectory", tDir[0])
         home = app.data.config.getHome()
-        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
+        app.data.gcodeFile.filename = home + "/.WebControl/gcode/" + f
         app.data.config.setValue("Maslow Settings", "openFile", tDir[1])
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
@@ -344,6 +420,7 @@ def openGCode():
             resp.status_code = 500
             return resp
 
+
 @app.route("/saveGCode", methods=["POST"])
 @login_required
 def saveGCode():
@@ -352,18 +429,18 @@ def saveGCode():
         print(request.form)
         f = request.form["fileName"]
         d = request.form["selectedDirectory"]
-        app.data.console_queue.put("selectedGcode="+f)
-        app.data.config.setValue("Computed Settings", "lastSelectedDirectory",d)
+        app.data.console_queue.put("selectedGcode=" + f)
+        app.data.config.setValue("Computed Settings", "lastSelectedDirectory", d)
         home = app.data.config.getHome()
-        returnVal = app.data.gcodeFile.saveFile(f, home+"/.WebControl/gcode/"+d)
-        '''
+        returnVal = app.data.gcodeFile.saveFile(f, home + "/.WebControl/gcode/" + d)
+        """
         tDir = f.split("/")
         app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
         home = app.data.config.getHome()
         app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
         app.data.config.setValue("Maslow Settings", "openFile", tDir[1])
         returnVal = app.data.gcodeFile.loadUpdateFile()
-        '''
+        """
         if returnVal:
             app.data.config.setValue("Maslow Settings", "openFile", f)
             message = {"status": 200}
@@ -376,19 +453,22 @@ def saveGCode():
             resp.status_code = 500
             return resp
 
+
 @app.route("/openBoard", methods=["POST"])
 @login_required
 def openBoard():
     app.data.logger.resetIdler()
     if request.method == "POST":
         f = request.form["selectedBoard"]
-        app.data.console_queue.put("selectedBoard="+str(f))
+        app.data.console_queue.put("selectedBoard=" + str(f))
         tDir = f.split("/")
-        app.data.config.setValue("Computed Settings","lastSelectedBoardDirectory",tDir[0])
+        app.data.config.setValue(
+            "Computed Settings", "lastSelectedBoardDirectory", tDir[0]
+        )
         home = app.data.config.getHome()
-        app.data.gcodeFile.filename = home+"/.WebControl/boards/" + f
+        app.data.gcodeFile.filename = home + "/.WebControl/boards/" + f
         app.data.config.setValue("Maslow Settings", "openBoardFile", tDir[1])
-        returnVal = app.data.boardManager.loadBoard(home+"/.WebControl/boards/"+f)
+        returnVal = app.data.boardManager.loadBoard(home + "/.WebControl/boards/" + f)
         if returnVal:
             message = {"status": 200}
             resp = jsonify(message)
@@ -400,6 +480,7 @@ def openBoard():
             resp.status_code = 500
             return resp
 
+
 @app.route("/saveBoard", methods=["POST"])
 @login_required
 def saveBoard():
@@ -408,10 +489,12 @@ def saveBoard():
         print(request.form)
         f = request.form["fileName"]
         d = request.form["selectedDirectory"]
-        app.data.console_queue.put("selectedBoard="+f)
-        app.data.config.setValue("Computed Settings", "lastSelectedBoardDirectory",d)
+        app.data.console_queue.put("selectedBoard=" + f)
+        app.data.config.setValue("Computed Settings", "lastSelectedBoardDirectory", d)
         home = app.data.config.getHome()
-        returnVal = app.data.boardManager.saveBoard(f, home+"/.WebControl/boards/"+d)
+        returnVal = app.data.boardManager.saveBoard(
+            f, home + "/.WebControl/boards/" + d
+        )
         app.data.config.setValue("Maslow Settings", "openBoardFile", f)
         if returnVal:
             message = {"status": 200}
@@ -432,7 +515,7 @@ def importFile():
     if request.method == "POST":
         f = request.files["file"]
         home = app.data.config.getHome()
-        secureFilename = home+"/.WebControl/imports/" + secure_filename(f.filename)
+        secureFilename = home + "/.WebControl/imports/" + secure_filename(f.filename)
         f.save(secureFilename)
         returnVal = app.data.importFile.importGCini(secureFilename)
         if returnVal:
@@ -445,6 +528,7 @@ def importFile():
             resp = jsonify(message)
             resp.status_code = 500
             return resp
+
 
 @app.route("/importFileWCJSON", methods=["POST"])
 @login_required
@@ -467,6 +551,7 @@ def importFileJSON():
             resp.status_code = 500
             return resp
 
+
 @app.route("/importRestoreWebControl", methods=["POST"])
 @login_required
 def importRestoreWebControl():
@@ -488,11 +573,12 @@ def importRestoreWebControl():
             resp.status_code = 500
             return resp
 
+
 @app.route("/sendGCode", methods=["POST"])
 @login_required
 def sendGcode():
     app.data.logger.resetIdler()
-    #print(request.form)#["gcodeInput"])
+    # print(request.form)#["gcodeInput"])
     if request.method == "POST":
         returnVal = app.data.actions.sendGCode(request.form["gcode"].rstrip())
         if returnVal:
@@ -513,9 +599,12 @@ def triangularCalibration():
     app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
-        motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = app.data.actions.calibrate(
-            result
-        )
+        (
+            motorYoffsetEst,
+            rotationRadiusEst,
+            chainSagCorrectionEst,
+            cut34YoffsetEst,
+        ) = app.data.actions.calibrate(result)
         # print(returnVal)
         if motorYoffsetEst:
             message = {
@@ -536,15 +625,20 @@ def triangularCalibration():
             resp.status_code = 500
             return resp
 
+
 @app.route("/holeyCalibration", methods=["POST"])
 @login_required
 def holeyCalibration():
     app.data.logger.resetIdler()
     if request.method == "POST":
         result = request.form
-        motorYoffsetEst, distanceBetweenMotors, leftChainTolerance, rightChainTolerance, calibrationError = app.data.actions.holeyCalibrate(
-            result
-        )
+        (
+            motorYoffsetEst,
+            distanceBetweenMotors,
+            leftChainTolerance,
+            rightChainTolerance,
+            calibrationError,
+        ) = app.data.actions.holeyCalibrate(result)
         # print(returnVal)
         if motorYoffsetEst:
             message = {
@@ -554,7 +648,7 @@ def holeyCalibration():
                     "distanceBetweenMotors": distanceBetweenMotors,
                     "leftChainTolerance": leftChainTolerance,
                     "rightChainTolerance": rightChainTolerance,
-                    "calibrationError": calibrationError
+                    "calibrationError": calibrationError,
                 },
             }
             resp = jsonify(message)
@@ -565,6 +659,7 @@ def holeyCalibration():
             resp = jsonify(message)
             resp.status_code = 500
             return resp
+
 
 @app.route("/opticalCalibration", methods=["POST"])
 @login_required
@@ -595,11 +690,12 @@ def quickConfigure():
         resp.status_code = 200
         return resp
 
+
 @app.route("/editGCode", methods=["POST"])
 @login_required
 def editGCode():
     app.data.logger.resetIdler()
-    #print(request.form["gcode"])
+    # print(request.form["gcode"])
     if request.method == "POST":
         returnVal = app.data.actions.updateGCode(request.form["gcode"].rstrip())
         if returnVal:
@@ -613,19 +709,21 @@ def editGCode():
             resp.status_code = 500
             return resp
 
+
 @app.route("/downloadDiagnostics", methods=["GET"])
 @login_required
 def downloadDiagnostics():
     app.data.logger.resetIdler()
     if request.method == "GET":
         returnVal = app.data.actions.downloadDiagnostics()
-        if  returnVal != False:
+        if returnVal != False:
             print(returnVal)
             return send_file(returnVal, as_attachment=True)
         else:
             resp = jsonify("failed")
             resp.status_code = 500
             return resp
+
 
 @app.route("/backupWebControl", methods=["GET"])
 @login_required
@@ -657,6 +755,7 @@ def editBoard():
             resp.status_code = 500
             return resp
 
+
 @app.route("/trimBoard", methods=["POST"])
 @login_required
 def trimBoard():
@@ -672,11 +771,12 @@ def trimBoard():
             resp.status_code = 500
             return resp
 
+
 @app.route("/assets/<path:path>")
 @login_required
 def sendDocs(path):
     print(path)
-    return send_from_directory('docs/assets/', path)
+    return send_from_directory("docs/assets/", path)
 
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
@@ -712,22 +812,26 @@ def my_event(msg):
 def modalClosed(msg):
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
-    socketio.emit("message", {"command": "closeModals", "data": data, "dataFormat": "json"},
-                  namespace="/MaslowCNC", )
+    socketio.emit(
+        "message",
+        {"command": "closeModals", "data": data, "dataFormat": "json"},
+        namespace="/MaslowCNC",
+    )
 
 
 @socketio.on("contentModalClosed", namespace="/MaslowCNC")
 @login_required
 def contentModalClosed(msg):
-    #Note, this shouldn't be called anymore
-    #todo: cleanup
+    # Note, this shouldn't be called anymore
+    # todo: cleanup
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
     print(data)
-    #socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
+    # socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
     #              namespace="/MaslowCNC", )
 
-'''
+
+"""
 todo: cleanup
 not used
 @socketio.on("actionModalClosed", namespace="/MaslowCNC")
@@ -736,15 +840,19 @@ def actionModalClosed(msg):
     data = json.dumps({"title": msg["data"]})
     socketio.emit("message", {"command": "closeActionModals", "data": data, "dataFormat": "json"},
                   namespace="/MaslowCNC", )
-'''
+"""
+
 
 @socketio.on("alertModalClosed", namespace="/MaslowCNC")
 @login_required
 def alertModalClosed(msg):
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
-    socketio.emit("message", {"command": "closeAlertModals", "data": data, "dataFormat": "json"},
-                  namespace="/MaslowCNC", )
+    socketio.emit(
+        "message",
+        {"command": "closeAlertModals", "data": data, "dataFormat": "json"},
+        namespace="/MaslowCNC",
+    )
 
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
@@ -754,15 +862,37 @@ def requestPage(msg):
     app.data.console_queue.put(request.sid)
     client = request.sid
     try:
-        page, title, isStatic, modalSize, modalType, resume = app.webPageProcessor.createWebPage(msg["data"]["page"],msg["data"]["isMobile"], msg["data"]["args"])
-        #if msg["data"]["page"] != "help":
+        (
+            page,
+            title,
+            isStatic,
+            modalSize,
+            modalType,
+            resume,
+        ) = app.webPageProcessor.createWebPage(
+            msg["data"]["page"], msg["data"]["isMobile"], msg["data"]["args"]
+        )
+        # if msg["data"]["page"] != "help":
         #    client = "all"
-        data = json.dumps({"title": title, "message": page, "isStatic": isStatic, "modalSize": modalSize, "modalType": modalType, "resume":resume, "client":client})
-        socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
+        data = json.dumps(
+            {
+                "title": title,
+                "message": page,
+                "isStatic": isStatic,
+                "modalSize": modalSize,
+                "modalType": modalType,
+                "resume": resume,
+                "client": client,
+            }
+        )
+        socketio.emit(
+            "message",
+            {"command": "activateModal", "data": data, "dataFormat": "json"},
             namespace="/MaslowCNC",
         )
     except Exception as e:
         app.data.console_queue.put(e)
+
 
 @socketio.on("connect", namespace="/MaslowCNC")
 @login_required
@@ -776,16 +906,23 @@ def test_connect():
         app.uithread.start()
 
     if not app.data.connectionStatus:
-        app.data.console_queue.put("Attempting to re-establish connection to controller")
+        app.data.console_queue.put(
+            "Attempting to re-establish connection to controller"
+        )
         app.data.serialPort.openConnection()
 
     socketio.emit("my response", {"data": "Connected", "count": 0})
     address = app.data.hostAddress
     data = json.dumps({"hostAddress": address})
     print(data)
-    socketio.emit("message", {"command": "hostAddress", "data": data, "dataFormat":"json"}, namespace="/MaslowCNC",)
+    socketio.emit(
+        "message",
+        {"command": "hostAddress", "data": data, "dataFormat": "json"},
+        namespace="/MaslowCNC",
+    )
     if app.data.pyInstallUpdateAvailable:
         app.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
+
 
 @socketio.on("disconnect", namespace="/MaslowCNC")
 @login_required
@@ -802,19 +939,27 @@ def command(msg):
         print("Shutting Down")
         socketio.stop()
         print("Shutdown")
-    if (retval == "TurnOffRPI"):
+    if retval == "TurnOffRPI":
         print("Turning off RPI")
-        os.system('sudo poweroff')
+        os.system("sudo poweroff")
+
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
 @login_required
 def settingRequest(msg):
     app.data.logger.resetIdler()
     # didn't move to actions.. this request is just to send it computed values.. keeping it here makes it faster than putting it through the UIProcessor
-    setting, value = app.data.actions.processSettingRequest(msg["data"]["section"], msg["data"]["setting"])
+    setting, value = app.data.actions.processSettingRequest(
+        msg["data"]["section"], msg["data"]["setting"]
+    )
     if setting is not None:
         data = json.dumps({"setting": setting, "value": value})
-        socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC",)
+        socketio.emit(
+            "message",
+            {"command": "requestedSetting", "data": data, "dataFormat": "json"},
+            namespace="/MaslowCNC",
+        )
+
 
 @socketio.on("updateSetting", namespace="/MaslowCNC")
 @login_required
@@ -833,12 +978,14 @@ def checkForGCodeUpdate(msg):
     app.data.ui_queue1.put("Action", "unitsUpdate", "")
     app.data.ui_queue1.put("Action", "gcodeUpdate", "")
 
+
 @socketio.on("checkForBoardUpdate", namespace="/MaslowCNC")
 @login_required
 def checkForBoardUpdate(msg):
     app.data.logger.resetIdler()
     # this currently doesn't check for updated board, it just resends it..
     app.data.ui_queue1.put("Action", "boardUpdate", "")
+
 
 @socketio.on("connect", namespace="/MaslowCNCLogs")
 def log_connect():
@@ -850,15 +997,17 @@ def log_connect():
         )
         app.logstreamerthread.start()
 
-    socketio.emit("my response", {"data": "Connected", "count": 0}, namespace="/MaslowCNCLog")
+    socketio.emit(
+        "my response", {"data": "Connected", "count": 0}, namespace="/MaslowCNCLog"
+    )
+
 
 @socketio.on("disconnect", namespace="/MaslowCNCLogs")
-
 def log_disconnect():
     app.data.console_queue.put("Client disconnected")
 
 
-@app.template_filter('isnumber')
+@app.template_filter("isnumber")
 def isnumber(s):
     try:
         float(s)
@@ -866,7 +1015,8 @@ def isnumber(s):
     except ValueError:
         return False
 
-#def shutdown():
+
+# def shutdown():
 #    print("Shutdown")
 
 migrate = Migrate(app, db)
@@ -874,7 +1024,7 @@ migrate = Migrate(app, db)
 if __name__ == "__main__":
     app.debug = False
     app.config["SECRET_KEY"] = "secret!"
-    #look for touched file
+    # look for touched file
     app.data.config.checkForTouchedPort()
     webPort = app.data.config.getValue("WebControl Settings", "webPort")
     webPortInt = 5000
@@ -891,15 +1041,13 @@ if __name__ == "__main__":
     app.data.releaseManager.processAbsolutePath(os.path.abspath(__file__))
     print("-$$$$$-")
 
-
     print("opening browser")
     webPortStr = str(webPortInt)
-    webbrowser.open_new_tab("http://localhost:"+webPortStr)
+    webbrowser.open_new_tab("http://localhost:" + webPortStr)
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
 
-    #app.data.shutdown = shutdown
+    # app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
     # socketio.run(app, host='0.0.0.0')
-
