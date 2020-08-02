@@ -3,21 +3,25 @@ from flask_mobility import Mobility
 from flask_socketio import SocketIO
 from flask_misaka import Misaka
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import (LoginManager, current_user, login_required,
-                         login_user, logout_user)
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 
 
 import os, sys
 from os import environ, path
 from logging import DEBUG, StreamHandler, basicConfig, getLogger
-base_dir = '.'
-if hasattr(sys, '_MEIPASS'):
+
+base_dir = "."
+if hasattr(sys, "_MEIPASS"):
     base_dir = os.path.join(sys._MEIPASS)
 
 
-
-
-#Variables
+# Variables
 db = SQLAlchemy()
 login_manager = LoginManager()
 md = Misaka()
@@ -26,31 +30,34 @@ md = Misaka()
 class Config(object):
     """
     """
-    #BASE DIR
+
+    # BASE DIR
     basedir = path.abspath(path.dirname(__file__))
-    
-    #Sqlalchemy
-    SECRET_KEY = environ.get('KEY_SECRET', 'love_it') 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(basedir, 'site_database.db')
-    #sqlite:///:memory'
+
+    # Sqlalchemy
+    SECRET_KEY = environ.get("KEY_SECRET", "love_it")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + path.join(basedir, "site_database.db")
+    # sqlite:///:memory'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    #theme
+
+    # theme
     DEFAULT_THEME = None
+
 
 class ProductionConfig(Config):
     """
     """
-    #Developer
+
+    # Developer
     DEBUG = False
 
-    #Security
+    # Security
     SESSION_COOKIE_HTTPPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_DURATION = 3600
 
-    #PostgreSQL
-    #TODO: configure production DB extension
+    # PostgreSQL
+    # TODO: configure production DB extension
     """
     SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
         environ.get('LIGHT_DATABASE_USER', 'master'),
@@ -68,15 +75,13 @@ class ProductionConfig(Config):
     )
     """
 
+
 class DebugConfig(Config):
-    
+
     DEBUG = True
 
-config_dict = {
-    'Debug': DebugConfig, 
-    'Production': ProductionConfig,
-    'Config': Config
-}
+
+config_dict = {"Debug": DebugConfig, "Production": ProductionConfig, "Config": Config}
 
 
 def register_extension(app):
@@ -86,10 +91,12 @@ def register_extension(app):
     db.init_app(app)
     login_manager.init_app(app)
 
+
 def configure_database(app):
     """
     Configure database
     """
+
     @app.before_first_request
     def initalize_database():
         """
@@ -104,33 +111,42 @@ def configure_database(app):
         """
         db.session.remove()
 
+
 def configure_loging(app):
     """
     """
     try:
-        basicConfig(filename='logs.log', level = DEBUG)
+        basicConfig(filename="logs.log", level=DEBUG)
         logger = getLogger()
         logger.addHandler(StreamHandler())
     except:
         pass
 
+
 def configure_theme(app):
 
     """
     """
-    #TODO: @app theme
+    # TODO: @app theme
     pass
 
-config_mode_get = environ.get('CONFIG_MODE', 'Debug' ).strip().replace('\'','') #Debug, Config, Production
+
+config_mode_get = (
+    environ.get("CONFIG_MODE", "Debug").strip().replace("'", "")
+)  # Debug, Config, Production
 
 try:
     config_mode = config_dict[config_mode_get.capitalize()]
     print(config_mode)
 except KeyError:
-    exit('Error: Invalid CONFIG_MODE enviroment variable.')
+    exit("Error: Invalid CONFIG_MODE enviroment variable.")
 
 
-app = Flask(__name__, static_folder=os.path.join(base_dir, 'static'), template_folder=os.path.join(base_dir, 'templates'))
+app = Flask(
+    __name__,
+    static_folder=os.path.join(base_dir, "static"),
+    template_folder=os.path.join(base_dir, "templates"),
+)
 app.config.from_object(config_mode)
 
 app.debug = True
@@ -138,7 +154,7 @@ md.init_app(app)
 register_extension(app)
 configure_database(app)
 configure_loging(app)
-#TODO:
-#configure_theme(app)
+# TODO:
+# configure_theme(app)
 socketio = SocketIO(app)
 mobility = Mobility(app)
