@@ -48,6 +48,16 @@ class User_activity(db.Model):
 
             setattr(self, property, value)
 
+class Site_Users(db.Model):
+    __tablename__ = "Site_Users"
+
+    id = Column(Integer, primary_key=True)
+    multiuser = Column(Integer, default=0)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+
+            setattr(self, property, value)
 
 def hash_pass(password):
     """
