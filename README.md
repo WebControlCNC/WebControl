@@ -29,7 +29,7 @@ WebControl started as a browser-based port of the original GroundControl applica
 
 At this point, WebControl has become the **de-facto beginner's tool for Maslow**.
 
-<img src="assets/Screenshot.png" alt="Screenshot" width="100%">
+<img src="docs/assets/Screenshot.png" alt="Screenshot" width="100%">
 
 ## Installation
 
