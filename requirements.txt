@@ -24,3 +24,5 @@ wget
 distro
 python-frontmatter
 markdown
+cwiid
+requests

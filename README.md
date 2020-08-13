@@ -235,8 +235,8 @@ Added to TODO list?
 * **John Boiles** - *Docker Expert* - [johnboiles](https://github.com/johnboiles)
 * **Tinker** - *UI Improvements/Bug Fixer/Etc.* - [gb0101010101](https://github.com/gb0101010101)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/WebControlCNC/contributors) who participated in this project.
 
 ## License
 
-See [LICENSE](https://github.com/madgrizzle/WebControl/blob/master/LICENSE)
+See [LICENSE](https://github.com/WebControlCNC/WebControl/blob/master/LICENSE)
