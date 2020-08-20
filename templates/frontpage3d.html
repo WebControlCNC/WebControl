@@ -6,11 +6,16 @@
 {% endblock %}
 
 {% block javascript %}
+  <script>
+    enable3D=true;
+  </script>
   <script src="{{ url_for('static',filename='scripts/pako.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019t') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/sprite3D.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019w') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102019w') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -19,44 +24,44 @@
     <div class="flex-fixed-width-item"><!--"col my-sidebar">-->
         <h3>Controls</h3>
         <div>
-        <div class="controls row">
+        <div class="controls row" ><!-- This block needs to be disabled while code running. -->
           <div class="col-3 mb-1">
             <button type="button" class="btn btn-secondary btn-block disabler" onclick="moveAction('upLeft')"><i data-feather="arrow-up-left"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('up')"><i data-feather="arrow-up"></i></button>
+            <button type="button" class="btn btn-dark btn-block disabler" onclick="moveAction('up')"><i data-feather="arrow-up"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="moveAction('upRight')"><i data-feather="arrow-up-right"></i></button>
+            <button type="button" class="btn btn-secondary btn-block disabler" onclick="moveAction('upRight')"><i data-feather="arrow-up-right"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-primary btn-block" onclick="action('macro1')">{{ macro1_title }}</button>
-          </div>
-          <div class="w-100"></div>
-          <div class="col-3 mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('left')"><i data-feather="arrow-left"></i></button>
-          </div>
-          <div class="col-3 mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="action('home')"><i data-feather="home"></i></button>
-          </div>
-          <div class="col-3 mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('right')"><i data-feather="arrow-right"></i></button>
-          </div>
-          <div class="col-3 mb-1">
-            <button type="button" class="btn btn-primary btn-block" onclick="action('macro2')">{{ macro2_title }}</button>
+            <button type="button" class="btn btn-primary btn-block disabler" onclick="action('macro1')">{{ macro1_title }}</button>
           </div>
           <div class="w-100"></div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="moveAction('downLeft')"><i data-feather="arrow-down-left"></i></button>
+            <button type="button" class="btn btn-dark btn-block disabler" onclick="moveAction('left')"><i data-feather="arrow-left"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-dark btn-block" onclick="moveAction('down')"><i data-feather="arrow-down"></i></button>
+            <button type="button" class="btn btn-dark btn-block disabler" onclick="action('home')"><i data-feather="home"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-secondary btn-block" onclick="moveAction('downRight')"><i data-feather="arrow-down-right"></i></button>
+            <button type="button" class="btn btn-dark btn-block disabler disabler" onclick="moveAction('right')"><i data-feather="arrow-right"></i></button>
           </div>
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
+            <button type="button" class="btn btn-primary btn-block disabler" onclick="action('macro2')">{{ macro2_title }}</button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-secondary btn-block disabler" onclick="moveAction('downLeft')"><i data-feather="arrow-down-left"></i></button>
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-dark btn-block disabler" onclick="moveAction('down')"><i data-feather="arrow-down"></i></button>
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-secondary btn-block disabler" onclick="moveAction('downRight')"><i data-feather="arrow-down-right"></i></button>
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn btn-primary btn-block disabler" onclick="requestPage('zAxis');">ZAxis</button>
           </div>
           <div class="w-100"></div>
           <div class="col-3 mb-1">
@@ -69,7 +74,7 @@
             <button id="units" type="button" class="btn btn-secondary" onclick="unitSwitch();">--</button>
           </div>
           <div class="col-3 mb-1">
-            <button id="btnDefHome" type="button" class="btn btn-primary btn-block" onclick="action('defineHome')" ><i data-feather="save">Def.</i> <i data-feather="home">Home</i></button>
+            <button id="btnDefHome" type="button" class="btn btn-primary btn-block disabler" onclick="action('defineHome')" ><i data-feather="save">Def.</i> <i data-feather="home">Home</i></button>
           </div>
         </div>
         <div class="row">
@@ -79,10 +84,10 @@
         </div>
         <div class="row">
           <div class="col mb-1">
-            <button type="button" class="btn btn-block btn-success" onclick="action('startRun')">Play</button>
+            <button type="button" class="btn btn-block btn-success gcdisabler" onclick="action('startRun')">Play</button>
           </div>
           <div class="col mb-1">
-            <button type="button" id="pauseButton" class="btn btn-block btn-warning" onclick="pauseRun()">Pause</button>
+            <button type="button" id="pauseButton" class="btn btn-block btn-warning ndisabler" onclick="pauseRun()">Pause</button>
           </div>
           <div class="col mb-1">
             <button type="button" id="stopButton" class="btn btn-block btn-danger" onclick="$(this).removeClass('stopbutton'); action('stopRun')">Stop</button>
@@ -136,17 +141,21 @@
           <div class="col-3">
             <h5>Error:</h5>
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <div class="progress">
-              <div id="leftError" class = "progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              <div id="leftError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <div class="progress">
-              <div id="rightError" class = "progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              <div id="rightError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
             </div>
           </div>
-
+          <div class="col-3">
+            <div class="progress">
+              <div id="zError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 20%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
+            </div>
+          </div>
         </div>
         <div class="row">
           <div class="col-3 mb-1">
@@ -208,10 +217,12 @@
         </div>-->
         <div id="button3DResetGroup"><!-- class="btn-toolbar" role="toolbar">-->
             <button class="btn btn-secondary btn-sm" type="button" id="button3D" onclick="toggle3DView()">3D</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="buttonPO" onclick="toggle3DPO()">Ortho</button>
             <button class="btn btn-secondary btn-sm" type="button" id="buttonReset" onclick="resetView()">Reset</button>
             <!--<button class="btn btn-secondary btn-sm" type="button" id="cursorPosition">Cursor Position</button>-->
             <span id="cursorPosition" class="btn btn-secondary btn-sm">Cursor Position</span>
-            <button id="boardID" class="btn btn-primary btn-sm" onclick="toggleBoard()">...</button>
+            <button id="boardID" class="btn btn-secondary btn-sm" onclick="toggleBoard()">...</button>
+            <button id="labelsID" class="btn btn-secondary btn-sm" onclick="toggleLabels()">Labels</button>
         </div>
       <div id="cameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
       <div id="cameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>

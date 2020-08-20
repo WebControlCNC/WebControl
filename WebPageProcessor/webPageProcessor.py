@@ -147,6 +147,35 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
+        
+        elif pageID == "LEDStatus":
+            setValues = self.data.config.getJSONSettingSection("LED Status List")
+            options = self.data.gpioActions.getLEDColorList()
+            #print(options)  
+            page = render_template(
+                    "LEDStatus.html",
+                    title="LED Status Settings",
+                    settings=setValues,
+                    options=options,
+                    pageID="LEDStatus"
+                    )
+            return page, "LEDStatus", False, "medium", "content", "footerSubmit"
+        
+        elif pageID == "LEDSettings":
+            setValues = self.data.config.getJSONSettingSection("LED Settings")
+            behaviors = self.data.gpioActions.getLEDBehaviorList()
+            colors = self.data.gpioActions.getLEDColors()
+            #print(options)  
+            page = render_template(
+                    "LEDSettings.html",
+                    title="LED Settings",
+                    settings=setValues,
+                    behaviors=behaviors,
+                    colors=colors,
+                    pageID="LEDSettings"
+                    )
+            return page, "LEDSettings", False, "medium", "content", "footerSubmit"
+        
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
@@ -245,17 +274,31 @@ class WebPageProcessor:
                 enableHoley = False
             else:
                 enableHoley = True
-            if self.data.platform == "RPI":
-                docker = True
-            else:
+            if (self.data.platform == "PYINSTALLER"):
                 docker = False
+            else:
+                docker = True
+            if self.data.platform == "RPI":
+                enableRPIshutdown = True
+            else:
+                enableRPIshutdown = False
             if self.data.pyInstallUpdateAvailable:
                 updateAvailable = True
                 updateRelease = self.data.pyInstallUpdateVersion
             else:
                 updateAvailable = False
                 updateRelease = "N/A"
-            page = render_template("actions.html", updateAvailable=updateAvailable, updateRelease=updateRelease, docker=docker, customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley)
+            page = render_template("actions.html", 
+                                   updateAvailable=updateAvailable, 
+                                   updateRelease=updateRelease, 
+                                   docker=docker, 
+                                   customFirmwareVersion=self.data.customFirmwareVersion, 
+                                   stockFirmwareVersion=self.data.stockFirmwareVersion, 
+                                   holeyFirmwareVersion=self.data.holeyFirmwareVersion, 
+                                   enableCustom=enableCustom, 
+                                   enableHoley=enableHoley, 
+                                   enableRPIshutdown = enableRPIshutdown
+                                   )
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
@@ -279,6 +322,19 @@ class WebPageProcessor:
             else:
                 page = render_template("setSprockets.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
             return page, "Set Sprockets", False, "medium", "content", False
+        elif pageID == "resetChains":
+            if self.data.controllerFirmwareVersion < 100:
+                fourMotor = False
+            else:
+                fourMotor = True
+            chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            if isMobile:
+                page = render_template("resetChains_mobile.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
+            else:
+                page = render_template("resetChains.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
+            return page, "Reset Chains", False, "medium", "content", False
+
         elif pageID == "triangularCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")

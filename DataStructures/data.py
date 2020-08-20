@@ -33,12 +33,17 @@ class Data:
     customFirmwareVersion = None
     holeyFirmwareVersion = None
     controllerFirmwareVersion = 0
-
+    '''
+    interpreter version
+    if using a compiler newer than 3.5, use the newer string format methods without %'s
+    '''
+    pythonVersion35 = False  
+    
     '''
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.927
+    pyInstallCurrentVersion = 0.94
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
@@ -116,7 +121,10 @@ class Data:
     gcode_z_min = 10
     gcode_z_max = -10
     moveDistance = 10 # CHECK UNITS!!
-    
+    GPIOButtonService = False # is there an external subprocess or service running to handle gpio?
+    RGB_LED = False # this is in maslow settings
+    LED_Status = "Off" # "Off, At Home, Homing, Sled Moving, Z Moving, Z Zero, Cutting, Paused, Idle, Error, Calibrating, Need Chain Reset "
+
     """
     Pointers to Objects
     """
@@ -175,9 +183,14 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    time = 0.0
     xval_prev = -99990.0
     yval_prev = -99990.0
     zval_prev = -99990.0
+    time_prev = -99990.0
+    velocity_prev = 0
+    velocity_filter = 0.5
+    wasmoving = 1
 
     leftError = 0.0
     rightError = 0.0

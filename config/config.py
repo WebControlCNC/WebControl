@@ -7,12 +7,13 @@ and using the data in this dict.
 """
 import json
 import re
-import os, sys
+import os, sys, os.path
 import math
 from shutil import copyfile
 from pathlib import Path
 import time
 import glob
+import subprocess
 
 from __main__ import app
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
@@ -157,7 +158,80 @@ class Config(MakesmithInitFuncs):
             print(e)
             return False
         return True
-
+    def getWebPortNumber(self):
+        '''
+        This function looks for the flask / socket IO port number where the webcontrol page is to be hosted.  default is 5000, but often is not found there
+        '''
+        webPort = self.data.config.getValue("WebControl Settings", "webPort")
+        webPortInt = 5000
+        try:
+            webPortInt = int(webPort)
+            if webPortInt < 0 or webPortInt > 65535:
+                webPortInt = 5000
+            return (str(webPortInt))
+        except Exception as e:
+            self.data.console_queue.put(e)
+            self.data.console_queue.put("Invalid port assignment found in webcontrol.json")
+            return('5000') 
+            
+    def buttonSubProcess(self, command):
+        '''
+        this function starts and stops a separate process called MaslowButton that handles the GPIO completely separate from the threads in webcontrol
+        MaslowButton communicates over a socket text communication using the IO web port set up in webcontrol and is toggled by the gpio settings menu
+        this process is only available if running on raspberry pi
+        '''
+        #sys.setrecursionlimit(15000)
+        if ((self.data.GPIOButtonService) and (self.data.platform == "RPI")):
+            #try:
+                cwd = os.getcwd()
+                startcommand = 'python3 ' + str(cwd) + '/Services/maslowButton.py'
+                print("current working directory: ", str(cwd))
+                path =  cwd + '/Services/maslowButton.py'                
+                if (os.path.isfile(path)):
+                    print("path 1 is ", path)
+                    #startcommand = "python " + path
+                    openpath = cwd + "/Services/buttonconfig.json"
+                else:
+                    path = "./Services/maslowButton.py"
+                    if(os.path.isfile(path)):
+                        print("path 2 is ", path)
+                        #startcommand = "python " + path
+                        openpath = './buttonconfig.json'
+                    else:
+                        path = "../Services/maslowButton.py"
+                        if(os.path.isfile(path)):
+                            print("path 3 is ", path)
+                            #startcommand = "python " + path
+                            openpath = '../buttonconfig.json'
+                f = open(openpath, 'w')
+                f.write(str(self.getWebPortNumber()))
+                f.close
+                print("subprocess start command: ", startcommand)
+                if command == 'stop':
+                    print("Maslow Button subprocess stopping")
+                    subprocess.Popen('killall -9 maslowButton.py')
+                    return True
+                elif command == 'start':
+                    print("Maslow Button subprocess starting")
+                    subprocess.call([cwd + '/Services/MBstart.sh'])
+                    #subprocess.Popen(startcommand,, stdout=dev_null, stderr=dev_null)
+                    return True
+                elif command == 'restart':
+                    print("Maslow Button subprocess restarting")
+                    subprocess.call('killall -9 maslowButton.py')
+                    subprocess.Popen([cwd + '/Services/MBstart.sh'])
+                    return True
+                else:
+                    self.data.console_queue.put("no process found or cannot start service - invalid request")
+                    return False          
+            #except Exception as e:
+            #    self.data.console_queue.put(e)
+            #    self.data.console_queue.put("Error with staring MaslowButton.py subprocess")
+                return False
+        else:
+            self.data.console_queue.put("button service option not selected.  No Buttons activated") 
+            return True  
+              
     def getHome(self):
         return self.home
 
@@ -728,7 +802,7 @@ class Config(MakesmithInitFuncs):
         if hasattr(sys, '_MEIPASS'):
             home = os.path.join(sys._MEIPASS)
             print(self.home)
-        path = home+"/firmware/madgrizzle/*.hex"
+        path = home+"/firmware/test/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
             maxIndex = len(version)-1

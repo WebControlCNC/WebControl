@@ -18,6 +18,7 @@ from Background.webcamVideoStream import WebcamVideoStream
 from Boards.boardManager import BoardManager
 from ReleaseManager.releaseManager import ReleaseManager
 from HelpManager.helpManager import HelpManager
+#from GCodeOptimizer.gcodeOptimizer import GCodeOptimizer
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -42,7 +43,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     boardManager = BoardManager()
     releaseManager = ReleaseManager()
     helpManager = HelpManager()
-    #iiPendant = WiiPendant()
+    #gcodeOptimizer = GCodeOptimizer()
 
     def setUpData(self, data):
         """
@@ -73,7 +74,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
         data.helpManager = self.helpManager
-        
+        #data.gcodeOptimizer = self.gcodeOptimizer
+
         if hasattr(sys, '_MEIPASS'):
             data.platform = "PYINSTALLER"
             data.platformHome = sys._MEIPASS
