@@ -390,6 +390,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G20 ")
             else:
                 self.data.gcode_queue.put("G21 ")
+            self.LED_Status = "Idle"
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
