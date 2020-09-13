@@ -9,8 +9,6 @@ import subprocess
 import sys
 
 monkey.patch_all()
-    
-
 
 import schedule
 import time
@@ -406,7 +404,7 @@ def gpioSettings():
         except:
             print("error restarting button service")
         return resp
-        
+
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
     app.data.logger.resetIdler()
@@ -956,7 +954,7 @@ def isnumber(s):
         return True
     except ValueError:
         return False
-        
+
 #def shutdown():
 #    print("Shutdown")
 

@@ -132,7 +132,7 @@ class GCodeFile(MakesmithInitFuncs):
             #print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
-                r"([0-9])([GXYZIJFTMR]) *", "\\1 \\2", filtersparsed
+                r"([0-9])([GXYZIJFTMRS]) *", "\\1 \\2", filtersparsed
             )  # put spaces between gcodes
             filtersparsed = re.sub(r"  +", " ", filtersparsed)  # condense space runs
             value = self.data.config.getValue("Advanced Settings", "truncate")
@@ -155,40 +155,8 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
             filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
-            #print (filtersparsed)
-            #((\%)|((?P<linenumber>N\s*\d{1,5})?\s*(?P<word>[ABCDFGHIJKLMNPRSTXYZ]\s*[+-]?(\d|\s)*\.?(\d|\s)*\s*)|(?P<comment>\(.*?\)\s*)))
-            for index, line in enumerate(filtersparsed):
-                R = re.search("R(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
-                if R:                 #R will crash the arduino, so change the G02 G03 to G01
-                    piece = line
-                    print("line: ", line)
-                    if (line.find("G03")!=-1):
-                        newpiece = piece.replace("G03","G01")
-                        Index1 = newpiece.split("R") #remove after R
-                        newpiece = Index1[0]
-                        print ("G3 replace",newpiece)
-                        filtersparsed[index] = newpiece
-                    if (line.find("G02")!=-1):
-                        cut2line = piece.replace("G02","G01")
-                        Index1 = cut2line.split("R") #remove after R
-                        cut2line = Index1[0]
-                        print ("G03 replace", cut2line)
-                        filtersparsed[index] = cut2line
-                #print ("took out the G02 and G03: ", filtersparsed)
-                if (self.data.clidisplay):
-                    X = re.search("X(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
-                    Y = re.search("Y(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", line)
-                    if (type(X) != None):
-                        if X:  # find min and max of X values
-                            q = abs(float(X.groups()[0]))
-                            self.displayX(q)
-                    if (type(Y) != None):
-                        if Y: # find min and max of Y values
-                            q = abs(float(Y.groups()[0]))
-                            self.displayY(q)
-            self.data.gcode = "[]"
+            filtersparsed = [x.replace("S ", "S") for x in filtersparsed]
             self.data.gcode = filtersparsed
-            # Find gcode indicies of z moves
             self.data.zMoves = [0]
             zList = []
             for index, line in enumerate(self.data.gcode):
@@ -466,7 +434,11 @@ class GCodeFile(MakesmithInitFuncs):
         else:
             code = mString[code0+1: code1-code0]
         if code!="":
-            return int(code)
+            try:
+                code = int(code)
+                return int(code)
+            except:
+                return 0
         else:
             return 0
 

@@ -39,11 +39,11 @@ class Data:
     '''
     pythonVersion35 = False  
     
-    '''
+    '''l
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.9335
+    pyInstallCurrentVersion = 0.94
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
@@ -179,9 +179,14 @@ class Data:
     xval = 0.0
     yval = 0.0
     zval = 0.0
+    time = 0.0
     xval_prev = -99990.0
     yval_prev = -99990.0
     zval_prev = -99990.0
+    time_prev = -99990.0
+    velocity_prev = 0
+    velocity_filter = 0.5
+    wasmoving = 1
 
     leftError = 0.0
     rightError = 0.0
@@ -205,7 +210,7 @@ class Data:
     """
     bufferSize = 127
 
-    pausedzval = 0.0
+    pausedzval = None
     pausedPositioningMode = 0
     pausedUnits = "INCHES"
 

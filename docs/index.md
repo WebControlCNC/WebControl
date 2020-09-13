@@ -4,36 +4,108 @@ title: Home
 nav_order: 1
 description: Help pages for WebControl
 wcversion: 0.915.001
+tags: web-control
 ---
-
 # WebControl
 
-On Github: [madgrizzle/WebControl](https://github.com/madgrizzle/WebControl)
+The official tool for [Maslow CNC](https://www.maslowcnc.com/); control your Maslow with any web browser.
 
-Report Issues: [madgrizzle/WebControl/issues](https://github.com/madgrizzle/WebControl/issues)
+* Browser-based, multi-platform controller software.
+* Connects to Maslow's Arduino Mega (or similar) via USB.
+* Includes setup instructions (updated from [Maslow Community Garden](http://maslowcommunitygarden.org/)).
+* Runs gcode (`.nc` files) for printing cuts.
 
-WebControl is a browser-based implementation of [MaslowCNC/GroundControl](https://github.com/MaslowCNC/GroundControl) for controlling a Maslow CNC.  Ground Control utilizes Kivy as the graphic front end, which makes it difficult to implement multiple and/or remote access.  WebControl, however, runs completely as a flask-socketio web server and inherently supports remote access and multiple screens.  Therefore, WebControl can be installed on a low cost device like a Raspberry Pi, Windows 10, or linux (Debian) machines and the user can utilize their laptop, tablet and/or phone to control it.. all at the same time.  Since the the installation supports headless operation, someone trying to build a self contained sled (i.e., motors located on the sled) can also install the Raspberry Pi on the sled as well.
+You can [report issues](https://github.com/WebControlCNC/WebControl/issues) to the [volunteer team](https://github.com/WebControlCNC/WebControl/).
+
+
+## Context
+
+WebControl started as a browser-based port of the original GroundControl application, but has grown to support more features:
+
+* The calibration and setup process is better documented and easier to use.
+* It implements a flask+socketio web server, so other computers on the network may control the machine.
+* It can be run on a low-cost device, like a Raspberry Pi.
+* It can also support multiple custom firmwares developed by the community which enhance the Maslow.
+
+At this point, WebControl has become the **de-facto beginner's tool for Maslow**.
 
 <img src="assets/Screenshot.png" alt="Screenshot" width="100%">
-## Notice
 
-Webcontrol will be moving all releases to a pyinstaller created executable, including for the Raspberry Pi.  I will try to create a pre-built image for the RPI, but until then you will need to install a copy of raspbian on an SD card, update it for SSH and network access, then download webcontrol and set it to run automatically (if you chose).
 
-### Windows 10 and Linux Single-File Releases
+## Installation
 
-For Windows 10 and Linux (Debian-based, such as Ubuntu) machines, users can download the latest single-file release, extract it, and run webcontrol.  As a single-file release, it is completely portable and does not require an installation.  The file unpacks itself into a temporary directory and runs.  If you have a very slow computer, it might take a while to unpack.  In that case, it is recommended to use the single-directory release which extracts into a single directory containing unpacked files.  Startup is much quicker using single-directory releases versus a single-file release.
+### Pre-Built Raspberry Pi Image
 
-Check out the release page at:
+See the [dedicated repository](https://github.com/WebControlCNC/webcontrol-pi).
 
-[https://github.com/madgrizzle/WebControl/releases](https://github.com/madgrizzle/WebControl/releases)
+### Pre-Built Application Binaries
 
-### Raspberry Pi (3B+ & Zero W)
+There are both single-file (installer) and single-directory (zipped) releases available. The installer files are appropriate for faster machines, like a Windows 10 laptop where an installer executable is desired. Zipped, "single-directory" releases will unpack faster and startup quicker on devices like the Raspberry Pi.
 
-For Raspberry Pi's, single-directory releases are your best option.  It can take up to a minute to unpack a single-file release on a Raspberry Pi 3B+.  Single-directory releases unpack the files into the directory so startup is much quicker.  Both the Raspberry Pi 3B+ and Zero W have been tested to work with webcontrol.  Other versions likely would also.  I recommend the 3B+ if you are trying to decide.
+See the [releases page](https://github.com/madgrizzle/WebControl/releases) and choose the appropriate architecture and release type.
 
-Check out the release page at:
+### Linux Autostart (systemd)
 
-[https://github.com/madgrizzle/WebControl/releases](https://github.com/madgrizzle/WebControl/releases)
+To run WebControl automatically on startup for a Linux-based machine, it is recommended to create a service:
+
+>nano webcontrol.service
+
+type the following:
+
+>[Unit]</br>
+>Description=WebControl</br>
+>After=network.target</br>
+></br>
+>[Service]</br>
+>ExecStart=/home/pi/webcontrol/webcontrol</br>
+>WorkingDirectory=/home/pi/webcontrol</br>
+>StandardOutput=inherit</br>
+>StandardError=inherit</br>
+>Restart=always</br>
+>User=pi</br>
+></br>
+>[Install]</br>
+>WantedBy=multi-user.target</br>
+
+Save file using Ctrl-X/Yes
+
+>sudo cp webcontrol.service /etc/systemd/system
+
+Test with the following:
+
+>sudo systemctl start webcontrol.service
+
+Try to reach webcontrol using your browser.
+
+To debug, try:
+
+>sudo systemctl status webcontrol
+
+Or, to. get logs:
+
+>journalctl -xe
+
+When it works, then type:
+
+>sudo systemctl enable webcontrol.service
+
+see for more details:
+https://www.raspberrypi.org/documentation/linux/usage/systemd.md
+
+### Docker & Kubernetes
+
+* Pull the docker image from `inzania/web-control` using the `armv7` or `amd64` tag.
+* Mount a data/config volume at `/root/.WebControl`
+* Expose port `5000`
+* Run with `privileged: true` security context for USB access.
+
+### Remote Access
+
+WebControl can be run behind a front-proxy with TLS termination, such as nginx. You can use this in conjunction with semi-static IP to access your Maslow from anywhere with internet access. The full scope of this is outside this documentation, so you should be sure you understand the **security implications** before proceeding (hint: WebControl doesn't have a login or user authentication system).
+
+## Usage
+
+Open your web browser to `localhost:5000` (or use the IP address of your device).
 
 ## Built With
 
@@ -57,7 +129,7 @@ Check out the release page at:
 You can use virtualenv to set up a local development environment for running the code without installing packages in the system Python installation.
 
     # Create a virtual environment
-    virtualenv -p python3 .venv 
+    virtualenv -p python3 .venv
     # Activate the virtual environment
     source .venv/bin/activate
     # Install the prerequisites
@@ -77,7 +149,7 @@ This project uses [black](https://github.com/ambv/black) to automatically format
 
     pip install black
 
-Subsequently, you can just run `black .` to format all files in the current directory. 
+Subsequently, you can just run `black .` to format all files in the current directory.
 
     black .
 
@@ -99,7 +171,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 Added to TODO list?
 
-## Authors
+## With Thanks
 
 * **Madgrizzle** - *Initial work* - [madgrizzle](https://github.com/madgrizzle)
 * **John Boiles** - *Docker Expert* - [johnboiles](https://github.com/johnboiles)

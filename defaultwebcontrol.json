@@ -91,7 +91,7 @@
         },
         {
             "default": 1651,
-            "desc": "The length in mm that will be extended during chain calibration\ndefault setting: 1650",
+            "desc": "The length in mm that will be extended during chain calibration\ndefault setting: 1651",
             "firmwareKey": 11,
             "key": "chainExtendLength",
             "section": "Advanced Settings",
@@ -121,19 +121,41 @@
         },
         {
             "default": "None",
-            "desc": "How should the spindle start and stop automatically based on gcode? Leave off for none, or set external servo control, or external relay control, active high or low.\ndefault setting: None",
+            "desc": "How should the spindle start and stop automatically based on gcode? Leave off for none, or set external servo control, or external relay control, active high or low.  Speed control uses pin 45 in 51.29 firmware\ndefault setting: None",
             "firmwareKey": 17,
             "key": "spindleAutomate",
             "options": [
                 "None",
                 "Servo",
                 "Relay_High",
-                "Relay_Low"
+                "Relay_Low",
+                "SPEED_CTRL_RELAY_HIGH",
+                "SPEED_CTRL_RELAY_LOW"
             ],
             "section": "Advanced Settings",
             "title": "Spindle Automation",
             "type": "options",
             "value": "None"
+        },
+        {
+            "default": "None",
+            "desc": "Spindle start speed absolute minimum\ndefault setting: 4000",
+            "firmwareKey": 60,
+            "key": "spindleMin",
+            "section": "Advanced Settings",
+            "title": "Spindle Speed Minimum",
+            "type": "string",
+            "value": "4000"
+        },
+        {
+            "default": "None",
+            "desc": "Spindle maximum speed\ndefault setting: 24000",
+            "firmwareKey": 61,
+            "key": "spindleMax",
+            "section": "Advanced Settings",
+            "title": "Spindle Speed Maximum",
+            "type": "string",
+            "value": "24000"
         },
         {
             "default": 800,
