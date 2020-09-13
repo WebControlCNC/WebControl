@@ -259,7 +259,23 @@ class WebPageProcessor:
             else:
                 updateAvailable = False
                 updateRelease = "N/A"
-            page = render_template("actions.html", updateAvailable=updateAvailable, updateRelease=updateRelease, docker=docker, customFirmwareVersion=self.data.customFirmwareVersion, stockFirmwareVersion=self.data.stockFirmwareVersion, holeyFirmwareVersion=self.data.holeyFirmwareVersion, enableCustom=enableCustom, enableHoley=enableHoley, enableRPIshutdown = enableRPIshutdown)
+            if (float(self.data.controllerFirmwareVersion) > 1.26):
+                firmwareSupportsZaxisLimit = True
+            else:
+                firmwareSupportsZaxisLimit = False
+            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so: ", firmwareSupportsZaxisLimit)
+            page = render_template("actions.html", 
+                                   updateAvailable=updateAvailable, 
+                                   updateRelease=updateRelease, 
+                                   docker=docker, 
+                                   customFirmwareVersion=self.data.customFirmwareVersion, 
+                                   stockFirmwareVersion=self.data.stockFirmwareVersion, 
+                                   holeyFirmwareVersion=self.data.holeyFirmwareVersion, 
+                                   enableCustom=enableCustom, 
+                                   enableHoley=enableHoley, 
+                                   enableRPIshutdown = enableRPIshutdown,
+                                   firmwareSupportsZaxisLimit = firmwareSupportsZaxisLimit
+                                   )
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
@@ -267,10 +283,39 @@ class WebPageProcessor:
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
             if isMobile:
-                page = render_template("zaxis_mobile.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+                page = render_template("zaxis_mobile.html", 
+                                       distToMoveZ=distToMoveZ, 
+                                       unitsZ=unitsZ, 
+                                       touchPlate=touchPlate
+                                       )
             else:
-                page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+                page = render_template("zaxis.html", 
+                                       distToMoveZ=distToMoveZ, 
+                                       unitsZ=unitsZ, 
+                                       touchPlate=touchPlate
+                                       )
             return page, "Z-Axis", False, "medium", "content", False
+        elif pageID == "setZaxis":
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            minZlimit = 0 #self.data.config.getValue("Advanced Settings", "minZlimit")
+            maxZlimit = 0 #self.data.config.getValue("Advanced Settings", "maxZlimit")
+            distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
+            unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
+            if isMobile:
+                page = render_template("setZaxis_mobile.html", 
+                                       minZlimit = minZlimit, 
+                                       maxZlimit = maxZlimit, 
+                                       distToMoveZ=distToMoveZ, 
+                                       unitsZ=unitsZ
+                                       )
+            else:
+                page = render_template("setZaxis.html", 
+                                       minZlimit = minZlimit, 
+                                       maxZlimit = maxZlimit, 
+                                       distToMoveZ=distToMoveZ, 
+                                       unitsZ=unitsZ
+                                       )
+            return page, "Z-Axis Limits", False, "medium", "content", False
         elif pageID == "setSprockets":
             if self.data.controllerFirmwareVersion < 100:
                 fourMotor = False

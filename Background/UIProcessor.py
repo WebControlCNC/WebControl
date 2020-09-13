@@ -62,6 +62,12 @@ class UIProcessor:
                             if message[0] == "<":
                                 #call function to parse position message and update UI clients
                                 self.setPosOnScreen(message)
+                            elif message[0:20] == "Upper limit set to":
+                                pass
+                            elif message[0:19] == "Lower limit set to":
+                                pass
+                            elif message[0:7] == "Z-Axis":
+                                pass
                             elif message[0] == "[":
                                 # call function to parse position error message and update UI clients
                                 if message[1:4] == "PE:":
@@ -385,7 +391,7 @@ class UIProcessor:
         '''
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
-
+    
     def sendErrorValueMessage(self, position):
         '''
         Sends the error value message to UI client.  Not sure why I separated this from the only function that calls it.
@@ -570,6 +576,9 @@ class UIProcessor:
                 elif msg["message"] == "closeModals":
                     title = json.loads(msg["data"])
                     msg["data"] = json.dumps({"title": title})  # msg["data"]})
+                elif msg["message"] == "getZLimits":  # z axis limit json strings for sending to UI
+                    msg["message"] = "getZLimits"
+                    msg["data"] = json.dumps({"maxZlimit": max, "minZlimit": min})    
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
                               namespace="/MaslowCNC")
         # I think I was working on clearing on an issue with the formatting of messages so I added this.  I think the
