@@ -42,7 +42,7 @@ See the [dedicated repository](https://github.com/WebControlCNC/webcontrol-pi).
 
 There are both single-file (installer) and single-directory (zipped) releases available. The installer files are appropriate for faster machines, like a Windows 10 laptop where an installer executable is desired. Zipped, "single-directory" releases will unpack faster and startup quicker on devices like the Raspberry Pi.
 
-See the [releases page](https://github.com/madgrizzle/WebControl/releases) and choose the appropriate architecture and release type.
+See the [releases page](https://github.com/WebControlCNC/WebControl/releases) and choose the appropriate architecture and release type.
 
 ### Linux Autostart (systemd)
 
@@ -181,4 +181,4 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## License
 
-See [LICENSE](https://github.com/madgrizzle/WebControl/blob/master/LICENSE)
+See [LICENSE](https://github.com/WebControlCNC/WebControl/blob/master/LICENSE)
