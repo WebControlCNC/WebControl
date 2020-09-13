@@ -123,7 +123,7 @@ class GCodeFile(MakesmithInitFuncs):
             #print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
-                r"([0-9])([GXYZIJFTM]) *", "\\1 \\2", filtersparsed
+                r"([0-9])([GXYZIJFTMRS]) *", "\\1 \\2", filtersparsed
             )  # put spaces between gcodes
             filtersparsed = re.sub(r"  +", " ", filtersparsed)  # condense space runs
             value = self.data.config.getValue("Advanced Settings", "truncate")
@@ -149,6 +149,8 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
             filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
+            filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
+            filtersparsed = [x.replace("S ", "S") for x in filtersparsed]
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
 
