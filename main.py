@@ -38,7 +38,10 @@ from flask_login import (
     logout_user,
 )
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug import secure_filename
+
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import  FileStorage
+
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from Background.LogStreamer import LogStreamer  # do this after socketio is declared
 from Background.WebMCPProcessor import WebMCPProcessor
@@ -1062,7 +1065,7 @@ if __name__ == "__main__":
     app.data.releaseManager.processAbsolutePath(os.path.abspath(__file__))
     print("-$$$$$-")
 
-    print("opening browser")
+    print("opening browser{}".format(webPort))
     webPortStr = str(webPortInt)
     webbrowser.open_new_tab("http://localhost:" + webPortStr)
     host_name = socket.gethostname()

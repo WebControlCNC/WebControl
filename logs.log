@@ -1607,3 +1607,5 @@ INFO:engineio:81de1658b0b7458eb1ff69faca6a5607: Sending packet MESSAGE data 2/Ma
 INFO:engineio:702691a79ed74fa79116d3f98048f3af: Sending packet MESSAGE data 2/MaslowCNC,["message",{"command":"statusMessage","data":"{\"uploadFlag\": 0, \"positioningMode\": 0, \"currentTool\": 0}","dataFormat":"json"}]
 INFO:engineio:162e2f59ef754c2cbaa10a64edc46988: Sending packet MESSAGE data 2/MaslowCNC,["message",{"command":"statusMessage","data":"{\"uploadFlag\": 0, \"positioningMode\": 0, \"currentTool\": 0}","dataFormat":"json"}]
 INFO:engineio:4097d40ad2334639ae5d654ab98f4212: Sending packet MESSAGE data 2/MaslowCNC,["message",{"command":"statusMessage","data":"{\"uploadFlag\": 0, \"positioningMode\": 0, \"currentTool\": 0}","dataFormat":"json"}]
+INFO:engineio.server:Server initialized for gevent.
+INFO:engineio.server:Server initialized for gevent.
