@@ -617,7 +617,7 @@ class GCodeFile(MakesmithInitFuncs):
         ]
 
         fullString = (
-            fullString + " "
+            fullString.upper() + " "
         )  # ensures that there is a space at the end of the line
         # find 'G' anywhere in string
 
