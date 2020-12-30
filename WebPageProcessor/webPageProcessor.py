@@ -511,7 +511,7 @@ class WebPageProcessor:
             )
             return page, "Open Board", False, "medium", "content", "footerSubmit"
         elif pageID == "about":
-            version = self.data.pyInstallCurrentVersion
+            version = self.data.pyInstallCurrentVersionNumber
             if isMobile:
                 pageName = "about.html"
             else:
@@ -526,30 +526,26 @@ class WebPageProcessor:
             page = render_template(pageName, pageID="gettingStarted")
             return page, "Getting Started", False, "medium", "content", False
         elif pageID == "releases":
-            releases = self.data.releaseManager.getReleases()
-            latestRelease = self.data.releaseManager.getLatestRelease()
-            currentRelease = "v"+str(self.data.pyInstallCurrentVersion)
-            for release in releases:
-                tag_name = re.sub(r'[v]', r'', release.tag_name)
+            latestRelease = self.data.releaseManager.getLatestValidRelease()
+            releases = self.data.releaseManager.getValidReleases()
+            currentRelease = "v" + str(self.data.pyInstallCurrentVersionNumber)
+
             if isMobile:
-                page = render_template(
-                    "releases_mobile.html",
-                    title="Update Manager",
-                    releases=releases,
-                    latestRelease=latestRelease,
-                    currentRelease=currentRelease,
-                    pageID="releases",
-                )
+                file = "releases_mobile.html"
             else:
-                page = render_template(
-                    "releases.html",
-                    title="Update Manager",
-                    releases=releases,
-                    latestRelease=latestRelease,
-                    currentRelease=currentRelease,
-                    pageID="releases",
+                file = "releases.html",
+
+            page = render_template(
+                    file,
+                    title = "Update Manager",
+                    releases = releases,
+                    latestRelease = latestRelease,
+                    currentRelease = currentRelease,
+                    pageID = "releases",
                 )
+
             return page, "Update Manager", False, "medium", "content", False
+
         elif pageID == "helpPages":
             helpPages = self.data.helpManager.getHelpPages()
             if isMobile:

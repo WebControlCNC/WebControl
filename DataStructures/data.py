@@ -4,7 +4,7 @@ from DataStructures.loggingQueue import LoggingQueue
 from DataStructures.uiQueue import UIQueue
 from config.config import Config
 import queue
-
+import datetime
 
 class Data:
     """
@@ -38,7 +38,8 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.94
+    pyInstallCurrentVersionNumber = 0.94
+    pyInstallCurrentVersionDate = datetime.datetime(2020, 5, 21)
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0

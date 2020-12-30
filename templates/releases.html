@@ -1,33 +1,110 @@
 {% block content %}
 <div class="container-fluid">
   <input id="pageID" type="hidden" value="{{pageID}}">
-    <ul class="list-group">
-      {% for release in releases %}
-      <li class="list-group-item">
-        <div class="row align-items-center">
-            <div class="col-1 align-self-start">
-                <p>{{release.tag_name}}</p>
-            </div>
-            <div class="col-8 align-self-start">
-                <h4>{{release.title}}</h4>
-                <p>{{release.body|markdown}}</p>
-            </div>
-            <div class="col-3">
-                {% if release.tag_name == currentRelease %}
-                    <button type="button" class="btn btn-block btn-secondary disabled ">Current</button>
-                {% elif release.tag_name == latestRelease.tag_name %}
-                    <button type="submit" class="btn btn-block btn-primary" onclick="action('update','{{release.tag_name}}');$('#contentModal').modal('hide');">Update</button>
-                {% else %}
-                    <button type="submit" class="btn btn-block btn-secondary" onclick="action('update','{{release.tag_name}}');$('#contentModal').modal('hide');">Update</button>
-                {% endif %}
-            </div>
+  <ul class="list-group">
+    {% for release in releases %}
+    <li class="list-group-item">
+      <div class="row align-items-center">
+        <div class="col-1 align-self-start">
+          <p>{{release.tag_version}}</p>
+          {% if release.tag_date %}
+          <p>{{release.tag_date.strftime("%x")}}</p>
+          {% endif %}
         </div>
-      </li>
-      {% endfor %}
-    </ul>
+        <div class="col-8 align-self-start">
+          <h4>{{release.title}}</h4>
+          <p>{{release.body|markdown}}</p>
+        </div>
+        <div class="col-3">
+          {% if release.tag_name == currentRelease %}
+          <button type="button" class="btn btn-block btn-secondary disabled ">Current</button>
+          {% elif release.tag_name == latestRelease.tag_name %}
+          <button type="submit" class="btn btn-block btn-primary" onclick="processUpgrade('{{release.tag_name}}')">Update</button>
+          {% else %}
+          <button type="submit" class="btn btn-block btn-secondary" onclick="processUpgrade('{{release.tag_name}}')">Update</button>
+          {% endif %}
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <div id="upgrade" style="display: none">
+    <div id="upgrade-status">Upgrade in progress. Please wait.</div>
+    <div id="upgrade-download" class="progress bg-info progress-bar-striped progress-bar-animated" style="display: none">
+      <div id="upgrade-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+  </div>
 </div>
 {% endblock %}
-
 {% block javascript %}
-<!--<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>-->
+<script>
+
+var closeDisableHandler = function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+};
+
+function processUpgradeStatus(data) {
+  $("#upgrade-status").text(data)
+}
+
+function processUpgradeDownload(data) {
+  if ($("#upgrade-download").is(":hidden")) {
+    $("#upgrade-download").show();
+  }
+  $("#upgrade-progress").attr("aria-valuenow", data.percent).width(data.percent + "%")
+  if (data.percent == 100) {
+    $("#upgrade-download").hide();
+  }
+}
+
+function processUpgradeSuccess() {
+  // Re-enable click outside of modal to close modal.
+  $('#contentModal').unbind('hide.bs.modal', closeDisableHandler)
+  $("#contentModal .modal-footer").show();
+  socketModal.disconnect();
+}
+
+function processUpgrade(releaseTag) {
+  // Stop click outside of modal from closing modal.
+  // The following should work but does not.
+  // $("#contentModal").attr('data-backdrop','static').attr('data-keyboard','false');
+  // Force stop existing event.
+  $('#contentModal').bind('hide.bs.modal', closeDisableHandler);
+  // Hide the footer so upgrade is not interrupted.
+  // @TODO: Allow user to stop upgrade.
+  $("#contentModal .modal-footer").hide()
+  
+  socketModal = io.connect('//' + document.domain + ':' + location.port + "/MaslowCNC");
+  
+  socketModal.on('connect', function(msg) {
+    socketModal.emit('join_room',{data:{room:"modal"}});
+  })
+   
+  socketModal.on('message', function(msg) {
+    if (msg.dataFormat=='json')
+      data = JSON.parse(msg.data);
+    else
+      data = msg.data;
+    
+    switch (msg.command) {
+      case 'upgradeStatus':
+        processUpgradeStatus(data);
+        break;
+      case 'upgradeDownload':
+        processUpgradeDownload(data);
+        break;
+      case 'upgradeSuccess':
+        processUpgradeSuccess(data);
+        break;
+    }
+  })
+
+  $("#contentModal .list-group").hide();
+  $("#contentModal #upgrade").show();
+  action('update', releaseTag)
+}
+
+</script>
 {% endblock %}

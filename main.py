@@ -14,7 +14,7 @@ import schedule
 import time
 import threading
 import json
-
+from flask_socketio import join_room
 from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
 from flask_mobility.decorators import mobile_template
 from werkzeug import secure_filename
@@ -737,6 +737,10 @@ def log_connect():
 def log_disconnect():
     app.data.console_queue.put("Client disconnected")
 
+@socketio.on("join_room", namespace="/MaslowCNC")
+def joinRoom(msg):
+    room = msg["data"]["room"]
+    join_room(room)
 
 @app.template_filter('isnumber')
 def isnumber(s):

@@ -129,9 +129,9 @@ class Actions(MakesmithInitFuncs):
                     else:
                         self.data.ui_queue1.put("Alert", "Alert", "No GCode file loaded.")
             elif msg["data"]["command"] == "update":
-                if not self.data.releaseManager.update(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with updating webcontrol.")
-                return "Shutdown"
+                # Errors handled during update so only reboot on success.
+                if self.data.releaseManager.update(msg["data"]["arg"]):
+                    return "Shutdown"
             elif msg["data"]["command"] == "cutTriangularCalibrationPattern":
                 if not self.data.triangularCalibration.cutTriangularCalibrationPattern():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with cutting triangular calibration pattern.")
@@ -1997,7 +1997,7 @@ class Actions(MakesmithInitFuncs):
                 except:
                     print("error parsing tagname")
             print(latest)
-            if latest>self.data.pyInstallCurrentVersion:
+            if latest>self.data.pyInstallCurrentVersionNumber:
                 if latestRelease is not None:
                     print(latestRelease.tag_name)
                     assets = latestRelease.get_assets()
