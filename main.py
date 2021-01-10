@@ -195,7 +195,7 @@ def gpioSettings():
         resp = jsonify(message)
         resp.status_code = 200
         return resp
-        
+
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
     app.data.logger.resetIdler()
@@ -745,7 +745,7 @@ def isnumber(s):
         return True
     except ValueError:
         return False
-        
+
 #def shutdown():
 #    print("Shutdown")
 
@@ -777,7 +777,7 @@ if __name__ == "__main__":
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPortStr
-    
+
     #app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
     # socketio.run(app, host='0.0.0.0')

@@ -12,6 +12,7 @@ import re
 import zipfile
 import threading
 import platform
+import subprocess
 from subprocess import call
 from gpiozero.pins.mock import MockFactory
 from gpiozero import Device
@@ -244,19 +245,14 @@ class Actions(MakesmithInitFuncs):
                 if not self.adjustCenter(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting center.")
             elif msg["data"]["command"] == "upgradeCustomFirmware":
-                if not self.upgradeFirmware(0):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading custom firmware.")
-                else:
+                #if the upgradeFirmware process fails, it will send the Error Alert UI
+                if self.upgradeFirmware(0):
                     self.data.ui_queue1.put("Alert", "Alert", "Custom firmware update complete.")
             elif msg["data"]["command"] == "upgradeStockFirmware":
-                if not self.upgradeFirmware(1):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading stock firmware.")
-                else:
+                if self.upgradeFirmware(1):
                     self.data.ui_queue1.put("Alert", "Alert", "Stock firmware update complete.")
             elif msg["data"]["command"] == "upgradeHoleyFirmware":
-                if not self.upgradeFirmware(2):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading holey firmware.")
-                else:
+                if self.upgradeFirmware(2):
                     self.data.ui_queue1.put("Alert", "Alert", "Custom firmware update complete.")
             elif msg["data"]["command"] == "adjustChain":
                 if not self.adjustChain(msg["data"]["arg"]):
@@ -990,6 +986,7 @@ class Actions(MakesmithInitFuncs):
                   self.data.gcodeShift[0] * scaleFactor,
                   self.data.gcodeShift[1] * scaleFactor,
                 ]
+                self.data.feedRate = scaleFactor*self.data.feedRate
                 # The UI client sending this has already converted the distToMove to the correct value for the units
                 self.data.config.setValue("Computed Settings", "distToMove", value)
                 # get the current homeX and homeY coordinates
@@ -1466,11 +1463,14 @@ class Actions(MakesmithInitFuncs):
                     #    cmd = "\"C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\avrdude\" -Cavr/avrdude.conf -v -patmega2560 -cwiring -P" + port + " -b115200 -D -Uflash:w:" + filename + ":i"
                     #else:
                     cmd = home+"/tools/avrdude -C"+home+"/tools/avrdude.conf -v -patmega2560 -cwiring -P"+port+" -b115200 -D -Uflash:w:"+filename+":i"
-                    #print(cmd)
                     # I think this is blocking..
-                    x = os.system(cmd)
+                    x = subprocess.run(cmd, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                    if x.returncode > 0:
+                        print("Error upgrading:"+str(x.stdout,'utf-8'))
+                        self.data.ui_queue1.put("Action", "closeModals", "Notification:")
+                        self.data.ui_queue1.put("Alert", "Alert", "Error loading firmware: "+str(x.stdout,'utf-8'))
+                        return False
                     self.data.connectionStatus = 0
-                    #print(x)
                     #print("closing modals")
                     # close off the modals and put away the spinner.
                     self.data.ui_queue1.put("Action", "closeModals", "Notification:")
@@ -1480,7 +1480,7 @@ class Actions(MakesmithInitFuncs):
                 print("Port not closed")
                 return False
         except Exception as e:
-            self.data.console_log.put(str(e))
+            print(str(e))
             return False
 
 
@@ -1547,6 +1547,10 @@ class Actions(MakesmithInitFuncs):
                     self.data.previousPosZ = zTarget
                 else:
                     zTarget = self.data.previousPosZ
+
+                f = re.search("F(?=.)([+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+                if f:
+                    self.data.feedRate =float(f.groups()[0])
             else:
                 # if directed to recalculate or there's a comment in the line, then use more time consuming method.
                 xTarget, yTarget, zTarget = self.findPositionAt(self.data.gcodeIndex)
@@ -1609,6 +1613,7 @@ class Actions(MakesmithInitFuncs):
         zAxisSafeHeight = float(self.data.config.getValue("Maslow Settings", "zAxisSafeHeight"))
         zAxisFeedRate = 12.8  # currently hardcoded, but Todo: Add setting
         xyAxisFeedRate = float(self.data.config.getValue("Advanced Settings", "maxFeedrate"))
+        self.data.feedRate - xyAxisFeedRate
         positioning = "G90 "
         units = "G20 "
         homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
@@ -1793,6 +1798,9 @@ class Actions(MakesmithInitFuncs):
                                 zpos = zpos + float(_zpos.groups()[0])
                             else:
                                 zpos = float(_zpos.groups()[0])
+                        if line.find("F") != -1:
+                            _fval = re.search("F(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", line)
+                            self.data.feedRate=float(_fval.groups()[0])
         #print("xpos="+str(xpos)+", ypos="+str(ypos)+", zpoz="+str(zpos)+" for index="+str(index))
         return xpos, ypos, zpos
 

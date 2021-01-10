@@ -61,12 +61,35 @@ function processRequestedSetting(data){
   }
 }
 
+function pwr2color(pwr) {
+	var r, g, b = 0;
+
+	if(pwr < 127) {
+		g = 255;
+		r = pwr*2;
+	}
+	else {
+		r = 255;
+		g = 255-(pwr-127)*2;
+		if(pwr>240) {
+		    g=0
+		    b=(pwr-240)*16
+		}
+	}
+	var h = r * 0x10000 + g * 0x100 + b * 0x1;
+	return '#' + ('000000' + h.toString(16)).slice(-6);
+}
+
 function processPositionMessage(data){
-  $('#positionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2));
+  $('#positionMessage').html('X:'+parseFloat(data.xval).toFixed(2)+' Y:'+parseFloat(data.yval).toFixed(2)+' Z:'+parseFloat(data.zval).toFixed(2)+' V:'+parseFloat(data.vel).toFixed(2)+'/'+parseFloat(data.rqvel).toFixed(2));
   $('#percentComplete').html(data.pcom)
   $('#machineState').html(data.state)
   if (enable3D)
     positionUpdate(data.xval,data.yval,data.zval);
+
+  $('#leftError').css('background-color', pwr2color(data.lpwr)).attr('title', data.lpwr);
+  $('#rightError').css('background-color', pwr2color(data.rpwr)).attr('title', data.rpwr);
+  $('#zError').css('background-color', pwr2color(data.zpwr)).attr('title', data.zpwr);
 }
 
 function processErrorValueMessage(data){
@@ -149,15 +172,27 @@ function moveAction(direction) {
 
 function processStatusMessage(data){
     //console.log(data)
-    if (data.uploadFlag){
-        if (!isDisabled){
+    if (data.uploadFlag==1){
+        if (isDisabled!=data.uploadFlag){
             $('.disabler').prop('disabled', true);
-            isDisabled = true;
+            $('.ndisabler').prop('disabled', false);
+            $('.gcdisabler').prop('disabled', true);
+            isDisabled =data.uploadFlag;
         }
-    } else {
-        if (isDisabled){
+    } else if (data.uploadFlag==2 || data.uploadFlag==-1 ){
+        if (isDisabled!=data.uploadFlag){
+            $('.gcdisabler').prop('disabled', true);
             $('.disabler').prop('disabled', false);
-            isDisabled = false;
+            $('.ndisabler').prop('disabled', false);
+            isDisabled = data.uploadFlag;
+            }
+        }
+    else {
+        if (isDisabled!=data.uploadFlag){
+            $('.disabler').prop('disabled', false);
+            $('.ndisabler').prop('disabled', true);
+            $('.gcdisabler').prop('disabled', false);
+            isDisabled = data.uploadFlag;
         }
     }
     $("#currentTool").text(data.currentTool.toString());

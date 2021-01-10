@@ -170,10 +170,8 @@ class UIProcessor:
         '''
         try:
             with self.app.app_context():
-                startpt = message.find("MPos:") + 5
-                endpt = message.find("WPos:")
-                numz = message[startpt:endpt]
-                valz = numz.split(",")
+                self.app.data.time = time.time()
+
                 state = ""
                 if message.find("Stop") != -1:
                     state = "Stopped"
@@ -182,9 +180,34 @@ class UIProcessor:
                 elif message.find("Idle") != -1:
                     state = "Idle"
 
+                startpt = message.find("MPos:") + 5
+                endpt = message.find("WPos:")
+                numz = message[startpt:endpt]
+                valz = numz.split(",")
                 self.app.data.xval = float(valz[0])
                 self.app.data.yval = float(valz[1])
                 self.app.data.zval = float(valz[2])
+
+                startpt = message.find("PWR:") + 4
+                if startpt > 4:
+                    endpt = message.find(">", startpt)
+                    numz = message[startpt:endpt]
+                    valz = numz.split(",")
+                    lpwr = abs(int(valz[0]))
+                    rpwr = abs(int(valz[1]))
+                    zpwr = abs(int(valz[2]))
+                else:
+                    #No PWR message from Maslow, so just say 15/255% to keep it green.
+                    lpwr = 15
+                    rpwr = 15
+                    zpwr = 15
+
+                startpt = message.find("F:") + 2
+                if startpt > 2:
+                    endpt = message.find(",", startpt)
+                    numz = message[startpt:endpt+1]
+                    valz = numz.split(",")
+                    self.app.data.feedRate= abs(float(valz[0]))
 
                 if math.isnan(self.app.data.xval):
                     self.sendControllerMessage("Unable to resolve x Kinematics.")
@@ -196,8 +219,9 @@ class UIProcessor:
                     self.sendControllerMessage("Unable to resolve z Kinematics.")
                     self.app.data.zval = 0
 
-        except:
-            self.app.data.console_queue.put("One Machine Position Report Command Misread")
+        except ValueError as err:
+            self.app.data.console_queue.put("One Machine Position Report Command Misread:" + message)
+            self.app.data.console_queue.put(err)
             return
 
         # compute just how much the sled has moved.
@@ -205,19 +229,32 @@ class UIProcessor:
         ydiff = abs(self.app.data.yval - self.app.data.yval_prev)
         zdiff = abs(self.app.data.zval - self.app.data.zval_prev)
 
+        velocity = (1-self.app.data.velocity_filter) * self.app.data.velocity_prev  + self.app.data.velocity_filter * math.sqrt(xdiff*xdiff + ydiff*ydiff + zdiff*zdiff) / (self.app.data.time - self.app.data.time_prev) * 60.0
+
         # compute percentage of gcode that's been completed.
         percentComplete = '%.1f' % math.fabs(100 * (self.app.data.gcodeIndex / (len(self.app.data.gcode) - 1))) + "%"
 
         # if the sled has moved more than a very, very small amount, then go ahead and send.  Cuts down on network
         # traffic.
-        if (xdiff + ydiff + zdiff) > 0.01:
+        if self.app.data.wasmoving or (xdiff + ydiff + zdiff) > 0.01:
+            if (xdiff + ydiff + zdiff) > 0.01:
+                self.app.data.wasmoving = 1
+            else:
+                self.app.data.wasmoving = 0
+                velocity=0
+
             # package as json
             position = {
                 "xval": self.app.data.xval,
                 "yval": self.app.data.yval,
                 "zval": self.app.data.zval,
+                "vel": velocity,
+                "rqvel": self.app.data.feedRate,
                 "pcom": percentComplete,
-                "state": state
+                "state": state,
+                "lpwr": lpwr,
+                "rpwr": rpwr,
+                "zpwr": zpwr
             }
             # call command to send the position data
             self.sendPositionMessage(position)
@@ -225,6 +262,8 @@ class UIProcessor:
             self.app.data.xval_prev = self.app.data.xval
             self.app.data.yval_prev = self.app.data.yval
             self.app.data.zval_prev = self.app.data.zval
+            self.app.data.velocity_prev = velocity
+            self.app.data.time_prev = self.app.data.time;
 
     def setErrorOnScreen(self, message):
         '''
@@ -291,7 +330,7 @@ class UIProcessor:
                         self.app.data.rightErrorValue = 0
 
             except:
-                self.app.data.console_queue.put("One Error Report Command Misread")
+                self.app.data.console_queue.put("One Error Report Command Misread SEOS")
                 return
 
             # only send the error information if it has changed at least slightly.
