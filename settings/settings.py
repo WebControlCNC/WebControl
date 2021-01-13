@@ -98,7 +98,7 @@ settings = {
         },
         {
             "type": "bool",
-            "title": "z-axis installed",
+            "title": "Z-axis installed",
             "desc": "Does the machine have an automatic z-axis?",
             "key": "zAxis",
             "default": 0,

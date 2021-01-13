@@ -82,6 +82,18 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveZ":
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "setMaxZ":
+                if not self.setMaxZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Maximum")
+            elif msg["data"]["command"] == "setMinZ":
+                if not self.setMinZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Minimum")
+            elif msg["data"]["command"] == "clearZ":
+                if not self.clearZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
+            elif msg["data"]["command"] == "getZlimits":
+                if not self.getZlimits():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
             elif msg["data"]["command"] == "home":
@@ -432,7 +444,55 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+        
+    def setMinZ(self):
+        '''
+        Arduino command to set minimum z axis travel position to prevent z axis motor damage
+        B18
+        '''
+        try:
+            self.data.gcode_queue.put("B18")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def setMaxZ(self):
+        '''
+        Arduino command to set maximum z axis travel position to prevent z axis motor damage
+        B17
+        '''
+        try:
+            self.data.gcode_queue.put("B17")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def clearZ(self):
+        '''
+        Arduino command to clear z axis minimum and maximum
+        B19
+        '''
+        try:
+            self.data.gcode_queue.put("B19")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def getZlimits(self):
+        '''
+        Arduino command to echo z axis minimum and maximum values
+        B20
+        '''
+        try:
+            self.data.gcode_queue.put("B20")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
     def startRun(self):
         '''
         Starts the process of sending the gcode to the controller.
@@ -1373,14 +1433,14 @@ class Actions(MakesmithInitFuncs):
                 home = "."
             if version == 0:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
-                path = home+"/firmware/madgrizzle/*.hex"
+                path = home+"/firmware/beta/*.hex"
             if version == 1:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/maslowcnc/*.hex"
             if version == 2:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Holey Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/holey/*.hex"
-            # wait half second.. not sure why..
+            # wait half second... not sure why
             time.sleep(.5)
             t0 = time.time()*1000
             portClosed = False

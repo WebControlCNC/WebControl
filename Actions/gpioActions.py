@@ -13,7 +13,7 @@ class GPIOActions(MakesmithInitFuncs):
     '''
     Buttons = []
     LEDs = []
-    actionList = ["", "WebMCP Running", "Shutdown", "Stop", "Pause", "Play", "Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
+    actionList = ["Spindle On", "Spindle Off", "Shutdown", "Stop", "Pause", "Play", "Set Home", "Go Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
 
     def getActionList(self):
         return self.actionList
@@ -85,4 +85,3 @@ class GPIOActions(MakesmithInitFuncs):
         if action == "StopLED" and onoff == "on":
             self.causeAction("PauseLED", "off")
             self.causeAction("PlayLED", "off")
-

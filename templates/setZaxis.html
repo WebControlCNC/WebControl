@@ -1,0 +1,58 @@
+{% block content %}
+  <div class="container-fluid">
+    <div class="card">
+			<div class="card-body">
+        <p>Router Z limits help Maslow avoid potential damage from plunging too deep or retracting too far.</p>
+        <h5 class="card-title">Step 1: Clear Z-Axis upper and lower limits</h5>
+        <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearZ');"">Clear Z</button>
+        <h5 class="card-title">Step 2: Move Z to Limits and save position</h5>
+        <p>at max, press save max; at min, press save min</p>
+        </div>
+         <div class="row">
+          <div class = "col-9">
+            <div class="row">
+              <div class="col-4 mb-1">
+                <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" id="distToMoveZ" value="{{distToMoveZ}}">
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('moveZ','raise',$('#distToMoveZ').val())"><i data-feather="arrow-up">Raise</i></button>
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMaxZ');"><i data-feather="save">Save</i>Save Z Max</button>  
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-4 mb-1">
+                <button id="unitsZ" type="button" class="btn  btn-lg btn-block btn-secondary" onclick="unitSwitchZ();">{{unitsZ}}</button>
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn  btn-lg btn-block btn-secondary" onclick="action('moveZ','lower',$('#distToMoveZ').val())"><i data-feather="arrow-down">Lower</i></button>
+              </div>
+              <div class="col-4 mb-1">
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('setMinZ');"><i data-feather="save">Set</i>Save Z Min</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-3 mb-1">
+            <button type="button" class="btn  btn-lg btn-block btn-danger" style="height:100%" onclick="action('stopZ');"><i data-feather="alert-octagon"></i> Stop</button>
+          </div>
+        </div>
+      <br>
+        <div class = "row">
+          <div class = "col-5 mb-1">
+            
+          </div>
+          <div class = "col-5 mb-1">
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/setZaxis.js', version='10262018a') }}" crossorigin="anonymous"></script> 
+<script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
+<script> feather.replace() </script>
+{% endblock %}
