@@ -38,12 +38,12 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.94
+    pyInstallCurrentVersion = 0.95
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
-    pyInstallPlatform = "win"
-    pyInstallType = "singlefile"
+    pyInstallPlatform = "rpi"
+    pyInstallType = "singlefolder"
     pyInstallInstalledPath = ""
 
 
