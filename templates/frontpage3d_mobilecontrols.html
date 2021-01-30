@@ -16,51 +16,51 @@
   <h3>Controls</h3>
   <div class="row">
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','upLeft',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-secondary btn-block disabler" onclick="action('move','upLeft',$('#distToMove').val())">
         <i data-feather="arrow-up-left"></i>
       </button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','up',$('#distToMove').val())";>
+      <button type="button" class="btn btn-lg btn-dark btn-block disabler" onclick="action('move','up',$('#distToMove').val())";>
         <i data-feather="arrow-up"></i>
       </button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','upRight',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-secondary btn-block disabler" onclick="action('move','upRight',$('#distToMove').val())">
         <i data-feather="arrow-up-right"></i>
       </button>
     </div>
   </div>
   <div class="row">
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','left',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-dark btn-block disabler" onclick="action('move','left',$('#distToMove').val())">
         <i data-feather="arrow-left"></i>
       </button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('home')">
+      <button type="button" class="btn btn-lg btn-dark btn-block disabler" onclick="action('home')">
         <i data-feather="home"></i>
       </button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','right',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-dark btn-block disabler" onclick="action('move','right',$('#distToMove').val())">
         <i data-feather="arrow-right"></i>
       </button>
     </div>
   </div>
   <div class="row">
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','downLeft',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-secondary btn-block disabler" onclick="action('move','downLeft',$('#distToMove').val())">
         <i data-feather="arrow-down-left"></i>
       </button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-dark btn-block" onclick="action('move','down',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-dark btn-block disabler" onclick="action('move','down',$('#distToMove').val())">
         <i data-feather="arrow-down"></i>
       </button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('move','downRight',$('#distToMove').val())">
+      <button type="button" class="btn btn-lg btn-secondary btn-block disabler" onclick="action('move','downRight',$('#distToMove').val())">
         <i data-feather="arrow-down-right"></i>
       </button>
     </div>
@@ -73,12 +73,12 @@
       <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro2')" >{{ macro2_title }}</button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
+      <button type="button" class="btn btn-lg btn-primary btn-block disabler" onclick="requestPage('zAxis');">ZAxis</button>
     </div>
   </div>
   <div class="row">
     <div class="col-5  mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('defineHome')" >Def. Home</button>
+      <button type="button" class="btn btn-lg btn-primary btn-block disabler" onclick="action('defineHome')" >Def. Home</button>
     </div>
   </div>
   <div class="row">
@@ -89,7 +89,7 @@
       <input class="form-control" type="number" id="distToMove" value="0.01">
     </div>
     <div class="col-4  mb-1">
-      <button id="units" type="button" class="btn btn-lg btn-secondary" onclick="unitSwitch();">--</button>
+      <button id="units" type="button" class="btn btn-lg btn-secondary disabler" onclick="unitSwitch();">--</button>
     </div>
   </div>
   <div class="row">
@@ -100,10 +100,10 @@
 
   <div class="row">
     <div class="col-4  mb-1">
-      <button type="button" class="btn btn-lg btn-block btn-success" onclick="action('startRun')">Play</button>
+      <button type="button" class="btn btn-lg btn-block btn-success gcdisabler" onclick="action('startRun')">Play</button>
     </div>
     <div class="col-4  mb-1">
-      <button type="button" id="pauseButton" class="btn btn-lg btn-block btn-warning" onclick="pauseRun()">Pause</button>
+      <button type="button" id="pauseButton" class="btn btn-lg btn-block btn-warning ndisabler" onclick="pauseRun()">Pause</button>
     </div>
     <div class="col-4  mb-1">
       <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="$(this).removeClass('stopbutton'); action('stopRun')">Stop</button>
