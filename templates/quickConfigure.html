@@ -1,3 +1,4 @@
+{% import 'macros.html' as macros %}
 {% block content %}
 <div class="container-fluid">
   <input id="pageID" type="hidden" value="{{pageID}}">
@@ -48,7 +49,7 @@
         </select>
         <p></p>
         <label for="rotationRadius">Rotational Radius</label>
-        <input class="form-control"  type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="rotationRadius" id="rotationRadius" value="{{rotationRadius}}">
+        {{ macros.input_decimal("rotationRadius", False, rotationRadius) }}
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>
@@ -80,7 +81,7 @@
         <img src="{{ url_for('static',filename='images/quickConfig/measureEdgeMotor.png') }}" height="300" width="300">
         <p></p>
         <label for="motorSpacingX">Distance Between Motors</label>
-        <input class="form-control"  type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="motorSpacingX" id="motorSpacingX" value="{{motorSpacingX}}">
+        {{ macros.input_decimal("motorSpacingX", False, motorSpacingX) }}
         <small class="form-text text-muted">Enter value in mm only</small>
         <button type="button" onclick="subtract40p4();">Subtract 40.4 mm</button>
       </div>
@@ -95,7 +96,7 @@
         <img src="{{ url_for('static',filename='images/quickConfig/motorOffsetY.png') }}" height="300" width="300">
         <p></p>
         <label for="motorOffsetY">Height of Motors Above Workspace</label>
-        <input class="form-control"  type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="motorOffsetY" id="motorOffSetY" value="{{motorOffsetY}}">
+        {{ macros.input_decimal("motorOffsetY", False, motorOffsetY) }}
         <small class="form-text text-muted">Enter value in mm only</small>
       </div>
     </div>

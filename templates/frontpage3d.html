@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% import 'macros.html' as macros %}
 {% block header %}
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='11102018j') }}" crossorigin="anonymous">
   <!--<style> #workarea {background-color: #AAA; width: 100%; height: 100%; border: 1px solid black;}</style>-->
@@ -26,7 +26,7 @@
         <div>
         <div class="controls row" ><!-- This block needs to be disabled while code running. -->
           <div class="col-3 mb-1">
-            <button type="button" class="btn btn-secondary btn-block disabler" onclick="moveAction('upLeft')"><i data-feather="arrow-up-left"></i></button>
+            <button type="button" data-wc-major-digits="5" class="btn btn-secondary btn-block disabler" onclick="moveAction('upLeft')"><i data-feather="arrow-up-left"></i></button>
           </div>
           <div class="col-3 mb-1">
             <button type="button" class="btn btn-dark btn-block disabler" onclick="moveAction('up')"><i data-feather="arrow-up"></i></button>
@@ -68,7 +68,7 @@
             <label>Distance:</label>
           </div>
           <div class="col-3 mb-1">
-            <form id="distInput" onsubmit="return false;"><input class="form-control" type="text" pattern="^[0-9]*(\.[0-9]{0,3})?$" id="distToMove" title="Positive number with maximum 3 decimal places"></form>
+            <form id="distInput" onsubmit="return false;">{{ macros.input_decimal("distToMove", True) }}</form>
           </div>
           <div class="col-3 mb-1">
             <button id="units" type="button" class="btn btn-secondary" onclick="unitSwitch();">--</button>

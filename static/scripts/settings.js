@@ -1,9 +1,11 @@
 function onFooterSubmit(){
+  var form = $("#settingsForm")
+  if (form[0].checkValidity()) {
     var url = $("#pageID").val()
     $.ajax({
         url : '/'+url,
         type: "POST",
-        data: $("#settingsForm").serialize(),
+        data: form.serialize(),
         success: function (data) {
           console.log("success");
             $('#contentModal').modal('toggle')
@@ -12,8 +14,10 @@ function onFooterSubmit(){
             alert(errorThrown);
         }
     });
+  }
 }
 
+/*
 $(document).ready(function () {
     $('#settingsForm').on('submit', function(e) {
         e.preventDefault();
@@ -38,6 +42,7 @@ $(document).ready(function () {
      });
 
 });
+*/
 
 function updatePorts(data){
   var selectedPort = $("#comPorts").find(":selected").text();

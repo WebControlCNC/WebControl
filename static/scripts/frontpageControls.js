@@ -22,6 +22,25 @@ $(document).ready(function(){
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
     $("#stickyButtons").css("top", $(".navbar").outerHeight());
+
+    // Set custom validation on all form inputs of type 'number' with attribute 'pattern'.
+    // Input type 'number' does not support 'pattern' attribute by default using HTML5.
+    // Input type 'number' always returns a value compatible with parseFloat using period as decimal separator.
+    // @todo: This event handler may need to be moved to other JS files for more/less global application.
+    $(':input[type="number"][pattern]').change(function () {
+      var re = new RegExp($(this).attr("pattern"));
+      var isValid = re.test($(this).val());
+      // JQuery selector returns array of possible matches.
+      // Validity checks must be applied to first item [0].
+      if (isValid) {
+        // Set empty value to clear error.
+        $(this)[0].setCustomValidity("");
+      }
+      else {
+        // Set title as error message.
+        $(this)[0].setCustomValidity($(this).attr("title"));
+      }
+    });
 });
 
 function pauseRun(){
@@ -161,13 +180,12 @@ function boardDataUpdate(data){
 }
 
 function moveAction(direction) {
-	distance = $("#distToMove").val();
-	distanceValid = distance.search(/^[0-9]*(\.[0-9]{0,3})?$/);
-	if (distanceValid == 0) {
-		action('move', direction, distance);
-	} else {
-		$("#distToMove").focus();
-	}
+  // JQuery returns list of matching forms so select first [0] for validitity checking.
+  var isValid = $("#distInput")[0].checkValidity();
+  if (isValid) {
+    distance = $("#distToMove").val();
+    action('move', direction, distance);
+  }
 }
 
 function processStatusMessage(data){
