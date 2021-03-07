@@ -18,6 +18,10 @@ alog.txt
 # IDE-specific files
 .idea
 
+# Eclipse PyDev
+.pydevproject
+.settings/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
