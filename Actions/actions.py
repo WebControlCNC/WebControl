@@ -1469,14 +1469,14 @@ class Actions(MakesmithInitFuncs):
                 home = "."
             if version == 0:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
-                path = home+"/firmware/madgrizzle/*.hex"
+                path = home+"/firmware/beta/*.hex"
             if version == 1:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/maslowcnc/*.hex"
             if version == 2:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Holey Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/holey/*.hex"
-            # wait half second.. not sure why..
+            # wait half second... not sure why
             time.sleep(.5)
             t0 = time.time()*1000
             portClosed = False

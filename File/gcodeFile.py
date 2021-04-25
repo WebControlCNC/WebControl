@@ -43,7 +43,7 @@ class GCodeFile(MakesmithInitFuncs):
     '''
     prependString is defined here so it can be persistent across each 'moveOneLine'.  That way, if a gcode line
     does not contain a valid gcode, it uses the previous line's gcode.  Thanks to @amantalion for discovering the
-    glitch.  https://github.com/madgrizzle/WebControl/issues/78
+    glitch.  https://github.com/WebControlCNC/WebControl/issues/78
     '''
     prependString = ""
 
@@ -699,7 +699,7 @@ class GCodeFile(MakesmithInitFuncs):
         ]
 
         fullString = (
-            fullString + " "
+            fullString.upper() + " "
         )  # ensures that there is a space at the end of the line
         # find 'G' anywhere in string
 

@@ -196,4 +196,4 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## License
 
-See [LICENSE](https://github.com/madgrizzle/WebControl/blob/master/LICENSE)
+See [LICENSE](https://github.com/WebControlCNC/WebControl/blob/master/LICENSE)
