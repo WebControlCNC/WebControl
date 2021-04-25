@@ -132,7 +132,7 @@ class GCodeFile(MakesmithInitFuncs):
             #print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
-                r"([0-9])([GXYZIJFTMRS]) *", "\\1 \\2", filtersparsed
+                r"([0-9])([gGxXyYzZiIjJfFtTmMrRsS]) *", "\\1 \\2", filtersparsed
             )  # put spaces between gcodes
             filtersparsed = re.sub(r"  +", " ", filtersparsed)  # condense space runs
             value = self.data.config.getValue("Advanced Settings", "truncate")
@@ -148,15 +148,29 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = re.split("\n", filtersparsed)  # splits the gcode into elements to be added to the list
             filtersparsed = [x.lstrip() for x in filtersparsed] # remove leading spaces
             filtersparsed = [x + " " for x in filtersparsed]  # adds a space to the end of each line
+            filtersparsed = [x.replace("g", "G") for x in filtersparsed]
+            filtersparsed = [x.replace("G ", "G") for x in filtersparsed]
+            filtersparsed = [x.replace("x", "X") for x in filtersparsed]
             filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
+            filtersparsed = [x.replace("y", "Y") for x in filtersparsed]
             filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
+            filtersparsed = [x.replace("z", "Z") for x in filtersparsed]
             filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
+            filtersparsed = [x.replace("i", "I") for x in filtersparsed]
             filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
+            filtersparsed = [x.replace("j", "J") for x in filtersparsed]
             filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
+            filtersparsed = [x.replace("f", "F") for x in filtersparsed]
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
+            filtersparsed = [x.replace("m", "M") for x in filtersparsed]
+            filtersparsed = [x.replace("M ", "M") for x in filtersparsed]
+            filtersparsed = [x.replace("r", "R") for x in filtersparsed]
             filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
+            filtersparsed = [x.replace("s", "S") for x in filtersparsed]
             filtersparsed = [x.replace("S ", "S") for x in filtersparsed]
-            self.data.gcode = filtersparsed
+            filtersparsed = [x.replace("t", "T") for x in filtersparsed]
+            filtersparsed = [x.replace("T ", "T") for x in filtersparsed]
+            fself.data.gcode = filtersparsed
             self.data.zMoves = [0]
             zList = []
             for index, line in enumerate(self.data.gcode):
@@ -282,7 +296,7 @@ class GCodeFile(MakesmithInitFuncs):
             yTarget = self.yPosition
             zTarget = self.zPosition
 
-            x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+            x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)  # this is capital x only.  
             if x:
                 xTarget = float(x.groups()[0]) * self.canvasScaleFactor
                 if self.absoluteFlag == 1:
