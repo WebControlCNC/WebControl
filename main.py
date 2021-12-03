@@ -1,5 +1,5 @@
 # main.py
-from app import app, socketio
+from app import app, socketio, db
 from gevent import monkey
 import webbrowser
 import socket
@@ -15,8 +15,12 @@ import time
 import threading
 import json
 
-from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
+from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory, redirect, url_for
 from flask_mobility.decorators import mobile_template
+from flask_migrate import Migrate
+from flask_login import (LoginManager, current_user, login_required,
+                         login_user, logout_user)
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from Background.LogStreamer import LogStreamer  # do this after socketio is declared
@@ -25,6 +29,8 @@ from Background.WebMCPProcessor import ConsoleProcessor
 from DataStructures.data import Data
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
+from forms import LoginForm, CreateAccountForm
+from models import User, User_activity, hash_pass, verify_pass
 
 from os import listdir
 from os.path import isfile, join
@@ -97,13 +103,86 @@ app.logstreamerthread = None
 @app.route("/")
 @mobile_template("{mobile/}")
 def index(template):
+    
+    if not current_user.is_authenticated:
+        return redirect( url_for('login'))
+ 
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
     if template == "mobile/":
+        
         return render_template("frontpage3d_mobile.html", modalStyle="modal-lg", macro1_title=macro1Title,  macro2_title=macro2Title)
     else:
         return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    login_form = LoginForm(request.form)
+        
+    if 'login' in request.form:
+        
+        # read form data
+        username = request.form['username']
+        password = request.form['password']
+
+        # Locate user
+        user = User.query.filter_by(username=username).first()
+        
+        # Check the password
+        if user and verify_pass( password, user.password):
+
+            login_user(user)
+            user.activity += 1
+            db.session.commit()
+
+            return redirect(url_for('index'))
+
+        # Something (user or pass) is not ok
+        return render_template( 'login/login.html', msg='Wrong user or password', form=login_form)
+
+
+    if not current_user.is_authenticated:
+        return render_template( 'login/login.html',
+                                form=login_form)
+    
+    
+    return redirect(url_for('index'))
+
+
+@app.route('/create_user', methods=['GET', 'POST'])
+def create_user():
+    login_form = LoginForm(request.form)
+    create_account_form = CreateAccountForm(request.form)
+    if 'register' in request.form:
+
+        username  = request.form['username']
+        email     = request.form['email'   ]
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            return render_template( 'login/register.html', msg='Username already registered', form=create_account_form)
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            return render_template( 'login/register.html', msg='Email already registered', form=create_account_form)
+
+        # else we can create the user
+        user = User(**request.form)
+        db.session.add(user)
+        db.session.commit()
+
+        #return render_template( 'login/register.html', msg='User created please <a href="/login">login</a>', form=create_account_form )
+        return redirect( url_for('login'))
+
+    else:
+        return render_template( 'login/register.html', form=create_account_form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 
 @app.route("/controls")
 @mobile_template("/controls/{mobile/}")
@@ -118,6 +197,7 @@ def controls(template):
 
 @app.route("/text")
 @mobile_template("/text/{mobile/}")
+@login_required
 def text(template):
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
@@ -129,6 +209,7 @@ def text(template):
 
 @app.route("/logs")
 @mobile_template("/logs/{mobile/}")
+@login_required
 def logs(template):
     print("here")
     app.data.logger.resetIdler()
@@ -139,6 +220,7 @@ def logs(template):
 
 
 @app.route("/maslowSettings", methods=["POST"])
+@login_required
 def maslowSettings():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -151,6 +233,7 @@ def maslowSettings():
 
 
 @app.route("/advancedSettings", methods=["POST"])
+@login_required
 def advancedSettings():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -163,6 +246,7 @@ def advancedSettings():
 
 
 @app.route("/webControlSettings", methods=["POST"])
+@login_required
 def webControlSettings():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -175,6 +259,7 @@ def webControlSettings():
 
 
 @app.route("/cameraSettings", methods=["POST"])
+@login_required
 def cameraSettings():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -186,6 +271,7 @@ def cameraSettings():
         return resp
 
 @app.route("/gpioSettings", methods=["POST"])
+@login_required
 def gpioSettings():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -197,6 +283,7 @@ def gpioSettings():
         return resp
 
 @app.route("/uploadGCode", methods=["POST"])
+@login_required
 def uploadGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -234,6 +321,7 @@ def uploadGCode():
 
 
 @app.route("/openGCode", methods=["POST"])
+@login_required
 def openGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -257,6 +345,7 @@ def openGCode():
             return resp
 
 @app.route("/saveGCode", methods=["POST"])
+@login_required
 def saveGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -288,6 +377,7 @@ def saveGCode():
             return resp
 
 @app.route("/openBoard", methods=["POST"])
+@login_required
 def openBoard():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -311,6 +401,7 @@ def openBoard():
             return resp
 
 @app.route("/saveBoard", methods=["POST"])
+@login_required
 def saveBoard():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -335,6 +426,7 @@ def saveBoard():
 
 
 @app.route("/importFile", methods=["POST"])
+@login_required
 def importFile():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -355,6 +447,7 @@ def importFile():
             return resp
 
 @app.route("/importFileWCJSON", methods=["POST"])
+@login_required
 def importFileJSON():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -375,6 +468,7 @@ def importFileJSON():
             return resp
 
 @app.route("/importRestoreWebControl", methods=["POST"])
+@login_required
 def importRestoreWebControl():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -395,6 +489,7 @@ def importRestoreWebControl():
             return resp
 
 @app.route("/sendGCode", methods=["POST"])
+@login_required
 def sendGcode():
     app.data.logger.resetIdler()
     #print(request.form)#["gcodeInput"])
@@ -413,6 +508,7 @@ def sendGcode():
 
 
 @app.route("/triangularCalibration", methods=["POST"])
+@login_required
 def triangularCalibration():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -441,6 +537,7 @@ def triangularCalibration():
             return resp
 
 @app.route("/holeyCalibration", methods=["POST"])
+@login_required
 def holeyCalibration():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -470,6 +567,7 @@ def holeyCalibration():
             return resp
 
 @app.route("/opticalCalibration", methods=["POST"])
+@login_required
 def opticalCalibration():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -486,6 +584,7 @@ def opticalCalibration():
 
 
 @app.route("/quickConfigure", methods=["POST"])
+@login_required
 def quickConfigure():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -497,6 +596,7 @@ def quickConfigure():
         return resp
 
 @app.route("/editGCode", methods=["POST"])
+@login_required
 def editGCode():
     app.data.logger.resetIdler()
     #print(request.form["gcode"])
@@ -514,6 +614,7 @@ def editGCode():
             return resp
 
 @app.route("/downloadDiagnostics", methods=["GET"])
+@login_required
 def downloadDiagnostics():
     app.data.logger.resetIdler()
     if request.method == "GET":
@@ -527,6 +628,7 @@ def downloadDiagnostics():
             return resp
 
 @app.route("/backupWebControl", methods=["GET"])
+@login_required
 def backupWebControl():
     app.data.logger.resetIdler()
     if request.method == "GET":
@@ -541,6 +643,7 @@ def backupWebControl():
 
 
 @app.route("/editBoard", methods=["POST"])
+@login_required
 def editBoard():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -555,6 +658,7 @@ def editBoard():
             return resp
 
 @app.route("/trimBoard", methods=["POST"])
+@login_required
 def trimBoard():
     app.data.logger.resetIdler()
     if request.method == "POST":
@@ -569,17 +673,20 @@ def trimBoard():
             return resp
 
 @app.route("/assets/<path:path>")
+@login_required
 def sendDocs(path):
     print(path)
     return send_from_directory('docs/assets/', path)
 
 
 @socketio.on("checkInRequested", namespace="/WebMCP")
+@login_required
 def checkInRequested():
     socketio.emit("checkIn", namespace="/WebMCP")
 
 
 @socketio.on("connect", namespace="/WebMCP")
+@login_required
 def watchdog_connect():
     app.data.console_queue.put("watchdog connected")
     app.data.console_queue.put(request.sid)
@@ -595,11 +702,13 @@ def watchdog_connect():
 
 
 @socketio.on("my event", namespace="/MaslowCNC")
+@login_required
 def my_event(msg):
     app.data.console_queue.put(msg["data"])
 
 
 @socketio.on("modalClosed", namespace="/MaslowCNC")
+@login_required
 def modalClosed(msg):
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
@@ -608,6 +717,7 @@ def modalClosed(msg):
 
 
 @socketio.on("contentModalClosed", namespace="/MaslowCNC")
+@login_required
 def contentModalClosed(msg):
     #Note, this shouldn't be called anymore
     #todo: cleanup
@@ -629,6 +739,7 @@ def actionModalClosed(msg):
 '''
 
 @socketio.on("alertModalClosed", namespace="/MaslowCNC")
+@login_required
 def alertModalClosed(msg):
     app.data.logger.resetIdler()
     data = json.dumps({"title": msg["data"]})
@@ -637,6 +748,7 @@ def alertModalClosed(msg):
 
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
+@login_required
 def requestPage(msg):
     app.data.logger.resetIdler()
     app.data.console_queue.put(request.sid)
@@ -653,6 +765,7 @@ def requestPage(msg):
         app.data.console_queue.put(e)
 
 @socketio.on("connect", namespace="/MaslowCNC")
+@login_required
 def test_connect():
     app.data.console_queue.put("connected")
     app.data.console_queue.put(request.sid)
@@ -675,11 +788,13 @@ def test_connect():
         app.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
 
 @socketio.on("disconnect", namespace="/MaslowCNC")
+@login_required
 def test_disconnect():
     app.data.console_queue.put("Client disconnected")
 
 
 @socketio.on("action", namespace="/MaslowCNC")
+@login_required
 def command(msg):
     app.data.logger.resetIdler()
     retval = app.data.actions.processAction(msg)
@@ -692,6 +807,7 @@ def command(msg):
         os.system('sudo poweroff')
 
 @socketio.on("settingRequest", namespace="/MaslowCNC")
+@login_required
 def settingRequest(msg):
     app.data.logger.resetIdler()
     # didn't move to actions.. this request is just to send it computed values.. keeping it here makes it faster than putting it through the UIProcessor
@@ -701,6 +817,7 @@ def settingRequest(msg):
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC",)
 
 @socketio.on("updateSetting", namespace="/MaslowCNC")
+@login_required
 def updateSetting(msg):
     app.data.logger.resetIdler()
     if not app.data.actions.updateSetting(msg["data"]["setting"], msg["data"]["value"]):
@@ -708,6 +825,7 @@ def updateSetting(msg):
 
 
 @socketio.on("checkForGCodeUpdate", namespace="/MaslowCNC")
+@login_required
 def checkForGCodeUpdate(msg):
     app.data.logger.resetIdler()
     # this currently doesn't check for updated gcode, it just resends it..
@@ -716,6 +834,7 @@ def checkForGCodeUpdate(msg):
     app.data.ui_queue1.put("Action", "gcodeUpdate", "")
 
 @socketio.on("checkForBoardUpdate", namespace="/MaslowCNC")
+@login_required
 def checkForBoardUpdate(msg):
     app.data.logger.resetIdler()
     # this currently doesn't check for updated board, it just resends it..
@@ -734,6 +853,7 @@ def log_connect():
     socketio.emit("my response", {"data": "Connected", "count": 0}, namespace="/MaslowCNCLog")
 
 @socketio.on("disconnect", namespace="/MaslowCNCLogs")
+
 def log_disconnect():
     app.data.console_queue.put("Client disconnected")
 
@@ -749,6 +869,7 @@ def isnumber(s):
 #def shutdown():
 #    print("Shutdown")
 
+migrate = Migrate(app, db)
 
 if __name__ == "__main__":
     app.debug = False
