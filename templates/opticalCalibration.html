@@ -1,4 +1,4 @@
-
+{% import 'macros.html' as macros %}
 {% block content %}
 <div class="container-fluid">
   <div class="row">
@@ -16,14 +16,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="markerX">Horizontal Size of Marker</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="markerX" id="markerX" value="{{markerX}}">
+                  {{ macros.input_decimal("markerX", True, markerX) }}
                   <small class="form-text text-muted">Enter value in inches only</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="markerY">Vertical Size of Marker</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="markerY" id="markerY" value="{{markerY}}">
+                  {{ macros.input_decimal("markerY", True, markerY) }}
                   <small class="form-text text-muted">Enter value in inches only</small>
                 </div>
               </div>
@@ -32,13 +32,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="scaleX">Horizontal Scale Factor</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="scaleX" id="scaleX" value="{{scaleX}}">
+                  {{ macros.input_decimal("scaleX", True, scaleX) }}
                   <small class="form-text text-muted">Enter something like 1.0028</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="scaleY">Vertical Scale Factor</label>
+                  {{ macros.input_decimal("scaleY", True, scaleY) }}
                   <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="scaleY" id="scaleY" value="{{scaleY}}">
                   <small class="form-text text-muted">Enter something like 1.0028</small>
                 </div>
@@ -48,14 +49,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="opticalCenterX">X Coordinate of Center</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
+                  {{ macros.input_decimal("opticalCenterX", True, opticalCenterX) }}
                   <small class="form-text text-muted">Enter something like 300</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="opticalCenterY">Y Coordinate of Center</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
+                  {{ macros.input_decimal("opticalCenterY", True, opticalCenterY) }}
                   <small class="form-text text-muted">Enter something like 200</small>
                 </div>
              </div>
@@ -64,7 +65,7 @@
               <div class="col">
                 <div class="form-group">
                   <label for="positionTolerance">Position Tolerance</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
+                  {{ macros.input_decimal("positionTolerance", True, positionTolerance) }}
                   <small class="form-text text-muted">Enter something like 0.125 (mm)</small>
                 </div>
               </div>
@@ -91,17 +92,18 @@
               <option value="Custom" {{'selected' if calibrationExtents=='Custom' else ''}}>Custom</option>
             </select>
             <div class="row">
+            {% set disabled_custom = (calibrationExtents!='Custom') %}
             <div class="col">
               <div class="form-group">
                 <label for="tlX">X Coordinate of Top Left</label>
-                <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="tlX" id="tlX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlX}}">
+                {{ macros.input_decimal("tlX", True, tlX, disabled_custom) }}
                 <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
               </div>
             </div>
             <div class="col">
               <div class="form-group">
                 <label for="tlY">Y Coordinate of Top Left</label>
-                <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="tlY" id="tlY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{tlY}}">
+                {{ macros.input_decimal("tlY", True, tlY, disabled_custom) }}
                 <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
               </div>
             </div>
@@ -110,14 +112,14 @@
               <div class="col">
                 <div class="form-group">
                   <label for="brX">X Coordinate of Bottom Right</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="brX" id="brX" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brX}}">
+                  {{ macros.input_decimal("brX", True, brX, disabled_custom) }}
                   <small class="form-text text-muted">Range from +15 to -15 (+ is right, - is left)</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-group">
                   <label for="brY">Y Coordinate of Bottom Right</label>
-                  <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="brY" id="brY" {{'disabled' if calibrationExtents!='Custom' else ''}} value="{{brY}}">
+                  {{ macros.input_decimal("brY", True, brY, disabled_custom) }}
                   <small class="form-text text-muted">Range from +7 to -7 (+ is up, - is down)</small>
                 </div>
               </div>
@@ -156,14 +158,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="markerX">Horizontal Size of Marker</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="markerX" id="markerX" value="{{markerX}}">
+                      {{ macros.input_decimal("markerX", True, markerX) }}
                       <small class="form-text text-muted">Enter value in inches only</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="markerY">Vertical Size of Marker</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="markerY" id="markerY" value="{{markerY}}">
+                      {{ macros.input_decimal("markerY", True, markerY) }}
                       <small class="form-text text-muted">Enter value in inches only</small>
                     </div>
                   </div>
@@ -172,14 +174,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="scaleX">Horizontal Scale Factor</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="scaleX" id="scaleX" value="{{scaleX}}">
+                      {{ macros.input_decimal("scaleX", True, scaleX) }}
                       <small class="form-text text-muted">Enter something like 1.0028</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="scaleY">Vertical Scale Factor</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="scaleY" id="scaleY" value="{{scaleY}}">
+                      {{ macros.input_decimal("scaleY", True, scaleY) }}
                       <small class="form-text text-muted">Enter something like 1.0028</small>
                     </div>
                   </div>
@@ -188,14 +190,14 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="opticalCenterX">X Coordinate of Center</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="opticalCenterX" id="opticalCenterX" value="{{opticalCenterX}}">
+                      {{ macros.input_decimal("opticalCenterY", True, opticalCenterY) }}
                       <small class="form-text text-muted">Enter something like 300</small>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="opticalCenterY">Y Coordinate of Center</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="opticalCenterY" id="opticalCenterY" value="{{opticalCenterY}}">
+                      {{ macros.input_decimal("opticalCenterY", True, opticalCenterY) }}
                       <small class="form-text text-muted">Enter something like 200</small>
                     </div>
                    </div>
@@ -204,7 +206,7 @@
                   <div class="col-6">
                     <div class="form-group">
                       <label for="positionTolerance">Position Tolerance</label>
-                      <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="positionTolerance" id="positionTolerance" value="{{positionTolerance}}">
+                      {{ macros.input_decimal("positionTolerance", True, positionTolerance) }}
                       <small class="form-text text-muted">Enter something like 0.125 (mm)</small>
                     </div>
                   </div>

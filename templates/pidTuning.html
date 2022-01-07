@@ -1,4 +1,4 @@
-
+{% import 'macros.html' as macros %}
 {% block content %}
 <div class="container-fluid">
   <div class="card" id="motorAdjustmentAccordion">
@@ -290,14 +290,14 @@
              <div class="col">
                <div class="form-group">
                  <label for="vStart">Start</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vStart" id="vStart" value="{{vStart}}">
+                 {{ macros.input_decimal("vStart", False, vStart) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="vStop">Stop</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vStop" id="vStop" value="{{vStop}}">
+                 {{ macros.input_decimal("vStop", False, vStop) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -306,14 +306,14 @@
              <div class="col">
                <div class="form-group">
                  <label for="vSteps">Steps</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vSteps" id="vSteps" value="{{vSteps}}">
+                 {{ macros.input_decimal("vSteps", False, vSteps) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="vVersion">Version</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vVersion" id="vVersion" value="{{vVersion}}">
+                 {{ macros.input_decimal("vVersion", False, vVersion) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -322,21 +322,21 @@
              <div class="col">
                <div class="form-group">
                  <label for="KpV">KpV</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpV" id="KpV" value="{{KpV}}">
+                 {{ macros.input_decimal("KpV", False, KpV) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="KiV">KiV</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiV" id="KiV" value="{{KiV}}">
+                 {{ macros.input_decimal("KiV", False, KiV) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="KdV">KdV</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdV" id="KdV" value="{{KdV}}">
+                 {{ macros.input_decimal("KdV", False, KdV) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -393,14 +393,14 @@
              <div class="col">
                <div class="form-group">
                  <label for="pStart">Start</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pStart" id="pStart" value="{{pStart}}">
+                 {{ macros.input_decimal("pStart", False, pStart) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="pStop">Stop</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pStop" id="pStop" value="{{pStop}}">
+                 {{ macros.input_decimal("pStop", False, pStop) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -409,14 +409,14 @@
              <div class="col">
                <div class="form-group">
                  <label for="pSteps">Steps</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pSteps" id="pSteps" value="{{pSteps}}">
+                 {{ macros.input_decimal("pSteps", False, pSteps) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="pVersion">Version</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pVersion" id="pVersion" value="{{pVersion}}">
+                 {{ macros.input_decimal("pVersion", False, pVersion) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -425,7 +425,7 @@
              <div class="col-6">
                <div class="form-group">
                  <label for="pTime">Time</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pTime" id="pTime" value="{{pTime}}">
+                 {{ macros.input_decimal("pTime", False, pTime) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -434,21 +434,21 @@
              <div class="col">
                <div class="form-group">
                  <label for="KpP">KpP</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpP" id="KpP" value="{{KpP}}">
+                 {{ macros.input_decimal("KpP", False, KpP) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="KiP">KiP</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiP" id="KiP" value="{{KiP}}">
+                 {{ macros.input_decimal("KiP", False, KiP) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
                  <label for="KdV">KdP</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdP" id="KdP" value="{{KdP}}">
+                 {{ macros.input_decimal("KdV", False, KdV) }}
                  <small class="form-text text-muted"></small>
                </div>
              </div>

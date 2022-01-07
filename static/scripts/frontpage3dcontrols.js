@@ -152,3 +152,11 @@ function processStatusMessage(data){
     else
         $("#currentPositioningMode").text("Incremental (G91)");
 }
+
+function inputDecimalValidate() {
+    var re = new RegExp($(this).attr("pattern"));
+    valid = pattern.test($(this).val());
+    if (!valid) {
+      $(this).setCustomValidity("Decimal input pattern mismatch");
+    }
+}

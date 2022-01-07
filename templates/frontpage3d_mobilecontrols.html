@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% import 'macros.html' as macros %}
 {% block header %}
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/frontpage.css', version='10262019b') }}" crossorigin="anonymous">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -86,7 +86,7 @@
       <label>Dist To Move</label>
     </div>
     <div class="col-4  mb-1">
-      <input class="form-control" type="number" id="distToMove" value="0.01">
+      <form id="distInput" onsubmit="return false;">{{ macros.input_decimal("distToMove", True) }}</form>
     </div>
     <div class="col-4  mb-1">
       <button id="units" type="button" class="btn btn-lg btn-secondary" onclick="unitSwitch();">--</button>
