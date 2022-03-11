@@ -604,7 +604,7 @@ class GCodeFile(MakesmithInitFuncs):
         #This test should always pass so taking it out
         #if gCodeLine.find("(") == -1 and gCodeLine.find(";") == -1:
         if True:
-            #try:
+            try:
                 gCodeLine = gCodeLine.upper() + " "
                 x = re.search("X(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
                 if x:

@@ -15,7 +15,7 @@ import platform
 
 from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
 from flask_mobility.decorators import mobile_template
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from Background.LogStreamer import LogStreamer  # do this after socketio is declared
 from Background.WebMCPProcessor import WebMCPProcessor
@@ -1189,7 +1189,7 @@ if __name__ == "__main__":
     
     if app.data.platform == "RPI":
         app.data.GPIOButtonService = app.data.config.getValue("Maslow Settings","MaslowButtonService")
-        # start button service next to last : this launches a separete button
+        # start button service next to last : this launches a separate button script NOT a Thread
         if (app.data.GPIOButtonService):
             print("starting Maslow GPIO button service")
             subprocess.run('/usr/local/etc/MaslowButtonStart.sh')
