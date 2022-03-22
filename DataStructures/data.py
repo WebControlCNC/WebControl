@@ -107,10 +107,6 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
-    GPIOButtonService = False
-    clidisplay = False
-    wiiPendantPresent = False # has user set wiimote as active?
-    wiiPendantConnected = False # is the wiimote BT connected?
     sledMoving = False # for LED light status
     zMoving = False
     #gcode position flags for imported gcode to show outer bouding box
@@ -124,7 +120,10 @@ class Data:
     GPIOButtonService = False # is there an external subprocess or service running to handle gpio?
     RGB_LED = False # this is in maslow settings
     LED_Status = "Off" # "Off, At Home, Homing, Sled Moving, Z Moving, Z Zero, Cutting, Paused, Idle, Error, Calibrating, Need Chain Reset "
-
+    clidisplay = False
+    wiiPendantPresent = False # has user set wiimote as active?
+    wiiPendantConnected = False # is the wiimote BT connected?
+    
     """
     Pointers to Objects
     """

@@ -15,7 +15,8 @@ class GPIOActions(MakesmithInitFuncs):
     LEDs = []
     actionList = ["","Spindle On", "Spindle Off", "Shutdown", "Stop", "Pause", "Play", "Set Home", "Go Home", "Return to Center", "PlayLED", "PauseLED", "StopLED", "Tri_LED_RED","Tri_LED_GREEN","Tri_LED_BLUE" ]
     
-    LEDStatusList = ["Idle",
+    LEDStatusList = ["",
+                     "Idle",
                      "At Home",
                      "Homing",
                      "Run",
@@ -58,21 +59,14 @@ class GPIOActions(MakesmithInitFuncs):
                     "White BlinkFast",
                     "White BlinkSlow"
                     ]
-    
     def getActionList(self):
         return self.actionList
     
     def getLEDStatusList(self):
         return self.LEDStatusList
     
-    def getLEDColorList(self):
-        return self.LEDColorList
-    
     def getLEDColors(self):
-        return self.LEDColors
-    
-    def getLEDBehaviorList(self):
-        return self.LEDBehaviorList
+        return self.LEDColorList
     
     def setup(self):
         #self.setGPIOAction(2,"Stop")

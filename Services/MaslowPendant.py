@@ -2,7 +2,9 @@
 import requests
 import cwiid
 import time
-
+'''
+ TODO add functionality to change port number if changed in webcontrol...  startup arguement?
+'''
 class WiiPendant():
  '''
     This class will connect to the wiimode with the Bluetooth address specified in the input file

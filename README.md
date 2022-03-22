@@ -20,14 +20,14 @@ For Linux/RPI users, make a new subdirectory,and then issue the untar:
 >cd ~</br>
 >mkdir webcontrol</br>
 >cd webcontrol</br>
->wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz</br>
+>wget https://github.com/WebControlCNC/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz</br>
 >tar -zxvf webcontrol-0.920-rpi-singledirectory.tar.gz</br>
 
 **For Linux:**
 >cd ~</br>
 >mkdir webcontrol</br>
 >cd webcontrol</br>
->wget https://github.com/madgrizzle/WebControl/releases/download/v0.920/webcontrol-0.920-linux-singledirectory.tar.gz</br>
+>wget https://github.com/WebControlCNC/WebControl/releases/download/v0.920/webcontrol-0.920-linux-singledirectory.tar.gz</br>
 >tar -zxvf webcontrol-0.920-linux-singledirectory.tar.gz</br>
 
 Change 0.920 to the lastest release if you want.
@@ -36,7 +36,7 @@ For Windows users, just extract the zip file as is.
 
 Check out the release page at:
 
-https://github.com/madgrizzle/WebControl/releases
+https://github.com/WebControlCNC/WebControl/releases
 
 
 ## Getting WebControl to Run Upon Startup on RPI (## NOT FULLY VETTED ##)
@@ -123,16 +123,16 @@ There are two ways to run WebControl.  The first downloading and running the web
 
 While logged into the RPi, issue the following command:
 ```
-docker pull madgrizzle/webmcp
-docker run -it -v $HOME/.WebControl:/root/.WebControl -v /var/run/docker.sock:/var/run/docker.sock -p 5001:5001 -e HOST_HOME=$HOME --network=host --privileged madgrizzle/webmcp
+docker pull WebControlCNC/webmcp
+docker run -it -v $HOME/.WebControl:/root/.WebControl -v /var/run/docker.sock:/var/run/docker.sock -p 5001:5001 -e HOST_HOME=$HOME --network=host --privileged WebControlCNC/webmcp
 ```
 
 ### Setting Up WebMCP to Run on Boot
 
-You can configure WebMCP to start at boot using the example systemd unit file included in the [WebMCP repo](https://www.github.com/madgrizzle/WebMCP).
+You can configure WebMCP to start at boot using the example systemd unit file included in the [WebMCP repo](https://www.github.com/WebControlCNC/WebMCP).
 
 ```
-# TODO this line will eventually pull from madgrizzle/WebMCP directly when that repo is publicly available
+# TODO this line will eventually pull from WebControlCNC/WebMCP directly when that repo is publicly available
 sudo curl -fsSL https://gist.githubusercontent.com/johnboiles/da4f3fac73105c82d900e8118dae1ec4/raw/f5bf24641e7ce6c000b5d79dc0c5ed68477566f7/webmcp.service -o /etc/systemd/system/webmcp.service
 sudo systemctl start webmcp
 sudo systemctl enable webmcp
@@ -143,8 +143,8 @@ sudo systemctl enable webmcp
 So, if you don't want to use WebMCP, you can issue the following command to download the webcontrol docker and run it:
 
 ```
-docker pull madgrizzle/webcontrol
-docker run -it -v $HOME/.WebControl:/root/.WebControl -p 5000:5000 --privileged madgrizzle/webcontrol python main.py
+docker pull WebControlCNC/webcontrol
+docker run -it -v $HOME/.WebControl:/root/.WebControl -p 5000:5000 --privileged WebControlCNC/webcontrol python main.py
 ```
 
 ## Built With
@@ -187,15 +187,15 @@ The server will then be available at http://localhost:5000
 
 You can build a Docker image with (takes ~2-3 hours)
 
-    docker build -t madgrizzle/webcontrol .
+    docker build -t WebControlCNC/webcontrol .
 
 Then you can run it directly
 
-    docker run -it -p 5000:5000 -v $HOME/.WebControl:/root/.WebControl --privileged madgrizzle/webcontrol
+    docker run -it -p 5000:5000 -v $HOME/.WebControl:/root/.WebControl --privileged WebControlCNC/webcontrol
 
 Or push it up to Docker Hub
 
-    docker push madgrizzle/webcontrol
+    docker push WebControlCNC/webcontrol
 
 Note that you'll need to build the Docker image either on an ARM platform (e.g. RaspberryPi), or on a version of Docker that supports ARM emulation (either Docker for Mac or on Linux with binfmt_misc/qemu configured).
 

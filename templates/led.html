@@ -1,0 +1,37 @@
+{% block content %}
+<div class="container-fluid">
+  <input id="pageID" type="hidden" value="{{pageID}}">
+    <form id="settingsForm">
+      <text>TRI-Color LED is enabled in GPIO settings by selecting the correct color pins.  This section assigns colors to the various machine status items</text>
+      <div class="row">
+      <div class="col-8">
+          {% for setting in settings %}
+            <div class="row align-items-center">
+              <div class="col-5">
+                <p{{'' if enableCustom or setting.custom != 1 else 'style=color:#ccc'}}>{{setting.title}}</p>
+              </div>
+              <div class="col-7">
+                {% if setting.type=="options" %}
+                  <select name="{{setting.key}}" data-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+                    {% for option in options %}
+                      <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
+                        {{option}}
+                      </option>
+                    {% endfor %}
+                  </select>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+      </div>
+      
+    </div>
+    <!--<button type="submit" class="btn btn-primary">Submit</button>-->
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>
+<script> feather.replace() </script>
+{% endblock %}

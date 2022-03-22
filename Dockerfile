@@ -44,21 +44,12 @@ RUN pip install -r /requirements.txt
 # PlatformIO doesn't support python3 yet, so also install python2 :/
 # See also: https://github.com/platformio/platformio-core/issues/895
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python2.7 python-pip python-setuptools python-wheel git \
-    && pip2 install -U platformio \
+    && apt-get install -y --no-install-recommends python3 python3-pip python-setuptools python-wheel git \
+    && pip3 install -U platformio \
     && pio platform install --with-package framework-arduino atmelavr \
     && pio lib -g install "Servo"
 
 
-ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
-ARG madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
-#ARG madgrizzle_firmware_sha=95f7d4b5c431dec162d2e2eec7c6e42530298c4b
-RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
-    && cd firmware/madgrizzle \
-    && git checkout $madgrizzle_firmware_sha \
-    && pio run -e megaatmega2560 \
-    && mkdir build \
-    && mv .pio/build/megaatmega2560/firmware.hex build/$madgrizzle_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 ARG maslowcnc_firmware_repo=https://github.com/MaslowCNC/Firmware.git
 ARG maslowcnc_firmware_sha=e1e0d020fff1f4f7c6b403a26a85a16546b7e15b
 RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
@@ -68,7 +59,7 @@ RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && mkdir build \
     && mv .pio/build/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 RUN pwd
-ARG  holey_firmware_repo=https://github.com/madgrizzle/Firmware.git
+ARG  holey_firmware_repo=https://github.com/WebControlCNC/Firmware.git
 ARG  holey_firmware_sha=950fb23396171cbd456c2d4149455cc45f5e6bc3
 RUN git clone $holey_firmware_repo firmware/holey \
     && cd firmware/holey \
@@ -113,7 +104,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -y autoremove
 # Copy in the pre-compiled firmware
-COPY --from=builder /firmware/madgrizzle/build/* /firmware/madgrizzle/
+COPY --from=builder /firmware/WebControlCNC/build/* /firmware/WebControlCNC/
 COPY --from=builder /firmware/holey/build/* /firmware/holey/
 COPY --from=builder /firmware/maslowcnc/build/* /firmware/maslowcnc/
 

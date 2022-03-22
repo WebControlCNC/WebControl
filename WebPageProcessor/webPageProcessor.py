@@ -121,6 +121,7 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "Camera Settings", False, "medium", "content", "footerSubmit"
+
         elif pageID == "gpioSettings":
             setValues = self.data.config.getJSONSettingSection("GPIO Settings")
             if self.data.controllerFirmwareVersion < 100:
@@ -148,33 +149,33 @@ class WebPageProcessor:
                 )
             return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
         
-        elif pageID == "LEDStatus":
-            setValues = self.data.config.getJSONSettingSection("LED Status List")
-            options = self.data.gpioActions.getLEDColorList()
-            #print(options)  
-            page = render_template(
-                    "LEDStatus.html",
-                    title="LED Status Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="LEDStatus"
-                    )
-            return page, "LEDStatus", False, "medium", "content", "footerSubmit"
-        
-        elif pageID == "LEDSettings":
+        elif pageID == "ledSettings":
             setValues = self.data.config.getJSONSettingSection("LED Settings")
-            behaviors = self.data.gpioActions.getLEDBehaviorList()
-            colors = self.data.gpioActions.getLEDColors()
+            if self.data.controllerFirmwareVersion < 100:
+                enableCustom = False
+            else:
+                enableCustom = True
+            options = self.data.gpioActions.getLEDColors()
             #print(options)  
-            page = render_template(
-                    "LEDSettings.html",
+            if isMobile:
+                page = render_template(
+                    "led_mobile.html",
                     title="LED Settings",
                     settings=setValues,
-                    behaviors=behaviors,
-                    colors=colors,
-                    pageID="LEDSettings"
-                    )
-            return page, "LEDSettings", False, "medium", "content", "footerSubmit"
+                    options=options,
+                    pageID="ledSettings",
+                    enableCustom=enableCustom,
+                )
+            else:
+                page = render_template(
+                    "led.html",
+                    title="Tri-Color LED Settings",
+                    settings=setValues,
+                    options=options,
+                    pageID="ledSettings",
+                    enableCustom=enableCustom,
+                )
+            return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
         
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")

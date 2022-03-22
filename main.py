@@ -577,54 +577,29 @@ def gpioSettings():
         # this button service resets the button maps for the updated gpio pins
         print("restarting maslow button service") 
         try:
-            subprocess.run(['sudo','/usr/local/etc/MaslowButtonRestart.sh'])
+            self.home = str(Path.home())
+            subprocess.run([self.home+'/Webcontrol/Services/MaslowButtonRestart.sh'])
             print("restarted maslow button service")
         except:
             print("error restarting button service")
         return resp
         
-@app.route("/LEDStatus", methods=["POST"])
-def LEDStatus():
+@app.route("/ledSettings", methods=["POST"])
+def ledSettings():
     '''
-    This is called when the LED status settings from the menu are changed.  The button service must be restarted so the LED gPIO pins are initialized correctly and useable.
-    '''
-    app.data.logger.resetIdler()
-    if app.data.platform == "RPI": #for raspberry pi ONLY commands
-        if request.method == "POST":
-            result = request.form
-            app.data.config.updateSettings("LED Status List", result)
-            message = {"status": 200}
-            resp = jsonify(message)
-            resp.status_code = 200
-            print("Updated LED status list in webcontrol.json; restarting maslow button service") 
-            try:
-                print("restarting maslow button service")
-                app.data.config.buttonSubProcess('restart')
-            except:
-                print("error restarting button service")
-            return resp  
-        
-@app.route("/LEDSettings", methods=["POST"])
-def LEDSettings():
-    '''
-    This is called when the LED settings from the menu are changed.  The button service must be restarted so the LED gPIO pins are initialized correctly and useable.
+    This is called when the LED settings from the menu are changed.
     '''
     app.data.logger.resetIdler()
-    if app.data.platform == "RPI": #for raspberry pi ONLY commands
-        if request.method == "POST":
-            result = request.form
-            app.data.config.updateSettings("LED Settings", result)
-            message = {"status": 200}
-            resp = jsonify(message)
-            resp.status_code = 200
-            print("Updated LED settings webcontrol.json; restarting maslow button service") 
-            try:
-                print("restarting maslow button service")
-                app.data.config.buttonSubProcess('restart')
-            except:
-                print("error restarting button service")
-            return resp 
-                      
+    #if app.data.platform == "RPI": #for raspberry pi ONLY commands
+    if request.method == "POST":
+        result = request.form
+        app.data.config.updateSettings("LED Settings", result)
+        message = {"status": 200}
+        resp = jsonify(message)
+        resp.status_code = 200
+        print("Updated LED settings webcontrol.json") 
+    return resp
+
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
     app.data.logger.resetIdler()
@@ -1192,7 +1167,8 @@ if __name__ == "__main__":
         # start button service next to last : this launches a separate button script NOT a Thread
         if (app.data.GPIOButtonService):
             print("starting Maslow GPIO button service")
-            subprocess.run('/usr/local/etc/MaslowButtonStart.sh')
+            self.home = str(Path.home())
+            subprocess.run(self.home+'/Services/MaslowButtonStart.sh')
             #app.data.config.buttonSubProcess('start')
 
     # app.data.shutdown = shutdown

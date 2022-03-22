@@ -703,14 +703,6 @@
         },
         {
             "default": 0,
-            "desc": "GPIO buttons run in separate process / system service",
-            "key": "MaslowButtonService",
-            "title": "Raspberry Pi Button Service Active",
-            "type": "bool",
-            "value": 0
-        },
-        {
-            "default": 0,
             "desc": "Attached command line text display on Maslow",
             "key": "clidisplay",
             "title": "RPI Text display",
@@ -1077,7 +1069,7 @@
             "value": 0.001
         }
     ],
-    "LED Status List": [
+    "LED Settings": [
         {
             "default": "",
             "desc": "LED Idle Behavior",

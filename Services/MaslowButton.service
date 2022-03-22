@@ -3,8 +3,8 @@ Description=Maslow Buttons daemon
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3  /usr/local/etc/MaslowButton.py
-WorkingDirectory=/usr/local/etc
+ExecStart=/usr/bin/python3  ~/.WebControl/systemd/MaslowButton.py
+WorkingDirectory=~/.WebControl/systemd/MaslowButton.py
 StandardOutput=tty
 TTYPath=/dev/tty1
 Restart=never

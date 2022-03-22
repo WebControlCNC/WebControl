@@ -49,6 +49,12 @@ class Config(MakesmithInitFuncs):
             print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
             copyfile(self.home1+"/defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
+        if not os.path.isdir(self.home+"/.WebControl/systemd"):
+            print("creating "+self.home+"/.WebControl/systemd directory")
+            os.mkdir(self.home+"/.WebControl/systemd")
+            copyfile(self.home1+"/Services/MaslowButton.py",self.home+"/.WebControl/systemd/MaslowButton.py")
+            copyfile(self.home1+"/Services/MaslowButton.service",self.home+"/.config/systemd/user/MaslowButton.service")
+            
         if not os.path.isdir(self.home+"/.WebControl/gcode"):
             print("creating "+self.home+"/.WebControl/gcode directory")
             os.mkdir(self.home+"/.WebControl/gcode")

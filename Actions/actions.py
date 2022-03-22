@@ -1410,7 +1410,7 @@ class Actions(MakesmithInitFuncs):
                 home = "."
             if version == 0:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
-                path = home+"/firmware/madgrizzle/*.hex"
+                path = home+"/firmware/custom/*.hex"
             if version == 1:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/maslowcnc/*.hex"
@@ -2015,7 +2015,7 @@ class Actions(MakesmithInitFuncs):
         if True: #self.data.platform=="PYINSTALLER":
             print("check for pyrelease")
             g = Github()
-            repo = g.get_repo("madgrizzle/WebControl")
+            repo = g.get_repo("WebControlCNC/WebControl")
             releases = repo.get_releases()
             latest = 0
             latestRelease = None

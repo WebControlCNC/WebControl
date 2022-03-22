@@ -31,7 +31,7 @@ class ReleaseManager(MakesmithInitFuncs):
             print("Checking latest pyrelease.")
             try:
                 g = Github()
-                repo = g.get_repo("madgrizzle/WebControl")
+                repo = g.get_repo("WebControlCNC/WebControl")
                 self.releases = repo.get_releases()
                 latestVersionGithub = 0
                 self.latestRelease = None

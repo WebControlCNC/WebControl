@@ -11,6 +11,10 @@ import json
 import os
 from os import system, name   # import only system from os 
 
+'''
+ TODO add functionality to change port number if changed in webcontrol...  startup arguement?
+'''
+
 class MaslowButton():
     '''
      this class runs in a separate process on the raspberry pi to communicate with GPIO buttons or possibly other devices.
@@ -53,7 +57,8 @@ class MaslowButton():
                 "Tri_LED_GREEN",
                 "Tri_LED_BLUE" ]
     
-    LEDStatusList = ["Idle",
+    LEDStatusList = ["",
+                     "Idle",
                      "At Home",
                      "Homing",
                      "Run",

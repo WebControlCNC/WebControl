@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo  systemctl start MaslowPendant
+systemctl start MaslowPendant
