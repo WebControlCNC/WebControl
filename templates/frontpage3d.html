@@ -22,7 +22,19 @@
 {% block content %}
 <div class="container-fluid d-flex flex-row-reverse">
     <div class="flex-fixed-width-item"><!--"col my-sidebar">-->
-        <h3>Controls</h3>
+        <div class="form-group row">
+          <div class="col-sm-4"><h3>Controls</h3>
+          </div>
+          <div class="col4 mb-1">
+            <button type="button" class="btn btn-primary btn-block disabler" onclick="action('macro3')">{{ macro3_title }}</button>
+          </div>
+          <div class="col4 mb-1">
+            <button type="button" class="btn btn-primary btn-block disabler" onclick="action('macro4')">{{ macro4_title }}</button>
+          </div>
+          <div class="col4 mb-1">
+            <button type="button" class="btn btn-primary btn-block disabler" onclick="action('macro5')">{{ macro5_title }}</button>
+          </div>
+        </div>
         <div>
         <div class="controls row" ><!-- This block needs to be disabled while code running. -->
           <div class="col-3 mb-1">

@@ -667,7 +667,7 @@
         },
         {
             "default": 3.17,
-            "desc": "The number of mm moved per rotation of the z-axis\ndefault setting: 3.17",
+            "desc": "Vertical movement (mm) from one revolution of z-motor: affected by leadscrew and belt pulleys.\ndefault setting: 3.17",
             "firmwareKey": 19,
             "key": "zDistPerRot",
             "section": "Maslow Settings",
@@ -711,7 +711,7 @@
         },
         {
             "default": "",
-            "desc": "The path to the open file\\ndefault setting: your home directory",
+            "desc": "The path to the open file. \ndefault setting: your home directory",
             "key": "openFile",
             "section": "Maslow Settings",
             "title": "Open File",
@@ -729,12 +729,12 @@
         },
         {
             "default": "Macro 1",
-            "desc": "User defined title for the Macro 1 button\ndefault setting: Macro 1",
+            "desc": "User defined title for the Macro 1 button\ndefault setting: Macro1",
             "key": "macro1_title",
             "section": "Maslow Settings",
             "title": "Macro 1 Title",
             "type": "string",
-            "value": "Macro 1"
+            "value": "Macro1"
         },
         {
             "default": "",
@@ -747,12 +747,66 @@
         },
         {
             "default": "Macro 2",
-            "desc": "User defined title for the Macro 2 button\ndefault setting: Macro 2",
+            "desc": "User defined title for the Macro 2 button\ndefault setting: Macro2",
             "key": "macro2_title",
             "section": "Maslow Settings",
             "title": "Macro 2 Title",
             "type": "string",
-            "value": "Macro 2"
+            "value": "Macro2"
+        },
+        {
+            "default": "",
+            "desc": "User defined gcode bound to the Macro 3 button\ndefault setting: ",
+            "key": "macro3",
+            "section": "Maslow Settings",
+            "title": "Macro 3",
+            "type": "string",
+            "value": ""
+        },
+        {
+            "default": "Macro 3",
+            "desc": "User defined title for the Macro 3 button\ndefault setting: Macro3",
+            "key": "macro3_title",
+            "section": "Maslow Settings",
+            "title": "Macro 3 Title",
+            "type": "string",
+            "value": "Macro3"
+        },
+        {
+            "default": "",
+            "desc": "User defined gcode bound to the Macro 4 button\ndefault setting: ",
+            "key": "macro4",
+            "section": "Maslow Settings",
+            "title": "Macro 4",
+            "type": "string",
+            "value": ""
+        },
+        {
+            "default": "Macro 4",
+            "desc": "User defined title for the Macro 4 button\ndefault setting: Macro4",
+            "key": "macro4_title",
+            "section": "Maslow Settings",
+            "title": "Macro 4 Title",
+            "type": "string",
+            "value": "Macro4"
+        },
+        {
+            "default": "",
+            "desc": "User defined gcode bound to the Macro 5 button\ndefault setting: ",
+            "key": "macro5",
+            "section": "Maslow Settings",
+            "title": "Macro 5",
+            "type": "string",
+            "value": ""
+        },
+        {
+            "default": "Macro 5",
+            "desc": "User defined title for the Macro 5 button\ndefault setting: Macro5",
+            "key": "macro5_title",
+            "section": "Maslow Settings",
+            "title": "Macro 5 Title",
+            "type": "string",
+            "value": "Macro5"
         },
         {
             "default": 5,
@@ -774,7 +828,7 @@
         },
         {
             "default": "",
-            "desc": "The path to the open board file\\ndefault setting: your home directory",
+            "desc": "The path to the open board file. \n\r default setting: your home directory",
             "key": "openBoardFile",
             "section": "Maslow Settings",
             "title": "Open Board File",

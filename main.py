@@ -1167,8 +1167,8 @@ if __name__ == "__main__":
         # start button service next to last : this launches a separate button script NOT a Thread
         if (app.data.GPIOButtonService):
             print("starting Maslow GPIO button service")
-            self.home = str(Path.home())
-            subprocess.run(self.home+'/Services/MaslowButtonStart.sh')
+            app.home = str(os.path.home())
+            subprocess.run(app.home+'/Services/MaslowButtonStart.sh')
             #app.data.config.buttonSubProcess('start')
 
     # app.data.shutdown = shutdown
