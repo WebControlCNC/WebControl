@@ -176,7 +176,15 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
-        
+        elif pageID =="gcodeclean":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
+            home = self.data.config.getHome()
+            homedir = home+"/.WebControl/gcode"
+            directories = []
+            files = []
+            
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
