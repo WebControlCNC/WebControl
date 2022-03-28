@@ -1,0 +1,33 @@
+editor.find('needle',{
+    backwards: true,
+    wrap: true,
+    caseSensitive: true, 
+    range: null,
+    wholeWord: true,
+    regExp: false
+});
+
+editor.$search.set({ needle: /(start_#D1_SavePos)/  });
+
+var found = editor.$search.find(editor.getSession()),
+
+    Range = require('ace/range').Range,
+
+    // Find Coordinates, after Line "start_#D1_SavePos"
+    row   = new Range(found.start.row+1, found.start.column-1, found.end.row+1, found.end.column),
+
+    // read Text in row
+    D1SavePos = (editor.session.getTextRange(row)),
+
+    // rewrite
+    // get value from input field
+    newD1SavePos = document.getElementById("highestBTTXT").value; 
+
+// rewrite R-Parameter with input value
+D1SavePos = D1SavePos.replace(/R13=0/, "R13=" + newD1SavePos); 
+
+// write in editor
+// mark line
+editor.selection.moveCursorToPosition({row: row, column: 0});
+// write    
+editor.session.replace(new Range(row, 0, row, Number.MAX_VALUE), D1SavePos);

@@ -100,6 +100,15 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "macro2":
                 if not self.macro(2):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro3":
+                if not self.macro(3):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro4":
+                if not self.macro(4):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro5":
+                if not self.macro(5):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
             elif msg["data"]["command"] == "clearLogs":
                 if not self.clearLogs():
                     self.data.ui_queue1.put("Alert", "Alert", "Error clearing log files.")
@@ -256,6 +265,12 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
             elif msg["data"]["command"] == "executePositionPIDTest":
                 if not self.positionPIDTest(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+            elif msg["data"]["command"] == "executezVelocityPIDTest":
+                if not self.zvelocityPIDTest(msg["data"]["arg"]):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
+            elif msg["data"]["command"] == "executezPositionPIDTest":
+                if not self.zpositionPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
             elif msg["data"]["command"] == "boardProcessGCode":
                 if not self.data.boardManager.processGCode():
@@ -1885,7 +1900,27 @@ class Actions(MakesmithInitFuncs):
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    def zvelocityPIDTest(self, parameters):
+        '''
+        Send commands to start the zveloctiy pid test
+        Todo: further explain this
+        :param parameters:
+        :return:
+        '''
+        try:
+            print(parameters)
+            print(parameters["KpVZ"])
+            self.data.config.setValue("Advanced Settings", "KpVZ", parameters["KpVZ"])
+            self.data.config.setValue("Advanced Settings", "KiVZ", parameters["KiVZ"])
+            self.data.config.setValue("Advanced Settings", "KdVZ", parameters["KdVZ"])
+            gcodeString = "B13 "+parameters["zvMotor"]+"1 S"+parameters["zvStart"]+" F"+parameters["zvStop"]+" I"+parameters["zvSteps"]+" V"+parameters["zvVersion"]
+            print(gcodeString)
+            self.data.PIDzVelocityTestVersion = parameters["zvVersion"]
+            self.data.gcode_queue.put(gcodeString)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
     def positionPIDTest(self, parameters):
         '''
         Send commands to start the position pid test
@@ -1904,6 +1939,29 @@ class Actions(MakesmithInitFuncs):
             gcodeString = "B14 "+parameters["pMotor"]+"1 S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
             print(gcodeString)
             self.data.PIDPositionTestVersion = parameters["pVersion"]
+            self.data.gcode_queue.put(gcodeString)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+    def zpositionPIDTest(self, parameters):
+        '''
+        Send commands to start the position pid test
+        Todo: further explain this
+        :param parameters:
+        :return:
+        '''
+
+        try:
+            print(parameters)
+            print(parameters["KpPZ"])
+            self.data.config.setValue("Advanced Settings", "KpPosZ", parameters["KpPZ"])
+            self.data.config.setValue("Advanced Settings", "KiPosZ", parameters["KiPZ"])
+            self.data.config.setValue("Advanced Settings", "KdPosZ", parameters["KdPZ"])
+
+            gcodeString = "B14 "+parameters["zpMotor"]+"1 S"+parameters["zpStart"]+" F"+parameters["zpStop"]+" I"+parameters["zpSteps"]+" T"+parameters["zpTime"]+" V"+parameters["zpVersion"]
+            print(gcodeString)
+            self.data.zPIDPositionTestVersion = parameters["zpVersion"]
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
@@ -1940,6 +1998,59 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def zvelocityPIDTestRun(self, command, msg):
+        '''
+
+        :param command:
+        :param msg:
+        :return:
+        '''
+        try:
+            if command == 'stop':
+                self.data.inzPIDVelocityTest = False
+                print("zPID velocity test stopped")
+                print(self.data.zPIDVelocityTestData)
+                data = json.dumps({"zresult": "zvelocity", "zversion": self.data.zPIDVelocityTestVersion, "data": self.data.PIDVelocityTestData})
+                self.data.ui_queue1.put("Action", "updatezPIDData", data)
+                self.stopRun()
+            if command == 'running':
+                if msg.find("Kp=") == -1:
+                    if self.data.zPIDVelocityTestVersion == "2":
+                        if msg.find("setpoint") == -1:
+                            self.data.zPIDVelocityTestData.append(msg)
+                    else:
+                        self.data.zPIDVelocityTestData.append(float(msg))
+            if command == 'start':
+                self.data.inzPIDVelocityTest = True
+                self.data.zPIDVelocityTestData = []
+                print("zPID velocity test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
+    def zpositionPIDTestRun(self, command, msg):
+        try:
+            if command == 'stop':
+                self.data.inzPIDPositionTest = False
+                print("zPID position test stopped")
+                print(self.data.zPIDPositionTestData)
+                data = json.dumps({"zresult": "zposition", "zversion": self.data.zPIDPositionTestVersion, "data": self.data.PIDPositionTestData})
+                self.data.ui_queue1.put("Action", "updatezPIDData", data)
+                self.stopRun()
+            if command == 'running':
+                if msg.find("Kp=") == -1:
+                    if self.data.zPIDPositionTestVersion == "2":
+                        if msg.find("zsetpoint") == -1:
+                            self.data.zPIDPositionTestData.append(msg)
+                    else:
+                        self.data.zPIDPositionTestData.append(float(msg))
+            if command == 'start':
+                self.data.inzPIDPositionTest = True
+                self.data.zPIDPositionTestData = []
+                print("zPID position test started")
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
     def positionPIDTestRun(self, command, msg):
         try:
             if command == 'stop':

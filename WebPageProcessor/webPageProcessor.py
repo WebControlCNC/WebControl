@@ -184,7 +184,7 @@ class WebPageProcessor:
             homedir = home+"/.WebControl/gcode"
             directories = []
             files = []
-            
+        
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
@@ -441,6 +441,27 @@ class WebPageProcessor:
                                    pVersion=pVersion,
                                    fourMotor=fourMotor)
             return page, "PID Tuning", False, "large", "content", False
+        elif pageID == "zpidTuning":
+            fourMotor = False
+            KpPZ = self.data.config.getValue("Advanced Settings", "KpPosZ")
+            KiPZ = self.data.config.getValue("Advanced Settings", "KiPosZ")
+            KdPZ = self.data.config.getValue("Advanced Settings", "KdPosZ")
+            KpVZ = self.data.config.getValue("Advanced Settings", "KpVZ")
+            KiVZ = self.data.config.getValue("Advanced Settings", "KiVZ")
+            KdVZ = self.data.config.getValue("Advanced Settings", "KdVZ")
+            zvVersion = "1"
+            zpVersion = "1"
+            page = render_template("zpidTuning.html",
+                                   KpPZ=KpPZ,
+                                   KiPZ=KiPZ,
+                                   KdPZ=KdPZ,
+                                   KpVZ=KpVZ,
+                                   KiVZ=KiVZ,
+                                   KdVZ=KdVZ,
+                                   zvVersion=zvVersion,
+                                   zpVersion=zpVersion)
+            return page, "zPID Tuning", False, "large", "content", False
+
         elif pageID == "editBoard":
             board = self.data.boardManager.getCurrentBoard()
             scale = 1

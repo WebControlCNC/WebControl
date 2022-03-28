@@ -24,11 +24,12 @@ pyinstaller ./main-onedir.spec
 
 # WebControl/dist/main/
 cd dist/main
-mkdir releases
+#mkdir releases
 
-touch webcontrol-linux-singledirectory.tar.gz
-tar -zcvf webcontrol-linux-singledirectory.tar.gz --exclude=webcontrol-linux-singledirectory.tar.gz .
-mv webcontrol-linux-singledirectory.tar.gz ../releases
+mkdir ../releases
+touch ../releases/webcontrol-linux-singledirectory.tar.gz
+tar -zcvf ../releases/webcontrol-linux-singledirectory.tar.gz --exclude=webcontrol-linux-singledirectory.tar.gz .
+#mv webcontrol-linux-singledirectory.tar.gz ../releases
 
 # WebControl
 cd ../..

@@ -107,6 +107,10 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
+    inzPIDVelocityTest = False
+    inzPIDPositionTest = False
+    zPIDVelocityTestVersion = 0
+    zPIDPositionTestVersion = 0
     sledMoving = False # for LED light status
     zMoving = False
     #gcode position flags for imported gcode to show outer bouding box

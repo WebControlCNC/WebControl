@@ -32,3 +32,4 @@ coll = COLLECT(exe,
           strip=False,
           upx=True,
           name='main')
+

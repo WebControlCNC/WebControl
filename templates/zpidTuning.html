@@ -1,0 +1,183 @@
+
+{% block content %}
+<div class="container-fluid">
+  
+  <div class="card" id="velocityzPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapsezVelocityPID" aria-expanded="false" aria-controls="collapsezVelocityPID">
+      <h4 class="card-title" id="velocityzPIDHeader">
+        zVelocity PID Testing...
+      </h4>
+    </button>
+    <div id="collapsezVelocityPID" class="collapse" aria-labelledby="velocityzPIDHeader" data-parent="#velocityzPIDAccordion">
+      <div class = "row">
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">zSettings</h4>
+             
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="zvStart">zStart</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvStart" id="zvStart" value="{{zvStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="zvStop">zStop</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvStop" id="zvStop" value="{{zvStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="vSteps">zSteps</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvSteps" id="zvSteps" value="{{zvSteps}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="zvVersion">zVersion</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvVersion" id="zvVersion" value="{{zvVersion}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="KpVZ">KpVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpVZ" id="KpVZ" value="{{KpVZ}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KiVZ">KiVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiVZ" id="KiVZ" value="{{KiVZ}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KdVZ">KdVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdVZ" id="KdVZ" value="{{KdVZ}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="vExecute();">Execute</button>
+         </div>
+       </div>
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Test Results</h4>
+           <div class="col">
+             <div id="vErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+         </div>
+       </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="positionzPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapsezPositionPID" aria-expanded="false" aria-controls="collapsezPositionPID">
+      <h4 class="card-title" id="positionzPIDHeader">
+        zPosition PID Testing...
+      </h4>
+    </button>
+    <div id="collapsezPositionPID" class="collapse" aria-labelledby="positionzPIDHeader" data-parent="#positionzPIDAccordion">
+      <div class = "row">
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">zSettings</h4>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="zpStart">zStart</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpStart" id="zpStart" value="{{zpStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="zpStop">zStop</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpStop" id="zpStop" value="{{zpStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="zpSteps">zSteps</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpSteps" id="zpSteps" value="{{zpSteps}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="zpVersion">zVersion</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpVersion" id="zpVersion" value="{{zpVersion}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-6">
+               <div class="form-group">
+                 <label for="zpTime">zTime</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpTime" id="zpTime" value="{{zpTime}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="KpPZ">KpPZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpPZ" id="KpPZ" value="{{KpPZ}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KiPZ">KiPZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiPZ" id="KiPZ" value="{{KiPZ}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KdVZ">KdPZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdPZ" id="KdPZ" value="{{KdPZ}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="zpExecute();">Execute</button>
+         </div>
+       </div>
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Test Results</h4>
+           <div class="col">
+             <div id="zpErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+         </div>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018l') }}" crossorigin="anonymous"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script> feather.replace() </script>
+{% endblock %}
