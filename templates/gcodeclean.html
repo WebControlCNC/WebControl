@@ -7,7 +7,7 @@
           {% for directory in directories %}
             <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
               {{directory if directory != '.' else './'}}
-            </option>
+            </option> 
           {% endfor %}
         </select>
       </div>
@@ -21,14 +21,14 @@
           {% endfor %}
         </select>
       </div>
-      <label for="minimization">Select Minimize Level</label>
+      <label for="minimize">Select Minimize Level</label>
       <div class="row mb-3">
-        <input type="radio" id="soft" name="minimization" value="soft"
+        <input type="radio" id="soft" name="minimize" value="soft"
                checked>
         <label for="soft">Soft</label>
-        <input type="radio" id="medium" name="minimization" value="medium">
+        <input type="radio" id="medium" name="minimize" value="medium">
         <label for="medium">medium</label>
-        <input type="radio" id="hard" name="minimization" value="hard">
+        <input type="radio" id="hard" name="minimize" value="hard">
         <label for="hard">Hard</label>
       </div>
     <!--<button type="submit" class="btn btn-primary mt-1">Submit</button>-->

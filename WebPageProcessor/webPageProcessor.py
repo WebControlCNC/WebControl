@@ -179,7 +179,7 @@ class WebPageProcessor:
         
         elif pageID =="cleanGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
-            print(lastSelectedFile)
+            print('-------from WPP - lastSelectedFile: ',lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"
@@ -201,18 +201,16 @@ class WebPageProcessor:
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
                 lastSelectedDirectory="."
-            print("directories",directories, type(directories))
-            print("files",files, type(files))
-            print("last file",lastSelectedFile, type(lastSelectedDirectory))
-            print("homedir",homedir, type(homedir))
+            print("-----directories",directories, type(directories))
+            print("-----files",files, type(files))
+            print("-----last file",lastSelectedFile, type(lastSelectedDirectory))
+            print("-----homedir",homedir, type(homedir))
         
             page = render_template(
                 "gcodeclean.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=False
             )
-            #page = render_template(
-            #    "gcodeclean.html" 
-            #)
             return page, "cleanGCode", False, "medium", "content", "footerSubmit"
+
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
@@ -288,8 +286,7 @@ class WebPageProcessor:
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
-            print("----from webpageprocessor")
-            print("----directories: ", directories)
+            print("----from webpageprocessor----")
             print("----homedir: ", homedir)
             page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
             return page, "Upload GCode", False, "medium", "content", "footerSubmit"

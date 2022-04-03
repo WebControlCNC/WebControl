@@ -27,8 +27,7 @@ function refreshList(){
 
 
 function onFooterSubmit(){
-    //var formdata = $("#gcodecleanForm").serialize();
-    $('#gcCircle').show();
+    //$('#gcCircle').show();
     var formdata = new FormData($('#gcodeForm')[0]);
 
     $.ajax({
@@ -43,11 +42,11 @@ function onFooterSubmit(){
           console.log("success");
             $('#contentModal').modal('toggle')
             checkForGCodeUpdate();
-            $('#gcCircle').hide();
+            //$('#gcCircle').hide();
         },
         error: function (jXHR, textStatus, errorThrown) {
             alert(errorThrown);
-            $('#gcCircle').hide();
+            //$('#gcCircle').hide();
         }
     });
 }
