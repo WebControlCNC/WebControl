@@ -1,7 +1,7 @@
 gcode clean command line interface utility to be called from the menu
 
 CLI 0.9.4
-Copyright (C) 2022 md8n
+Copyright (C) 2022 md8n (forums.maslowcnc.com)
 USAGE:
 Clean GCode file:
   GCodeClean --filename facade.nc

@@ -29,9 +29,9 @@ class Data:
     compressedGCode3D = None
 
     version = "1.27"
-    stockFirmwareVersion = None
+    stockFirmwareVersion = 1.27
     customFirmwareVersion = None
-    holeyFirmwareVersion = None
+    holeyFirmwareVersion = 51.30
     controllerFirmwareVersion = 0
     '''
     interpreter version
@@ -43,7 +43,7 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.94
+    pyInstallCurrentVersion = 0.95
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0

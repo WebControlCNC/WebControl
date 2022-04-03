@@ -20,7 +20,7 @@
       <div class="row mb-2">
 
           <div class="custom-file">
-            <input type="file" class="custom-file-input" id="gcodeFile" name="file" accept="{{validExtensions}}">
+            <input type="file" class="custom-file-input" id="gcodeFile" name="file[]" multiple accept="{{validExtensions}}">
             <label class="custom-file-label" for="gcodeFile">Choose file</label>
           </div>
         <!--label for="gcodeFile" class="mt-1">Select GCode File</label>
@@ -28,11 +28,12 @@
       </div>
     </div>
     <!--<button type="submit" class="btn btn-primary">Submit</button>-->
-  </form>
+  </form> 
 </div>
+<!--<FormWrapper onSubmit={signUp}>-->
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/uploadGCode.js', version='11102020j') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/uploadGCode.js', version='11102020k') }}" crossorigin="anonymous"></script>
 
 {% endblock %}

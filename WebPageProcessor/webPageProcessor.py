@@ -176,16 +176,8 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
-        elif pageID =="gcodeclean":
-            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
-            print(lastSelectedFile)
-            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
-            home = self.data.config.getHome()
-            homedir = home+"/.WebControl/gcode"
-            directories = []
-            files = []
         
-        elif pageID == "openGCode":
+        elif pageID =="cleanGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print(lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
@@ -205,6 +197,42 @@ class WebPageProcessor:
                         files.append({"directory":_dir, "file":file})
             except Exception as e:
                 print(e)
+           # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory="."
+            print("directories",directories, type(directories))
+            print("files",files, type(files))
+            print("last file",lastSelectedFile, type(lastSelectedDirectory))
+            print("homedir",homedir, type(homedir))
+        
+            page = render_template(
+                "gcodeclean.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+            )
+            #page = render_template(
+            #    "gcodeclean.html" 
+            #)
+            return page, "cleanGCode", False, "medium", "content", "footerSubmit"
+        elif pageID == "openGCode":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
+            home = self.data.config.getHome()
+            homedir = home+"/.WebControl/gcode"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory":_dir, "file":file})
+            except Exception as e:
+                print("exception in open gocode file in webpage processor: ", e)
            # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
@@ -256,10 +284,13 @@ class WebPageProcessor:
                     if _dirs:
                         directories = _dirs
             except Exception as e:
-                print(e)
+                print("Exception in upload gcode in webpageprocessor", e)
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
+            print("----from webpageprocessor")
+            print("----directories: ", directories)
+            print("----homedir: ", homedir)
             page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
             return page, "Upload GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "importGCini":

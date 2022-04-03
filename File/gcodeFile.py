@@ -77,7 +77,20 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         return True
 
-
+    def gcodecleanFile(self, filename="none", annotate=False, minimise=0, tolerance=0, arctolernace=0, zclamp=50):
+        print("gcode clean file call")
+        print("filename = ",filename)
+        if (annotate != False):
+            print("annotate = ",annotate)
+        if (minimise != 0):
+            print("minimize = ",minimise)
+        if (tolerance != 0):
+            print("tolerance = ",tolerance)
+        if (arctolernace != 0):
+            print("arctolerance = ",arctolernace)
+        if (zclamp < 50):
+            print("zclamp = ",zclamp)
+        print("now process gcodeclean")
 
     def loadUpdateFile(self, gcode=""):
         print("At loadUpdateFile")

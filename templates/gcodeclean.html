@@ -1,40 +1,49 @@
 {% block content %}
 <div class="container-fluid">
-    <div class="card-body">
-      <h1 class="card-title">gcode Cleaner</h1>
-      <input type="checkbox" class="btn btn-lg btn-block btn-secondary" onclick="action('cutHoleyCalibrationPattern');">Cut Calibration Pattern</button>
-      <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">Stop</button>
-    </div>
-    <div class="card-body">
-      <h4 class="card-title">Measurements</h4>
-      <form id="calibrateForm">
-        <input id="pageID" type="hidden" value="{{pageID}}">
-        <img class = "img-fluid" src="{{ url_for('static',filename='images/holeyCalibration/holeyCalibration.png' , version='11102019o') }}" >
-        <div class="form-group">
-          <div class="form-group">
-            <label for="M1">M1</label>
-            <input id="M1" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="M1" value="0">
-            <small class="form-text text-muted">Enter value in mm only</small>
+  <form class="form" id="gcodeForm" method="post" enctype=multipart/form-data>
+    <div class="row mb-3">
+        <label for="directorySelect">Select Directory</label>
+        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+          {% for directory in directories %}
+            <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
+              {{directory if directory != '.' else './'}}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="row">
+        <label for="fileSelect">Select File</label>
+        <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
+          {% for file in files %}
+            <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
+              {{file["file"]}}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <label for="minimization">Select Minimize Level</label>
+      <div class="row mb-3">
+        <input type="radio" id="soft" name="minimization" value="soft"
+               checked>
+        <label for="soft">Soft</label>
+        <input type="radio" id="medium" name="minimization" value="medium">
+        <label for="medium">medium</label>
+        <input type="radio" id="hard" name="minimization" value="hard">
+        <label for="hard">Hard</label>
+      </div>
+    <!--<button type="submit" class="btn btn-primary mt-1">Submit</button>-->
+    <div id="gcCircle">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="M2">M2</label>
-            <input id="M2" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="M2" value="0">
-            <small class="form-text text-muted">Enter value in mm only</small>
-          </div>
- <div class="container">
-  <div class="row">
-    <div class="col p-2">
-		<div class="card">
-			<div class="card-body">
-				<h4 class="card-title">Diagnostics/Maintenance</h4>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('testMotors');$('#contentModal').modal('hide');">Test Motors/Encoders</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('queryCamera');$('#contentModal').modal('hide');">Query Camera</button>
-				<a class="btn btn-lg btn-block btn-secondary" href="downloadDiagnostics?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Download Diagnostics File</a>
-				<a class="btn btn-lg btn-block btn-secondary" href="backupWebControl?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Backup WebControl</a>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('restoreWebControl');$('#contentModal').modal('hide');">Restore WebControl</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" {{'' if enableRPIshutdown else 'data-toggle="tooltip" title="Raspberry Pi System Shutdown"' | safe}} onclick="action('TurnOffRPI');$('#contentModal').modal('hide');"{{'' if enableRPIshutdown else 'hidden'}}>Turn off RPI</button>
-			</div>
-		</div>
-	</div>
+        </div>
+      
+  </form>
+</div>
+{% endblock %}
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/gcodeclean.js') }}" crossorigin="anonymous"></script>
+{% endblock %}

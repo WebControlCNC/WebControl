@@ -2075,6 +2075,15 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def cleanGCode(self, gcode, switches):
+        try:
+            self.data.gcodeFile.gcodecleanFile(gcode)
+            self.data.ui_queue1.put("Action", "gcodeclean", switches)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
     def updateGCode(self, gcode):
         try:
             #print(gcode)

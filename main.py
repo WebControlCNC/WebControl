@@ -12,6 +12,7 @@ import time
 import threading
 import json
 import platform
+monkey.patch_all()
 
 from flask import Flask, jsonify, render_template, current_app, request, flash, Response, send_file, send_from_directory
 from flask_mobility.decorators import mobile_template
@@ -26,7 +27,6 @@ from WebPageProcessor.webPageProcessor import WebPageProcessor
 from os import listdir
 from os.path import isfile, join
 
-monkey.patch_all()
 app.data = Data()
 app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
@@ -602,20 +602,40 @@ def ledSettings():
         resp.status_code = 200
         print("Updated LED settings webcontrol.json") 
     return resp
+def sc_filename(self, filename):
+    if isinstance(filename, text_type):
+        from unicodedata import normalize
+        filename = normalize('NFKD', filename).encode('utf-8', 'ignore')
+        filename = filename.decode('utf-8')
+    for sep in os.path.sep, os.path.altsep:
+        if sep:
+            filename = filename.replace(sep, ' ')
+    filename = str(_filename_gbk_strip_re.sub('', '_'.join(
+        filename.split()))).strip('._')
+
+    if os.name == 'nt' and filename and \
+       filename.split('.')[0].upper() in _windows_device_files:
+        filename = '_' + filename
+    return filename 
 
 @app.route("/uploadGCode", methods=["POST"])
 def uploadGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
+        print("------ in POST processor in main.py")
+        #result = request.form["gcodeForm"]
         result = request.form
+        print("----- form pull", result)
         directory = result["selectedDirectory"]
+        print("-----results: ",result)
         #print(directory)
-        f = request.files.getlist("file[]")
-        print(f)
-        home = app.data.config.getHome()
-        app.data.config.setValue("Computed Settings", "lastSelectedDirectory", directory)
-        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory+"/"+secure_filename(f.filename)
-        f.save(app.data.gcodeFile.filename)
+        uploaded_files = request.files.getlist("file[]")
+        for file in uploaded_files:
+            print(f'ile name :',file)
+            if file.filename !='':
+                home = app.data.config.getHome()
+                app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory+"/"+secure_filename(file.filename)
+                file.save(app.data.gcodeFile.filename)
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
             message = {"status": 200}
@@ -628,18 +648,48 @@ def uploadGCode():
             resp.status_code = 500
             return resp
 
-
-@app.route("/openGCode", methods=["POST"])
-def openGCode():
+@app.route("/cleanGcode", methods=["POST"])
+def gcodeclean():
     app.data.logger.resetIdler()
     if request.method == "POST":
-        f = request.form["selectedGCode"]
+        f = request.form["gcodeForm"]
+        print('data in from form = ', f)
+        ''''
         app.data.console_queue.put("selectedGcode="+str(f))
         tDir = f.split("/")
         app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
         home = app.data.config.getHome()
         app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
+        app.data.config.setValue("Maslow Settings", "gcodecleanFile", tDir[1])
+        '''
+        returnVal = app.data.gcodeFile.cleangcodeFile(str(f))
+        if returnVal:
+            message = {"status": 200}
+            resp = jsonify(message)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {"status": 500}
+            resp = jsonify(message)
+            resp.status_code = 500
+            return resp
+            
+@app.route("/openGCode", methods=["POST"])
+def openGCode():
+    app.data.logger.resetIdler()
+    if request.method == "POST":
+        #get data from the form / web page
+        f = request.form["selectedGCode"]
+        print("f: ",f)
+        app.data.console_queue.put("selectedGcode="+str(f))
+        tDir = f.split("/")
+        print("tDir: ",tDir)
+        app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
+        home = app.data.config.getHome()
+        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
+        #set the file name
         app.data.config.setValue("Maslow Settings", "openFile", tDir[1])
+        # load the file
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
             message = {"status": 200}
