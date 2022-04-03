@@ -32,7 +32,7 @@ class Data:
     stockFirmwareVersion = 1.27
     customFirmwareVersion = None
     holeyFirmwareVersion = 51.30
-    controllerFirmwareVersion = 0
+    controllerFirmwareVersion = 1.28
     '''
     interpreter version
     if using a compiler newer than 3.5, use the newer string format methods without %'s
