@@ -1,6 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import sys
+import subprocess
 import threading
 import json
 import re
@@ -77,20 +78,37 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         return True
 
-    def gcodecleanFile(self, filename="none", annotate=False, minimise=0, tolerance=0, arctolernace=0, zclamp=50):
-        print("gcode clean file call")
+    def gcodecleanFile(self, filename="none", annotate=False, minimise="easy", tolerance=0, arctolernace=0, zclamp=50):
+        print("gcode clean file call in gcodeFile.py")
         print("filename = ",filename)
-        if (annotate != False):
-            print("annotate = ",annotate)
-        if (minimise != 0):
+        try:
+            switches = ""
+            if (annotate == True):
+                print("annotate = ",annotate)
+                switches = " --annotate"
             print("minimize = ",minimise)
-        if (tolerance != 0):
-            print("tolerance = ",tolerance)
-        if (arctolernace != 0):
-            print("arctolerance = ",arctolernace)
-        if (zclamp < 50):
-            print("zclamp = ",zclamp)
-        print("now process gcodeclean")
+            if (int(tolerance) != 0):
+                print("tolerance = ",tolerance)
+                switches = switches + " --tolerance " + tolerance
+            if (int(arctolernace) != 0):
+                print("arctolerance = ",arctolernace)
+                switches = switches + " --arctolerance " + arctolernace
+            if (int(zclamp) < 50):
+                print("zclamp = ",zclamp)
+                switches = switches + " --zclamp " + zclamp
+            print("now process gcodeclean with these switches :",switches)
+            #call gcodeclean path
+            #homedir ../  put gcodeclean next to Webcontrol folder
+            home = "../GcodeClean/"
+            print("home ",home)
+            gcodecommand = home + "CLI --filename" + filename + switches
+            print('gcode command is : ',gcodecommand)
+            #sys.run(gcodecommand)
+        except Exception as e:
+            print("error with gcodeclean input variables", e)
+            return False
+        self.loadUpdateFile(filename)
+        return True
 
     def loadUpdateFile(self, gcode=""):
         print("At loadUpdateFile")

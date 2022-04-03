@@ -31,7 +31,7 @@ function onFooterSubmit(){
     var formdata = new FormData($('#gcodeForm')[0]);
 
     $.ajax({
-        url : '/cleanGCode',
+        url : '/gcodeClean',
         type: "POST",
         data: formdata,
         mimeTypes:"multipart/form-data",

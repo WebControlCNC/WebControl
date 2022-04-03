@@ -10,8 +10,8 @@
             </option> 
           {% endfor %}
         </select>
-      </div>
-      <div class="row">
+    </div>
+    <div class="row">
         <label for="fileSelect">Select File</label>
         <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
           {% for file in files %}
@@ -20,18 +20,32 @@
             </option>
           {% endfor %}
         </select>
-      </div>
-      <label for="minimize">Select Minimize Level</label>
-      <div class="row mb-3">
-        <input type="radio" id="soft" name="minimize" value="soft"
-               checked>
-        <label for="soft">Soft</label>
+    </div>
+    <div class="row mb-3">
+        <input type="checkbox" id="annotate" name="annotate" value="True">
+        <label for="annotate"> _ annotate gcode (default = NO)</label>
+    </div>
+    <div class="row mb-3">
+        <label for="minimize">Select Minimize Level</label>
+        <input type="radio" id="soft" name="minimize" value="soft" checked>
+        <label for="soft"> Soft  </label>
         <input type="radio" id="medium" name="minimize" value="medium">
-        <label for="medium">medium</label>
+        <label for="medium"> Medium  </label>
         <input type="radio" id="hard" name="minimize" value="hard">
-        <label for="hard">Hard</label>
-      </div>
-    <!--<button type="submit" class="btn btn-primary mt-1">Submit</button>-->
+        <label for="hard"> Hard  </label>
+    </div>
+    <div class="row mb-3">
+        <input type="text" id="tolerance" name="tolerance" value="0">
+        <label for="tolerance"> _ clipping tolerance (default = 0)</label>
+    </div>
+    <div class="row mb-3">
+      <input type="text" id="arctolerance" name="arctolerance" value="0">
+      <label for="arctolerance">_ arc tolerance for point-to-point length of arcs (default = 0)</label>
+    </div>
+    <div class="row mb-3">
+      <input type="text" id="zClamp" name="zClamp" value="50">
+      <label for="zClamp"> _ zclamp restricts positive z values to this maximum (default = 50)</label>
+    </div>
     <div id="gcCircle">
       <div class="loader">
         <div class="loader">

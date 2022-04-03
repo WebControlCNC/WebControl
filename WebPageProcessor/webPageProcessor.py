@@ -177,9 +177,9 @@ class WebPageProcessor:
                 )
             return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
         
-        elif pageID =="cleanGCode":
+        elif pageID =="gcodeClean":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
-            print('-------from WPP - lastSelectedFile: ',lastSelectedFile)
+            print('--from WPP - lastSelectedFile: ',lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"
@@ -201,15 +201,15 @@ class WebPageProcessor:
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
                 lastSelectedDirectory="."
-            print("-----directories",directories, type(directories))
-            print("-----files",files, type(files))
-            print("-----last file",lastSelectedFile, type(lastSelectedDirectory))
-            print("-----homedir",homedir, type(homedir))
+            print("--directories",directories, type(directories))
+            print("--files",files, type(files))
+            print("--last file",lastSelectedFile, type(lastSelectedDirectory))
+            print("--homedir",homedir, type(homedir))
         
             page = render_template(
                 "gcodeclean.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=False
             )
-            return page, "cleanGCode", False, "medium", "content", "footerSubmit"
+            return page, "gcodeClean", False, "medium", "content", "footerSubmit"
 
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")

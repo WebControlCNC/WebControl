@@ -622,19 +622,20 @@ def sc_filename(self, filename):
 def uploadGCode():
     app.data.logger.resetIdler()
     if request.method == "POST":
-        print("------ in POST processor in main.py")
-        #result = request.form["gcodeForm"]
+        print("---in POST processor in main.py")
         result = request.form
-        print("----- form pull", result)
-        directory = result["selectedDirectory"]
-        print("-----results: ",result)
-        #print(directory)
+        #print("---results: ",result)
+        directory = os.path.split(result["selectedDirectory"])
+        print("---directory: ",directory[1])
+        if directory[1] != "":
+            directory[1] = directory[1]+"/"
         uploaded_files = request.files.getlist("file[]")
         for file in uploaded_files:
-            print('file name :',file)
+            print('----file name :',file)
             if file.filename !='':
                 home = app.data.config.getHome()
-                app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory+"/"+secure_filename(file.filename)
+                app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory[1] + secure_filename(file.filename)
+                print("-----save path :", app.data.gcodeFile.filename)
                 file.save(app.data.gcodeFile.filename)
         returnVal = app.data.gcodeFile.loadUpdateFile()
         if returnVal:
@@ -648,44 +649,57 @@ def uploadGCode():
             resp.status_code = 500
             return resp
 
-@app.route("/cleanGcode", methods=["POST"])
-def cleanGcode():
+@app.route("/gcodeClean", methods=["POST"])
+def gcodeClean():
     app.data.logger.resetIdler()
     if request.method == "POST":
-        f = request.form["gcodeForm"]
-        print('Post in from gcode Clean')
-        print('----- data in from form = ', f)
-        print('data in f :',f.data)
-        uploaded_files = request.files.getlist("file[]")
-        minimize = request.data.getlist('minimize')
-        for file in uploaded_files:
-            print('file name :',file)
-            if file.filename !='':
-                home = app.data.config.getHome()
-                app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + directory+"/"+secure_filename(file.filename)
-                print('filename: ',app.data.gcodeFile.filename)
-                gcodecleanFile = app.data.gcodeFile.filename
-                print('gcodefilename: ',gcodecleanFile)
-        
-        ''''
-        app.data.console_queue.put("selectedGcode="+str(f))
-        tDir = f.split("/")
-        app.data.config.setValue("Computed Settings","lastSelectedDirectory",tDir[0])
+        cleaner = request.form
+        print('---Post in from gcode Clean')
+        #print('---Data in from form = ', cleaner)
+        try:
+            minimize = request.form["minimize"].rstrip()
+        except Exception as e:
+            minimize = "soft"
+        print('---minimize selection = ', minimize)
+        try:
+            annotate = request.form["annotate"].rstrip()
+        except:
+            annotate = "False"
+        print('---annotate selection = ', annotate)
+        try:
+            tolerance = request.form["tolerance"].rstrip()
+        except:
+            tolerance = 0
+        print('---tolerance selection = ', tolerance)
+        try:
+            arctolerance = request.form["arctolerance"].rstrip()
+        except:
+            arctolerance = 0
+        print('---arctolerance selection = ', arctolerance)
+        try:
+            zClamp = request.form["zClamp"].rstrip()
+        except:
+            zClamp = 50
+        print('---zClamp selection = ', zClamp)
+        directory = os.path.split(cleaner["selectedDirectory"])
+        print("---directory: ",directory[1])
+        if directory[1] != "":
+            folder = directory[1]+"/"
+        else: 
+            folder = directory[1]
+        print('---selected directory = ', directory)
+        selectedfile = cleaner["selectedGCode"]
+        print('---selected file = ', selectedfile)
+        #uploaded_files = request.files.getlist("file[]")
+        #for file in uploaded_files:
+        #    print('---file name :',file)
+        #    if file.filename !='':
         home = app.data.config.getHome()
-        app.data.gcodeFile.filename = home+"/.WebControl/gcode/" + f
-        app.data.config.setValue("Maslow Settings", "gcodecleanFile", tDir[1])
-        print("------ in POST processor in main.py")
-        #result = request.form["gcodeForm"]
-        result = request.form
-        print("----- form pull", result)
-        directory = result["selectedDirectory"]
-        print("-----results: ",result)
-        #print(directory)
-        uploaded_files = request.files.getlist("file[]")
-        
-                file.save(app.data.gcodeFile.filename)
-        '''
-        returnVal = app.data.gcodeFile.cleangcodeFile(gcodecleanFile)
+        gcodecleanFile = home+"/.WebControl/gcode/" + folder + secure_filename(selectedfile)
+        app.data.gcodeFile.filename = gcodecleanFile
+        print('----filename: ',gcodecleanFile)
+        print('----gcodefilename: ',gcodecleanFile)
+        returnVal = app.data.gcodeFile.gcodecleanFile(gcodecleanFile,annotate,minimize,tolerance,arctolerance,zClamp)
         if returnVal:
             message = {"status": 200}
             resp = jsonify(message)
