@@ -14,7 +14,7 @@ from Actions.gpioActions import GPIOActions
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
-from Background.webcamVideoStream import WebcamVideoStream
+# from Background.webcamVideoStream import WebcamVideoStream
 from Boards.boardManager import BoardManager
 from ReleaseManager.releaseManager import ReleaseManager
 from HelpManager.helpManager import HelpManager
@@ -38,7 +38,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     messageProcessor = MessageProcessor()
     mcpProcessor = WebMCPProcessor()
     consoleProcessor = ConsoleProcessor()
-    camera = WebcamVideoStream()
+    #camera = WebcamVideoStream()
     gpioActions = GPIOActions()
     boardManager = BoardManager()
     releaseManager = ReleaseManager()
@@ -69,7 +69,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
-        data.camera = self.camera
+        #data.camera = self.camera
         data.gpioActions = self.gpioActions
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
@@ -121,8 +121,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
-        self.camera.setUpData(data)
-        self.camera.getSettings()
+        #self.camera.setUpData(data)
+        #self.camera.getSettings()
         self.gpioActions.setUpData(data)
         self.gpioActions.setup()
         self.boardManager.setUpData(data)

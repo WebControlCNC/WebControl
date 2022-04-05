@@ -124,16 +124,16 @@ function setListeners(){
             case 'calibrationMessage':
                 processCalibrationMessage(data);
                 break;
-            case 'cameraMessage':
-                //completed
-                processCameraMessage(data);
-                break;
+            // case 'cameraMessage':
+            //     //completed
+            //     processCameraMessage(data);
+            //     break;
             case 'positionMessage':
                 //completed
                 processPositionMessage(data)
-                if (typeof processPositionMessageOptical === "function") {
-                     processPositionMessageOptical(data)
-                }
+                //if (typeof processPositionMessageOptical === "function") {
+                //     processPositionMessageOptical(data)
+                //}
                 break;
             case 'errorValueMessage':
                 processErrorValueMessage(data)

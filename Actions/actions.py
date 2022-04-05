@@ -44,16 +44,16 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "resumeRun":
                 if not self.resumeRun():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resuming run")
-            elif msg["data"]["command"] == "toggleCamera":
-                if not self.toggleCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "statusRequest":
-                if msg["data"]["arg"] == "cameraStatus":
-                    if not self.cameraStatus():
-                        self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "queryCamera":
-                if not self.queryCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with querying camera.")
+            # elif msg["data"]["command"] == "toggleCamera":
+            #     if not self.toggleCamera():
+            #         self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            # elif msg["data"]["command"] == "statusRequest":
+            #     if msg["data"]["arg"] == "cameraStatus":
+            #         if not self.cameraStatus():
+            #             self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            # elif msg["data"]["command"] == "queryCamera":
+            #     if not self.queryCamera():
+            #         self.data.ui_queue1.put("Alert", "Alert", "Error with querying camera.")
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")

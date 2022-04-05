@@ -1,7 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import sys
-import subprocess
+import os
 import threading
 import json
 import re
@@ -101,9 +101,9 @@ class GCodeFile(MakesmithInitFuncs):
             #homedir ../  put gcodeclean next to Webcontrol folder
             home = "../GcodeClean/"
             print("home ",home)
-            gcodecommand = home + "CLI --filename" + filename + switches
+            gcodecommand = home + "CLI --filename " + filename + switches
             print('gcode command is : ',gcodecommand)
-            #sys.run(gcodecommand)
+            os.system(gcodecommand)
         except Exception as e:
             print("error with gcodeclean input variables", e)
             return False

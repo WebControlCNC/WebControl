@@ -18,7 +18,7 @@ function unitSwitch(){
 }
 
 $(document).ready(function(){
-    action("statusRequest","cameraStatus");
+    //action("statusRequest","cameraStatus");
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
     $("#stickyButtons").css("top", $(".navbar").outerHeight());

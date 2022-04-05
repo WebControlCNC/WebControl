@@ -1,6 +1,6 @@
 gcode clean command line interface utility is called from a folder next to the Webcontrol folder.
 
-You must install the correct gcodeclean files for your operating system.
+You must install the correct gcodeclean files for your operating system in a folder alongside Webcontrol.
 Once it is installed, then webcontrol gcode clean menus will function.
 
 CLI 0.9.4

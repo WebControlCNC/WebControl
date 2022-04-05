@@ -18,7 +18,7 @@ passed the app.
 
 class UIProcessor:
     app = None
-    lastCameraTime = 0
+    #lastCameraTime = 0
     lastHealthCheck = 0
     previousUploadFlag = None
     previousCurrentTool = None
@@ -44,14 +44,14 @@ class UIProcessor:
                                        "New installation detected.  If you have an existing groundcontrol.ini file you would like to import, please do so now by pressing Actions->Import groundcontrol.ini file before doing anything else.",
                                        "notification")
                 # This sends an updated camera image if available (camera)
-                if self.app.data.cameraImageUpdated is True:
-                    if time.time() - self.lastCameraTime > .25:
-                        self.sendCameraMessage(
-                            "cameraImageUpdated",
-                            self.app.data.cameraImage,
-                        )
-                        self.app.data.cameraImageUpdated = False
-                        self.lastCameraTime = time.time()
+                # if self.app.data.cameraImageUpdated is True:
+                #     if time.time() - self.lastCameraTime > .25:
+                #         self.sendCameraMessage(
+                #             "cameraImageUpdated",
+                #             self.app.data.cameraImage,
+                #         )
+                #         self.app.data.cameraImageUpdated = False
+                #         self.lastCameraTime = time.time()
                 # function is run while queues are not empty
                 while (
                         not self.app.data.ui_controller_queue.empty() or not self.app.data.ui_queue1.empty()):  # if there is new data to be read
@@ -356,7 +356,7 @@ class UIProcessor:
         socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
                       namespace="/MaslowCNC")
 
-    def sendCameraMessage(self, message, _data=""):
+    #def sendCameraMessage(self, message, _data=""):
         '''
         Sends message to the UI client regarding camera.. message could be to turn camera display on or off, or to
         update the camera display.
@@ -364,10 +364,10 @@ class UIProcessor:
         :param _data:
         :return:
         '''
-        data = json.dumps({"command": message, "data": _data})
-        socketio.emit(
-            "message", {"command": "cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
-        )
+        #data = json.dumps({"command": message, "data": _data})
+        #socketio.emit(
+        #    "message", {"command": "cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+        #)
 
     def updatePIDData(self, message, _data=""):
         '''
@@ -510,8 +510,8 @@ class UIProcessor:
                 # Todo: clean this up .. edit: sendCalibrationMessage got deleted somewhere.
                 #self.sendCalibrationMessage("updateTimer", json.loads(msg["data"]))
                 pass
-            elif msg["message"] == "updateCamera":
-                self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
+            # elif msg["message"] == "updateCamera":
+            #     self.sendCameraMessage("updateCamera", json.loads(msg["data"]))
             elif msg["message"] == "updatePIDData":
                 self.updatePIDData("updatePIDData", json.loads(msg["data"]))
             elif msg["message"] == "clearAlarm":

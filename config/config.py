@@ -837,10 +837,12 @@ class Config(MakesmithInitFuncs):
                 self.data.holeyFirmwareVersion = "n/a"
 
     def processChange(self, key, value):
-        ### TODO: This does not currently fire on bools ##
-        # Not really sure why I don't have it firing on bools.. must of had a reason
-        if key == "fps" or key == "videoSize" or key == "cameraSleep":
-            self.data.camera.changeSetting(key, value)
+         pass
+    #     ### TODO: This does not currently fire on bools ##
+    #     # Not really sure why I don't have it firing on bools.. must of had a reason
+        #  if key == "fps" or key == "videoSize" or key == "cameraSleep":
+        #      self.data.camera.changeSetting(key, value)
+
 
 
     def firmwareKeyString(self, firmwareKey, value):

@@ -24,8 +24,8 @@ class ImportFile(MakesmithInitFuncs):
                     section = ""
                 elif line == "[Background Settings]":
                     section = ""
-                elif line == "[Optical Calibration Settings]":
-                    section = "Optical Calibration Settings"
+                #elif line == "[Optical Calibration Settings]":
+                #    section = "Optical Calibration Settings"
                 elif line == "":
                     pass
                 else:
