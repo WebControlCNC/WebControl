@@ -36,15 +36,15 @@
     </div>
     <div class="row mb-3">
         <input type="text" id="tolerance" name="tolerance" value="0">
-        <label for="tolerance"> _ clipping tolerance (default = 0)</label>
+        <label for="tolerance"> _ clipping tolerance. Min: 0.00005 (default).  Max: 0.5)</label>
     </div>
     <div class="row mb-3">
       <input type="text" id="arctolerance" name="arctolerance" value="0">
-      <label for="arctolerance">_ arc tolerance for point-to-point length of arcs (default = 0)</label>
+      <label for="arctolerance">_ arc tolerance for point-to-point length of arcs. Min: 0.00005 (default).  Max: 0.5)</label>
     </div>
     <div class="row mb-3">
-      <input type="text" id="zClamp" name="zClamp" value="50">
-      <label for="zClamp"> _ zclamp restricts positive z values to this maximum (default = 50)</label>
+      <input type="text" id="zClamp" name="zClamp" value="0.5">
+      <label for="zClamp"> _ zclamp restricts positive z value. /br Min(mm):0.5 (*default). Max(mm) 10. /br Min(in) 0.02 (*default). Max(in) /br gcodeclean autoselects units depending on the gcode file G20 or G21.</label>
     </div>
     <div id="gcCircle">
       <div class="loader">

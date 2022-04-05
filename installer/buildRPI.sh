@@ -12,7 +12,7 @@ cd ..
 cp ../Hex/norm.hex ./firmware/maslowcnc/maslowcnc-1.29.hex
 cp ../Hex/holey.hex ./firmware/holey/holey-1.30.hex
 rm -r dist
-mkdri dist
+mkdir dist
 #cd WebControl
 pyinstaller ./main-onedir.spec
 cd dist/main

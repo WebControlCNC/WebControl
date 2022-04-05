@@ -669,17 +669,18 @@ def gcodeClean():
         try:
             tolerance = request.form["tolerance"].rstrip()
         except:
-            tolerance = 0
+            tolerance = 0.00005
         print('---tolerance selection = ', tolerance)
         try:
             arctolerance = request.form["arctolerance"].rstrip()
         except:
-            arctolerance = 0
+            arctolerance = 0.00005
         print('---arctolerance selection = ', arctolerance)
+        unitsZ = app.data.config.getValue("Computed Settings", "unitsZ")
         try:
             zClamp = request.form["zClamp"].rstrip()
         except:
-            zClamp = 50
+            zClamp = 0
         print('---zClamp selection = ', zClamp)
         directory = os.path.split(cleaner["selectedDirectory"])
         print("---directory: ",directory[1])
