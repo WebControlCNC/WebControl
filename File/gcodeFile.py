@@ -95,13 +95,13 @@ class GCodeFile(MakesmithInitFuncs):
                 switches = switches + " --arctolerance " + arctolernace
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             if unitsZ == "MM":
-                if (float(zclamp) == 0):
+                if (float(zclamp) != 0):
                     print("zclamp = ",zclamp)
-                    switches = switches + " --zclamp " + zclamp
+                    switches = switches + " --zClamp " + zclamp
             else:
-                if (float(zclamp) == 0):
+                if (float(zclamp) != 0):
                     print("zclamp = ",zclamp)
-                    switches = switches + " --zclamp " + zclamp
+                    switches = switches + " --zClamp " + zclamp
             print("now process gcodeclean with these switches :",switches)
             #call gcodeclean path
             #homedir ../  put gcodeclean next to Webcontrol folder

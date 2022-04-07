@@ -20,7 +20,6 @@ Jinja2==3.0.3
 Markdown==3.3.6
 MarkupSafe==2.1.0
 misaka==2.1.1
-numpy==1.22.3
 psutil==5.9.0
 pycparser==2.21
 PyGithub==1.55
@@ -33,7 +32,6 @@ python-socketio==2.0.0
 PyYAML==6.0
 requests==2.27.1
 schedule==1.1.0
-scipy==1.8.0
 six==1.11.0
 urllib3==1.26.8
 Werkzeug==2.0.3
