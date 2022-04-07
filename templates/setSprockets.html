@@ -4,7 +4,7 @@
   <h3>Set Sprockets</h3>
   <div>1. Use the left and right motor buttons to set a tooth on the respective motor sprocket to exactly vertical, then place teh second link of the chain on the vertical spoke.</div>
   <div>2. Click 'Define Zero' to establish teh start point.</div>
-  <div>3. Extend each chain sol that the sled can be attached near the middle of the workpiece.</div>
+  <div>3. Extend each chain so that the sled can be attached near the middle of the workpiece.</div>
   <br>
   <div>NOTE: At this point, it is helpful to mark each chain with paint, sharpie, or nailpolish at the top sprocket tooth.  If the chains need to be reset due to position loss from a chain skip or power outage for example, you will be able to skip the chain extend step, by positioning one sprocket tooth vertical (12:00 position)</div>
   <div>4. Attach sled, move to home, then calibrate your Maslow CNC using the calibration tool (Triangular is default)</div>
@@ -252,10 +252,16 @@
       <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
     </div>
   </div>
-
+    <br>
+    <div><h3>Reset Chains:</h3> </div>
+    <div>For use after initial extension with marked chains to reset position if unexpected power loss or skipped chain occurs.</div>
+    <div>1. Set left and right sprockets to 12:00 position.</div>
+    <div>2. Place marked chain link of each chain on the respective top tooth.</div>
+    <div>3. Press Reset Chains Button to set sled in known location</div>
+    <br>
   <div class="row mb-3">
     <div class="col mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault')"> Reset Chains: Marked links are at 12:00 tooth = extended {{chainExtendLength}} mm</button>
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault')"> Reset Chains to {{chainExtendLength}} mm</button>
     </div>
   </div>
 </div>
