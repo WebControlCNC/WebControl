@@ -123,7 +123,7 @@ class WebPageProcessor:
           #  return page, "Camera Settings", False, "medium", "content", "footerSubmit"
 
         elif pageID == "gpioSettings":
-            if self.data.platform == "RPI":
+            if self.data.pyInstallPlatform == "RPI":
                 setValues = self.data.config.getJSONSettingSection("GPIO Settings")
                 if self.data.controllerFirmwareVersion < 100:
                     enableCustom = False
@@ -155,11 +155,11 @@ class WebPageProcessor:
                         title="wrong platform",
                         pageID="not pi"
                     )
-                return page, "wrong platform"
+                return page, "wrong platform",False, "medium","content",False
         
         elif pageID == "ledSettings":
-            print("platform is: ", self.data.platform)
-            if self.data.platform == "RPI":
+            print("platform is: ", self.data.pyInstallPlatform)
+            if self.data.pyInstallPlatform == "RPI":
                 setValues = self.data.config.getJSONSettingSection("LED Settings")
                 if self.data.controllerFirmwareVersion < 100:
                     enableCustom = False
@@ -192,7 +192,7 @@ class WebPageProcessor:
                         title="wrong platform",
                         pageID="not pi"
                     )
-                return page, "wrong platform"
+                return page, "wrong platform",False, "medium","content",False
 
         elif pageID =="gcodeClean":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
@@ -350,7 +350,7 @@ class WebPageProcessor:
                 docker = False
             else:
                 docker = True
-            if self.data.platform == "RPI":
+            if self.data.pyInstallPlatform == "RPI":
                 enableRPIshutdown = True
             else:
                 enableRPIshutdown = False

@@ -237,7 +237,7 @@ class Data:
     shutdown = False
 
     hostAddress = "-"
-    platform = "RPI"
+    platform = "linux"
     platformHome = ""
 
 
