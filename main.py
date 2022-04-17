@@ -1252,7 +1252,7 @@ if __name__ == "__main__":
     host_ip = socket.gethostbyname(host_name)
     app.data.hostAddress = host_ip + ":" + webPort
     
-    if app.data.pyInstallerPlatform == "RPI":
+    if app.data.pyInstallPlatform == "RPI":
         app.data.GPIOButtonService = app.data.config.getValue("Maslow Settings","MaslowButtonService")
         # start button service next to last : this launches a separate button script NOT a Thread
         if (app.data.GPIOButtonService):

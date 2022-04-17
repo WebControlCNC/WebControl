@@ -91,10 +91,13 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
             print("##")
+            print(data.pyInstallPlatform)
             print(_platform)
             if  os.path.exists('/etc/rpi-issue'):
                 data.pyInstallPlatform = 'RPI'
                 print("--RPI--")
+            else:
+                print("not raspberrypi")
             print("##")
         print("----")
         print(data.pyInstallPlatform)
