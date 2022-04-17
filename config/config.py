@@ -829,6 +829,7 @@ class Config(MakesmithInitFuncs):
         path = home+"/firmware/holey/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
+            print('holey version: ',version)
             maxIndex = len(version)-1
             if maxIndex >= 0:
                 version = version[maxIndex].split(".hex")

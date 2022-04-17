@@ -3,7 +3,7 @@ gcode clean command line interface utility is called from a folder next to the W
 You must install the correct gcodeclean files for your operating system in a folder alongside Webcontrol.
 Once it is installed, then webcontrol gcode clean menus will function.
 
-CLI 0.9.4
+CLI 0.9.4+
 Copyright (C) 2022 md8n (forums.maslowcnc.com)
 USAGE:
 Clean GCode file:
@@ -23,11 +23,16 @@ Clean GCode file:
 
   --tolerance       Enter a clipping tolerance for the various deduplication
                     operations
+                    Minimum: 0.00005 (default).  Maximum: 0.5
 
   --arcTolerance    Enter a tolerance for the 'point-to-point' length of arcs
                     (G2, G3) below which they will be converted to lines (G1)
+                    Minimum: 0.00005 (default).  Maximum: 0.5
 
   --zClamp          Restrict z-axis positive values to the supplied value
+                    Unit dependent selected by the G20 or G21.  
+                    Minimum (mm): 0.5 (default).  Maximum (mm) 10.
+                    Minimum (in): 0.02 (default).  Maximum (in) 0.5.
 
   --help            Display this help screen.
 

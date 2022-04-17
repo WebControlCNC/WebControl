@@ -28,11 +28,11 @@ class Data:
     compressedGCode = None
     compressedGCode3D = None
 
-    version = "1.27"
-    stockFirmwareVersion = 1.27
+    version = "0.95"
+    stockFirmwareVersion = 0
     customFirmwareVersion = None
     holeyFirmwareVersion = 51.30
-    controllerFirmwareVersion = 1.28
+    controllerFirmwareVersion = 0
     '''
     interpreter version
     if using a compiler newer than 3.5, use the newer string format methods without %'s
@@ -47,7 +47,7 @@ class Data:
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
-    pyInstallPlatform = "rpi"
+    pyInstallPlatform = "linux"
     pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
