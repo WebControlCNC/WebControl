@@ -22,17 +22,12 @@ Clean GCode file:
                     excluding IJK and remove spaces, or list of codes e.g. FGXYZ
 
   --tolerance       Enter a clipping tolerance for the various deduplication
-                    operations.  
-                    Minimum: 0.00005 (default).  Maximum: 0.5
+                    operations
 
   --arcTolerance    Enter a tolerance for the 'point-to-point' length of arcs
                     (G2, G3) below which they will be converted to lines (G1)
-                    Minimum: 0.00005 (default).  Maximum: 0.5
 
   --zClamp          Restrict z-axis positive values to the supplied value
-                    Unit dependent selected by the G20 or G21.  
-                    Minimum (mm): 0.5 (default).  Maximum (mm) 10.
-                    Minimum (in): 0.02 (default).  Maximum (in) 0.5.
 
   --help            Display this help screen.
 

@@ -47,7 +47,7 @@ class Data:
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
-    pyInstallPlatform = "linux"
+    pyInstallPlatform = "rpi"
     pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
@@ -237,7 +237,7 @@ class Data:
     shutdown = False
 
     hostAddress = "-"
-    platform = ""
+    platform = "RPI"
     platformHome = ""
 
 

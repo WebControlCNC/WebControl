@@ -78,7 +78,7 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         return True
 
-    def gcodecleanFile(self, filename="none", annotate=False, minimise="easy", tolerance=0.00005, arctolernace=0.00005, zclamp=0):
+    def gcodecleanFile(self, filename="none", annotate=False, minimise="easy", tolerance=0, arctolernace=0, zclamp=50):
         print("gcode clean file call in gcodeFile.py")
         print("filename = ",filename)
         try:
@@ -87,21 +87,15 @@ class GCodeFile(MakesmithInitFuncs):
                 print("annotate = ",annotate)
                 switches = " --annotate"
             print("minimize = ",minimise)
-            if (float(tolerance) != 0.00005):
+            if (int(tolerance) != 0):
                 print("tolerance = ",tolerance)
                 switches = switches + " --tolerance " + tolerance
-            if (float(arctolernace) != 0.00005):
+            if (int(arctolernace) != 0):
                 print("arctolerance = ",arctolernace)
                 switches = switches + " --arctolerance " + arctolernace
-            unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
-            if unitsZ == "MM":
-                if (float(zclamp) != 0):
-                    print("zclamp = ",zclamp)
-                    switches = switches + " --zClamp " + zclamp
-            else:
-                if (float(zclamp) != 0):
-                    print("zclamp = ",zclamp)
-                    switches = switches + " --zClamp " + zclamp
+            if (int(zclamp) < 50):
+                print("zclamp = ",zclamp)
+                switches = switches + " --zclamp " + zclamp
             print("now process gcodeclean with these switches :",switches)
             #call gcodeclean path
             #homedir ../  put gcodeclean next to Webcontrol folder

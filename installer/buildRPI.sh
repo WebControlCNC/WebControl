@@ -7,7 +7,7 @@ mkdir firmware
 cd firmware
 
 mkdir holey
-mkdir webcontrolcnc
+mkdir maslowcnc
 cd ..
 cp ../Hex/norm.hex ./firmware/maslowcnc/maslowcnc-1.29.hex
 cp ../Hex/holey.hex ./firmware/holey/holey-1.30.hex

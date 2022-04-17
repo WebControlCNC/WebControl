@@ -1,7 +1,6 @@
 {% block content %}
 <div class="container-fluid">
   <form class="form" id="gcodeForm" method="post" enctype=multipart/form-data>
-    <div>gcodeClean is a path optimizing tool you can download <a href="https://github.com/md8n/GCodeClean/releases">here</a><br><br></div>
     <div class="row mb-3">
         <label for="directorySelect">Select Directory</label>
         <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
@@ -22,39 +21,30 @@
           {% endfor %}
         </select>
     </div>
-  </p>
     <div class="row mb-3">
-        <br> &nbsp &nbsp
         <input type="checkbox" id="annotate" name="annotate" value="True">
-        <label for="annotate"> &nbsp &nbsp annotate gcode (default = NO)</label>
+        <label for="annotate"> _ annotate gcode (default = NO)</label>
     </div>
     <div class="row mb-3">
-        <label for="minimize">&nbsp Select Minimize Level &nbsp &nbsp</label>
+        <label for="minimize">Select Minimize Level_</label>
         <input type="radio" id="soft" name="minimize" value="soft" checked>
-        <label for="soft">&nbsp &nbsp Soft  &nbsp &nbsp</label>
+        <label for="soft">_ Soft  _</label>
         <input type="radio" id="medium" name="minimize" value="medium">
-        <label for="medium">&nbsp &nbsp Medium  &nbsp &nbsp</label>
+        <label for="medium">_ Medium  _</label>
         <input type="radio" id="hard" name="minimize" value="hard">
-        <label for="hard">&nbsp &nbsp Hard  &nbsp &nbsp</label>
+        <label for="hard">_ Hard  _</label>
     </div>
     <div class="row mb-3">
-        <input type="text" id="tolerance" name="tolerance" value="0.00005">
-        <label for="tolerance"> &nbsp &nbsp clipping tolerance. </label>
-    </div>
-    <div class="row mb-3">&nbsp &nbsp Min: 0.00005 (default).  Max: 0.5)
+        <input type="text" id="tolerance" name="tolerance" value="0">
+        <label for="tolerance"> _ clipping tolerance (default = 0)</label>
     </div>
     <div class="row mb-3">
-      <input type="text" id="arctolerance" name="arctolerance" value="0.00005">
-      <label for="arctolerance">&nbsp &nbsp arc tolerance for point-to-point length of arcs.</label>
-    </div>
-    <div class="row mb-3">&nbsp &nbsp Min: 0.00005 (default).  Max: 0.5)</label>
+      <input type="text" id="arctolerance" name="arctolerance" value="0">
+      <label for="arctolerance">_ arc tolerance for point-to-point length of arcs (default = 0)</label>
     </div>
     <div class="row mb-3">
-      <input type="text" id="zClamp" name="zClamp" value="0.5">
-      <label for="zClamp"> &nbsp &nbsp zclamp restricts positive z value.
-    </div> 
-    <div class="row mb-3">
-      &nbsp &nbsp Millimeters: Min(mm):0.5 (*default). Max(mm) 10. <br> &nbsp &nbsp Inches: Min(in) 0.02 (*default). Max(in) <br> &nbsp &nbsp gcodeclean autoselects units depending on the gcode file G20 or G21.</label>
+      <input type="text" id="zClamp" name="zClamp" value="50">
+      <label for="zClamp"> _ zclamp restricts positive z values to this maximum (default = 50)</label>
     </div>
     <div id="gcCircle">
       <div class="loader">
