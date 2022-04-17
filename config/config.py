@@ -187,7 +187,7 @@ class Config(MakesmithInitFuncs):
         this process is only available if running on raspberry pi
         '''
         #sys.setrecursionlimit(15000)
-        if ((self.data.GPIOButtonService) and (self.data.platform == "RPI")):
+        if ((self.data.GPIOButtonService) and (self.data.pyInstallerPlatform == "RPI")):
             #try:
                 cwd = os.getcwd()
                 startcommand = 'python3 ' + str(cwd) + '/Services/maslowButton.py'
