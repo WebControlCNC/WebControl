@@ -661,7 +661,7 @@
             "firmwareKey": 16,
             "key": "zAxis",
             "section": "Maslow Settings",
-            "title": "z-axis installed",
+            "title": "Z-axis installed",
             "type": "bool",
             "value": 0
         },

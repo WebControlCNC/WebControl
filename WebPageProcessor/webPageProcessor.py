@@ -98,85 +98,102 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "WebControl Settings", False, "medium", "content", "footerSubmit"
-        elif pageID == "cameraSettings":
-            setValues = self.data.config.getJSONSettingSection("Camera Settings")
-            if self.data.controllerFirmwareVersion < 100:
-                enableCustom = False
-            else:
-                enableCustom = True
-            if isMobile:
-                page = render_template(
-                    "settings_mobile.html",
-                    title="Camera Settings",
-                    settings=setValues,
-                    pageID="cameraSettings",
-                    enableCustom=enableCustom,
-                )
-            else:
-                page = render_template(
-                    "settings.html",
-                    title="Camera Settings",
-                    settings=setValues,
-                    pageID="cameraSettings",
-                    enableCustom=enableCustom,
-                )
-            return page, "Camera Settings", False, "medium", "content", "footerSubmit"
+        # elif pageID == "cameraSettings":
+        #     setValues = self.data.config.getJSONSettingSection("Camera Settings")
+        #     if self.data.controllerFirmwareVersion < 100:
+        #         enableCustom = False
+        #     else:
+        #         enableCustom = True
+        #     if isMobile:
+        #         page = render_template(
+        #             "settings_mobile.html",
+        #             title="Camera Settings",
+        #             settings=setValues,
+        #             pageID="cameraSettings",
+        #             enableCustom=enableCustom,
+        #         )
+        #     else:
+        #         page = render_template(
+        #             "settings.html",
+        #             title="Camera Settings",
+        #             settings=setValues,
+        #             pageID="cameraSettings",
+        #             enableCustom=enableCustom,
+        #         )
+          #  return page, "Camera Settings", False, "medium", "content", "footerSubmit"
 
         elif pageID == "gpioSettings":
-            setValues = self.data.config.getJSONSettingSection("GPIO Settings")
-            if self.data.controllerFirmwareVersion < 100:
-                enableCustom = False
+            if self.data.platform == "RPI":
+                setValues = self.data.config.getJSONSettingSection("GPIO Settings")
+                if self.data.controllerFirmwareVersion < 100:
+                    enableCustom = False
+                else:
+                    enableCustom = True
+                options = self.data.gpioActions.getActionList()
+                if isMobile:
+                    page = render_template(
+                        "gpio_mobile.html",
+                        title="GPIO Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="gpioSettings",
+                        enableCustom=enableCustom,
+                    )
+                else:
+                    page = render_template(
+                        "gpio.html",
+                        title="GPIO Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="gpioSettings",
+                        enableCustom=enableCustom,
+                    )
+                return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
             else:
-                enableCustom = True
-            options = self.data.gpioActions.getActionList()
-            if isMobile:
                 page = render_template(
-                    "gpio_mobile.html",
-                    title="GPIO Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="gpioSettings",
-                    enableCustom=enableCustom,
-                )
-            else:
-                page = render_template(
-                    "gpio.html",
-                    title="GPIO Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="gpioSettings",
-                    enableCustom=enableCustom,
-                )
-            return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
+                        "gpio-led-rpi-error.html",
+                        title="wrong platform",
+                        pageID="not pi"
+                    )
+                return page, "wrong platform"
         
         elif pageID == "ledSettings":
-            setValues = self.data.config.getJSONSettingSection("LED Settings")
-            if self.data.controllerFirmwareVersion < 100:
-                enableCustom = False
+            print("platform is: ", self.data.platform)
+            if self.data.platform == "RPI":
+                setValues = self.data.config.getJSONSettingSection("LED Settings")
+                if self.data.controllerFirmwareVersion < 100:
+                    enableCustom = False
+                else:
+                    enableCustom = True
+                options = self.data.gpioActions.getLEDColors()
+                #print(options)  
+                if isMobile:
+                    page = render_template(
+                        "led_mobile.html",
+                        title="LED Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="ledSettings",
+                        enableCustom=enableCustom,
+                    )
+                else:
+                    page = render_template(
+                        "led.html",
+                        title="Tri-Color LED Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="ledSettings",
+                        enableCustom=enableCustom,
+                    )
+                return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
             else:
-                enableCustom = True
-            options = self.data.gpioActions.getLEDColors()
-            #print(options)  
-            if isMobile:
                 page = render_template(
-                    "led_mobile.html",
-                    title="LED Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="ledSettings",
-                    enableCustom=enableCustom,
-                )
-            else:
-                page = render_template(
-                    "led.html",
-                    title="Tri-Color LED Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="ledSettings",
-                    enableCustom=enableCustom,
-                )
-            return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
-        
+                        "gpio-led-rpi-error.html",
+                        title="wrong platform",
+                        pageID="not pi"
+                    )
+                return page, "wrong platform"
+
         elif pageID =="gcodeClean":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
             print('--from WPP - lastSelectedFile: ',lastSelectedFile)
@@ -207,7 +224,12 @@ class WebPageProcessor:
             print("--homedir",homedir, type(homedir))
         
             page = render_template(
-                "gcodeclean.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+                "gcodeclean.html", 
+                directories=directories, 
+                files=files, 
+                lastSelectedFile=lastSelectedFile, 
+                lastSelectedDirectory=lastSelectedDirectory, 
+                isOpen=False
             )
             return page, "gcodeClean", False, "medium", "content", "footerSubmit"
 
@@ -236,7 +258,12 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory="."
             page = render_template(
-                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
+                "openGCode.html", 
+                directories=directories, 
+                files=files, 
+                lastSelectedFile=lastSelectedFile, 
+                lastSelectedDirectory=lastSelectedDirectory, 
+                isOpen=True
             )
             return page, "Open GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "saveGCode":
@@ -264,8 +291,12 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
             page = render_template(
-                "saveGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
-                lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+                "saveGCode.html", 
+                directories=directories, 
+                files=files, 
+                lastSelectedFile=lastSelectedFile,
+                lastSelectedDirectory=lastSelectedDirectory, 
+                isOpen=False
             )
             return page, "Save GCode", False, "medium", "content", "footerSubmit"
 
@@ -288,7 +319,11 @@ class WebPageProcessor:
                 lastSelectedDirectory = "."
             print("----from webpageprocessor----")
             print("----homedir: ", homedir)
-            page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
+            page = render_template("uploadGCode.html", 
+                validExtensions=validExtensions, 
+                directories=directories, 
+                lastSelectedDirectory=lastSelectedDirectory
+            )
             return page, "Upload GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "importGCini":
             url = "importFile"
@@ -325,6 +360,11 @@ class WebPageProcessor:
             else:
                 updateAvailable = False
                 updateRelease = "N/A"
+            if (float(self.data.controllerFirmwareVersion) > 1.26):
+                firmwareSupportsZaxisLimit = True
+            else:
+                firmwareSupportsZaxisLimit = False
+            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so: ", firmwareSupportsZaxisLimit)
             page = render_template("actions.html", 
                                    updateAvailable=updateAvailable, 
                                    updateRelease=updateRelease, 
@@ -334,7 +374,8 @@ class WebPageProcessor:
                                    holeyFirmwareVersion=self.data.holeyFirmwareVersion, 
                                    enableCustom=enableCustom, 
                                    enableHoley=enableHoley, 
-                                   enableRPIshutdown = enableRPIshutdown
+                                   enableRPIshutdown = enableRPIshutdown,
+                                   firmwareSupportsZaxisLimit = firmwareSupportsZaxisLimit
                                    )
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
@@ -343,10 +384,39 @@ class WebPageProcessor:
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
             if isMobile:
-                page = render_template("zaxis_mobile.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+                page = render_template("zaxis_mobile.html", 
+                distToMoveZ=distToMoveZ, 
+                unitsZ=unitsZ, 
+                touchPlate=touchPlate)
             else:
-                page = render_template("zaxis.html", distToMoveZ=distToMoveZ, unitsZ=unitsZ, touchPlate=touchPlate)
+                page = render_template("zaxis.html", 
+                distToMoveZ=distToMoveZ, 
+                unitsZ=unitsZ, 
+                touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
+
+        elif pageID == "setZaxis":
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            minZlimit = 0 #self.data.config.getValue("Advanced Settings", "minZlimit")
+            maxZlimit = 0 #self.data.config.getValue("Advanced Settings", "maxZlimit")
+            distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
+            unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
+            if isMobile:
+                page = render_template("setZaxis_mobile.html", 
+                                       minZlimit = minZlimit, 
+                                       maxZlimit = maxZlimit, 
+                                       distToMoveZ=distToMoveZ, 
+                                       unitsZ=unitsZ
+                                       )
+            else:
+                page = render_template("setZaxis.html", 
+                                       minZlimit = minZlimit, 
+                                       maxZlimit = maxZlimit, 
+                                       distToMoveZ=distToMoveZ, 
+                                       unitsZ=unitsZ
+                                       )
+            return page, "Z-Axis Limits", False, "medium", "content", False
+
         elif pageID == "setSprockets":
             if self.data.controllerFirmwareVersion < 100:
                 fourMotor = False

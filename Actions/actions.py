@@ -71,6 +71,18 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "moveZ":
                 if not self.moveZ(msg["data"]["arg"], float(msg["data"]["arg1"])):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with initiating Z-Axis move.")
+            elif msg["data"]["command"] == "setMaxZ":
+                if not self.setMaxZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Maximum")
+            elif msg["data"]["command"] == "setMinZ":
+                if not self.setMinZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with setting Z-Axis Minimum")
+            elif msg["data"]["command"] == "clearZ":
+                if not self.clearZ():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
+            elif msg["data"]["command"] == "getZlimits":
+                if not self.getZlimits():
+                    self.data.ui.queue1.put("Alert", "Alert", "Error with clearing Z-Axis Min and Max")
             elif msg["data"]["command"] == "reportSettings":
                 self.data.gcode_queue.put("$$")
             elif msg["data"]["command"] == "home":
@@ -254,9 +266,9 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Stock firmware update complete.")
             elif msg["data"]["command"] == "upgradeHoleyFirmware":
                 if not self.upgradeFirmware(2):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading holey firmware.")
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading precision firmware.")
                 else:
-                    self.data.ui_queue1.put("Alert", "Alert", "Custom firmware update complete.")
+                    self.data.ui_queue1.put("Alert", "Alert", "Precision firmware update complete.")
             elif msg["data"]["command"] == "adjustChain":
                 if not self.adjustChain(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting chain.")
@@ -876,7 +888,54 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             self.data.zMoving = False
             return False
-
+            
+    def setMinZ(self):
+        '''
+        Arduino command to set minimum z axis travel position to prevent z axis motor damage
+        B18
+        '''
+        try:
+            self.data.gcode_queue.put("B18")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def setMaxZ(self):
+        '''
+        Arduino command to set maximum z axis travel position to prevent z axis motor damage
+        B17
+        '''
+        try:
+            self.data.gcode_queue.put("B17")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def clearZ(self):
+        '''
+        Arduino command to clear z axis minimum and maximum
+        B19
+        '''
+        try:
+            self.data.gcode_queue.put("B19")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def getZlimits(self):
+        '''
+        Arduino command to echo z axis minimum and maximum values
+        B20
+        '''
+        try:
+            self.data.gcode_queue.put("B20")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
 
     def touchZ(self):
         '''

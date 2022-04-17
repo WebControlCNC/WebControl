@@ -87,10 +87,10 @@ class GCodeFile(MakesmithInitFuncs):
                 print("annotate = ",annotate)
                 switches = " --annotate"
             print("minimize = ",minimise)
-            if (int(tolerance) != 0.00005):
+            if (float(tolerance) != 0.00005):
                 print("tolerance = ",tolerance)
                 switches = switches + " --tolerance " + tolerance
-            if (int(arctolernace) != 0.00005):
+            if (float(arctolernace) != 0.00005):
                 print("arctolerance = ",arctolernace)
                 switches = switches + " --arctolerance " + arctolernace
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
@@ -169,7 +169,8 @@ class GCodeFile(MakesmithInitFuncs):
             '''
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
-                r"([0-9])([GXYZIJFTMR]) *", "\\1 \\2", filtersparsed
+                #r"([0-9])([GXYZIJFTMR]) *", "\\1 \\2", filtersparsed
+                r"([0-9])([gGxXyYzZiIjJfFtTmMrRsS]) *", "\\1 \\2", filtersparsed
             )  # put spaces between gcodes
             filtersparsed = re.sub(r"  +", " ", filtersparsed)  # condense space runs
             value = self.data.config.getValue("Advanced Settings", "truncate")
@@ -185,13 +186,28 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = re.split("\n", filtersparsed)  # splits the gcode into elements to be added to the list
             filtersparsed = [x.lstrip() for x in filtersparsed] # remove leading spaces
             filtersparsed = [x + " " for x in filtersparsed]  # adds a space to the end of each line
-            filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
-            filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
-            filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
-            filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
-            filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
+            filtersparsed = [x.replace("f ", "F") for x in filtersparsed]
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
+            filtersparsed = [x.replace("g ", "G") for x in filtersparsed]
+            filtersparsed = [x.replace("G ", "G") for x in filtersparsed]
+            filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
+            filtersparsed = [x.replace("i ", "I") for x in filtersparsed]
+            filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
+            filtersparsed = [x.replace("j ", "J") for x in filtersparsed]
+            filtersparsed = [x.replace("M ", "M") for x in filtersparsed]
+            filtersparsed = [x.replace("m ", "M") for x in filtersparsed]
             filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
+            filtersparsed = [x.replace("r ", "R") for x in filtersparsed]
+            filtersparsed = [x.replace("S ", "S") for x in filtersparsed]
+            filtersparsed = [x.replace("s ", "S") for x in filtersparsed]
+            filtersparsed = [x.replace("T ", "T") for x in filtersparsed]
+            filtersparsed = [x.replace("t ", "T") for x in filtersparsed]
+            filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
+            filtersparsed = [x.replace("x ", "X") for x in filtersparsed]
+            filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
+            filtersparsed = [x.replace("y ", "Y") for x in filtersparsed]
+            filtersparsed = [x.replace("z ", "Z") for x in filtersparsed]
+            filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
             '''
@@ -758,7 +774,7 @@ class GCodeFile(MakesmithInitFuncs):
         ]
 
         fullString = (
-            fullString + " "
+            fullString.upper() + " "
         )  # ensures that there is a space at the end of the line
         # find 'G' anywhere in string
 
