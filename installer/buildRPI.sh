@@ -10,7 +10,7 @@ mkdir holey
 mkdir maslowcnc
 cd ..
 cp ../Hex/norm.hex ./firmware/maslowcnc/maslowcnc-1.29.hex
-cp ../Hex/holey.hex ./firmware/holey/holey-1.30.hex
+cp ../Hex/holey.hex ./firmware/holey/holey-51.30.hex
 rm -r dist
 mkdir dist
 #cd WebControl
