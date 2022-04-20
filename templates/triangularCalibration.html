@@ -1,49 +1,96 @@
 
 {% block content %}
-<div class="container-fluid">
-  <h5>Cut Test Pattern</h5>
-  <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutTriangularCalibrationPattern');">Cut Calibration Pattern</button>
-  <button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">Stop</button>
-  <h5>Measurements</h5>
+<div class="container">
+  <label>Use the following controls to tune your Maslow CNC by cutting a calibration pattern.
+    </p>Us this process after the initial setup or any time the system may need to be recalibrated.
+    </p>Calibration adjusts the motor spacing and motor height as well as chain sag to compensate for measurement errors.
+  </label>
+  <br>
+  <label>Before cutting the pattern, please make sure the "quick configure" system setup has been completed.</label>
+  <br>
+  <br>
+  <table>
+    <tr>
+      <h4>Step 1:  Cut Calibration Test Pattern</h4>
+    </tr>
+    <tr>&nbsp</tr>
+    <tr>
+      <td>&nbsp &nbsp &nbsp</td>
+      <td>&nbsp &nbsp &nbsp</td>
+      <td><button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('cutTriangularCalibrationPattern');">Cut Calibration Pattern</button></td>
+      <td>&nbsp &nbsp &nbsp</td>
+      <td>&nbsp &nbsp &nbsp</td>
+      <td><button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('stopRun');">&nbsp &nbsp Stop &nbsp &nbsp</button></td>
+    </tr> 
+    <tr>&nbsp</tr>   
+  </table>
+  <br>
+  <br>
+  <h4>Step 2:  Measure the pattern (record the numbers)</h4>
   <form id="calibrateForm">
     <input id="pageID" type="hidden" value="{{pageID}}">
     <img class = "img-fluid" src="{{ url_for('static',filename='images/triangularCalibration/triangularCalibration.png' , version='11102019o') }}" >
     <div class="form-group">
-      <div class="form-group">
-        <label for="cut12">Distance Between Cuts 1 and 2</label>
-        <input id="cut12" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="cut12" value="1930">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="cut34">Distance Between Cuts 3 and 4</label>
-        <input id="cut34" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="cut34" value="1930">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="cut5">Distance Between Top of Work Area and Cut 5</label>
-        <input id="cut5" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="cut5" value="300">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="form-group">
-        <label for="bitDiameter">Router Bit Diameter</label>
-        <input id="bitDiameter" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="bitDiameter" value="6.35">
-        <small class="form-text text-muted">Enter value in mm only</small>
-      </div>
-      <div class="row">
-          <div class = "col">
-            <button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button>
-          </div>
-          <div class = "col">
-            <button id="acceptCalibration" type="button" class="btn btn-lg btn-block btn-primary">Accept Results</button>
-          </div>
-      </div>
+      <br>
+      <br>
+      <table>
+        <td>
+          <tr><h4>Step 3: Enter the measured distances (mm only)</h4></tr>
+          <tr><br></tr>
+          <tr> 
+            <td><input id="cut12" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="cut12" value="1930"></td>
+            <td><label for="cut12">&nbsp &nbsp Cuts 1 and 2</label></td>
+          </tr>
+          <tr>
+            <td><input id="cut34" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="cut34" value="1930"></td>
+            <td><label for="cut34">&nbsp &nbsp Cuts 3 and 4</label></td>
+          </tr>
+          <tr>
+            <td><input id="cut5" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="cut5" value="300"></td>
+            <td><label for="cut5">&nbsp &nbsp Top of Work Area and Cut 5</label></td>
+          </tr>
+          <tr>
+            <td><input id="bitDiameter" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" class="form-control" name="bitDiameter" value="6.35"></td>
+            <td><label for="bitDiameter">&nbsp &nbsp Router Bit Diameter (6.35 = 1/4", 3.175 = 1/8")</label></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td><button type="submit" class="btn btn-lg btn-block btn-primary">Calculate</button></td>
+          </tr>
+        </td>
+        <td>
+
+        </td>
+        </table>
+      
     </div>
   </form>
-  <h5>Parameters</h5>
-  <p><label id="motorYoffset">Height of Motors: {{motorYoffset}}</label></p>
-  <p><label id="rotationRadius">Rotational Radius: {{rotationRadius}}</label></p>
-  <p><label id="chainSagCorrection">Chain Sag Correction: {{chainSagCorrection}}</label></p>
-  <p><label id="calibrationError">Calibration Error: n/a</label></p>
+  <table>
+    <tr><h4>Step 4. ACCEPT the calculated values to save</h4></tr>
+    <tr><br></tr>
+    <tr>
+      <td><label for="motorYoffset">Height of Motors: </label></td>
+      <td><label id="motorYoffset">{{motorYoffset}}</label></td>
+    </tr>
+    <tr>
+      <td><label for="rotationRadius">Rotational Radius: </label></td>
+      <td><label id="rotationalRadius">{{rotationRadius}}</label></td>
+    </tr>
+    <tr>
+      <td><label for="chainSagCorrection">Chain Sag Correction: </label></td>
+      <td><label id="chainSagCorrection">{{chainSagCorrection}}</label></td>
+    </tr>
+    <tr>
+      <td><label for="calibrationError">Calibration Error: </label></td>
+      <td><label id="calibrationError">n/a</label></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td><button id="acceptCalibration" disabled type="Accept" class="btn btn-lg btn-block btn-primary" onclick="action('acceptTriangularCalibrationResults',0,0);$('#contentModal').modal('toggle')">Accept Results</button></td>
+    </tr>
+  </table>
 </div>
 {% endblock %}
 

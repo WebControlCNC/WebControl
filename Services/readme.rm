@@ -1,31 +1,19 @@
 To set up buttons:
 
-go to webcontrol/Services folder
+mkdir ~/.Control
+mkdir ~/.Control/systemd
 
-chmod 777 *
+cp ~/WebControl/MaslowButton.service ~/.Control/systemd
 
-sudo copy the following files from /Service  to /usr/local/etc/
+mkdir ~/.WebControl/systemd
+cp MaslowButton.py ~/.WebControl/systemd
 
-MaslowButtonRestart.sh 
-MaslowButtonStart.sh
-MaslowButtonStop.sh
-MaslowPendantStart.sh
-MaslowPendantRestart.sh
-MaslowPendantStop.sh 
-MaslowButton.py
-MaslwoPendant.py
+that is all for the button and LED service.
 
+To set up the bluetooth wii remote as a pendant input, copy these files also
 
-sudo copy the following files /Service to /etc/systemd/system/
+cp ~/WebControl/MaslowPendant.service ~/.Control/systemd
 
-MaslowButton.service
-MaslowPendant.service
+cp MaslowPendant.py ~/.WebControl/systemd
 
 This service requires the installation of the cwiid library compiled for python 3
-
-git clone https://github.com/Orob-Maslow/python3-wiimote.git
-aclocal
-autoconf
-./configure
-make
-sudo make install

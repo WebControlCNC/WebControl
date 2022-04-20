@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo  systemctl stop MaslowPendant
+systemctl stop MaslowPendant

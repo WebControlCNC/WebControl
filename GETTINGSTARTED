@@ -1,7 +1,7 @@
 
 Link to image for installing on sd card:
 
-https://drive.google.com/file/d/132811KALMXDlxUa9jGZdCv1eB2lz09Ws/view?usp=sharing
+https://github.com/WebControlCNC/webcontrol-pi/releases/download/0.1.1/2020-02-13-webcontrolcnc-buster-lite-0.1.1.zip
 
 Suggestions on getting started:
 
@@ -13,21 +13,14 @@ Suggestions on getting started:
 1.b.  Copy your groundcontrol.ini file to the computer that you will be using to communicate with webcontrol.  You'll be importing your
      groundcontrol.ini file into webcontrol to ease the transition.
 
-2. Burn the iso to the sd card, add your wpa_supplicant/ssh files to boot, insert into RPI, power on and wait 3-5 minutes.
+2. Burn the iso to the sd card, add your wpa_supplicant/ssh files to boot (if using rpi imager, then CTRL+SHIFT+X and enter information for wifi and password here), insert into RPI, power on and wait 3-5 minutes.
 
-3. Browse to http://xxx.xxx.xxx.xxx:5001, where "xxx.xxx.xxx.xxx" is the IP address of the RPI.  This is WebMCP.
-
-4. Press "Start WebControl".  You'll see a WebMCP message saying "Start WebControl" and after about 5 minutes or so (because it has to
-   download webcontrol) you'll see a message that says "Started WebControl: something_in_hex".  After 10-15 seconds, you'll see watchdog
-   messages from WebControl.. probably something about "connecting.. is not available or in use.."  That's basically saying that
-   webcontrol can't connect to the controller because the port is not configured yet.
-
-5.  Browse to xxx.xxx.xxx.xxx:5000 and you should see a screen with a notice about being the first time run.
+3. Browse to http://xxx.xxx.xxx.xxx:5000 and you should see a screen with a notice about being the first time run.
 
 
 If you did step 1 (have a groundcontrol.ini file) do this:
 
-6. Click Actions and under "Calibration/Setup" click "import groundcontrol.ini file".  Choose your groundcontrol.ini file and submit it.
+4. Click Actions and under "Calibration/Setup" click "import groundcontrol.ini file".  Choose your groundcontrol.ini file and submit it.
    If all goes well, the file will be imported and webcontrol will connect to the controller using the correct port.  If it doesn't 
    connect, please let me know by posting an issue on github.  You can manually set the port by going to Settings->Maslow Settings and
    clicking the 'refresh' simple next to the port input to populate the list of found ports.  Select the port and then scroll to bottom
@@ -35,7 +28,7 @@ If you did step 1 (have a groundcontrol.ini file) do this:
 
 If you didn't do step 1 (i.e., need to start from scratch)
 
-6.  Click Actions and under "Calibration/Setup" click "Quick Configure".  Then (and now that I think about this, I'll probably add this
+5.  Click Actions and under "Calibration/Setup" click "Quick Configure".  Then (and now that I think about this, I'll probably add this
     to quick configure) go to Settings->Maslow Settings and to the right of the list box for Serial Connection, there's a refresh button.
     Press it and list of ports will appear.  On my RPi, the correct port is /dev/ttyACM0.
 
@@ -45,7 +38,7 @@ firmware (from what we can tell) you might see some spammy error messages from t
 like that.  That's the controller saying that it received a setting it doesn't understand.  I'm looking to add in a way to avoid that
 without breaking compatibility with ground control.
 
-However, if you decide you want to stick with using webcontrol, you can update the firmware to my custom version by clicking Actions
+However, if you decide you want to stick with using webcontrol, you can update the firmware to the custom version by clicking Actions
 then "Upgrade Firmware".  If you ever want to go back to the stock firmware, you need to use the arduino programmer and such.
 
 IF YOU GET A "CANNOT FIND POSITION FOR CHAIN LENGTHS X, X" MESSAGE:
@@ -54,6 +47,4 @@ This is where we need some testing.  Ideally, you should be able to go between g
 settings are all synced properly.  I *think* I've gotten it to that point, but I need other people to try out importing the 
 groundcontrol.ini file and see if they get the same results.  If you got the message after importing groundcontrol.ini and you had moved
 the sled to the default position using the macro, click "Clear" to clear the alarm and then go to Actions and click "Reset Chain
-Lengths".  It will tell the controller that its at the default position and I think things will work.
-
-Let me know what works, what doesn't work, and what's confusing.
+Lengths".  It will tell the controller that its at the default position and things should work.

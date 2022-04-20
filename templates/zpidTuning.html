@@ -1,0 +1,183 @@
+
+{% block content %}
+<div class="container-fluid">
+  
+  <div class="card" id="velocityPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseVelocityPID" aria-expanded="false" aria-controls="collapseVelocityPID">
+      <h4 class="card-title" id="velocityzPIDHeader">
+        zVelocity PID Testing...
+      </h4>
+    </button>
+    <div id="collapseVelocityPID" class="collapse" aria-labelledby="velocityPIDHeader" data-parent="#velocityPIDAccordion">
+      <div class = "row">
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title"><Settings</h4>
+           <label name="vMotor" id="vMotor" value="Z"></label>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="vStart">zStart</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vStart" id="vStart" value="{{vStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="vStop">zStop</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vStop" id="vStop" value="{{vStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="Steps">zSteps</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vSteps" id="vSteps" value="{{vSteps}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="Version">zVersion</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vVersion" id="vVersion" value="{{vVersion}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="KpV">KpVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpV" id="KpV" value="{{KpV}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KiV">KiVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiV" id="KiV" value="{{KiV}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KdV">KdVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdV" id="KdV" value="{{KdV}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="vExecute();">Execute</button>
+         </div>
+       </div>
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Test Results</h4>
+           <div class="col">
+             <div id="vErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+         </div>
+       </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="positionPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapsePositionPID" aria-expanded="false" aria-controls="collapsePositionPID">
+      <h4 class="card-title" id="positionPIDHeader">
+        zPosition PID Testing...
+      </h4>
+    </button>
+    <div id="collapsePositionPID" class="collapse" aria-labelledby="positionPIDHeader" data-parent="#positionPIDAccordion">
+      <div class = "row">
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title"> Settings</h4>
+           <label name="pMotor" id="pMotor" value="Z"></label>
+          </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="pStart">Start</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pStart" id="pStart" value="{{pStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="pStop">Stop</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pStop" id="pStop" value="{{pStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="pSteps">Steps</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pSteps" id="pSteps" value="{{pSteps}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="pVersion">Version</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pVersion" id="pVersion" value="{{pVersion}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-6">
+               <div class="form-group">
+                 <label for="pTime">Time</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pTime" id="pTime" value="{{pTime}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="KpP">KpPZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpP" id="KpP" value="{{KpP}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KiP">KiP</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiP" id="KiP" value="{{KiP}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="KdV">KdP</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdP" id="KdP" value="{{KdP}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+           </div>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="pExecute();">Execute</button>
+         </div>
+       <div class = "col-6">
+         <div class="card-body">
+           <h4 class="card-title">Test Results</h4>
+           <div class="col">
+             <div id="pErrorPlot" style="width:100%; height:400px;"></div>
+          </div>
+         </div>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/zpidTuning.js') }}" crossorigin="anonymous"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script> feather.replace() </script>
+{% endblock %}

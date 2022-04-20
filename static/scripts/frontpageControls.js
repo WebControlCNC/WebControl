@@ -18,7 +18,7 @@ function unitSwitch(){
 }
 
 $(document).ready(function(){
-    action("statusRequest","cameraStatus");
+    //action("statusRequest","cameraStatus");
     var controllerMessage = document.getElementById('controllerMessage');
     controllerMessage.scrollTop = controllerMessage.scrollHeight;
     $("#stickyButtons").css("top", $(".navbar").outerHeight());
@@ -156,8 +156,8 @@ function boardDataUpdate(data){
   boardID = data.boardID;
   boardMaterial = data.material;
   $("#boardID").text("Board: "+boardID+", Material: "+boardMaterial);
-  if (enable3D)
-    board3DDataUpdate(data);
+  //if (enable3D)
+    //board3DDataUpdate(data);
 }
 
 function moveAction(direction) {

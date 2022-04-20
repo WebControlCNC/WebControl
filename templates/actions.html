@@ -11,33 +11,20 @@
 {% block content %}
 <div class="container">
   <div class="row">
+    
     <div class="col p-2">
 		<div class="card">
 			<div class="card-body">
-				<h4 class="card-title">Diagnostics/Maintenance</h4>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('testMotors');$('#contentModal').modal('hide');">Test Motors/Encoders</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('queryCamera');$('#contentModal').modal('hide');">Query Camera</button>
-				<a class="btn btn-lg btn-block btn-secondary" href="downloadDiagnostics?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Download Diagnostics File</a>
-				<a class="btn btn-lg btn-block btn-secondary" href="backupWebControl?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Backup WebControl</a>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('restoreWebControl');$('#contentModal').modal('hide');">Restore WebControl</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" {{'' if enableRPIshutdown else 'data-toggle="tooltip" title="Raspberry Pi System Shutdown"' | safe}} onclick="action('TurnOffRPI');$('#contentModal').modal('hide');"{{'' if enableRPIshutdown else 'hidden'}}>Turn off RPI</button>
-			</div>
-		</div>
-	</div>
-    <div class="col p-2">
-		<div class="card">
-			<div class="card-body">
-				<h4 class="card-title">Calibration/Setup</h4>
+				<h4 class="card-title">Calibration / Setup</h4>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importGCini');$('#contentModal').modal('hide');">Import groundcontrol.ini File</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importWCJSON');$('#contentModal').modal('hide');">Import webcontrol.json File</button>
+				<br>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('quickConfigure');$('#contentModal').modal('hide');">Quick Configure</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets & Chains</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if firmwareSupportsZaxisLimit else 'data-toggle="tooltip" title="Set Z Axis Limits"' | safe}} onclick="requestPage('setZaxis');$('#contentModal').modal('hide');"{{'' if firmwareSupportsZaxisLimit else 'hidden'}}>Set Z-Axis Limit</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('resetChains');$('#contentModal').modal('hide');">Reset Chains</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if not enableCustom and not enableHoley else 'data-toggle="tooltip" title="Stock Firmware Required"' | safe}} onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');" {{'' if not enableCustom and not enableHoley else 'disabled'}}>Triangular Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="requestPage('resetChains');$('#contentModal').modal('hide');">Reset Chains</button>
+				<br><button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if firmwareSupportsZaxisLimit else 'data-toggle="tooltip" title="Set Z Axis Limits"' | safe}} onclick="requestPage('setZaxis');$('#contentModal').modal('hide');"{{'' if firmwareSupportsZaxisLimit else 'disabled'}}>Set Z-Axis Limit</button>
+				<br><button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if not enableCustom and not enableHoley else 'data-toggle="tooltip" title="Stock Firmware Required"' | safe}} onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');" {{'' if not enableCustom and not enableHoley else 'disabled'}}>Triangular Calibration</button>
+				<!--<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>-->
 				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');$('#contentModal').modal('hide');">Return to Center</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('resetHomeToCenter');$('#contentModal').modal('hide');">Reset Home to Center</button>
@@ -45,22 +32,48 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="col p-2">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Diagnostics / Maintenance</h4>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('testMotors');$('#contentModal').modal('hide');">Test Motors/Encoders</button>
+				<!--<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('queryCamera');$('#contentModal').modal('hide');">Query Camera</button>-->
+				<br>
+				<a class="btn btn-lg btn-block btn-secondary" href="backupWebControl?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Backup WebControl</a>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('restoreWebControl');$('#contentModal').modal('hide');">Restore WebControl</button>
+				<br>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
+				<br>
+				<a class="btn btn-lg btn-block btn-secondary" href="downloadDiagnostics?rnd=1" onClick="this.href=this.href.split('?')[0]+'?rnd='+new Date().getTime()" target="_blank">Download Diagnostics File</a>
+				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
+				<br>
+				<button type="button" class="btn btn-lg btn-block btn-danger" {{'' if enableRPIshutdown else 'data-toggle="tooltip" title="Raspberry Pi System Shutdown"' | safe}} onclick="action('TurnOffRPI');$('#contentModal').modal('hide');"{{'' if enableRPIshutdown else 'hidden'}}>Turn off RPI</button>
+			</div>
+		</div>
+	</div>
+
    	<div class="col p-2">
 		<div class="card">
 			<div class="card-body">
 				<h4 class="card-title">Controller</h4>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeStockFirmware');$('#contentModal').modal('hide');">Upgrade Stock Firmware:{{stockFirmwareVersion}}</button>
-                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeHoleyFirmware');$('#contentModal').modal('hide');">Upgrade Holey Firmware:{{holeyFirmwareVersion}}</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeCustomFirmware');$('#contentModal').modal('hide');">Upgrade Custom Firmware:{{customFirmwareVersion}}</button>
+                <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeHoleyFirmware');$('#contentModal').modal('hide');">Upgrade Precision Firmware:{{holeyFirmwareVersion}}</button>
+				<!--<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('upgradeCustomFirmware');$('#contentModal').modal('hide');">Upgrade Custom Firmware:{{customFirmwareVersion}}</button>-->
+				<br>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('reportSettings');$('#contentModal').modal('hide');">Sync Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Settings');$('#contentModal').modal('hide');">Wipe Controller Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','Maslow');$('#contentModal').modal('hide');">Wipe Controller Position & Settings</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('wipeEEPROM','All');$('#contentModal').modal('hide');">Wipe Controller EEPROM</button>
+				<br>
                 <button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('pidTuning');$('#contentModal').modal('hide');">PID Tuning (Advanced)</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('zpidTuning');$('#contentModal').modal('hide');">Z PID Tuning (Advanced)</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('fakeServo');$('#contentModal').modal('hide');">Fake Servo (Advanced)</button>
  			</div>
 		</div>
 	</div>
+
+	
   </div>
 </div>
 {% endblock %}

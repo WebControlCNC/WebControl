@@ -73,13 +73,24 @@
     </div>
     <div class="row">
       <div class="col-4  mb-1">
-        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro1')" >Macro1</button>
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro1')" >{{ macro1_title }}</button>
       </div>
       <div class="col-4  mb-1">
-        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro2')" >Macro2</button>
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro2')" >{{ macro2_title }}</button>
       </div>
       <div class="col-4  mb-1">
-        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="requestPage('zAxis')">ZAxis</button>
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro3')" >{{ macro3_title }}</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro4')" >{{ macro4_title }}</button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="action('macro5')" >{{ macro5_title }}</button>
+      </div>
+      <div class="col-4  mb-1">
+        <button type="button" class="btn btn-lg btn-primary btn-block" onclick="requestPage('zAxis');">ZAxis</button>
       </div>
     </div>
     <div class="row">
@@ -230,14 +241,14 @@
       <div id="workarea" style="height:400px"></div>
     </div>
   </div>
-  <div class="col-3 mb-1">
+  <!--<div class="col-3 mb-1">
     <button id="videoStatus" type="button" class="btn btn-block btn-secondary" onclick="action('toggleCamera')"><i data-feather="video-off"></i></button>
   </div>
   <div id="mobileCameraArea" class="row" style="height:200px" style="display:none">
     <div class="col">
         <div id="mobileCameraDiv1"><img id="cameraImage1" src="#" style="display:none"></div>
         <div id="mobileCameraDiv2"><img id="cameraImage2" src="#" style="display:none"></div>
-    </div>
+    </div>-->
   </div>
   <div id="fpCircle" style="display: none;">
     <div class="loader">

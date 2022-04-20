@@ -37,18 +37,11 @@ RUN pip3 install -r /requirements.txt
 # Generates the firmware as /firmware/.pioenvs/megaatmega2560/firmware.hex
 # Python3 support was added in July, 2019: https://github.com/Homebrew/homebrew-core/pull/41821
 RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 python3-pip python-setuptools python-wheel git \
     && pip3 install -U platformio \
     && pio platform install --with-package framework-arduino atmelavr \
     && pio lib -g install "Servo"
 
-ARG madgrizzle_firmware_repo=https://github.com/madgrizzle/Firmware.git
-ARG madgrizzle_firmware_sha=bf4350ffd9bc154832505fc0125abd2c4c04dba7
-RUN git clone $madgrizzle_firmware_repo firmware/madgrizzle \
-    && cd firmware/madgrizzle \
-    && git checkout $madgrizzle_firmware_sha \
-    && pio run -e megaatmega2560 \
-    && mkdir build \
-    && mv .pio/build/megaatmega2560/firmware.hex build/$madgrizzle_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 ARG maslowcnc_firmware_repo=https://github.com/MaslowCNC/Firmware.git
 ARG maslowcnc_firmware_sha=e1e0d020fff1f4f7c6b403a26a85a16546b7e15b
 RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
@@ -58,7 +51,7 @@ RUN git clone $maslowcnc_firmware_repo firmware/maslowcnc \
     && mkdir build \
     && mv .pio/build/megaatmega2560/firmware.hex build/$maslowcnc_firmware_sha-$(sed -n -e 's/^.*VERSIONNUMBER //p' cnc_ctrl_v1/Maslow.h).hex
 RUN pwd
-ARG  holey_firmware_repo=https://github.com/madgrizzle/Firmware.git
+ARG  holey_firmware_repo=https://github.com/WebControlCNC/Firmware.git
 ARG  holey_firmware_sha=950fb23396171cbd456c2d4149455cc45f5e6bc3
 RUN git clone $holey_firmware_repo firmware/holey \
     && cd firmware/holey \
@@ -71,6 +64,39 @@ ADD . /WebControl
 
 # Pre-compile the pyc files (for faster Docker image startup)
 RUN python3 -m compileall /WebControl
+FROM arm32v7/python:3.5.6-slim-stretch
+
+# Pip wheels compiled in the builder
+COPY --from=builder /root/.cache /root/.cache
+# requirements.txt with opencv, scipy and numpy removed
+COPY --from=builder /requirements.txt /requirements.txt
+# Required shared libraries
+COPY --from=builder /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so
+COPY --from=builder /usr/lib/libf77blas.so /usr/lib/libf77blas.so
+COPY --from=builder /usr/lib/libf77blas.so.3 /usr/lib/libf77blas.so.3
+COPY --from=builder /usr/lib/libcblas.so.3 /usr/lib/libcblas.so.3
+COPY --from=builder /usr/lib/libatlas.so.3 /usr/lib/libatlas.so.3
+COPY --from=builder /usr/lib/libblas.so.3 /usr/lib/libblas.so.3
+COPY --from=builder /usr/lib/arm-linux-gnueabihf/libgfortran.so.3 /usr/lib/arm-linux-gnueabihf/libgfortran.so.3
+COPY --from=builder /usr/lib/liblapack.so.3 /usr/lib/liblapack.so.3
+
+RUN pip install numpy==1.16.2 && pip install scipy==1.3.1 && pip install -r /requirements.txt && rm -rf /root/.cache
+
+
+# Install avrdude
+# TODO: to speed up incremental docker builds, we can probably do this in the builder image if we can figure out
+# which files we need to copy over
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    avrdude \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y autoremove
+# Copy in the pre-compiled firmware
+COPY --from=builder /firmware/WebControlCNC/build/* /firmware/WebControlCNC/
+COPY --from=builder /firmware/holey/build/* /firmware/holey/
+COPY --from=builder /firmware/maslowcnc/build/* /firmware/maslowcnc/
+
+# Copy the pre-compiled source from the builder
+COPY --from=builder /WebControl /WebControl
 
 WORKDIR /WebControl
 EXPOSE 5000/tcp

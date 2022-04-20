@@ -1,6 +1,7 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import sys
+import os
 import threading
 import json
 import re
@@ -53,9 +54,9 @@ class GCodeFile(MakesmithInitFuncs):
         return sendStr
 
     def saveFile(self, fileName, directory):
-        if fileName is "":  # Blank the g-code if we're loading "nothing"
+        if fileName == "":  # Blank the g-code if we're loading "nothing"
             return False
-        if directory is "":
+        if directory =="":
             return False
         try:
             homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
@@ -75,6 +76,44 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.ui_queue1.put("Alert", "Alert", "Cannot save gcode file.")
             self.data.gcodeFile.filename = ""
             return False
+        return True
+
+    def gcodecleanFile(self, filename="none", annotate=False, minimise="easy", tolerance=0.00005, arctolernace=0.00005, zclamp=0):
+        print("gcode clean file call in gcodeFile.py")
+        print("filename = ",filename)
+        try:
+            switches = ""
+            if (annotate == True):
+                print("annotate = ",annotate)
+                switches = " --annotate"
+            print("minimize = ",minimise)
+            if (float(tolerance) != 0.00005):
+                print("tolerance = ",tolerance)
+                switches = switches + " --tolerance " + tolerance
+            if (float(arctolernace) != 0.00005):
+                print("arctolerance = ",arctolernace)
+                switches = switches + " --arctolerance " + arctolernace
+            unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
+            if unitsZ == "MM":
+                if (float(zclamp) != 0):
+                    print("zclamp = ",zclamp)
+                    switches = switches + " --zClamp " + zclamp
+            else:
+                if (float(zclamp) != 0):
+                    print("zclamp = ",zclamp)
+                    switches = switches + " --zClamp " + zclamp
+            print("now process gcodeclean with these switches :",switches)
+            #call gcodeclean path
+            #homedir ../  put gcodeclean next to Webcontrol folder
+            home = "../GcodeClean/"
+            print("home ",home)
+            gcodecommand = home + "CLI --filename " + filename + switches
+            print('gcode command is : ',gcodecommand)
+            os.system(gcodecommand)
+        except Exception as e:
+            print("error with gcodeclean input variables", e)
+            return False
+        self.loadUpdateFile(filename)
         return True
 
     def loadUpdateFile(self, gcode=""):
@@ -103,7 +142,7 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.gcodeShift[0] = round(float(self.data.config.getValue("Advanced Settings", "homeX")),4)
             self.data.gcodeShift[1] = round(float(self.data.config.getValue("Advanced Settings", "homeY")),4)
             del self.line3D[:]
-            if filename is "":  # Blank the g-code if we're loading "nothing"
+            if filename == "":  # Blank the g-code if we're loading "nothing"
                 self.data.gcode = ""
                 return False
 
@@ -132,6 +171,7 @@ class GCodeFile(MakesmithInitFuncs):
             #print(filtersparsed)
             filtersparsed = re.sub(r"\n\n", "\n", filtersparsed)  # removes blank lines
             filtersparsed = re.sub(
+                #r"([0-9])([GXYZIJFTMR]) *", "\\1 \\2", filtersparsed
                 r"([0-9])([gGxXyYzZiIjJfFtTmMrRsS]) *", "\\1 \\2", filtersparsed
             )  # put spaces between gcodes
             filtersparsed = re.sub(r"  +", " ", filtersparsed)  # condense space runs
@@ -148,29 +188,45 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = re.split("\n", filtersparsed)  # splits the gcode into elements to be added to the list
             filtersparsed = [x.lstrip() for x in filtersparsed] # remove leading spaces
             filtersparsed = [x + " " for x in filtersparsed]  # adds a space to the end of each line
-            filtersparsed = [x.replace("g", "G") for x in filtersparsed]
-            filtersparsed = [x.replace("G ", "G") for x in filtersparsed]
-            filtersparsed = [x.replace("x", "X") for x in filtersparsed]
-            filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
-            filtersparsed = [x.replace("y", "Y") for x in filtersparsed]
-            filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
-            filtersparsed = [x.replace("z", "Z") for x in filtersparsed]
-            filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
-            filtersparsed = [x.replace("i", "I") for x in filtersparsed]
-            filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
-            filtersparsed = [x.replace("j", "J") for x in filtersparsed]
-            filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
-            filtersparsed = [x.replace("f", "F") for x in filtersparsed]
+            filtersparsed = [x.replace("f ", "F") for x in filtersparsed]
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
-            filtersparsed = [x.replace("m", "M") for x in filtersparsed]
+            filtersparsed = [x.replace("g ", "G") for x in filtersparsed]
+            filtersparsed = [x.replace("G ", "G") for x in filtersparsed]
+            filtersparsed = [x.replace("I ", "I") for x in filtersparsed]
+            filtersparsed = [x.replace("i ", "I") for x in filtersparsed]
+            filtersparsed = [x.replace("J ", "J") for x in filtersparsed]
+            filtersparsed = [x.replace("j ", "J") for x in filtersparsed]
             filtersparsed = [x.replace("M ", "M") for x in filtersparsed]
-            filtersparsed = [x.replace("r", "R") for x in filtersparsed]
+            filtersparsed = [x.replace("m ", "M") for x in filtersparsed]
             filtersparsed = [x.replace("R ", "R") for x in filtersparsed]
-            filtersparsed = [x.replace("s", "S") for x in filtersparsed]
+            filtersparsed = [x.replace("r ", "R") for x in filtersparsed]
             filtersparsed = [x.replace("S ", "S") for x in filtersparsed]
-            filtersparsed = [x.replace("t", "T") for x in filtersparsed]
+            filtersparsed = [x.replace("s ", "S") for x in filtersparsed]
             filtersparsed = [x.replace("T ", "T") for x in filtersparsed]
-            fself.data.gcode = filtersparsed
+            filtersparsed = [x.replace("t ", "T") for x in filtersparsed]
+            filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
+            filtersparsed = [x.replace("x ", "X") for x in filtersparsed]
+            filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
+            filtersparsed = [x.replace("y ", "Y") for x in filtersparsed]
+            filtersparsed = [x.replace("z ", "Z") for x in filtersparsed]
+            filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
+            self.data.gcode = "[]"
+            self.data.gcode = filtersparsed
+            '''
+            get max and min drawing locations, then offset from defined home position
+            xmin = []
+            if (self.data.gcodeShift[0] < self.data.gcode_x_min):
+                self.data.gcode_x_min = self.data.gcodeShift[0]
+            if (self.data.gcodeShift[0] > self.data.gcode_x_max):
+                self.data.gcode_x_max = self.data.gcodeShift[0]
+            if (self.data.gcodeShift[0] < self.data.gcode_y_min):
+                self.data.gcode_y_min = self.data.gcodeShift[1]
+            if (self.data.gcodeShift[0] > self.data.gcode_y_max):
+                self.data.gcode_y_max = self.data.gcodeShift[1]
+            '''
+
+
+            # Find gcode indicies of z moves
             self.data.zMoves = [0]
             zList = []
             for index, line in enumerate(self.data.gcode):
@@ -470,6 +526,7 @@ class GCodeFile(MakesmithInitFuncs):
             xTarget = self.xPosition
             yTarget = self.yPosition
             zTarget = self.zPosition
+            rTarget = self.rPosition
             iTarget = 0
             jTarget = 0
 
@@ -492,7 +549,10 @@ class GCodeFile(MakesmithInitFuncs):
             j = re.search("J(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if j:
                 jTarget = float(j.groups()[0]) * self.canvasScaleFactor
-                
+            r = re.search("R(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
+            if r:
+                # TODO add r functionality for on screen display to go with R firmware upgrade
+                rTarget = float(r.groups()[0]) * self.canvasScaleFactor
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor

@@ -40,16 +40,7 @@ See the [dedicated repository](https://github.com/WebControlCNC/webcontrol-pi).
 ### Raspberry Pi
 _Replace the version number with the latest release..._
 
-```
-cd ~
-mkdir webcontrol
-cd webcontrol
-wget https://github.com/WebControlCNC/WebControl/releases/download/v0.920/webcontrol-0.920-rpi-singledirectory.tar.gz
-tar -zxvf webcontrol-0.920-rpi-singledirectory.tar.gz
-```
-
-### Linux (Debian)
-_Replace the version number with the latest release..._
+https://github.com/WebControlCNC/WebControl/releases
 
 ```
 cd ~</br>
@@ -192,7 +183,7 @@ Added to TODO list?
 * **John Boiles** - *Docker Expert* - [johnboiles](https://github.com/johnboiles)
 * **Tinker** - *UI Improvements/Bug Fixer/Etc.* - [gb0101010101](https://github.com/gb0101010101)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/WebControlCNC/contributors) who participated in this project.
 
 ## License
 

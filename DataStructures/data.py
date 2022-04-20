@@ -28,10 +28,10 @@ class Data:
     compressedGCode = None
     compressedGCode3D = None
 
-    version = "1.27"
-    stockFirmwareVersion = None
+    version = "0.95"
+    stockFirmwareVersion = 0
     customFirmwareVersion = None
-    holeyFirmwareVersion = None
+    holeyFirmwareVersion = 51.30
     controllerFirmwareVersion = 0
     '''
     interpreter version
@@ -43,12 +43,12 @@ class Data:
     Version Updater
     '''
     lastChecked = -1
-    pyInstallCurrentVersion = 0.96
+    pyInstallCurrentVersion = 0.95
     pyInstallUpdateAvailable = False
     pyInstallUpdateBrowserUrl = ""
     pyInstallUpdateVersion = 0
-    pyInstallPlatform = "rpi"
-    pyInstallType = "singlefolder"
+    pyInstallPlatform = "linux"
+    pyInstallType = "singlefile"
     pyInstallInstalledPath = ""
 
  
@@ -107,10 +107,7 @@ class Data:
     inPIDPositionTest = False
     PIDVelocityTestVersion = 0
     PIDPositionTestVersion = 0
-    GPIOButtonService = False
-    clidisplay = False # if you have a local RPI display
-    wiiPendantPresent = False # has user set wiimote as active?
-    wiiPendantConnected = False # is the wiimote BT connected?
+    
     sledMoving = False # for LED light status
     zMoving = False
     #gcode position flags for imported gcode to show outer bouding box
@@ -121,6 +118,12 @@ class Data:
     gcode_z_min = 20
     gcode_z_max = -20
     moveDistance = 10 # CHECK UNITS!!
+    GPIOButtonService = False # is there an external subprocess or service running to handle gpio?
+    RGB_LED = False # this is in maslow settings
+    LED_Status = "Off" # "Off, At Home, Homing, Sled Moving, Z Moving, Z Zero, Cutting, Paused, Idle, Error, Calibrating, Need Chain Reset "
+    clidisplay = False
+    wiiPendantPresent = False # has user set wiimote as active?
+    wiiPendantConnected = False # is the wiimote BT connected?
     
     """
     Pointers to Objects
@@ -129,14 +132,14 @@ class Data:
     requestSerialClose = False  # this is used to request the serialThread to gracefully close the port
     triangularCalibration = None  # points to the triangular calibration object
     holeyCalibration = None  # points to the triangular calibration object
-    opticalCalibration = None  # points to the optical calibration object
-    opticalCalibrationImage = None  # stores the current image
-    opticalCalibrationImageUpdated = False  # stores whether its been updated or not
-    opticalCalibrationTestImage = None  # stores the current image
-    opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
-    cameraImage = None
-    cameraImageUpdated = False
-    continuousCamera = False
+    #opticalCalibration = None  # points to the optical calibration object
+    #opticalCalibrationImage = None  # stores the current image
+    #opticalCalibrationImageUpdated = False  # stores whether its been updated or not
+    #opticalCalibrationTestImage = None  # stores the current image
+    #opticalCalibrationTestImageUpdated = False  # stores whether its been updated or not
+    #cameraImage = None
+    #cameraImageUpdated = False
+    #continuousCamera = False
     gpioActions = None
     boardManager = None
     """
@@ -230,7 +233,7 @@ class Data:
     shutdown = False
 
     hostAddress = "-"
-    platform = "RPI"
+    platform = "linux"
     platformHome = ""
 
 

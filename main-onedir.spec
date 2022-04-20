@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Windows\\System32\\downlevel', 'C:\\Users\\john\\PycharmProjects\\WebControl'],
+             pathex=['~/Documents/GitHub/WebControl'],
              binaries=[],
              datas=[('templates', 'templates'), ('firmware','firmware'), ('static', 'static'), ('tools', 'tools'), ('docs','docs'), ('defaultwebcontrol.json', '.')],
              hiddenimports=['flask', 'flask-misaka', 'clr', 'gevent', 'gevent-websocket', 'engineio.async_gevent', 'distro', 'markdown'],
@@ -32,3 +32,4 @@ coll = COLLECT(exe,
           strip=False,
           upx=True,
           name='main')
+
