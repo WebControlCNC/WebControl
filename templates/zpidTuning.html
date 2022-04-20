@@ -2,30 +2,30 @@
 {% block content %}
 <div class="container-fluid">
   
-  <div class="card" id="velocityzPIDAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapsezVelocityPID" aria-expanded="false" aria-controls="collapsezVelocityPID">
+  <div class="card" id="velocityPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapseVelocityPID" aria-expanded="false" aria-controls="collapseVelocityPID">
       <h4 class="card-title" id="velocityzPIDHeader">
         zVelocity PID Testing...
       </h4>
     </button>
-    <div id="collapsezVelocityPID" class="collapse" aria-labelledby="velocityzPIDHeader" data-parent="#velocityzPIDAccordion">
+    <div id="collapseVelocityPID" class="collapse" aria-labelledby="velocityPIDHeader" data-parent="#velocityPIDAccordion">
       <div class = "row">
        <div class = "col-6">
          <div class="card-body">
-           <h4 class="card-title">zSettings</h4>
-             
+           <h4 class="card-title"><Settings</h4>
+           <label name="vMotor" id="vMotor" value="Z"></label>
            <div class="row">
              <div class="col">
                <div class="form-group">
-                 <label for="zvStart">zStart</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvStart" id="zvStart" value="{{zvStart}}">
+                 <label for="vStart">zStart</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vStart" id="vStart" value="{{vStart}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="zvStop">zStop</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvStop" id="zvStop" value="{{zvStop}}">
+                 <label for="vStop">zStop</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vStop" id="vStop" value="{{vStop}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -33,15 +33,15 @@
            <div class="row">
              <div class="col">
                <div class="form-group">
-                 <label for="vSteps">zSteps</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvSteps" id="zvSteps" value="{{zvSteps}}">
+                 <label for="Steps">zSteps</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vSteps" id="vSteps" value="{{vSteps}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="zvVersion">zVersion</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zvVersion" id="zvVersion" value="{{zvVersion}}">
+                 <label for="Version">zVersion</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="vVersion" id="vVersion" value="{{vVersion}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -49,27 +49,27 @@
            <div class="row">
              <div class="col">
                <div class="form-group">
-                 <label for="KpVZ">KpVZ</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpVZ" id="KpVZ" value="{{KpVZ}}">
+                 <label for="KpV">KpVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpV" id="KpV" value="{{KpV}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="KiVZ">KiVZ</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiVZ" id="KiVZ" value="{{KiVZ}}">
+                 <label for="KiV">KiVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiV" id="KiV" value="{{KiV}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="KdVZ">KdVZ</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdVZ" id="KdVZ" value="{{KdVZ}}">
+                 <label for="KdV">KdVZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdV" id="KdV" value="{{KdV}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
            </div>
-           <button type="button" class="btn  btn-primary float-right m-1" onclick="zvExecute();">Execute</button>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="vExecute();">Execute</button>
          </div>
        </div>
        <div class = "col-6">
@@ -83,46 +83,47 @@
       </div>
     </div>
   </div>
-  <div class="card" id="positionzPIDAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapsezPositionPID" aria-expanded="false" aria-controls="collapsezPositionPID">
-      <h4 class="card-title" id="positionzPIDHeader">
+  <div class="card" id="positionPIDAccordion">
+    <button class="btn text-left" data-toggle="collapse" data-target="#collapsePositionPID" aria-expanded="false" aria-controls="collapsePositionPID">
+      <h4 class="card-title" id="positionPIDHeader">
         zPosition PID Testing...
       </h4>
     </button>
-    <div id="collapsezPositionPID" class="collapse" aria-labelledby="positionzPIDHeader" data-parent="#positionzPIDAccordion">
+    <div id="collapsePositionPID" class="collapse" aria-labelledby="positionPIDHeader" data-parent="#positionPIDAccordion">
       <div class = "row">
        <div class = "col-6">
          <div class="card-body">
-           <h4 class="card-title">zSettings</h4>
+           <h4 class="card-title"> Settings</h4>
+           <label name="pMotor" id="pMotor" value="Z"></label>
+          </div>
+           <div class="row">
+             <div class="col">
+               <div class="form-group">
+                 <label for="pStart">Start</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pStart" id="pStart" value="{{pStart}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
+             <div class="col">
+               <div class="form-group">
+                 <label for="pStop">Stop</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pStop" id="pStop" value="{{pStop}}">
+                 <small class="form-text text-muted"></small>
+               </div>
+             </div>
            </div>
            <div class="row">
              <div class="col">
                <div class="form-group">
-                 <label for="zpStart">zStart</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpStart" id="zpStart" value="{{zpStart}}">
+                 <label for="pSteps">Steps</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pSteps" id="pSteps" value="{{pSteps}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="zpStop">zStop</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpStop" id="zpStop" value="{{zpStop}}">
-                 <small class="form-text text-muted"></small>
-               </div>
-             </div>
-           </div>
-           <div class="row">
-             <div class="col">
-               <div class="form-group">
-                 <label for="zpSteps">zSteps</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpSteps" id="zpSteps" value="{{zpSteps}}">
-                 <small class="form-text text-muted"></small>
-               </div>
-             </div>
-             <div class="col">
-               <div class="form-group">
-                 <label for="zpVersion">zVersion</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpVersion" id="zpVersion" value="{{zpVersion}}">
+                 <label for="pVersion">Version</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pVersion" id="pVersion" value="{{pVersion}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -130,8 +131,8 @@
            <div class="row">
              <div class="col-6">
                <div class="form-group">
-                 <label for="zpTime">zTime</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="zpTime" id="zpTime" value="{{zpTime}}">
+                 <label for="pTime">Time</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="pTime" id="pTime" value="{{pTime}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
@@ -139,34 +140,33 @@
            <div class="row">
              <div class="col">
                <div class="form-group">
-                 <label for="KpPZ">KpPZ</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpPZ" id="KpPZ" value="{{KpPZ}}">
+                 <label for="KpP">KpPZ</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KpP" id="KpP" value="{{KpP}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="KiPZ">KiPZ</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiPZ" id="KiPZ" value="{{KiPZ}}">
+                 <label for="KiP">KiP</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KiP" id="KiP" value="{{KiP}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
              <div class="col">
                <div class="form-group">
-                 <label for="KdVZ">KdPZ</label>
-                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdPZ" id="KdPZ" value="{{KdPZ}}">
+                 <label for="KdV">KdP</label>
+                 <input class="form-control" type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$" name="KdP" id="KdP" value="{{KdP}}">
                  <small class="form-text text-muted"></small>
                </div>
              </div>
            </div>
-           <button type="button" class="btn  btn-primary float-right m-1" onclick="zpExecute();">Execute</button>
+           <button type="button" class="btn  btn-primary float-right m-1" onclick="pExecute();">Execute</button>
          </div>
-       </div>
        <div class = "col-6">
          <div class="card-body">
            <h4 class="card-title">Test Results</h4>
            <div class="col">
-             <div id="zpErrorPlot" style="width:100%; height:400px;"></div>
+             <div id="pErrorPlot" style="width:100%; height:400px;"></div>
           </div>
          </div>
        </div>

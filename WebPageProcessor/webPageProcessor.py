@@ -547,17 +547,17 @@ class WebPageProcessor:
             KpVZ = self.data.config.getValue("Advanced Settings", "KpVZ")
             KiVZ = self.data.config.getValue("Advanced Settings", "KiVZ")
             KdVZ = self.data.config.getValue("Advanced Settings", "KdVZ")
-            zvVersion = "1"
-            zpVersion = "1"
+            vVersion = "1"
+            pVersion = "1"
             page = render_template("zpidTuning.html",
-                                   KpPZ=KpPZ,
-                                   KiPZ=KiPZ,
-                                   KdPZ=KdPZ,
-                                   KpVZ=KpVZ,
-                                   KiVZ=KiVZ,
-                                   KdVZ=KdVZ,
-                                   zvVersion=zvVersion,
-                                   zpVersion=zpVersion)
+                                   KpP=KpPZ,
+                                   KiP=KiPZ,
+                                   KdP=KdPZ,
+                                   KpV=KpVZ,
+                                   KiV=KiVZ,
+                                   KdV=KdVZ,
+                                   vVersion=vVersion,
+                                   pVersion=pVersion)
             return page, "zPID Tuning", False, "large", "content", False
 
         elif pageID == "editBoard":
