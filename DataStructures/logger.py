@@ -41,19 +41,21 @@ class Logger(MakesmithInitFuncs):
         logpath = self.home + "/.WebControl"
         #print(self.home+"/.WebControl/"+"log.txt")
         logfilepath = logpath + "/log.txt"
-        logfilesize = os.stat(logfilepath).st_size
-        print("log file ",logfilepath," is ",logfilesize/1000000," MB")
-        if (logfilesize > 50000000):
-            print("log file over 50 MB, reduced to 10 MB")
-            lsfile = LtdSizeFile(logfilepath, 'wt', 10)
-            lsfile.close()
+        if (os.path.isfile(logfilepath)):
+            logfilesize = os.stat(logfilepath).st_size
+            print("log file ",logfilepath," is ",logfilesize/1000000," MB")
+            if (logfilesize > 50000000):
+                print("log file over 50 MB, reduced to 10 MB")
+                lsfile = LtdSizeFile(logfilepath, 'wt', 10)
+                lsfile.close()
         logfilepath = logpath + "/alog.txt"
-        logfilesize = os.stat(logfilepath).st_size
-        print("log file ",logfilepath," is ",logfilesize/1000000," MB")
-        if (logfilesize > 50000000):
-            print("log file over 50 MB, reduced to 10 MB")
-            lsfile = LtdSizeFile(logfilepath, 'wt', 10)
-            lsfile.close()
+        if(os.path.isfile(logfilepath)):
+            logfilesize = os.stat(logfilepath).st_size
+            print("log file ",logfilepath," is ",logfilesize/1000000," MB")
+            if (logfilesize > 50000000):
+                print("log file over 50 MB, reduced to 10 MB")
+                lsfile = LtdSizeFile(logfilepath, 'wt', 10)
+                lsfile.close()
         with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
             logFile.truncate()
 
