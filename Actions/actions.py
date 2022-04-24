@@ -277,9 +277,9 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Stock firmware update complete.")
             elif msg["data"]["command"] == "upgradeHoleyFirmware":
                 if not self.upgradeFirmware(2):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading precision firmware.")
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading Holey firmware.")
                 else:
-                    self.data.ui_queue1.put("Alert", "Alert", "Precision firmware update complete.")
+                    self.data.ui_queue1.put("Alert", "Alert", "Holey firmware update complete.")
             elif msg["data"]["command"] == "adjustChain":
                 if not self.adjustChain(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting chain.")
