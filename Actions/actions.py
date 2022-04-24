@@ -1435,11 +1435,23 @@ class Actions(MakesmithInitFuncs):
 
         '''
         try:
+            print("executing macro number ", number)
+            macro = ""
             if number == 1:
                 macro = self.data.config.getValue("Maslow Settings", "macro1")
-            else:
+            if number == 2:
                 macro = self.data.config.getValue("Maslow Settings", "macro2")
-            self.data.gcode_queue.put(macro)
+            if number == 3:
+                macro = self.data.config.getValue("Maslow Settings", "macro3")
+            if number == 4:
+                macro = self.data.config.getValue("Maslow Settings", "macro4")
+            if number == 5:
+                macro = self.data.config.getValue("Maslow Settings", "macro5")
+            if macro != "":
+                self.data.gcode_queue.put(macro)
+            else:
+                print("macro blank, nothing to do")
+                return False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))

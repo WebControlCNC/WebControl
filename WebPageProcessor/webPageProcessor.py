@@ -364,7 +364,7 @@ class WebPageProcessor:
                 firmwareSupportsZaxisLimit = True
             else:
                 firmwareSupportsZaxisLimit = False
-            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so: ", firmwareSupportsZaxisLimit)
+            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so sofware z-limit active = ", firmwareSupportsZaxisLimit)
             page = render_template("actions.html", 
                                    updateAvailable=updateAvailable, 
                                    updateRelease=updateRelease, 

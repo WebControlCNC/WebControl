@@ -373,10 +373,13 @@ def controls(template):
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
+    macro3Title = (app.data.config.getValue("Maslow Settings", "macro3_title"))[:6]
+    macro4Title = (app.data.config.getValue("Maslow Settings", "macro4_title"))[:6]
+    macro5Title = (app.data.config.getValue("Maslow Settings", "macro5_title"))[:6]
     if template == "/controls/mobile/":
-        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template("frontpage3d_mobilecontrols.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title,macro3_title=macro3Title,macro4_title=macro4Title,macro5_title=macro5Title)
     else:
-        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template("frontpage3d.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title, macro3_title=macro3Title,macro4_title=macro4Title,macro5_title=macro5Title)
 
 @app.route("/text")
 @mobile_template("/text/{mobile/}")
@@ -384,10 +387,13 @@ def text(template):
     app.data.logger.resetIdler()
     macro1Title = (app.data.config.getValue("Maslow Settings", "macro1_title"))[:6]
     macro2Title = (app.data.config.getValue("Maslow Settings", "macro2_title"))[:6]
+    macro3Title = (app.data.config.getValue("Maslow Settings", "macro3_title"))[:6]
+    macro4Title = (app.data.config.getValue("Maslow Settings", "macro4_title"))[:6]
+    macro5Title = (app.data.config.getValue("Maslow Settings", "macro5_title"))[:6]
     if template == "/text/mobile":
-        return render_template("frontpageText_mobile.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template("frontpageText_mobile.html", modalStyle="modal-lg", isControls=True, macro1_title=macro1Title,  macro2_title=macro2Title, macro3_title=macro3Title,macro4_title=macro4Title,macro5_title=macro5Title)
     else:
-        return render_template("frontpageText.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title)
+        return render_template("frontpageText.html", modalStyle="mw-100 w-75", macro1_title=macro1Title,  macro2_title=macro2Title, macro3_title=macro3Title,macro4_title=macro4Title,macro5_title=macro5Title)
 
 @app.route("/logs")
 @mobile_template("/logs/{mobile/}")
