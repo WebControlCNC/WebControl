@@ -33,13 +33,6 @@ app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
 app.data.config.computeSettings(None, None, None, True)
 app.data.config.parseFirmwareVersions()
-version = sys.version_info # this is for python newer than 3.5
-if version[:2] > (3, 5):
-    app.data.pythonVersion35 = False  # set data flag
-    print("Using routines for Python > 3.5")
-else:
-    app.data.pythonVersion35 = True # set data flag
-    print("Using routines for Python == 3.5")
 app.data.units = app.data.config.getValue("Computed Settings", "units")
 app.data.tolerance = app.data.config.getValue("Computed Settings", "tolerance")
 app.data.distToMove = app.data.config.getValue("Computed Settings", "distToMove")
@@ -50,15 +43,6 @@ app.data.gcodeShift = [
     float(app.data.config.getValue("Advanced Settings", "homeX")),
     float(app.data.config.getValue("Advanced Settings", "homeY")),
 ]
-version = sys.version_info
-
-if version[:2] > (3, 5):
-    app.data.pythonVersion35 = False
-    print("Using routines for Python > 3.5")
-else:
-    app.data.pythonVersion35 = True
-    print("Using routines for Python == 3.5")
-
 version = sys.version_info
 
 if version[:2] > (3, 5):
