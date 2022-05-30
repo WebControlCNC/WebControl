@@ -1,0 +1,19 @@
+To set up buttons:
+
+mkdir ~/.Control
+mkdir ~/.Control/systemd
+
+cp ~/WebControl/MaslowButton.service ~/.Control/systemd
+
+mkdir ~/.WebControl/systemd
+cp MaslowButton.py ~/.WebControl/systemd
+
+that is all for the button and LED service.
+
+To set up the bluetooth wii remote as a pendant input, copy these files also
+
+cp ~/WebControl/MaslowPendant.service ~/.Control/systemd
+
+cp MaslowPendant.py ~/.WebControl/systemd
+
+This service requires the installation of the cwiid library compiled for python 3

@@ -31,7 +31,6 @@ At this point, WebControl has become the **de-facto beginner's tool for Maslow**
 
 <img src="assets/Screenshot.png" alt="Screenshot" width="100%">
 
-
 ## Installation
 
 ### Pre-Built Raspberry Pi Image
@@ -94,10 +93,7 @@ https://www.raspberrypi.org/documentation/linux/usage/systemd.md
 
 ### Docker & Kubernetes
 
-* Pull the docker image from `inzania/web-control` using the `armv7` or `amd64` tag.
-* Mount a data/config volume at `/root/.WebControl`
-* Expose port `5000`
-* Run with `privileged: true` security context for USB access.
+[https://github.com/WebControlCNC/WebControl/releases](https://github.com/WebcontrolCNC/WebControl/releases)
 
 ### Remote Access
 
@@ -139,7 +135,7 @@ When running on the Pi, you'll also need some extra dependencies and will need t
 
 Then you can run the code with.
 
-    python main.py
+    python3 main.py
 
 The server will then be available at http://localhost:5000
 

@@ -22,8 +22,10 @@ nav_exclude: true
   
 [Controller](assets/Actions/Controller/index.md)  
 
-###### Boards
+###### Board / Workpiece Management
 
 [Board Management](Boards/boardManagement.md)
 
+###### Input and Indicators
 
+[GPIO(Raspberry Pi) and Pendants](Input-Indicators/index.md)

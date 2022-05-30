@@ -12,7 +12,7 @@ import time
 import datetime
 from pathlib import Path
 from app import app, socketio
-
+from DataStructures import ltdsizefile
 
 
 class Logger(MakesmithInitFuncs):
@@ -33,11 +33,29 @@ class Logger(MakesmithInitFuncs):
     def __init__(self):
         print("Initializing Logger")
         self.home = str(Path.home())
+        logpath = ""
         # clear the old log file
         if not os.path.isdir(self.home + "/.WebControl"):
             print("creating " + self.home + "/.WebControl directory")
             os.mkdir(self.home + "/.WebControl")
-        print(self.home+"/.WebControl/"+"log.txt")
+        logpath = self.home + "/.WebControl"
+        #print(self.home+"/.WebControl/"+"log.txt")
+        logfilepath = logpath + "/log.txt"
+        if (os.path.isfile(logfilepath)):
+            logfilesize = os.stat(logfilepath).st_size
+            print("log file ",logfilepath," is ",logfilesize/1000000," MB")
+            if (logfilesize > 50000000):
+                print("log file over 50 MB, reduced to 10 MB")
+                lsfile = LtdSizeFile(logfilepath, 'wt', 10)
+                lsfile.close()
+        logfilepath = logpath + "/alog.txt"
+        if(os.path.isfile(logfilepath)):
+            logfilesize = os.stat(logfilepath).st_size
+            print("log file ",logfilepath," is ",logfilesize/1000000," MB")
+            if (logfilesize > 50000000):
+                print("log file over 50 MB, reduced to 10 MB")
+                lsfile = LtdSizeFile(logfilepath, 'wt', 10)
+                lsfile.close()
         with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
             logFile.truncate()
 
@@ -226,3 +244,24 @@ class Logger(MakesmithInitFuncs):
         )
 
         # should popup message here
+
+''' Need to set up a rotating file buffer for the logging file'''        
+# import logging
+# from logging.handlers import RotatingFileHandler
+
+# log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
+
+# logFile = 'C:\\Temp\\log'
+
+# my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
+#                                  backupCount=2, encoding=None, delay=0)
+# my_handler.setFormatter(log_formatter)
+# my_handler.setLevel(logging.INFO)
+
+# app_log = logging.getLogger('root')
+# app_log.setLevel(logging.INFO)
+
+# app_log.addHandler(my_handler)
+
+# while True:
+#     app_log.info("data")

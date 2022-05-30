@@ -98,58 +98,105 @@ class WebPageProcessor:
                     enableCustom=enableCustom,
                 )
             return page, "WebControl Settings", False, "medium", "content", "footerSubmit"
-        elif pageID == "cameraSettings":
-            setValues = self.data.config.getJSONSettingSection("Camera Settings")
-            if self.data.controllerFirmwareVersion < 100:
-                enableCustom = False
-            else:
-                enableCustom = True
-            if isMobile:
-                page = render_template(
-                    "settings_mobile.html",
-                    title="Camera Settings",
-                    settings=setValues,
-                    pageID="cameraSettings",
-                    enableCustom=enableCustom,
-                )
-            else:
-                page = render_template(
-                    "settings.html",
-                    title="Camera Settings",
-                    settings=setValues,
-                    pageID="cameraSettings",
-                    enableCustom=enableCustom,
-                )
-            return page, "Camera Settings", False, "medium", "content", "footerSubmit"
+        # elif pageID == "cameraSettings":
+        #     setValues = self.data.config.getJSONSettingSection("Camera Settings")
+        #     if self.data.controllerFirmwareVersion < 100:
+        #         enableCustom = False
+        #     else:
+        #         enableCustom = True
+        #     if isMobile:
+        #         page = render_template(
+        #             "settings_mobile.html",
+        #             title="Camera Settings",
+        #             settings=setValues,
+        #             pageID="cameraSettings",
+        #             enableCustom=enableCustom,
+        #         )
+        #     else:
+        #         page = render_template(
+        #             "settings.html",
+        #             title="Camera Settings",
+        #             settings=setValues,
+        #             pageID="cameraSettings",
+        #             enableCustom=enableCustom,
+        #         )
+          #  return page, "Camera Settings", False, "medium", "content", "footerSubmit"
+
         elif pageID == "gpioSettings":
-            setValues = self.data.config.getJSONSettingSection("GPIO Settings")
-            if self.data.controllerFirmwareVersion < 100:
-                enableCustom = False
+            if self.data.pyInstallPlatform == "RPI":
+                setValues = self.data.config.getJSONSettingSection("GPIO Settings")
+                if self.data.controllerFirmwareVersion < 100:
+                    enableCustom = False
+                else:
+                    enableCustom = True
+                options = self.data.gpioActions.getActionList()
+                if isMobile:
+                    page = render_template(
+                        "gpio_mobile.html",
+                        title="GPIO Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="gpioSettings",
+                        enableCustom=enableCustom,
+                    )
+                else:
+                    page = render_template(
+                        "gpio.html",
+                        title="GPIO Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="gpioSettings",
+                        enableCustom=enableCustom,
+                    )
+                return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
             else:
-                enableCustom = True
-            options = self.data.gpioActions.getActionList()
-            if isMobile:
                 page = render_template(
-                    "gpio_mobile.html",
-                    title="GPIO Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="gpioSettings",
-                    enableCustom=enableCustom,
-                )
+                        "gpio-led-rpi-error.html",
+                        title="wrong platform",
+                        pageID="not pi"
+                    )
+                return page, "wrong platform",False, "medium","content",False
+        
+        elif pageID == "ledSettings":
+            print("platform is: ", self.data.pyInstallPlatform)
+            if self.data.pyInstallPlatform == "RPI":
+                setValues = self.data.config.getJSONSettingSection("LED Settings")
+                if self.data.controllerFirmwareVersion < 100:
+                    enableCustom = False
+                else:
+                    enableCustom = True
+                options = self.data.gpioActions.getLEDColors()
+                #print(options)  
+                if isMobile:
+                    page = render_template(
+                        "led_mobile.html",
+                        title="LED Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="ledSettings",
+                        enableCustom=enableCustom,
+                    )
+                else:
+                    page = render_template(
+                        "led.html",
+                        title="Tri-Color LED Settings",
+                        settings=setValues,
+                        options=options,
+                        pageID="ledSettings",
+                        enableCustom=enableCustom,
+                    )
+                return page, "Tri-Color LED Indicator Settings", False, "medium", "content", "footerSubmit"
             else:
                 page = render_template(
-                    "gpio.html",
-                    title="GPIO Settings",
-                    settings=setValues,
-                    options=options,
-                    pageID="gpioSettings",
-                    enableCustom=enableCustom,
-                )
-            return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
-        elif pageID == "openGCode":
+                        "gpio-led-rpi-error.html",
+                        title="wrong platform",
+                        pageID="not pi"
+                    )
+                return page, "wrong platform",False, "medium","content",False
+
+        elif pageID =="gcodeClean":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
-            print(lastSelectedFile)
+            print('--from WPP - lastSelectedFile: ',lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"
@@ -171,8 +218,52 @@ class WebPageProcessor:
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
                 lastSelectedDirectory="."
+            print("--directories",directories, type(directories))
+            print("--files",files, type(files))
+            print("--last file",lastSelectedFile, type(lastSelectedDirectory))
+            print("--homedir",homedir, type(homedir))
+        
             page = render_template(
-                "openGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile, lastSelectedDirectory=lastSelectedDirectory, isOpen=True
+                "gcodeclean.html", 
+                directories=directories, 
+                files=files, 
+                lastSelectedFile=lastSelectedFile, 
+                lastSelectedDirectory=lastSelectedDirectory, 
+                isOpen=False
+            )
+            return page, "gcodeClean", False, "medium", "content", "footerSubmit"
+
+        elif pageID == "openGCode":
+            lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
+            print(lastSelectedFile)
+            lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
+            home = self.data.config.getHome()
+            homedir = home+"/.WebControl/gcode"
+            directories = []
+            files = []
+            try:
+                for _root, _dirs, _files in os.walk(homedir):
+                    if _dirs:
+                        directories = _dirs
+                    for file in _files:
+                        if _root != homedir:
+                            _dir = _root.split("\\")[-1].split("/")[-1]
+                        else:
+                            _dir = "."
+                        files.append({"directory":_dir, "file":file})
+            except Exception as e:
+                print("exception in open gocode file in webpage processor: ", e)
+           # files = [f for f in listdir(homedir) if isfile(join(homedir, f))]
+            directories.insert(0, "./")
+            if lastSelectedDirectory is None:
+                lastSelectedDirectory="."
+            page = render_template(
+                "openGCode.html", 
+                directories=directories, 
+                files=files, 
+                lastSelectedFile=lastSelectedFile, 
+                lastSelectedDirectory=lastSelectedDirectory, 
+                isOpen=True
             )
             return page, "Open GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "saveGCode":
@@ -200,8 +291,12 @@ class WebPageProcessor:
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
             page = render_template(
-                "saveGCode.html", directories=directories, files=files, lastSelectedFile=lastSelectedFile,
-                lastSelectedDirectory=lastSelectedDirectory, isOpen=False
+                "saveGCode.html", 
+                directories=directories, 
+                files=files, 
+                lastSelectedFile=lastSelectedFile,
+                lastSelectedDirectory=lastSelectedDirectory, 
+                isOpen=False
             )
             return page, "Save GCode", False, "medium", "content", "footerSubmit"
 
@@ -218,11 +313,17 @@ class WebPageProcessor:
                     if _dirs:
                         directories = _dirs
             except Exception as e:
-                print(e)
+                print("Exception in upload gcode in webpageprocessor", e)
             directories.insert(0, "./")
             if lastSelectedDirectory is None:
                 lastSelectedDirectory = "."
-            page = render_template("uploadGCode.html", validExtensions=validExtensions, directories=directories, lastSelectedDirectory=lastSelectedDirectory)
+            print("----from webpageprocessor----")
+            print("----homedir: ", homedir)
+            page = render_template("uploadGCode.html", 
+                validExtensions=validExtensions, 
+                directories=directories, 
+                lastSelectedDirectory=lastSelectedDirectory
+            )
             return page, "Upload GCode", False, "medium", "content", "footerSubmit"
         elif pageID == "importGCini":
             url = "importFile"
@@ -245,14 +346,14 @@ class WebPageProcessor:
                 enableHoley = False
             else:
                 enableHoley = True
-            if ((self.data.platform == "RPI")or(self.data.platform == "PYINSTALLER")):
-                docker = True
-                enableRPIshutdown = True
-                #print("RPI shutdown is TRUE")
-            else:
+            if (self.data.platform == "PYINSTALLER"):
                 docker = False
+            else:
+                docker = True
+            if self.data.pyInstallPlatform == "RPI":
+                enableRPIshutdown = True
+            else:
                 enableRPIshutdown = False
-                #print ("RPI shutdown is FALSE")
             if self.data.pyInstallUpdateAvailable:
                 updateAvailable = True
                 updateRelease = self.data.pyInstallUpdateVersion
@@ -263,7 +364,7 @@ class WebPageProcessor:
                 firmwareSupportsZaxisLimit = True
             else:
                 firmwareSupportsZaxisLimit = False
-            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so: ", firmwareSupportsZaxisLimit)
+            print("action render-> firmware version is :", self.data.controllerFirmwareVersion, " so sofware z-limit active = ", firmwareSupportsZaxisLimit)
             page = render_template("actions.html", 
                                    updateAvailable=updateAvailable, 
                                    updateRelease=updateRelease, 
@@ -284,17 +385,16 @@ class WebPageProcessor:
             touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
             if isMobile:
                 page = render_template("zaxis_mobile.html", 
-                                       distToMoveZ=distToMoveZ, 
-                                       unitsZ=unitsZ, 
-                                       touchPlate=touchPlate
-                                       )
+                distToMoveZ=distToMoveZ, 
+                unitsZ=unitsZ, 
+                touchPlate=touchPlate)
             else:
                 page = render_template("zaxis.html", 
-                                       distToMoveZ=distToMoveZ, 
-                                       unitsZ=unitsZ, 
-                                       touchPlate=touchPlate
-                                       )
+                distToMoveZ=distToMoveZ, 
+                unitsZ=unitsZ, 
+                touchPlate=touchPlate)
             return page, "Z-Axis", False, "medium", "content", False
+
         elif pageID == "setZaxis":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             minZlimit = 0 #self.data.config.getValue("Advanced Settings", "minZlimit")
@@ -356,26 +456,6 @@ class WebPageProcessor:
                 chainSagCorrection=chainSagCorrection,
             )
             return page, "Triangular Calibration", True, "medium", "content", False
-        elif pageID == "opticalCalibration":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
-            opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
-            opticalCenterY = self.data.config.getValue("Optical Calibration Settings", "opticalCenterY")
-            scaleX = self.data.config.getValue("Optical Calibration Settings", "scaleX")
-            scaleY = self.data.config.getValue("Optical Calibration Settings", "scaleY")
-            gaussianBlurValue = self.data.config.getValue("Optical Calibration Settings", "gaussianBlurValue")
-            cannyLowValue = self.data.config.getValue("Optical Calibration Settings", "cannyLowValue")
-            cannyHighValue = self.data.config.getValue("Optical Calibration Settings", "cannyHighValue")
-            autoScanDirection = self.data.config.getValue("Optical Calibration Settings", "autoScanDirection")
-            markerX = self.data.config.getValue("Optical Calibration Settings", "markerX")
-            markerY = self.data.config.getValue("Optical Calibration Settings", "markerY")
-            tlX = self.data.config.getValue("Optical Calibration Settings", "tlX")
-            tlY = self.data.config.getValue("Optical Calibration Settings", "tlY")
-            brX = self.data.config.getValue("Optical Calibration Settings", "brX")
-            brY = self.data.config.getValue("Optical Calibration Settings", "brY")
-            calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
-            positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
-            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
-            return page, "Optical Calibration", True, "large", "content", False
         elif pageID == "holeyCalibration":
             socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
@@ -458,6 +538,27 @@ class WebPageProcessor:
                                    pVersion=pVersion,
                                    fourMotor=fourMotor)
             return page, "PID Tuning", False, "large", "content", False
+        elif pageID == "zpidTuning":
+            fourMotor = False
+            KpPZ = self.data.config.getValue("Advanced Settings", "KpPosZ")
+            KiPZ = self.data.config.getValue("Advanced Settings", "KiPosZ")
+            KdPZ = self.data.config.getValue("Advanced Settings", "KdPosZ")
+            KpVZ = self.data.config.getValue("Advanced Settings", "KpVZ")
+            KiVZ = self.data.config.getValue("Advanced Settings", "KiVZ")
+            KdVZ = self.data.config.getValue("Advanced Settings", "KdVZ")
+            vVersion = "1"
+            pVersion = "1"
+            page = render_template("zpidTuning.html",
+                                   KpP=KpPZ,
+                                   KiP=KiPZ,
+                                   KdP=KdPZ,
+                                   KpV=KpVZ,
+                                   KiV=KiVZ,
+                                   KdV=KdVZ,
+                                   vVersion=vVersion,
+                                   pVersion=pVersion)
+            return page, "zPID Tuning", False, "large", "content", False
+
         elif pageID == "editBoard":
             board = self.data.boardManager.getCurrentBoard()
             scale = 1
@@ -737,3 +838,27 @@ class WebPageProcessor:
             return link
 
         return link
+
+
+    '''
+    elif pageID == "opticalCalibration":
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
+            opticalCenterY = self.data.config.getValue("Optical Calibration Settings", "opticalCenterY")
+            scaleX = self.data.config.getValue("Optical Calibration Settings", "scaleX")
+            scaleY = self.data.config.getValue("Optical Calibration Settings", "scaleY")
+            gaussianBlurValue = self.data.config.getValue("Optical Calibration Settings", "gaussianBlurValue")
+            cannyLowValue = self.data.config.getValue("Optical Calibration Settings", "cannyLowValue")
+            cannyHighValue = self.data.config.getValue("Optical Calibration Settings", "cannyHighValue")
+            autoScanDirection = self.data.config.getValue("Optical Calibration Settings", "autoScanDirection")
+            markerX = self.data.config.getValue("Optical Calibration Settings", "markerX")
+            markerY = self.data.config.getValue("Optical Calibration Settings", "markerY")
+            tlX = self.data.config.getValue("Optical Calibration Settings", "tlX")
+            tlY = self.data.config.getValue("Optical Calibration Settings", "tlY")
+            brX = self.data.config.getValue("Optical Calibration Settings", "brX")
+            brY = self.data.config.getValue("Optical Calibration Settings", "brY")
+            calibrationExtents = self.data.config.getValue("Optical Calibration Settings", "calibrationExtents")
+            positionTolerance = self.data.config.getValue("Optical Calibration Settings", "positionTolerance")
+            page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
+            return page, "Optical Calibration", True, "large", "content", False
+    '''

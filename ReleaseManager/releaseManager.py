@@ -58,7 +58,7 @@ class ReleaseManager(MakesmithInitFuncs):
                     if eligible and tag_float > latestVersionGithub:
                         latestVersionGithub = tag_float
                         self.latestRelease = release
-
+                        # print(tag_name)
                 print("Latest pyrelease: " + str(latestVersionGithub))
                 if self.latestRelease is not None and latestVersionGithub > self.data.pyInstallCurrentVersion:
                     print("Latest release tag: " + self.latestRelease.tag_name)
@@ -71,8 +71,10 @@ class ReleaseManager(MakesmithInitFuncs):
                             self.data.pyInstallUpdateAvailable = True
                             self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                             self.data.pyInstallUpdateVersion = self.latestRelease
+                return True
             except Exception as e:
                 print("Error checking pyrelease: " + str(e))
+                return False
 
     def isExperimental(self, tag):
         '''
@@ -87,7 +89,7 @@ class ReleaseManager(MakesmithInitFuncs):
             return False
         else:
             return True
-
+              
     def processAbsolutePath(self, path):
         index = path.find("main.py")
         self.data.pyInstallInstalledPath = path[0:index - 1]

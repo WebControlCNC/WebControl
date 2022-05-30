@@ -52,16 +52,16 @@ class Actions(MakesmithInitFuncs):
             elif msg["data"]["command"] == "resumeRun":
                 if not self.resumeRun():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with resuming run")
-            elif msg["data"]["command"] == "toggleCamera":
-                if not self.toggleCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "statusRequest":
-                if msg["data"]["arg"] == "cameraStatus":
-                    if not self.cameraStatus():
-                        self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
-            elif msg["data"]["command"] == "queryCamera":
-                if not self.queryCamera():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with querying camera.")
+            # elif msg["data"]["command"] == "toggleCamera":
+            #     if not self.toggleCamera():
+            #         self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            # elif msg["data"]["command"] == "statusRequest":
+            #     if msg["data"]["arg"] == "cameraStatus":
+            #         if not self.cameraStatus():
+            #             self.data.ui_queue1.put("Alert", "Alert", "Error with toggling camera.")
+            # elif msg["data"]["command"] == "queryCamera":
+            #     if not self.queryCamera():
+            #         self.data.ui_queue1.put("Alert", "Alert", "Error with querying camera.")
             elif msg["data"]["command"] == "shutdown":
                 if not self.shutdown():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with shutting down.")
@@ -125,6 +125,15 @@ class Actions(MakesmithInitFuncs):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
             elif msg["data"]["command"] == "macro2":
                 if not self.macro(2):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro3":
+                if not self.macro(3):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro4":
+                if not self.macro(4):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
+            elif msg["data"]["command"] == "macro5":
+                if not self.macro(5):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with performing macro")
             elif msg["data"]["command"] == "clearLogs":
                 if not self.clearLogs():
@@ -200,40 +209,54 @@ class Actions(MakesmithInitFuncs):
                 if not self.updatePorts():
                     self.data.ui_queue1.put("Alert", "Alert", "Error with updating list of ports")
             elif msg["data"]["command"] == "optical_onStart":
-                if not self.data.opticalCalibration.on_Start():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
+                pass
+                #if not self.data.opticalCalibration.on_Start():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
             elif msg["data"]["command"] == "optical_Calibrate":
-                if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
+                pass
+                #if not self.data.opticalCalibration.on_Calibrate(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with starting optical calibration")
             elif msg["data"]["command"] == "saveOpticalCalibrationConfiguration":
-                if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving optical calibration configuration")
+                pass
+                #if not self.data.opticalCalibration.saveOpticalCalibrationConfiguration(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving optical calibration configuration")
             elif msg["data"]["command"] == "stopOpticalCalibration":
-                if not self.data.opticalCalibration.stopOpticalCalibration():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping optical calibration.")
+                pass
+                #if not self.data.opticalCalibration.stopOpticalCalibration():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with stopping optical calibration.")
             elif msg["data"]["command"] == "testOpticalCalibration":
-                if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with test image.")
+                pass
+                #if not self.data.opticalCalibration.testImage(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with test image.")
             elif msg["data"]["command"] == "findCenterOpticalCalibration":
-                if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with find Center.")
+                pass
+                #if not self.data.opticalCalibration.findCenter(msg["data"]["arg"]):
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with find Center.")
             elif msg["data"]["command"] == "saveAndSendOpticalCalibration":
-                if not self.data.opticalCalibration.saveAndSend():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving and sending calibration matrix.")
+                pass
+                #if not self.data.opticalCalibration.saveAndSend():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving and sending calibration matrix.")
             elif msg["data"]["command"] == "reloadCalibration":
+                pass
+                '''
                 errorX, errorY, curveX, curveY = self.data.opticalCalibration.reloadCalibration()
                 if errorX is None or errorY is None or curveX is None or curveY is None:
                     self.data.ui_queue1.put("Alert", "Alert", "Error with (re)loading calibration.")
                 else:
                     data = {"errorX": errorX, "errorY": errorY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
+                '''
             elif msg["data"]["command"] == "saveCalibrationToCSV":
-                if not self.data.opticalCalibration.saveCalibrationToCSV():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with saving calibration to CSV.")
+                pass
+                #if not self.data.opticalCalibration.saveCalibrationToCSV():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with saving calibration to CSV.")
             elif msg["data"]["command"] == "clearCalibration":
-                if not self.data.opticalCalibration.clearCalibration():
-                    self.data.ui_queue1.put("Alert", "Alert", "Error with clearing calibration.")
+                pass
+                #if not self.data.opticalCalibration.clearCalibration():
+                #    self.data.ui_queue1.put("Alert", "Alert", "Error with clearing calibration.")
             elif msg["data"]["command"] == "curveFitOpticalCalibration":
+                pass
+                '''
                 curveX, curveY = self.data.opticalCalibration.surfaceFit()
                 #curveX, curveY = self.data.opticalCalibration.polySurfaceFit()
                 if curveX is None or curveY is None:
@@ -241,6 +264,7 @@ class Actions(MakesmithInitFuncs):
                 else:
                     data = {"curveX": curveX, "curveY": curveY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationCurve", data)
+                '''
             elif msg["data"]["command"] == "adjustCenter":
                 if not self.adjustCenter(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting center.")
@@ -252,15 +276,19 @@ class Actions(MakesmithInitFuncs):
                 if self.upgradeFirmware(1):
                     self.data.ui_queue1.put("Alert", "Alert", "Stock firmware update complete.")
             elif msg["data"]["command"] == "upgradeHoleyFirmware":
-                if self.upgradeFirmware(2):
-                    self.data.ui_queue1.put("Alert", "Alert", "Custom firmware update complete.")
+                if not self.upgradeFirmware(2):
+                    self.data.ui_queue1.put("Alert", "Alert", "Error with upgrading Holey firmware.")
+                else:
+                    self.data.ui_queue1.put("Alert", "Alert", "Holey firmware update complete.")
             elif msg["data"]["command"] == "adjustChain":
                 if not self.adjustChain(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with adjusting chain.")
             elif msg["data"]["command"] == "executeVelocityPIDTest":
+                print('js payload for velocity:',msg["data"])
                 if not self.velocityPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
             elif msg["data"]["command"] == "executePositionPIDTest":
+                print('js payload for position:',msg["data"])
                 if not self.positionPIDTest(msg["data"]["arg"]):
                     self.data.ui_queue1.put("Alert", "Alert", "Error with executing velocity PID test.")
             elif msg["data"]["command"] == "boardProcessGCode":
@@ -365,6 +393,8 @@ class Actions(MakesmithInitFuncs):
             # send update to UI client with new home position
             position = {"xval": homeX, "yval": homeY}
             self.data.ui_queue1.put("Action", "homePositionMessage", position)
+            if ((homeX == self.data.xval) and (homeY == self.data.yval)):
+                self.data.LED_Status = "At Home"
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -376,6 +406,8 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Homing"
+            self.data.sledMoving = True
             self.data.gcode_queue.put("G90  ")
             safeHeightMM = float(
                 self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
@@ -395,9 +427,11 @@ class Actions(MakesmithInitFuncs):
                 + " "
             )
             self.data.gcode_queue.put("G00 Z0 ")
+            self.data.sledMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def resetChainLengths(self):
@@ -413,6 +447,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G20 ")
             else:
                 self.data.gcode_queue.put("G21 ")
+            self.LED_Status = "Idle"
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -424,6 +459,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Idle"
             self.data.gcode_queue.put("G10 Z0 ")
             return True
         except Exception as e:
@@ -437,9 +473,12 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Idle"
+            print("z!")
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
+            self.data.Zmoving = False    
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -503,6 +542,7 @@ class Actions(MakesmithInitFuncs):
                 # set current Z target to the current z height in case gcode doesn't include a z move before an xy move.
                 # if it doesn't and the user pauses during an xy move, then the target Z is set to 0.  This sets it to
                 # what it currently is when the user started the gcode send.
+                self.LED_Status = "Run"
                 self.data.currentZTarget = self.data.zval
                 # if the gcode index is not 0, then make sure the machine is in the proper state before starting to send
                 # the gcode.
@@ -515,7 +555,8 @@ class Actions(MakesmithInitFuncs):
                     self.data.uploadFlag = 1
                 else:
                     self.data.uploadFlag = 1
-                self.data.gpioActions.causeAction("PlayLED", "on")
+                if (self.data.GPIOButtonService == False):
+                    self.data.gpioActions.causeAction("PlayLED", "on")
                 return True
             else:
                 return False
@@ -531,8 +572,10 @@ class Actions(MakesmithInitFuncs):
         Stops the uploading of gcode.
         :return:
         '''
+        print("stopping run")
         try:
             self.data.console_queue.put("stopping run")
+            self.LED_Status = "Idle"
             # this is necessary because of the way PID data is being processed.  Otherwise could potentially get stuck
             # in PID test
             self.data.inPIDPositionTest = False
@@ -548,10 +591,12 @@ class Actions(MakesmithInitFuncs):
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
-            self.data.gpioActions.causeAction("StopLED", "on")
+            if (self.data.GPIOButtonService == False):
+                self.data.gpioActions.causeAction("StopLED", "on")
             # reset pause
             self.data.ui_queue1.put("Action", "setAsPause", "")
-            self.data.gpioActions.causeAction("PauseLED", "off")
+            if (self.data.GPIOButtonService == False):
+                self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -564,6 +609,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Sled Moving"
             chainLength = self.data.config.getValue(
                 "Advanced Settings", "chainExtendLength"
             )
@@ -590,6 +636,7 @@ class Actions(MakesmithInitFuncs):
         '''
         try:
             self.data.gcode_queue.put("B04 ")
+            self.LED_Status = "Calibrating"
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -633,8 +680,10 @@ class Actions(MakesmithInitFuncs):
         Pause the current uploading of gcode.  Notify UI client to change the Pause button to say Resume
         :return:
         '''
+        print("pause run selected")
         try:
             if self.data.uploadFlag == 1:
+                self.LED_Status = "Paused"
                 self.data.uploadFlag = 2
                 self.data.console_queue.put("Run Paused")
                 self.data.ui_queue1.put("Action", "setAsResume", "")
@@ -646,7 +695,8 @@ class Actions(MakesmithInitFuncs):
                 self.data.pausedUnits = self.data.units
                 self.data.pausedPositioningMode = self.data.positioningMode
                 #print("Saving paused positioning mode: " + str(self.data.pausedPositioningMode))
-                self.data.gpioActions.causeAction("PauseLED", "on")
+                if (self.data.GPIOButtonService == False):
+                    self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -713,7 +763,13 @@ class Actions(MakesmithInitFuncs):
             # Only needed if user initiated pause; but doesn't actually cause harm to controller.
             self.data.quick_queue.put("~")
             self.data.ui_queue1.put("Action", "setAsPause", "")
-            self.data.gpioActions.causeAction("PauseLED", "off")
+            if (self.data.Zval < 0):
+                self.LED_Status = "Cutting"
+            else:
+                self.LED_Status = "Run"
+             
+            if (self.data.GPIOButtonService == False):
+                self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -725,6 +781,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Sled Moving"
             self.data.gcode_queue.put("G90  ")
             safeHeightMM = float(
                 self.data.config.getValue("Maslow Settings", "zAxisSafeHeight")
@@ -826,11 +883,13 @@ class Actions(MakesmithInitFuncs):
         # moved equals what was specified.  For example, if enabled and command is issued to move one foot to top right,
         # then the x and y coordinates will be calculated as the 0.707 feet so that a total of 1 foot is moved.  If
         # disabled, then the sled will move 1 foot left and 1 foot up, for a total distance of 1.414 feet.
+        self.LED_Status = "Sled Moving"
         if self.data.config.getValue("WebControl Settings","diagonalMove") == 1:
             diagMove = round(math.sqrt(distToMove*distToMove/2.0), 4)
         else:
             diagMove = distToMove
         try:
+            self.data.sledMoving = True
             self.data.gcode_queue.put("G91 ")
             if direction == "upLeft":
                 self.data.gcode_queue.put("G00 X"+ str(-1.0 * diagMove)+ " Y"+ str(diagMove)+ " ")
@@ -853,9 +912,11 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 ")
             # keep track of the distToMove value
             self.data.config.setValue("Computed Settings", "distToMove", distToMove)
+            self.data.sledMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def moveZ(self, direction, distToMoveZ):
@@ -867,6 +928,7 @@ class Actions(MakesmithInitFuncs):
         '''
 
         try:
+            self.LED_Status = "Z Moving"
             #keep track of distToMoveZ value
             self.data.config.setValue("Computed Settings", "distToMoveZ", distToMoveZ)
             # It's possible the front page is set for one units and when you go to z-axis control, you might switch
@@ -874,6 +936,7 @@ class Actions(MakesmithInitFuncs):
             # the correct units when the z-axis move is sent
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             previousUnits = self.data.config.getValue("Computed Settings", "units")
+            self.data.zMoving = True
             if unitsZ == "MM":
                 self.data.gcode_queue.put("G21 ")
             else:
@@ -894,11 +957,60 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcode_queue.put("G21 ")
                 else:
                     self.data.gcode_queue.put("G20 ")
+            self.data.zMoving = False
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            self.data.zMoving = False
+            return False
+            
+    def setMinZ(self):
+        '''
+        Arduino command to set minimum z axis travel position to prevent z axis motor damage
+        B18
+        '''
+        try:
+            self.data.gcode_queue.put("B18")
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+        
+    def setMaxZ(self):
+        '''
+        Arduino command to set maximum z axis travel position to prevent z axis motor damage
+        B17
+        '''
+        try:
+            self.data.gcode_queue.put("B17")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def clearZ(self):
+        '''
+        Arduino command to clear z axis minimum and maximum
+        B19
+        '''
+        try:
+            self.data.gcode_queue.put("B19")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+        
+    def getZlimits(self):
+        '''
+        Arduino command to echo z axis minimum and maximum values
+        B20
+        '''
+        try:
+            self.data.gcode_queue.put("B20")
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
 
     def touchZ(self):
         '''
@@ -908,6 +1020,7 @@ class Actions(MakesmithInitFuncs):
         try:
             plungeDepth = self.data.config.getValue("Advanced Settings", "maxTouchProbePlungeDistance")
             revertToInches = False
+            self.data.zMoving = True
             if self.data.units == "INCHES":
                 revertToInches = True
                 self.data.gcode_queue.put("G21")
@@ -917,9 +1030,11 @@ class Actions(MakesmithInitFuncs):
             # don't think this line is needed
             # todo: remove if not needed.
             self.data.measureRequest = self.defineZ0()
+            self.data.zMoving = False
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.zMoving = False
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
@@ -1045,6 +1160,8 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            
+            self.LED_Status = "Calibrating"
             if  time > 0:
                 self.data.gcode_queue.put("B11 "+sprocket+" S100 T"+str(time))
             else:
@@ -1064,6 +1181,7 @@ class Actions(MakesmithInitFuncs):
         '''
         try:
             # calculate the amoount of chain to be fed out/in based upon sprocket circumference and degree
+            self.LED_Status = "Calibrating"
             degValue = round(
                 float(self.data.config.getValue("Advanced Settings", "gearTeeth"))
                 * float(self.data.config.getValue("Advanced Settings", "chainPitch"))
@@ -1097,6 +1215,7 @@ class Actions(MakesmithInitFuncs):
         Sets the call back for the automatic sprocket alignment and requests the measurement.
         '''
         try:
+            self.LED_Status = "Calibrating"
             self.data.measureRequest = self.getLeftChainLength
             # request a measurement
             self.data.gcode_queue.put("B10 L")
@@ -1134,6 +1253,7 @@ class Actions(MakesmithInitFuncs):
         vertical.
         :return:
         '''
+        self.LED_Status = "Calibrating"
         chainPitch = float(self.data.config.getValue("Advanced Settings", "chainPitch"))
         gearTeeth = float(self.data.config.getValue("Advanced Settings", "gearTeeth"))
         distPerRotation = chainPitch * gearTeeth
@@ -1154,6 +1274,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Calibrating"
             self.data.gcode_queue.put("B06 L0 R0 ")
             return True
         except Exception as e:
@@ -1168,6 +1289,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Calibrating"
             self.data.gcode_queue.put("B08 ")
             return True
         except Exception as e:
@@ -1212,6 +1334,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Calibrating"
             self.data.triangularCalibration.acceptTriangularKinematicsResults()
             return True
         except Exception as e:
@@ -1227,6 +1350,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Calibrating"
             motorYoffsetEst, rotationRadiusEst, chainSagCorrectionEst, cut34YoffsetEst = self.data.triangularCalibration.calculate(
                 result
             )
@@ -1251,6 +1375,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Calibrating"
             motorYoffsetEst, distanceBetweenMotors, leftChainTolerance, rightChainTolerance, calibrationError = self.data.holeyCalibration.Calibrate(
                 result
             )
@@ -1310,29 +1435,41 @@ class Actions(MakesmithInitFuncs):
 
         '''
         try:
+            print("executing macro number ", number)
+            macro = ""
             if number == 1:
                 macro = self.data.config.getValue("Maslow Settings", "macro1")
-            else:
+            if number == 2:
                 macro = self.data.config.getValue("Maslow Settings", "macro2")
-            self.data.gcode_queue.put(macro)
+            if number == 3:
+                macro = self.data.config.getValue("Maslow Settings", "macro3")
+            if number == 4:
+                macro = self.data.config.getValue("Maslow Settings", "macro4")
+            if number == 5:
+                macro = self.data.config.getValue("Maslow Settings", "macro5")
+            if macro == "":
+                print("macro blank, nothing to do")
+                return False
+            else:
+                self.data.gcode_queue.put(macro)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def testImage(self):
-        '''
-        Calls function to send the test image from optical calibration
-        Todo: move to processAction
-        :return:
-        '''
+        #
+        #Calls function to send the test image from optical calibration
+        #Todo: move to processAction
+        #:return:
+        #
         try:
             self.data.opticalCalibration.testImage()
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
+    '''
     def adjustCenter(self, dist):
         '''
         Used in optical calibration to allow user to raise/lower the center point and then move there.
@@ -1427,13 +1564,14 @@ class Actions(MakesmithInitFuncs):
         try:
             # if this is a pyinstaller release, find out where the root is... it could be a temp directory if single
             # file
+            self.LED_Status = "Calibrating"
             if self.data.platform == "PYINSTALLER":
                 home = os.path.join(self.data.platformHome)
             else:
                 home = "."
             if version == 0:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Custom Firmware Update in Progress, Please Wait.")
-                path = home+"/firmware/beta/*.hex"
+                path = home+"/firmware/custom/*.hex"
             if version == 1:
                 self.data.ui_queue1.put("SpinnerMessage", "", "Stock Firmware Update in Progress, Please Wait.")
                 path = home+"/firmware/maslowcnc/*.hex"
@@ -1577,10 +1715,12 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         # make sure not out of range.
+        self.LED_Status = "Sled Moving"
         bedHeight = float(self.data.config.getValue("Maslow Settings","bedHeight"))/25.4
         bedWidth = float(self.data.config.getValue("Maslow Settings", "bedWidth"))/25.4
         try:
             if posX<=bedWidth/2 and posX>=bedWidth/-2 and posY<=bedHeight/2 and posY>=bedHeight/-2:
+                self.data.sledMoving = True
                 if self.data.units == "INCHES":
                     posX=round(posX,4)
                     posY=round(posY,4)
@@ -1595,10 +1735,12 @@ class Actions(MakesmithInitFuncs):
                     + str(posY)
                     + " "
                 )
+                self.data.sledMoving = False
                 return True
             return False
         except Exception as e:
             self.data.console_queue.put(str(e))
+            self.data.sledMoving = False
             return False
 
     def processGCode(self):
@@ -1811,6 +1953,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
+            self.LED_Status = "Calibrating"
             for x in range(6):
                 self.data.ui_queue1.put("Action", "updateTimer", chain+":"+str(5-x))
                 self.data.console_queue.put("Action:updateTimer_" + chain + ":" + str(5 - x))
@@ -1830,6 +1973,7 @@ class Actions(MakesmithInitFuncs):
 
     def issueStopCommand(self, distance):
         try:
+            self.LED_Status = "Idle"
             self.data.quick_queue.put("!")
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
@@ -1838,55 +1982,55 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
-    def toggleCamera(self):
-        '''
-        Turns camera on or off.  If its suspended, it's read (though I can't explain why at this moment).
-        :return:
-        '''
-        try:
-            status = self.data.camera.status()
-            if status == "stopped":
-                self.data.camera.start()
-            if status == "suspended":
-                self.data.camera.read()
-            if status == "running":
-                self.data.camera.stop()
-            return True
-        except Exception as e:
-            self.data.console_queue.put(str(e))
-            return False
+    # def toggleCamera(self):
+    #     '''
+    #     Turns camera on or off.  If its suspended, it's read (though I can't explain why at this moment).
+    #     :return:
+    #     '''
+    #     try:
+    #         status = self.data.camera.status()
+    #         if status == "stopped":
+    #             self.data.camera.start()
+    #         if status == "suspended":
+    #             self.data.camera.read()
+    #         if status == "running":
+    #             self.data.camera.stop()
+    #         return True
+    #     except Exception as e:
+    #         self.data.console_queue.put(str(e))
+    #         return False
 
-    def cameraStatus(self):
-        '''
-        Sends the status of the camera to the UI client.  Not sure why its not called requestCameraStatus
-        Todo: update name to request cameraStatus
-        :return:
-        '''
-        try:
-            status = self.data.camera.status()
-            if status == "stopped":
-                self.data.ui_queue1.put("Action", "updateCamera", "off")
-            if status == "suspended":
-                self.data.ui_queue1.put("Action", "updateCamera", "off")
-            if status == "running":
-                self.data.ui_queue1.put("Action", "updateCamera", "on")
-            return True
-        except Exception as e:
-            self.data.console_queue.put(str(e))
-            return False
+    # def cameraStatus(self):
+    #     '''
+    #     Sends the status of the camera to the UI client.  Not sure why its not called requestCameraStatus
+    #     Todo: update name to request cameraStatus
+    #     :return:
+    #     '''
+    #     try:
+    #         status = self.data.camera.status()
+    #         if status == "stopped":
+    #             self.data.ui_queue1.put("Action", "updateCamera", "off")
+    #         if status == "suspended":
+    #             self.data.ui_queue1.put("Action", "updateCamera", "off")
+    #         if status == "running":
+    #             self.data.ui_queue1.put("Action", "updateCamera", "on")
+    #         return True
+    #     except Exception as e:
+    #         self.data.console_queue.put(str(e))
+    #         return False
 
-    def queryCamera(self):
-        '''
-        Query the camera's settings.  Probably could be called directly by processAction
-        Todo: move to processAction
-        :return:
-        '''
-        try:
-            self.data.camera.getSettings()
-            return True
-        except Exception as e:
-            self.data.console_queue.put(str(e))
-            return False
+    # def queryCamera(self):
+    #     '''
+    #     Query the camera's settings.  Probably could be called directly by processAction
+    #     Todo: move to processAction
+    #     :return:
+    #     '''
+    #     try:
+    #         self.data.camera.getSettings()
+    #         return True
+    #     except Exception as e:
+    #         self.data.console_queue.put(str(e))
+    #         return False
 
     def velocityPIDTest(self, parameters):
         '''
@@ -1896,20 +2040,25 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
-            print(parameters)
-            print(parameters["KpV"])
-            self.data.config.setValue("Advanced Settings", "KpV", parameters["KpV"])
-            self.data.config.setValue("Advanced Settings", "KiV", parameters["KiV"])
-            self.data.config.setValue("Advanced Settings", "KdV", parameters["KdV"])
-            gcodeString = "B13 "+parameters["vMotor"]+"1 S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
-            print(gcodeString)
+            print("parameters for velocity PID test: ", parameters)
+            #print(parameters["KpVZ"])
+            if (parameters["vMotor"]=='Z'):
+                self.data.config.setValue("Advanced Settings", "KpVZ", parameters["KpV"])
+                self.data.config.setValue("Advanced Settings", "KiVZ", parameters["KiV"])
+                self.data.config.setValue("Advanced Settings", "KdVZ", parameters["KdV"])
+                gcodeString = "B13 Z1 S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
+            else:
+                self.data.config.setValue("Advanced Settings", "KpV", parameters["KpV"])
+                self.data.config.setValue("Advanced Settings", "KiV", parameters["KiV"])
+                self.data.config.setValue("Advanced Settings", "KdV", parameters["KdV"])
+                gcodeString = "B13 "+parameters["vMotor"]+"1 S"+parameters["vStart"]+" F"+parameters["vStop"]+" I"+parameters["vSteps"]+" V"+parameters["vVersion"]
+            print("gcodeString:",gcodeString)
             self.data.PIDVelocityTestVersion = parameters["vVersion"]
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
-
     def positionPIDTest(self, parameters):
         '''
         Send commands to start the position pid test
@@ -1919,20 +2068,25 @@ class Actions(MakesmithInitFuncs):
         '''
 
         try:
-            print(parameters)
-            print(parameters["KpP"])
-            self.data.config.setValue("Advanced Settings", "KpPos", parameters["KpP"])
-            self.data.config.setValue("Advanced Settings", "KiPos", parameters["KiP"])
-            self.data.config.setValue("Advanced Settings", "KdPos", parameters["KdP"])
-
-            gcodeString = "B14 "+parameters["pMotor"]+"1 S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
-            print(gcodeString)
+            print("parameters:",parameters) 
+            if (parameters["pMotor"]=='Z'):
+                self.data.config.setValue("Advanced Settings", "KpPosZ", parameters["KpP"])
+                self.data.config.setValue("Advanced Settings", "KiPosZ", parameters["KiP"])
+                self.data.config.setValue("Advanced Settings", "KdPosZ", parameters["KdP"])
+                gcodeString = "B14 Z1 S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
+            else:
+                self.data.config.setValue("Advanced Settings", "KpPos", parameters["KpP"])
+                self.data.config.setValue("Advanced Settings", "KiPos", parameters["KiP"])
+                self.data.config.setValue("Advanced Settings", "KdPos", parameters["KdP"])
+                gcodeString = "B14 "+parameters["pMotor"]+"1 S"+parameters["pStart"]+" F"+parameters["pStop"]+" I"+parameters["pSteps"]+" T"+parameters["pTime"]+" V"+parameters["pVersion"]
+            print("gcodestring:",gcodeString)
             self.data.PIDPositionTestVersion = parameters["pVersion"]
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
             self.data.console_queue.put(str(e))
             return False
+#TODO remove all z specific nomenclature.  use same routines for left, right or z.  just pass motor label.
 
     def velocityPIDTestRun(self, command, msg):
         '''
@@ -1988,6 +2142,15 @@ class Actions(MakesmithInitFuncs):
             self.data.console_queue.put(str(e))
             return False
 
+    def cleanGCode(self, gcode, switches):
+        try:
+            self.data.gcodeFile.gcodecleanFile(gcode)
+            self.data.ui_queue1.put("Action", "gcodeclean", switches)
+            return True
+        except Exception as e:
+            self.data.console_queue.put(str(e))
+            return False
+
     def updateGCode(self, gcode):
         try:
             #print(gcode)
@@ -2039,7 +2202,7 @@ class Actions(MakesmithInitFuncs):
         if True: #self.data.platform=="PYINSTALLER":
             print("check for pyrelease")
             g = Github()
-            repo = g.get_repo("madgrizzle/WebControl")
+            repo = g.get_repo("WebControlCNC/WebControl")
             releases = repo.get_releases()
             latest = 0
             latestRelease = None

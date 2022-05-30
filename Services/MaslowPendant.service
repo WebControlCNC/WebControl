@@ -1,0 +1,14 @@
+[Unit]
+Description=Maslow Wiimote Input
+After=network-online.target
+ 
+[Service]
+ExecStart=/usr/bin/python3 /.WebControl/systemd/MaslowPendant.py
+WorkingDirectory=/.Webcontrol/systemd
+StandardOutput=inherit
+StandardError=inherit
+Restart=never
+User=pi
+ 
+[Install]
+WantedBy=multi-user.target

@@ -71,9 +71,9 @@ class BoardManager(MakesmithInitFuncs):
         :param directory: directory to save file
         :return:
         '''
-        if fileName is "":  # Blank the g-code if we're loading "nothing"
+        if fileName == "":  # Blank the g-code if we're loading "nothing"
             return False
-        if directory is "":
+        if directory == "":
             return False
         try:
             fileToWrite = directory + "/" + fileName
@@ -104,7 +104,7 @@ class BoardManager(MakesmithInitFuncs):
         :param directory: directory to load file from
         :return:
         '''
-        if fileName is "":  # Blank the g-code if we're loading "nothing"
+        if fileName == "":  # Blank the g-code if we're loading "nothing"
             return False
         try:
             file = open(fileName, "r")

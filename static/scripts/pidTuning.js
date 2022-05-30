@@ -4,10 +4,6 @@ var _yError = [];
 var _xValues = [];
 var colorwayLayout = ['#313131','#3D019D','#3810DC','#2D47F9','#2503FF','#2ADEF6','#60FDFA','#AEFDFF','#BBBBBB','#FFFDA9','#FAFD5B','#F7DA29','#FF8E25','#F8432D','#D90D39','#D7023D','#313131']
 
-
-
-
-
 function updateVErrorCurve(data) {
     console.log(data)
     xCurve = data.curveX;
@@ -74,13 +70,9 @@ function updatePIDData(msg){
       }
 }
 
-
-
 $(document).ready(function () {
 
 });
-
-
 
 function vExecute(){
   var vMotor = $('#vMotor label.active input').val();
@@ -103,9 +95,8 @@ function vExecute(){
   console.log(parameters);
   action('executeVelocityPIDTest',parameters);
 }
-
 function pExecute(){
-  var pMotor = $('#pMotor label.active input').val();
+  var vMotor = $('#pMotor label.active input').val();
   var pStart= $("#pStart").val();
   var pStop= $("#pStop").val();
   var pSteps= $("#pSteps").val();

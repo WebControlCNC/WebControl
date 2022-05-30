@@ -1,7 +1,18 @@
 {% block content %}
 <div class="container-fluid">
   <input id="pageID" type="hidden" value="{{pageID}}">
-  <form id="settingsForm">
+    <div class = "row">
+      <div class = "col-3">
+      <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('buttonSubProcessStop').val())">Stop Service</button>
+    </div>
+    <div class = "col-3">
+      <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('buttonSubProcessStart').val())">Start Service</button>
+    </div>
+    <div class = "col-3">
+      <button type="button" class="btn btn-lg  btn-block btn-secondary" onclick="action('buttonSubProcessRestart').val())">Restart Service</button>
+    </div>
+   
+    <form id="settingsForm">
     <div class="row">
       <div class="col-8">
           {% for setting in settings %}

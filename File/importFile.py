@@ -6,7 +6,7 @@ import json
 class ImportFile(MakesmithInitFuncs):
     def importGCini(self, filename):
         self.data.console_queue.put(filename)
-        if filename is "":  # Blank file?
+        if filename == "":  # Blank file?
             return False
         try:
             filterfile = open(filename, "r")
@@ -24,8 +24,8 @@ class ImportFile(MakesmithInitFuncs):
                     section = ""
                 elif line == "[Background Settings]":
                     section = ""
-                elif line == "[Optical Calibration Settings]":
-                    section = "Optical Calibration Settings"
+                #elif line == "[Optical Calibration Settings]":
+                #    section = "Optical Calibration Settings"
                 elif line == "":
                     pass
                 else:
@@ -45,7 +45,7 @@ class ImportFile(MakesmithInitFuncs):
 
     def importWebControlJSON(self, filename):
         self.data.console_queue.put(filename)
-        if filename is "":  # Blank file?
+        if filename == "":  # Blank file?
             return False
         try:
             with open(filename, "r") as infile:

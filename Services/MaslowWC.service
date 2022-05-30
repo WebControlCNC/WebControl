@@ -1,0 +1,15 @@
+[Unit]
+Description=Maslow WebControl
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3  ~/WebControl/webcontrol
+WorkingDirectory=~/WebControl/
+StandardOutput=inherit
+StandardError=inherit
+Restart=never
+user=pi
+
+[Install]
+WantedBy=sysinit.target

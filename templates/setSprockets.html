@@ -1,5 +1,14 @@
 
 {% block content %}
+<div>
+  <h3>Set Sprockets</h3>
+  <div>1. Use the left and right motor buttons to set a tooth on the respective motor sprocket to exactly vertical, then place teh second link of the chain on the vertical spoke.</div>
+  <div>2. Click 'Define Zero' to establish teh start point.</div>
+  <div>3. Extend each chain so that the sled can be attached near the middle of the workpiece.</div>
+  <br>
+  <div>NOTE: At this point, it is helpful to mark each chain with paint, sharpie, or nailpolish at the top sprocket tooth.  If the chains need to be reset due to position loss from a chain skip or power outage for example, you will be able to skip the chain extend step, by positioning one sprocket tooth vertical (12:00 position)</div>
+  <div>4. Attach sled, move to home, then calibrate your Maslow CNC using the calibration tool (Triangular is default)</div>
+</div>
 <div class="container-fluid">
   <h3>Left Motor</h3>
   <div class="row">
@@ -107,123 +116,13 @@
       </button>
     </div>
   </div>
-  <!--Bottom Left -->
-  {% if fourMotor == true %}
-  <h3>Bottom Left Motor</h3>
-  <div class="row">
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',360.0)">
-        <i data-feather="refresh-cw"></i>
-        360
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',10.0)">
-        <i data-feather="rotate-cw"></i>
-        10
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',1)">
-        <i data-feather="rotate-cw"></i>
-        1
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',0.1)">
-        <i data-feather="rotate-cw"></i>
-        0.1
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-360.0)">
-        <i data-feather="refresh-ccw"></i>
-        360
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-10.0)">
-        <i data-feather="rotate-ccw"></i>
-        10
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-1)">
-        <i data-feather="rotate-ccw"></i>
-        1
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','M',-0.1)">
-        <i data-feather="rotate-ccw"></i>
-        0.1
-      </button>
-    </div>
-  </div>
-  <h3>Bottom Right Motor</h3>
-  <div class="row">
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-360.0)">
-        <i data-feather="refresh-cw"></i>
-        360
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-10.0)">
-        <i data-feather="rotate-cw"></i>
-        10
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-1)">
-        <i data-feather="rotate-cw"></i>
-        1
-      </button>
-    </div>
-    <div class="col-3 mb-1">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',-0.1)">
-        <i data-feather="rotate-cw"></i>
-        0.1
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-3 mb-3">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',360.0)">
-        <i data-feather="refresh-ccw"></i>
-        360
-      </button>
-    </div>
-    <div class="col-3 mb-3">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',10.0)">
-        <i data-feather="rotate-ccw"></i>
-        10
-      </button>
-    </div>
-    <div class="col-3 mb-3">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',1)">
-        <i data-feather="rotate-ccw"></i>
-        1
-      </button>
-    </div>
-    <div class="col-3 mb-3">
-      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprockets','S',0.1)">
-        <i data-feather="rotate-ccw"></i>
-        0.1
-      </button>
-    </div>
-  </div>
-  {% endif %}
-  <!-- -->
-
-
-
 
   <div class="row mb-3">
+    <!--div class="col mb-1">
+      <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="disableChainToDefault();action('setSprocketAutomatic')">Automatic</button>
+    </div-->
     <div class="col mb-1">
-      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="setSprocketsZero()">Define Zero</button>
+      <button type="button" class="btn btn-lg btn-primary btn-block" onclick="setSprocketsZero()">Define Zero (sprocket teeth for both motors are at 12:00)</button>
     </div>
   </div>
   <div class="row mb-3">
@@ -239,7 +138,20 @@
       <button type="button" class="btn btn-lg btn-block btn-danger" id="stopButton" onclick="action('stopRun')">Stop</button>
     </div>
   </div>
-</div>
+
+  <div class="row">
+    <br>
+    <div><h3>Reset Chains:</h3> </div>
+    <div>For use after initial extension with marked chains to reset position if unexpected power loss or skipped chain occurs.</div>
+    <div>1. Set left and right sprockets to 12:00 position.</div>
+    <div>2. Place marked chain link of each chain on the respective top tooth.</div>
+    <div>3. Press Reset Chains Button to set sled in known location</div>
+    <br>
+  </div>
+  <div class="row mb-3">
+        <button type="button" class="btn btn-lg btn-secondary btn-block" onclick="action('setSprocketsDefault')">Manually Set / Reset Chains At {{chainExtendLength}} mm</button>
+      </div>
+  </div>
 
 {% endblock %}
 

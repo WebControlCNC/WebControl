@@ -316,6 +316,16 @@ function gcodePositionUpdate(x,y,z){
 }
 
 $(document).ready(function(){
+    //settingRequest("Computed Settings","units");
+    //settingRequest("Computed Settings","distToMove");
+    //settingRequest("Computed Settings","homePosition");
+    //action("statusRequest","cameraStatus");
+    //checkForGCodeUpdate();
+    var controllerMessage = document.getElementById('controllerMessage');
+    controllerMessage.scrollTop = controllerMessage.scrollHeight;
+    //var $controllerMessage = $("#controllerMessage");
+    //$controllerMessage.scrollTop($controllerMessage[0].scrollHeight);
+
     $( "#workarea" ).contextmenu(function() {
         if (!view3D)
         {

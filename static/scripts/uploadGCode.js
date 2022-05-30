@@ -8,7 +8,7 @@ function updateDirectories(data){
 
 $(document).ready(function () {
     $('#newDirectoryButton').on('click',function(){ //bind click handler
-        event.preventDefault();
+        //event.preventDefault();
         directory=$("#newDirectory").val();
         if (directory!="")
             action("createDirectory",directory);

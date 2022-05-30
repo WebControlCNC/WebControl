@@ -121,19 +121,41 @@
         },
         {
             "default": "None",
-            "desc": "How should the spindle start and stop automatically based on gcode? Leave off for none, or set external servo control, or external relay control, active high or low.\ndefault setting: None",
+            "desc": "How should the spindle start and stop automatically based on gcode? Leave off for none, or set external servo control, or external relay control, active high or low.  Speed control uses pin 45 in 51.29 firmware\ndefault setting: None",
             "firmwareKey": 17,
             "key": "spindleAutomate",
             "options": [
                 "None",
                 "Servo",
                 "Relay_High",
-                "Relay_Low"
+                "Relay_Low",
+                "SPEED_CTRL_RELAY_HIGH",
+                "SPEED_CTRL_RELAY_LOW"
             ],
             "section": "Advanced Settings",
             "title": "Spindle Automation",
             "type": "options",
             "value": "None"
+        },
+        {
+            "default": "None",
+            "desc": "Spindle start speed absolute minimum\ndefault setting: 4000",
+            "firmwareKey": 60,
+            "key": "spindleMin",
+            "section": "Advanced Settings",
+            "title": "Spindle Speed Minimum",
+            "type": "string",
+            "value": "4000"
+        },
+        {
+            "default": "None",
+            "desc": "Spindle maximum speed\ndefault setting: 24000",
+            "firmwareKey": 61,
+            "key": "spindleMax",
+            "section": "Advanced Settings",
+            "title": "Spindle Speed Maximum",
+            "type": "string",
+            "value": "24000"
         },
         {
             "default": 800,
@@ -667,17 +689,51 @@
         },
         {
             "default": 3.17,
-            "desc": "The number of mm moved per rotation of the z-axis\ndefault setting: 3.17",
+            "desc": "Vertical movement (mm) from one revolution of z-motor: affected by leadscrew and belt pulleys.\ndefault setting: 3.17",
             "firmwareKey": 19,
             "key": "zDistPerRot",
             "section": "Maslow Settings",
             "title": "Z-Axis Pitch",
             "type": "string",
-            "value": "3.17"
+            "value": "-24"
+        },
+        {
+            "default": 0,
+            "desc": "GPIO buttons run in separate process / system service",
+            "key": "MaslowButtonService",
+            "section": "Maslow Settings",
+            "title": "Raspberry Pi GPIO Button Service Active",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
+            "desc": "System status can be selected based on color and action in the GPIO settings page",
+            "key": "TriColorLED",
+            "title": "Status Indicator is Tricolor LED",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
+            "desc": "Wii controller connected via Bluetooth?\ndefault setting: 0",
+            "key": "wiiPendantPresent",
+            "section": "Maslow Settings",
+            "title": "Wii Pendant Installed",
+            "type": "bool",
+            "value": 0
+        },
+        {
+            "default": 0,
+            "desc": "Attached command line text display on Maslow",
+            "key": "clidisplay",
+            "title": "RPI Text display",
+            "type": "bool",
+            "value": 0
         },
         {
             "default": "",
-            "desc": "The path to the open file\\ndefault setting: your home directory",
+            "desc": "The path to the open file. \ndefault setting: your home directory",
             "key": "openFile",
             "section": "Maslow Settings",
             "title": "Open File",
@@ -695,12 +751,12 @@
         },
         {
             "default": "Macro 1",
-            "desc": "User defined title for the Macro 1 button\ndefault setting: Macro 1",
+            "desc": "User defined title for the Macro 1 button\ndefault setting: Macro1",
             "key": "macro1_title",
             "section": "Maslow Settings",
             "title": "Macro 1 Title",
             "type": "string",
-            "value": "Macro 1"
+            "value": "Macro1"
         },
         {
             "default": "",
@@ -713,12 +769,66 @@
         },
         {
             "default": "Macro 2",
-            "desc": "User defined title for the Macro 2 button\ndefault setting: Macro 2",
+            "desc": "User defined title for the Macro 2 button\ndefault setting: Macro2",
             "key": "macro2_title",
             "section": "Maslow Settings",
             "title": "Macro 2 Title",
             "type": "string",
-            "value": "Macro 2"
+            "value": "Macro2"
+        },
+        {
+            "default": "",
+            "desc": "User defined gcode bound to the Macro 3 button\ndefault setting: ",
+            "key": "macro3",
+            "section": "Maslow Settings",
+            "title": "Macro 3",
+            "type": "string",
+            "value": ""
+        },
+        {
+            "default": "Macro 3",
+            "desc": "User defined title for the Macro 3 button\ndefault setting: Macro3",
+            "key": "macro3_title",
+            "section": "Maslow Settings",
+            "title": "Macro 3 Title",
+            "type": "string",
+            "value": "Macro3"
+        },
+        {
+            "default": "",
+            "desc": "User defined gcode bound to the Macro 4 button\ndefault setting: ",
+            "key": "macro4",
+            "section": "Maslow Settings",
+            "title": "Macro 4",
+            "type": "string",
+            "value": ""
+        },
+        {
+            "default": "Macro 4",
+            "desc": "User defined title for the Macro 4 button\ndefault setting: Macro4",
+            "key": "macro4_title",
+            "section": "Maslow Settings",
+            "title": "Macro 4 Title",
+            "type": "string",
+            "value": "Macro4"
+        },
+        {
+            "default": "",
+            "desc": "User defined gcode bound to the Macro 5 button\ndefault setting: ",
+            "key": "macro5",
+            "section": "Maslow Settings",
+            "title": "Macro 5",
+            "type": "string",
+            "value": ""
+        },
+        {
+            "default": "Macro 5",
+            "desc": "User defined title for the Macro 5 button\ndefault setting: Macro5",
+            "key": "macro5_title",
+            "section": "Maslow Settings",
+            "title": "Macro 5 Title",
+            "type": "string",
+            "value": "Macro5"
         },
         {
             "default": 5,
@@ -740,7 +850,7 @@
         },
         {
             "default": "",
-            "desc": "The path to the open board file\\ndefault setting: your home directory",
+            "desc": "The path to the open board file. \n\r default setting: your home directory",
             "key": "openBoardFile",
             "section": "Maslow Settings",
             "title": "Open Board File",
@@ -1033,6 +1143,107 @@
             "title": "Camera Thread Sleep Interval",
             "type": "float",
             "value": 0.001
+        }
+    ],
+    "LED Settings": [
+        {
+            "default": "",
+            "desc": "LED Idle Behavior",
+            "key": "idle",
+            "section": "LED Status List",
+            "title": "Idle ",
+            "type": "options",
+            "value": ""  
+       },
+       {
+            "default": "",
+            "desc": "LED At Home Behavior",
+            "key": "athome",
+            "section": "LED Status List",
+            "title": "At Home",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Homing Behavior",
+            "key": "homing",
+            "section": "LED Status List",
+            "title": "Homing",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED run Gcode Behavior",
+            "key": "run",
+            "section": "LED Status List",
+            "title": "Run",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Sled Moving Behavior",
+            "key": "sledmoving",
+            "section": "LED Status List",
+            "title": "Sled Moving",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Calibrating Behavior",
+            "key": "calibrating",
+            "section": "LED Status List",
+            "title": "Calibrating",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Paused Behavior",
+            "key": "paused",
+            "section": "LED Status List",
+            "title": "Paused",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Cutting Behavior",
+            "key": "cutting",
+            "section": "LED Status List",
+            "title": "Cutting",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED shutdown Behavior",
+            "key": "off",
+            "section": "LED Status List",
+            "title": "Shutdown",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Z Moving Behavior",
+            "key": "zmoving",
+            "section": "LED Status List",
+            "title": "Z Moving",
+            "type": "options",
+            "value": "" 
+        },
+        {
+            "default": "",
+            "desc": "LED Error Behavior",
+            "key": "error",
+            "section": "LED Status List",
+            "title": "Error",
+            "type": "options",
+            "value": ""  
         }
     ],
     "GPIO Settings": [

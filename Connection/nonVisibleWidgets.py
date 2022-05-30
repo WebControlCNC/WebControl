@@ -10,12 +10,11 @@ from Actions.actions import Actions
 from Actions.triangularCalibration import TriangularCalibration
 from Actions.holeyCalibration import HoleyCalibration
 from Actions.HoleySimulationKinematics import Kinematics as HoleyKinematics
-from Actions.opticalCalibration import OpticalCalibration
 from Actions.gpioActions import GPIOActions
 from Background.messageProcessor import MessageProcessor
 from Background.WebMCPProcessor import WebMCPProcessor
 from Background.WebMCPProcessor import ConsoleProcessor
-from Background.webcamVideoStream import WebcamVideoStream
+# from Background.webcamVideoStream import WebcamVideoStream
 from Boards.boardManager import BoardManager
 from ReleaseManager.releaseManager import ReleaseManager
 from HelpManager.helpManager import HelpManager
@@ -34,13 +33,12 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     importFile = ImportFile()
     actions = Actions()
     triangularCalibration = TriangularCalibration()
-    opticalCalibration = OpticalCalibration()
     holeyCalibration = HoleyCalibration()
     holeyKinematics = HoleyKinematics()
     messageProcessor = MessageProcessor()
     mcpProcessor = WebMCPProcessor()
     consoleProcessor = ConsoleProcessor()
-    camera = WebcamVideoStream()
+    #camera = WebcamVideoStream()
     gpioActions = GPIOActions()
     boardManager = BoardManager()
     releaseManager = ReleaseManager()
@@ -68,11 +66,10 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.triangularCalibration = self.triangularCalibration
         data.holeyCalibration = self.holeyCalibration
         data.holeyKinematics = self.holeyKinematics
-        data.opticalCalibration = self.opticalCalibration
         data.messageProcessor = self.messageProcessor
         data.mcpProcessor = self.mcpProcessor
         data.consoleProcessor = self.consoleProcessor
-        data.camera = self.camera
+        #data.camera = self.camera
         data.gpioActions = self.gpioActions
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
@@ -94,10 +91,14 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
             print("##")
+            print(data.pyInstallPlatform)
             print(_platform)
+            if  os.path.exists('/etc/rpi-issue'):
+                data.pyInstallPlatform = 'RPI'
+                print("--RPI--")
+            else:
+                print("not raspberrypi")
             print("##")
-            if _platform.find("raspbian") != -1:
-                data.pyInstallPlatform = 'rpi'
         print("----")
         print(data.pyInstallPlatform)
 
@@ -121,12 +122,11 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.triangularCalibration.setUpData(data)
         self.holeyCalibration.setUpData(data)
         self.holeyKinematics.setUpData(data)
-        self.opticalCalibration.setUpData(data)
         self.messageProcessor.setUpData(data)
         self.mcpProcessor.setUpData(data)
         self.consoleProcessor.setUpData(data)
-        self.camera.setUpData(data)
-        self.camera.getSettings()
+        #self.camera.setUpData(data)
+        #self.camera.getSettings()
         self.gpioActions.setUpData(data)
         self.gpioActions.setup()
         self.boardManager.setUpData(data)
@@ -138,4 +138,5 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         #set up kinematics with current settings
         self.holeyKinematics.initializeSettings()
         #self.camera.start()
-
+        
+        

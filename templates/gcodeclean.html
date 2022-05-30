@@ -1,0 +1,70 @@
+{% block content %}
+<div class="container-fluid">
+  <form class="form" id="gcodeForm" method="post" enctype=multipart/form-data>
+    <div>gcodeClean is a path optimizing tool you can download <a href="https://github.com/md8n/GCodeClean/releases">here</a><br><br></div>
+    <div class="row mb-3">
+        <label for="directorySelect">Select Directory</label>
+        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+          {% for directory in directories %}
+            <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
+              {{directory if directory != '.' else './'}}
+            </option> 
+          {% endfor %}
+        </select>
+    </div>
+    <div class="row">
+        <label for="fileSelect">Select File</label>
+        <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
+          {% for file in files %}
+            <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
+              {{file["file"]}}
+            </option>
+          {% endfor %}
+        </select>
+    </div>
+    </p>
+    <div class="row mb-3">
+        <br> &nbsp &nbsp
+        <input type="checkbox" id="annotate" name="annotate" value="True">
+        <label for="annotate"> &nbsp &nbsp annotate gcode (default = NO)</label>
+    </div>
+    <div class="row mb-3">
+        <label for="minimize">&nbsp Select Minimize Level &nbsp &nbsp</label>
+        <input type="radio" id="soft" name="minimize" value="soft" checked>
+        <label for="soft">&nbsp &nbsp Soft  &nbsp &nbsp</label>
+        <input type="radio" id="medium" name="minimize" value="medium">
+        <label for="medium">&nbsp &nbsp Medium  &nbsp &nbsp</label>
+        <input type="radio" id="hard" name="minimize" value="hard">
+        <label for="hard">&nbsp &nbsp Hard  &nbsp &nbsp</label>
+    </div>
+    <div class="row mb-3">
+        <input type="text" id="tolerance" name="tolerance" value="0.00005">
+        <label for="tolerance"> &nbsp &nbsp clipping tolerance (default = 0.00005)</label>
+    </div>
+    <div class="row mb-3">
+      <input type="text" id="arctolerance" name="arctolerance" value="0.00005">
+      <label for="arctolerance">&nbsp &nbsp arc tolerance for point-to-point length of arcs (default = 0.00005)</label>
+    </div>
+    <div class="row mb-3">
+      <input type="text" id="zClamp" name="zClamp" value="0">
+      <label for="zClamp"> &nbsp &nbsp zclamp restricts positive z values to this maximum (default = 0)</label>
+    </div>
+    <div class="row mb-3">
+      <label>&nbsp &nbsp Millimeters: Min(mm):0.5 (*default). Max(mm) 10. 
+      <br> &nbsp &nbsp Inches: Min(in) 0.02 (*default). Max(in) 
+      <br> &nbsp &nbsp gcodeclean autoselects units depending on the gcode file G20 or G21.</label>
+    <div id="gcCircle">
+      <div class="loader">
+        <div class="loader">
+          <div class="loader">
+            <div class="loader">
+            </div>
+          </div>
+        </div>
+      
+  </form>
+</div>
+{% endblock %}
+{% block javascript %}
+<script src="{{ url_for('static',filename='scripts/gcodeclean.js') }}" crossorigin="anonymous"></script>
+{% endblock %}
