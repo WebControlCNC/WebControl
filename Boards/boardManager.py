@@ -1,9 +1,12 @@
+import base64
+import math
+
+# import numpy as np
+# from scipy.spatial import ConvexHull
+
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 from Boards.boards import Board
-import math
-import base64
-import numpy as np
-from scipy.spatial import ConvexHull, convex_hull_plot_2d
+
 
 class BoardManager(MakesmithInitFuncs):
     '''

@@ -1,5 +1,6 @@
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import math
+
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 class TriangularCalibration(MakesmithInitFuncs):
@@ -7,12 +8,12 @@ class TriangularCalibration(MakesmithInitFuncs):
     motorYoffsetEst = 0
     chainSagCorrectionEst = 0
     rotationRadiusEst = 0
-    
+
     def cutTriangularCalibrationPattern(self):
-        '''
+        """
         Sends command to controller to cut the calibration pattern.
         :return:
-        '''
+        """
 
         workspaceHeight = float(
             self.data.config.getValue("Maslow Settings", "bedHeight")
@@ -78,7 +79,6 @@ class TriangularCalibration(MakesmithInitFuncs):
             self.data.gcode_queue.put("G20 ")  # Switch back to inches
 
         return True
-
 
     def calculate(self, result):
         """
@@ -576,11 +576,15 @@ class TriangularCalibration(MakesmithInitFuncs):
                     chainSagCorrectionCorrectionScale / 2
                 )
                 cutYoffsetCorrectionScale = float(cutYoffsetCorrectionScale / 2)
-                self.data.console_queue.put("Estimated values out of range, trying again with smaller steps")
+                self.data.console_queue.put(
+                    "Estimated values out of range, trying again with smaller steps"
+                )
 
         if n == numberOfIterations:
-            self.data.ui_queue1.put("Alert", "Alert",
-                "Message: The machine was not able to be calibrated. Please ensure the work area dimensions are correct and try again."
+            self.data.ui_queue1.put(
+                "Alert",
+                "Alert",
+                "Message: The machine was not able to be calibrated. Please ensure the work area dimensions are correct and try again.",
             )
             self.data.console_queue.put("Machine parameters could not be determined")
 
@@ -619,17 +623,22 @@ class TriangularCalibration(MakesmithInitFuncs):
         )
 
     def acceptTriangularCalibrationResults(self):
-        '''
+        """
         Saves the values that were calculated.
         :return:
-        '''
-        self.data.config.setValue('Maslow Settings', 'motorOffsetY', str(self.motorYoffsetEst))
-        self.data.config.setValue('Advanced Settings', 'rotationRadius', str(self.rotationRadiusEst))
-        self.data.config.setValue('Advanced Settings', 'chainSagCorrection', str(self.chainSagCorrectionEst))
-        
+        """
+        self.data.config.setValue(
+            "Maslow Settings", "motorOffsetY", str(self.motorYoffsetEst)
+        )
+        self.data.config.setValue(
+            "Advanced Settings", "rotationRadius", str(self.rotationRadiusEst)
+        )
+        self.data.config.setValue(
+            "Advanced Settings", "chainSagCorrection", str(self.chainSagCorrectionEst)
+        )
+
         self.data.gcode_queue.put("G21 ")
         self.data.gcode_queue.put("G90 ")
         self.data.gcode_queue.put("G40 ")
         self.data.gcode_queue.put("G0 X0 Y0 ")
         return True
-

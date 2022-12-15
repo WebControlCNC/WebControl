@@ -1,0 +1,22 @@
+-r ./Actions/requirements.in
+-r ./Background/requirements.in
+-r ./Boards/requirements.in
+-r ./Connection/requirements.in
+-r ./GCodeOptimizer/requirements.in
+-r ./HelpManager/requirements.in
+-r ./ReleaseManager/requirements.in
+-r ./WebPageProcessor/requirements.in
+
+# Flask-Misaka
+Flask-Mobility
+Flask-SocketIO
+gevent
+# greenlet # used by gevent
+# itsdangerous
+# Jinja2
+# MarkupSafe
+# python-engineio
+# python-socketio
+
+# six
+Werkzeug

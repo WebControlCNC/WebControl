@@ -1,22 +1,18 @@
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-#from scipy.spatial import distance as dist
-
-# from imutils.video                      import VideoStream
-from Background.webcamVideoStream       import WebcamVideoStream
-# from imutils.video			import WebcamVideoStream
-import numpy as np
-#import imutils
-import cv2
-import itertools
-import time
-import re
-import sys
-import math
 import base64
-import json
-import time
-import os
 import datetime
+import itertools
+import math
+import os
+import time
+
+# from scipy.spatial import distance as dist
+
+import numpy as np
+
+# import imutils
+import cv2
+
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 class OpticalCalibration(MakesmithInitFuncs):

@@ -1,33 +1,44 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from gpiozero.pins.mock import MockFactory
-from gpiozero import Device, Button, LED
+from gpiozero import Button, LED
 
 
 class GPIOActions(MakesmithInitFuncs):
-
     def __init__(self):
         pass
 
-    '''
+    """
     get gpio settings
-    '''
+    """
     Buttons = []
     LEDs = []
-    actionList = ["Spindle On", "Spindle Off", "Shutdown", "Stop", "Pause", "Play", "Set Home", "Go Home", "Return to Center", "PlayLED", "PauseLED", "StopLED"]
+    actionList = [
+        "Spindle On",
+        "Spindle Off",
+        "Shutdown",
+        "Stop",
+        "Pause",
+        "Play",
+        "Set Home",
+        "Go Home",
+        "Return to Center",
+        "PlayLED",
+        "PauseLED",
+        "StopLED",
+    ]
 
     def getActionList(self):
         return self.actionList
 
     def setup(self):
-        #self.setGPIOAction(2,"Stop")
+        # self.setGPIOAction(2,"Stop")
         setValues = self.data.config.getJSONSettingSection("GPIO Settings")
-        #print(setValues)
+        # print(setValues)
         for setting in setValues:
             if setting["value"] != "":
                 pinNumber = int(setting["key"][4:])
                 self.setGPIOAction(pinNumber, setting["value"])
 
-    def setGPIOAction(self,pin, action):
+    def setGPIOAction(self, pin, action):
         # first remove pin assignments if already made
         foundButton = None
         for button in self.Buttons:
@@ -52,12 +63,12 @@ class GPIOActions(MakesmithInitFuncs):
             button = Button(pin)
             button.when_pressed = pinAction
             self.Buttons.append(button)
-            print("set Button with action: "+action)
+            print(f"set Button with action: {action}")
         if type == "led":
             _led = LED(pin)
-            led = (action,_led)
+            led = (action, _led)
             self.LEDs.append(led)
-            print("set LED with action: " + action)
+            print(f"set LED with action: {action}")
 
     def getAction(self, action):
         if action == "Stop":

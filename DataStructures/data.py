@@ -1,9 +1,9 @@
-from time import time
+import queue
+
+from config.config import Config
 from DataStructures.logger import Logger
 from DataStructures.loggingQueue import LoggingQueue
 from DataStructures.uiQueue import UIQueue
-from config.config import Config
-import queue
 
 
 class Data:
@@ -34,9 +34,9 @@ class Data:
     holeyFirmwareVersion = None
     controllerFirmwareVersion = 0
 
-    '''
+    """
     Version Updater
-    '''
+    """
     lastChecked = -1
     pyInstallCurrentVersion = 0.95
     pyInstallUpdateAvailable = False
@@ -45,7 +45,6 @@ class Data:
     pyInstallPlatform = "rpi"
     pyInstallType = "singlefolder"
     pyInstallInstalledPath = ""
-
 
     # all of the available COM ports
     comPorts = []
@@ -107,7 +106,9 @@ class Data:
     Pointers to Objects
     """
     serialPort = None  # this is a pointer to the program serial port object
-    requestSerialClose = False  # this is used to request the serialThread to gracefully close the port
+    requestSerialClose = (
+        False  # this is used to request the serialThread to gracefully close the port
+    )
     triangularCalibration = None  # points to the triangular calibration object
     holeyCalibration = None  # points to the triangular calibration object
     opticalCalibration = None  # points to the optical calibration object
@@ -140,17 +141,20 @@ class Data:
     zPopupUnits = None
     zStepSizeVal = 0.1
 
-
     """
     Queues
     """
     message_queue = LoggingQueue(logger)
     ui_controller_queue = queue.Queue()
     ui_queue1 = UIQueue()
-    alog_streamer_queue = queue.Queue(1000)  # used for sending log to client screen.. limit to 1000 "items"
-    log_streamer_queue = queue.Queue(1000) # used for sending log to client screen.. limit to 1000 "items"
-    console_queue = queue.Queue() # used for printing to terminal
-    mcp_queue = queue.Queue () # used for sending messages to WebMCP(if enabled)
+    alog_streamer_queue = queue.Queue(
+        1000
+    )  # used for sending log to client screen.. limit to 1000 "items"
+    log_streamer_queue = queue.Queue(
+        1000
+    )  # used for sending log to client screen.. limit to 1000 "items"
+    console_queue = queue.Queue()  # used for printing to terminal
+    mcp_queue = queue.Queue()  # used for sending messages to WebMCP(if enabled)
     webMCPActive = False  # start false until WebMCP connects
     gcode_queue = queue.Queue()
     quick_queue = queue.Queue()
@@ -208,14 +212,11 @@ class Data:
     """
     currentBoard = None
 
-
     shutdown = False
 
     hostAddress = "-"
     platform = "RPI"
     platformHome = ""
-
-
 
     def __init__(self):
         """

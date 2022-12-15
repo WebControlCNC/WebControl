@@ -1,25 +1,27 @@
 import sys
-import distro
-import os
 import platform
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from Connection.serialPort import SerialPort
-from File.gcodeFile import GCodeFile
-from File.importFile import ImportFile
+
+import distro
+
 from Actions.actions import Actions
-from Actions.triangularCalibration import TriangularCalibration
+from Actions.gpioActions import GPIOActions
 from Actions.holeyCalibration import HoleyCalibration
 from Actions.HoleySimulationKinematics import Kinematics as HoleyKinematics
 from Actions.opticalCalibration import OpticalCalibration
-from Actions.gpioActions import GPIOActions
+from Actions.triangularCalibration import TriangularCalibration
 from Background.messageProcessor import MessageProcessor
-from Background.WebMCPProcessor import WebMCPProcessor
-from Background.WebMCPProcessor import ConsoleProcessor
 from Background.webcamVideoStream import WebcamVideoStream
+from Background.WebMCPProcessor import ConsoleProcessor, WebMCPProcessor
 from Boards.boardManager import BoardManager
+from Connection.serialPort import SerialPort
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
+from File.gcodeFile import GCodeFile
+from File.importFile import ImportFile
 from ReleaseManager.releaseManager import ReleaseManager
 from HelpManager.helpManager import HelpManager
-#from GCodeOptimizer.gcodeOptimizer import GCodeOptimizer
+
+# from GCodeOptimizer.gcodeOptimizer import GCodeOptimizer
+
 
 class NonVisibleWidgets(MakesmithInitFuncs):
     """
@@ -45,7 +47,7 @@ class NonVisibleWidgets(MakesmithInitFuncs):
     boardManager = BoardManager()
     releaseManager = ReleaseManager()
     helpManager = HelpManager()
-    #gcodeOptimizer = GCodeOptimizer()
+    # gcodeOptimizer = GCodeOptimizer()
 
     def setUpData(self, data):
         """
@@ -77,18 +79,18 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         data.boardManager = self.boardManager
         data.releaseManager = self.releaseManager
         data.helpManager = self.helpManager
-        #data.gcodeOptimizer = self.gcodeOptimizer
+        # data.gcodeOptimizer = self.gcodeOptimizer
 
-        if hasattr(sys, '_MEIPASS'):
+        if hasattr(sys, "_MEIPASS"):
             data.platform = "PYINSTALLER"
             data.platformHome = sys._MEIPASS
 
         data.pyInstallPlatform = platform.system().lower()
-        
+
         if data.pyInstallPlatform == "windows":
-            if platform.machine().endswith('64'):
+            if platform.machine().endswith("64"):
                 data.pyInstallPlatform = "win64"
-            if platform.machine().endswith('32'):
+            if platform.machine().endswith("32"):
                 data.pyInstallPlatform = "win32"
 
         if data.pyInstallPlatform == "linux":
@@ -97,13 +99,12 @@ class NonVisibleWidgets(MakesmithInitFuncs):
             print(_platform)
             print("##")
             if _platform.find("raspbian") != -1:
-                data.pyInstallPlatform = 'rpi'
+                data.pyInstallPlatform = "rpi"
         print("----")
         print(data.pyInstallPlatform)
 
-
-        if getattr(sys, 'frozen', False):
-            if hasattr(sys, '_MEIPASS'):
+        if getattr(sys, "frozen", False):
+            if hasattr(sys, "_MEIPASS"):
                 if sys._MEIPASS.find("_MEI") == -1:
                     data.pyInstallType = "singledirectory"
                 else:
@@ -133,9 +134,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         self.boardManager.initializeNewBoard()
         self.releaseManager.setUpData(data)
         self.helpManager.setUpData(data)
-        #self.gcodeOptimizer.setUpData(data)
+        # self.gcodeOptimizer.setUpData(data)
 
-        #set up kinematics with current settings
+        # set up kinematics with current settings
         self.holeyKinematics.initializeSettings()
-        #self.camera.start()
-
+        # self.camera.start()

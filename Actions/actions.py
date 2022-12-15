@@ -1,4 +1,3 @@
-
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import os
@@ -10,8 +9,6 @@ import json
 import time
 import re
 import zipfile
-import threading
-import platform
 import subprocess
 from subprocess import call
 from gpiozero.pins.mock import MockFactory

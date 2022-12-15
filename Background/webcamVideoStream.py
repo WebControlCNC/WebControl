@@ -1,8 +1,10 @@
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-import threading
-import cv2
-import time
 import base64
+import threading
+import time
+
+import cv2
+
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 class WebcamVideoStream(MakesmithInitFuncs):

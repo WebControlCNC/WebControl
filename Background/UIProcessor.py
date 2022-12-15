@@ -1,11 +1,11 @@
 from __main__ import socketio
 
-import time
-import math
 import json
+import math
+import time
+
 import psutil
-import webbrowser
-from flask import render_template
+
 
 '''
 This class sends messages the browser via sockets.  It monitors the ui_controller_queue (where controller messages that
