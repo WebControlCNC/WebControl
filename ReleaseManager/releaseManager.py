@@ -1,19 +1,16 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-import time
-import json
-import datetime
+
 import os
 import glob
-import zipfile
 import re
-from github import Github
-import wget
-import subprocess
 from shutil import copyfile
+import subprocess
+
+from github import Github
+import requests
 
 
 class ReleaseManager(MakesmithInitFuncs):
-
     def __init__(self):
         pass
 
@@ -22,15 +19,16 @@ class ReleaseManager(MakesmithInitFuncs):
 
     def getReleases(self):
         tempReleases = []
-        enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
+        enableExperimental = self.data.config.getValue(
+            "WebControl Settings", "experimentalReleases"
+        )
         for release in self.releases:
             if not enableExperimental:
-                if not self.isExperimental(re.sub(r'[v]', r'', release.tag_name)):
+                if not self.isExperimental(re.sub(r"[v]", r"", release.tag_name)):
                     tempReleases.append(release)
             else:
                 tempReleases.append(release)
         return tempReleases
-
 
     def getLatestRelease(self):
         return self.latestRelease
@@ -39,14 +37,20 @@ class ReleaseManager(MakesmithInitFuncs):
         if True:  # self.data.platform=="PYINSTALLER":
             print("Checking latest pyrelease.")
             try:
-                enableExperimental = self.data.config.getValue("WebControl Settings", "experimentalReleases")
+                enableExperimental = self.data.config.getValue(
+                    "WebControl Settings", "experimentalReleases"
+                )
                 g = Github()
                 repo = g.get_repo("WebControlCNC/WebControl")
                 self.releases = repo.get_releases()
                 latestVersionGithub = 0
                 self.latestRelease = None
+                # Map tags that didn't use the `vX.Y` numbering to a floatable value
+                release_tag_map = {"2020-05-26-2021": "0.939"}
                 for release in self.releases:
-                    tag_name = re.sub(r'[v]', r'', release.tag_name)
+                    tag_name = re.sub(r"[v]", r"", release.tag_name)
+                    if tag_name in release_tag_map:
+                        tag_name = release_tag_map[tag_name]
                     tag_float = float(tag_name)
                     eligible = False
                     if not enableExperimental:
@@ -54,46 +58,54 @@ class ReleaseManager(MakesmithInitFuncs):
                             eligible = True
                     else:
                         eligible = True
-                    #print("tag:"+tag_name+", eligible:"+str(eligible))
+                    # print("tag:"+tag_name+", eligible:"+str(eligible))
                     if eligible and tag_float > latestVersionGithub:
                         latestVersionGithub = tag_float
                         self.latestRelease = release
 
-                print("Latest pyrelease: " + str(latestVersionGithub))
-                if self.latestRelease is not None and latestVersionGithub > self.data.pyInstallCurrentVersion:
-                    print("Latest release tag: " + self.latestRelease.tag_name)
+                print(f"Latest pyrelease: {latestVersionGithub}")
+                if (
+                    self.latestRelease is not None
+                    and latestVersionGithub > self.data.pyInstallCurrentVersion
+                ):
+                    print(f"Latest release tag: {self.latestRelease.tag_name}")
                     assets = self.latestRelease.get_assets()
                     for asset in assets:
-                        if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
+                        if (
+                            asset.name.find(self.data.pyInstallType) != -1
+                            and asset.name.find(self.data.pyInstallPlatform) != -1
+                        ):
                             print(asset.name)
                             print(asset.url)
                             self.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
                             self.data.pyInstallUpdateAvailable = True
-                            self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
+                            self.data.pyInstallUpdateBrowserUrl = (
+                                asset.browser_download_url
+                            )
                             self.data.pyInstallUpdateVersion = self.latestRelease
             except Exception as e:
-                print("Error checking pyrelease: " + str(e))
+                print(f"Error checking pyrelease: {e}")
 
     def isExperimental(self, tag):
-        '''
+        """
         Deternmines if release is experimental.  All even releases are stable, odd releases are experimental
         :param tag:
         :return:
-        '''
-        if float(tag) <= 0.931: # all releases before now are 'stable'
+        """
+        if float(tag) <= 0.931:  # all releases before now are 'stable'
             return False
         lastDigit = tag[-1]
-        if (int(lastDigit) % 2) == 0: # only even releases are 'stable'
+        if (int(lastDigit) % 2) == 0:  # only even releases are 'stable'
             return False
         else:
             return True
 
     def processAbsolutePath(self, path):
         index = path.find("main.py")
-        self.data.pyInstallInstalledPath = path[0:index - 1]
+        self.data.pyInstallInstalledPath = path[0 : index - 1]
         print(self.data.pyInstallInstalledPath)
 
-    def updatePyInstaller(self, bypassCheck = False):
+    def updatePyInstaller(self, bypassCheck=False):
         home = self.data.config.getHome()
         if self.data.pyInstallUpdateAvailable == True or bypassCheck:
             if not os.path.exists(home + "/.WebControl/downloads"):
@@ -106,29 +118,45 @@ class ReleaseManager(MakesmithInitFuncs):
                 except:
                     print("error cleaning download directory: ", filePath)
                     print("---")
-            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
-                filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "\\.WebControl\\downloads")
+            req = requests.get(self.data.pyInstallUpdateBrowserUrl)
+            if (
+                self.data.pyInstallPlatform == "win32"
+                or self.data.pyInstallPlatform == "win64"
+            ):
+                filename = home + "\\.WebControl\\downloads"
             else:
-                filename = wget.download(self.data.pyInstallUpdateBrowserUrl, out=home + "/.WebControl/downloads")
+                filename = home + "/.WebControl/downloads"
+            open(filename, "wb").write(req.content)
             print(filename)
 
             if self.data.platform == "PYINSTALLER":
                 lhome = os.path.join(self.data.platformHome)
             else:
                 lhome = "."
-            if self.data.pyInstallPlatform == "win32" or self.data.pyInstallPlatform == "win64":
+            if (
+                self.data.pyInstallPlatform == "win32"
+                or self.data.pyInstallPlatform == "win64"
+            ):
                 path = lhome + "/tools/upgrade_webcontrol_win.bat"
-                copyfile(path, home + "/.WebControl/downloads/upgrade_webcontrol_win.bat")
+                copyfile(
+                    path, home + "/.WebControl/downloads/upgrade_webcontrol_win.bat"
+                )
                 path = lhome + "/tools/7za.exe"
                 copyfile(path, home + "/.WebControl/downloads/7za.exe")
-                self.data.pyInstallInstalledPath = self.data.pyInstallInstalledPath.replace('/', '\\')
-                program_name = home + "\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
+                self.data.pyInstallInstalledPath = (
+                    self.data.pyInstallInstalledPath.replace("/", "\\")
+                )
+                program_name = (
+                    home + "\\.WebControl\\downloads\\upgrade_webcontrol_win.bat"
+                )
 
             else:
                 path = lhome + "/tools/upgrade_webcontrol.sh"
                 copyfile(path, home + "/.WebControl/downloads/upgrade_webcontrol.sh")
                 program_name = home + "/.WebControl/downloads/upgrade_webcontrol.sh"
-                self.make_executable(home + "/.WebControl/downloads/upgrade_webcontrol.sh")
+                self.make_executable(
+                    home + "/.WebControl/downloads/upgrade_webcontrol.sh"
+                )
             tool_path = home + "\\.WebControl\\downloads\\7za.exe"
             arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
@@ -148,18 +176,20 @@ class ReleaseManager(MakesmithInitFuncs):
         os.chmod(path, mode)
         print("4")
 
-
     def update(self, version):
-        '''
+        """
         Need to clean this up.
         :param version:
         :return:
-        '''
+        """
         for release in self.releases:
             if release.tag_name == version:
                 assets = release.get_assets()
                 for asset in assets:
-                    if asset.name.find(self.data.pyInstallType) != -1 and asset.name.find(self.data.pyInstallPlatform) != -1:
+                    if (
+                        asset.name.find(self.data.pyInstallType) != -1
+                        and asset.name.find(self.data.pyInstallPlatform) != -1
+                    ):
                         print(asset.name)
                         print(asset.url)
                         self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
@@ -167,5 +197,3 @@ class ReleaseManager(MakesmithInitFuncs):
                         return self.updatePyInstaller(True)
         print("hmmm.. issue")
         return False
-
-

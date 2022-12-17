@@ -1,8 +1,6 @@
 from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 import time
-import math
-import json
 
 
 class MessageProcessor(MakesmithInitFuncs):

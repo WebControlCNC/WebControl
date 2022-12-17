@@ -1,17 +1,10 @@
 from __main__ import socketio
 
-import time
-import math
-import json
-from os import listdir
-from os.path import isfile, join
 import re
-from flask import render_template
 import os
+
+from flask import render_template
 import frontmatter
-import webbrowser
-import socket
-from github import Github
 import markdown
 
 

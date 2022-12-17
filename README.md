@@ -139,24 +139,55 @@ Open your web browser to `localhost:5000` (or use the IP address of your device)
 
 ## Developing
 
-### Virtualenv
+### Python Virtual Environment
 
-You can use virtualenv to set up a local development environment for running the code without installing packages in the system Python installation.
+There are several ways to set up a Python virtual environment (sometimes shown as 'virtualenv' or just 'venv'). Python itself can do this with the command `python -m venv venv` to create a virtual environment called `venv`. However, it's quite common to work with multiple versions of Python itself, so having a tool that can manage multiple Python versions and virtual environments is really helpful.
 
-    # Create a virtual environment
-    virtualenv -p python3 .venv
-    # Activate the virtual environment
-    source .venv/bin/activate
-    # Install the prerequisites
-    pip install -r requirements.txt
+To manage multiple python versions and virtual environments get `pyenv` (or [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) for Windows)
+
+Here's a well-written [walkthrough](https://community.cisco.com/t5/developer-general-knowledge-base/pyenv-for-managing-python-versions-and-environments/ta-p/4696819) of setting up your system (macOS, Ubuntu/Debian, Fedora/CentOS/RHEL, Windows) for `pyenv` and then using `pyenv` to set up your virtual environment.
+
+Once you've prepared your system and installed `pyenv`
+- get the latest version of Python that we know works with WebControl, currently that's `3.9.13`:
+    `pyenv install 3.9.13`
+- create a virtual environment with it:
+    `pyenv virtualenv 3.9.13 webcontrol_3_9`
+    The `webcontrol_3_9` name is arbitrary
+- activate the virtual environment - this will help isolate what you do from the rest of your system:
+    `pyenv activate webcontrol_3_9`
+
+#### Prepare the Virtual Environment itself
+
+This next stuff should only need to be done once in your virtual environment.
+- install some useful tools
+    `pip install setuptools`
+    `pip install pip-tools`
+    `pip install black`
+- rebuild the list of requirements needed by WebControl (optional)
+    `rm requirements.txt`
+    `pip-compile -r requirements.in --resolver=backtracking --verbose`
+- install the requirements
+    `pip install -r requirements.txt`
+
+And that's the virtual environment creation and set up done. From now on you'll only need to activate the virtual environment after any restart to get going.
+
+#### Virtualenv on a Raspberry Pi
 
 When running on the Pi, you'll also need some extra dependencies and will need to build OpenCV from source. See the Dockerfile for details. (TODO: add instructions here)
+
+### Now What? Let's Start Up WebControl🎉
 
 Then you can run the code with.
 
     python main.py
 
-The server will then be available at http://localhost:5000
+The server will then be available at `http://localhost:5000`
+
+* If you get an error message with something like `ModuleNotFoundError: No module named '_ctypes'` within it. Then it means that you didn't get your system properly prepared before creating your virtual environment (looking at you Ubuntu). Please follow the walkthrough linked above to:
+1. deactivate your virtual environment,
+2. delete it,
+3. prepare your system,
+4. recreate your virtual environment.
 
 ### Automatic code formatting
 
@@ -174,9 +205,15 @@ If you don't have python3.6+ locally (to be able to run `black`), you can run `b
 
 ### IDE
 
+#### PyCharm
 [Pycharm Community Edition](https://www.jetbrains.com/pycharm/download) is a free, well-featured Python IDE.
 
 With the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) and [BlackPycharm](https://plugins.jetbrains.com/plugin/10563-black-pycharm) plugins you can set up your editor to automatically format your code on save. Then you never have to think about code formatting again :tada:
+
+#### VSCode
+[Visual Studio Code](https://code.visualstudio.com/Download) is a free IDE with awesome support for Python (and every other language you can think of). And yes, you can install it on a Raspberry Pi.
+
+Once it picks up that you're working with Python it will advise on extensions that are available to help you get the best out of it, including Python, PyLance, Black, ... Plus built-in support for GitHub, extensions for Docker, Linux under Windows (WSL), and so much more
 
 ## Contributing
 

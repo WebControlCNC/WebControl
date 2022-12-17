@@ -1,11 +1,11 @@
 from __future__ import print_function
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import re
 import math
+
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
-
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 def print_solution(manager, routing, solution):

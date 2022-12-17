@@ -5,14 +5,13 @@ behavior.
 
 """
 
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 import threading
 import os
 import time
 import datetime
 from pathlib import Path
-from app import app, socketio
 
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 class Logger(MakesmithInitFuncs):

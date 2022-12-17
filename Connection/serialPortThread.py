@@ -1,10 +1,10 @@
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from DataStructures.data import Data
-import serial
-import time
 from collections import deque
-import json
+import time
 import re
+
+import serial
+
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
 
 
 class SerialPortThread(MakesmithInitFuncs):

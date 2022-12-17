@@ -1,13 +1,10 @@
-from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
-from Connection.serialPortThread import SerialPortThread
-
-import sys
-import serial
-import serial.tools.list_ports
 import threading
+
 import schedule
-import time
-import json
+
+from Connection.serialPortThread import SerialPortThread
+from DataStructures.makesmithInitFuncs import MakesmithInitFuncs
+
 
 class SerialPort(MakesmithInitFuncs):
     """
@@ -17,6 +14,7 @@ class SerialPort(MakesmithInitFuncs):
     The actual connection is run in a separate thread by an instance of a SerialPortThread object.
 
     """
+
     serialPortRequest = ""
 
     # COMports = ListProperty(("Available Ports:", "None"))
@@ -59,27 +57,39 @@ class SerialPort(MakesmithInitFuncs):
         # This function opens the thread which handles the input from the serial port
 
         if not self.data.connectionStatus:
-            #self.data.ui_queue.put(
+            # self.data.ui_queue.put(
             #    "Action: connectionStatus:_" + json.dumps({'status': 'disconnected', 'port': 'none'})
-            #)  # the "_" facilitates the parse
-            self.data.ui_queue1.put("Action", "connectionStatus",
-                                    {'status': 'disconnected', 'port': 'none', 'fakeServoStatus': self.data.fakeServoStatus})
+            # )  # the "_" facilitates the parse
+            self.data.ui_queue1.put(
+                "Action",
+                "connectionStatus",
+                {
+                    "status": "disconnected",
+                    "port": "none",
+                    "fakeServoStatus": self.data.fakeServoStatus,
+                },
+            )
             x = SerialPortThread()
             x.data = self.data
             self.th = threading.Thread(target=x.getmessage)
             self.th.daemon = True
             self.th.start()
         else:
-            self.data.ui_queue1.put("Action", "connectionStatus",
-                                    {'status': 'connected', 'port': self.data.comport, 'fakeServoStatus': self.data.fakeServoStatus})
-            #self.data.ui_queue.put(
+            self.data.ui_queue1.put(
+                "Action",
+                "connectionStatus",
+                {
+                    "status": "connected",
+                    "port": self.data.comport,
+                    "fakeServoStatus": self.data.fakeServoStatus,
+                },
+            )
+            # self.data.ui_queue.put(
             #    "Action: connectionStatus:_" + json.dumps({'status': 'connected', 'port': self.data.comport})
-            #)  # the "_" facilitates the parse
+            # )  # the "_" facilitates the parse
 
     def closeConnection(self):
         self.serialPortRequest = "requestToClose"
 
     def getConnectionStatus(self):
         return self.serialPortRequest
-
-
