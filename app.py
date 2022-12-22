@@ -1,3 +1,5 @@
+# from pyjion.wsgi import PyjionWsgiMiddleware
+
 from flask import Flask
 from flask_mobility import Mobility
 from flask_socketio import SocketIO
@@ -18,6 +20,10 @@ app = Flask(
     template_folder=os.path.join(base_dir, "templates"),
 )
 app.debug = True
+
+# Override the app wsgi_app property
+# app.wsgi_app = PyjionWsgiMiddleware(app.wsgi_app)
+
 socketio = SocketIO(app)
 mobility = Mobility(app)
 # md.init_app(app)

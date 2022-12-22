@@ -78,10 +78,10 @@ function boardDataUpdate(msg){
   console.log("Unsupported");
 }
 
-function gcodeUpdateCompressed(data){
-  console.log("Unsupported");
-  $("#fpCircle").hide();
-}
+// function gcodeUpdateCompressed(data){
+//   console.log("Unsupported");
+//   $("#fpCircle").hide();
+// }
 
 function boardCutDataUpdateCompressed(data){
   console.log("Unsupported");
@@ -98,9 +98,9 @@ function toggle3DView()
     console.log("Unsupported");
 }
 
-function resetView(){
-    console.log("Unsupported");
-}
+// function resetView(){
+//     console.log("Unsupported");
+// }
 
 function cursorPosition(){
     console.log("Unsupported");

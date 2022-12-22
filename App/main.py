@@ -5,14 +5,17 @@ monkey.patch_all()
 
 from app import app, socketio
 
-import json
-import os
-import socket
-import threading
-import time
 import webbrowser
+import socket
+import os
+import sys
+
+from werkzeug.utils import secure_filename
 
 import schedule
+import time
+import threading
+import json
 
 from flask import (
     jsonify,
@@ -23,20 +26,16 @@ from flask import (
     send_from_directory,
 )
 from flask_mobility.decorators import mobile_template
-from werkzeug.utils import secure_filename
-
-from App.data import init_data
-from App.route import init_route
 
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from Background.LogStreamer import LogStreamer  # do this after socketio is declared
 from Connection.nonVisibleWidgets import NonVisibleWidgets
 from WebPageProcessor.webPageProcessor import WebPageProcessor
 
-app = init_data(app)
 
 app.nonVisibleWidgets = NonVisibleWidgets()
 app.nonVisibleWidgets.setUpData(app.data)
+
 
 app.UIProcessor = UIProcessor()
 app.webPageProcessor = WebPageProcessor(app.data)
@@ -73,7 +72,6 @@ app.mcpthread = None
 ## logstreamerthread set to None.. will be activated upon first websocket connection from log streamer browser
 app.logstreamerthread = None
 
-# init_route(app)
 
 @app.route("/")
 @mobile_template("{mobile/}")
@@ -701,7 +699,6 @@ def alertModalClosed(msg):
 
 @socketio.on("requestPage", namespace="/MaslowCNC")
 def requestPage(msg):
-    print(f"requestPage: {msg}")
     app.data.logger.resetIdler()
     app.data.console_queue.put(request.sid)
     client = request.sid

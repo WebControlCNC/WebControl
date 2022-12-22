@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/ace.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='node_modules/ace-builds/src-min-noconflict/ace.js') }}" crossorigin="anonymous"></script>
 <script>
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/twilight");

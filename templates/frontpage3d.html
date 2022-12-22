@@ -9,12 +9,11 @@
   <script>
     enable3D=true;
   </script>
-  <script src="{{ url_for('static',filename='scripts/pako.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/sprite3D.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019w') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='node_modules/pako/dist/pako.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='node_modules/feather-icons/dist/feather.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='node_modules/three/build/three.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='node_modules/three-spritetext/dist/three-spritetext.min.js') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019w') }}" type="module" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102019w') }}" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}

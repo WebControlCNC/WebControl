@@ -1,3 +1,6 @@
+import * as THREE from "../node_modules/three/build/three.module.js";
+import { OrbitControls } from "./OrbitControls.js";
+
 settingRequest('Optical Calibration Settings','calibrationCurve');
 settingRequest('Optical Calibration Settings','calibrationError');
 
@@ -332,7 +335,7 @@ function setupDisplay(){
     oimageShowing = 1
 
     ocamera = new THREE.PerspectiveCamera(45, ow/oh, 1, 500);
-    ocontrols = new THREE.OrbitControls(ocamera, orenderer.domElement);
+    ocontrols = new OrbitControls(ocamera, orenderer.domElement);
     ocontrols.screenSpacePanning = true;
 
     ocamera.position.set(0, 0, 100);

@@ -1,4 +1,5 @@
 -r ./Actions/requirements.in
+# -r ./App/requirements.in
 -r ./Background/requirements.in
 -r ./Boards/requirements.in
 -r ./Connection/requirements.in
@@ -7,10 +8,13 @@
 -r ./ReleaseManager/requirements.in
 -r ./WebPageProcessor/requirements.in
 
+eventlet
 # Flask-Misaka
 Flask-Mobility
 Flask-SocketIO
 gevent
 
-# six
+# Pyjion requires Python 3.10+ and .net 7+ to work
+pyjion
+
 Werkzeug

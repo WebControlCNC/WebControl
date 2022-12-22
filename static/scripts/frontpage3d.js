@@ -1,777 +1,729 @@
+import * as THREE from "../node_modules/three/build/three.module.js";
+import { OrbitControls } from "./OrbitControls.js";
+
 //checkForGCodeUpdate();
 //checkForGCodeUpdate();
 
 //setInterval(function(){ alert("Hello"); }, 3000);
 
-var cutSquareGroup = new THREE.Group();
-var showBoard = false;
-var showLabels = false;
-var homeX = 0;
-var homeY = 0;
+class Frontpage3d {
+  cutSquareGroup = new THREE.Group();
+  showBoard = false;
+  showLabels = false;
+  homeX = 0;
+  homeY = 0;
 
-var renderer = new THREE.WebGLRenderer();
-var w = $("#workarea").width();//-20;
-var h = $("#workarea").height();//-20;
-renderer.setSize( w, h );
-//console.log("w="+w+", h="+h);
+  renderer = new THREE.WebGLRenderer();
+  // Workarea width and height are set in initWorkarea
+  w = 0;
+  h = 0;
 
-container = document.getElementById('workarea');
-container.appendChild(renderer.domElement);
-var imageShowing = 1
+  imageShowing = 1;
 
-var gcode = new THREE.Group();
-var textLabels = new THREE.Group();
-//var cutTrailGroup = new THREE.Group();
+  gcode = new THREE.Group();
+  textLabels = new THREE.Group();
+  // cutTrailGroup = new THREE.Group();
 
-var cameraPerspective = 0; // 0 = Orthographic, 1 = Perspective
-var scale = .07
-var cameraO;
-var cameraP;
+  cameraPerspective = 0; // 0 = Orthographic, 1 = Perspective
+  scale = .07;
 
-var cameraO = new THREE.OrthographicCamera(w/-2*scale, w/2*scale, h/2*scale, h/-2*scale, 1, 100*500/380);
-cameraO.position.set(0, 0, 100); //380
-cameraO.lookAt(0,0,0);
-var cameraP = new THREE.PerspectiveCamera(45, w/h, 1, 500);
-cameraP.position.set(0, 0, 100);
-cameraP.lookAt(0,0,0);
+  cameraO = null;
+  cameraP = null;
 
+  controlsO = null;
+  controlsP = null;
 
-//setCameraPerspective(true); // true indicates initial setting
-var controlsO = new THREE.OrbitControls(cameraO, renderer.domElement);
-var controlsP = new THREE.OrbitControls(cameraP, renderer.domElement);
-controlsO.screenSpacePanning = true;
-controlsP.screenSpacePanning = true;
+  view3D = true;
 
-var view3D = true;
-toggle3DView(); // makes it not true and applies appropriate settings
-//controls.update();
-controlsO.saveState();
-controlsP.saveState();
+  blueLineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+  lightBlueLineMaterial = new THREE.LineBasicMaterial({ color: 0xadd8e6 });
+  greenLineMaterial = new THREE.LineBasicMaterial({ color: 0x00aa00 });
+  redLineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  blackLineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+  grayLineMaterial = new THREE.LineBasicMaterial({ color: 0x777777 });
 
-var scene = new THREE.Scene();
-scene.background= new THREE.Color(0xeeeeee);
-var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-scene.add( light );
-var blueLineMaterial = new THREE.LineBasicMaterial( {color:0x0000ff });
-var lightBlueLineMaterial = new THREE.LineBasicMaterial( {color:0xadd8e6 });
-var greenLineMaterial = new THREE.LineBasicMaterial( {color:0x00aa00 });
-var redLineMaterial = new THREE.LineBasicMaterial( {color:0xff0000 });
-var blackLineMaterial = new THREE.LineBasicMaterial( {color:0x000000 });
-var grayLineMaterial = new THREE.LineBasicMaterial( {color:0x777777 });
+  blackDashedMaterial = new THREE.LineDashedMaterial({ color: 0x000000, dashSize: .5, gapSize: .5 });
 
-var greenLineDashedMaterial = new THREE.LineDashedMaterial( {color:0x00aa00, dashSize:.1, gapSize: .1} );
-var blackDashedMaterial = new THREE.LineDashedMaterial( {color:0x000000, dashSize:.5, gapSize: .5} );
+  scene = new THREE.Scene();
 
-var outerFrameShape = new THREE.Geometry();
-outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
-outerFrameShape.vertices.push(new THREE.Vector3(48, 24, 0));
-outerFrameShape.vertices.push(new THREE.Vector3(48, -24, 0));
-outerFrameShape.vertices.push(new THREE.Vector3(-48, -24, 0));
-outerFrameShape.vertices.push(new THREE.Vector3(-48, 24, 0));
-var outerFrame = new THREE.Line(outerFrameShape, blackLineMaterial);
+  sled = new THREE.Group();
+  home = new THREE.Group();
+  gcodePos = new THREE.Group();
+  computedSled = new THREE.Group();
+  cursor = new THREE.Group();
 
-var frameLineSegments = new THREE.Geometry();
-frameLineSegments.vertices.push(new THREE.Vector3(-24, 24, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(-24, -24, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(0, 24, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(0, -24, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(24, 24, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(24, -24, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(-48, 0, 0));
-frameLineSegments.vertices.push(new THREE.Vector3(48, 0, 0));
-var innerFrame = new THREE.LineSegments(frameLineSegments, blackDashedMaterial)
-innerFrame.computeLineDistances();
+  cursorVLine = null;
+  cursorHLine = null;
+  boardCutLines = null;
 
-scene.add(outerFrame);
-scene.add(innerFrame);
+  boardGroup = new THREE.Group();
 
+  boardOutlineGeometry = new THREE.BoxGeometry(96, 48, 0.75);
+  boardFillMaterial = new THREE.MeshBasicMaterial({ color: 0xD2B48C, opacity: 0.5, transparent: true })
+  boardOutlineFill = new THREE.Mesh(this.boardOutlineGeometry, this.boardFillMaterial);
+  boardOutlineMaterial = new THREE.LineBasicMaterial({ color: 0x783E04 })
+  boardEdgesGeometry = new THREE.EdgesGeometry(this.boardOutlineGeometry)
+  boardOutlineOutline = new THREE.LineSegments(this.boardEdgesGeometry, this.boardOutlineMaterial);
 
-var sledHorizontalLineSegments = new THREE.Geometry();
-sledHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.5, 0, 0));
-sledHorizontalLineSegments.vertices.push(new THREE.Vector3(1.5, 0, 0));
-var sledHorizontalLine = new THREE.LineSegments(sledHorizontalLineSegments, redLineMaterial);
+  isComputedEnabled = false;
 
-var sledVerticalLineSegments = new THREE.Geometry();
-sledVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.5, 0));
-sledVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.5, 0));
-var sledVerticalLine = new THREE.LineSegments(sledVerticalLineSegments, redLineMaterial);
+  initWorkArea(renderer) {
+    this.w = $("#workarea").width();//-20;
+    this.h = $("#workarea").height();//-20;
+    renderer.setSize(this.w, this.h);
+    //console.log("w="+w+", h="+h);
 
-var sledCircleGeometry = new THREE.CircleGeometry(1,32);
-var sledCircleEdges = new THREE.EdgesGeometry(sledCircleGeometry)
-var sledCircle = new THREE.LineSegments(sledCircleEdges,redLineMaterial);
+    const container = document.getElementById('workarea');
+    container.appendChild(this.renderer.domElement);
+  }
 
-var sled = new THREE.Group();
-sled.add(sledHorizontalLine);
-sled.add(sledVerticalLine);
-sled.add(sledCircle);
-sled.position.set(0,0,0);
+  initCamera(camera) {
+    camera.position.set(0, 0, 100); //380
+    camera.lookAt(0, 0, 0);
+  }
 
+  initCameraO(w, h, scale) {
+    return new THREE.OrthographicCamera(w / -2 * scale, w / 2 * scale, h / 2 * scale, h / -2 * scale, 1, 100 * 500 / 380);
+  }
 
-var homeHorizontalLineSegments = new THREE.Geometry();
-homeHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.25, 0, 0));
-homeHorizontalLineSegments.vertices.push(new THREE.Vector3(1.25, 0, 0));
-var homeHorizontalLine = new THREE.LineSegments(homeHorizontalLineSegments, greenLineMaterial);
+  initCameraP(w, h) {
+    return new THREE.PerspectiveCamera(45, w / h, 1, 500)
+  }
 
-var homeVerticalLineSegments = new THREE.Geometry();
-homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.25, 0));
-homeVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.25, 0));
-var homeVerticalLine = new THREE.LineSegments(homeVerticalLineSegments, greenLineMaterial);
+  initControls(camera, renderer) {
+    //setCameraPerspective(true); // true indicates initial setting
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.screenSpacePanning = true;
 
-var homeCircleGeometry = new THREE.CircleGeometry(.75,32);
-var homeCircleEdges = new THREE.EdgesGeometry(homeCircleGeometry)
-var homeCircle = new THREE.LineSegments(homeCircleEdges,greenLineMaterial);
+    return controls;
+  }
 
-var home = new THREE.Group();
-home.add(homeHorizontalLine);
-home.add(homeVerticalLine);
-home.add(homeCircle);
-home.position.set(0,0,0);
+  initScene(scene, blackLineMaterial, blackDashedMaterial) {
+    scene.background = new THREE.Color(0xeeeeee);
+    const light = new THREE.AmbientLight(0x404040); // soft white light
+    scene.add(light);
 
+    const outerFramePoints = [];
+    outerFramePoints.push(new THREE.Vector3(-48, 24, 0));
+    outerFramePoints.push(new THREE.Vector3(48, 24, 0));
+    outerFramePoints.push(new THREE.Vector3(48, -24, 0));
+    outerFramePoints.push(new THREE.Vector3(-48, -24, 0));
+    outerFramePoints.push(new THREE.Vector3(-48, 24, 0));
+    const outerFrameShape = new THREE.BufferGeometry().setFromPoints(outerFramePoints);
+    const outerFrame = new THREE.Line(outerFrameShape, blackLineMaterial);
 
-var gcodePosHorizontalLineSegments = new THREE.Geometry();
-gcodePosHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.0, 0, 0));
-gcodePosHorizontalLineSegments.vertices.push(new THREE.Vector3(1.0, 0, 0));
-var gcodePosHorizontalLine = new THREE.LineSegments(gcodePosHorizontalLineSegments, blackLineMaterial);
+    const innerFramePoints = [];
+    innerFramePoints.push(new THREE.Vector3(-24, 24, 0));
+    innerFramePoints.push(new THREE.Vector3(-24, -24, 0));
+    innerFramePoints.push(new THREE.Vector3(0, 24, 0));
+    innerFramePoints.push(new THREE.Vector3(0, -24, 0));
+    innerFramePoints.push(new THREE.Vector3(24, 24, 0));
+    innerFramePoints.push(new THREE.Vector3(24, -24, 0));
+    innerFramePoints.push(new THREE.Vector3(-48, 0, 0));
+    innerFramePoints.push(new THREE.Vector3(48, 0, 0));
+    const innerFrameShape = new THREE.BufferGeometry().setFromPoints(innerFramePoints);
+    const innerFrame = new THREE.LineSegments(innerFrameShape, blackDashedMaterial);
+    innerFrame.computeLineDistances();
 
-var gcodePosVerticalLineSegments = new THREE.Geometry();
-gcodePosVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.0, 0));
-gcodePosVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.0, 0));
-var gcodePosVerticalLine = new THREE.LineSegments(gcodePosVerticalLineSegments, blackLineMaterial);
+    this.scene.add(outerFrame);
+    this.scene.add(innerFrame);
+  }
 
-var gcodePosCircleGeometry = new THREE.CircleGeometry(.5,32);
-var gcodePosCircleEdges = new THREE.EdgesGeometry(gcodePosCircleGeometry)
-var gcodePosCircle = new THREE.LineSegments(gcodePosCircleEdges,blackLineMaterial);
+  initMarkers(marker, lineSize, circleSize, lineMaterial) {
+    const sledHorizontalLinePoints = [];
+    sledHorizontalLinePoints.push(new THREE.Vector3(-lineSize, 0, 0));
+    sledHorizontalLinePoints.push(new THREE.Vector3(lineSize, 0, 0));
+    const sledHorizontalLineSegments = new THREE.BufferGeometry().setFromPoints( sledHorizontalLinePoints );
+    const sledHorizontalLine = new THREE.LineSegments(sledHorizontalLineSegments, lineMaterial);
 
-var gcodePos = new THREE.Group();
-gcodePos.add(gcodePosHorizontalLine);
-gcodePos.add(gcodePosVerticalLine);
-gcodePos.add(gcodePosCircle);
-gcodePos.position.set(0,0,0);
+    const sledVerticalLinePoints = [];
+    sledVerticalLinePoints.push(new THREE.Vector3(0, -lineSize, 0));
+    sledVerticalLinePoints.push(new THREE.Vector3(0, lineSize, 0));
+    const sledVerticalLineSegments = new THREE.BufferGeometry().setFromPoints( sledVerticalLinePoints );
+    const sledVerticalLine = new THREE.LineSegments(sledVerticalLineSegments, lineMaterial);
 
-var computedSledHorizontalLineSegments = new THREE.Geometry();
-computedSledHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.5, 0, 0));
-computedSledHorizontalLineSegments.vertices.push(new THREE.Vector3(1.5, 0, 0));
-var computedSledHorizontalLine = new THREE.LineSegments(computedSledHorizontalLineSegments, grayLineMaterial);
+    const sledCircleGeometry = new THREE.CircleGeometry(circleSize, 32);
+    const sledCircleEdges = new THREE.EdgesGeometry(sledCircleGeometry)
+    const sledCircle = new THREE.LineSegments(sledCircleEdges, lineMaterial);
 
-var computedSledVerticalLineSegments = new THREE.Geometry();
-computedSledVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.5, 0));
-computedSledVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.5, 0));
-var computedSledVerticalLine = new THREE.LineSegments(computedSledVerticalLineSegments, grayLineMaterial);
+    marker.add(sledHorizontalLine);
+    marker.add(sledVerticalLine);
+    marker.add(sledCircle);
+    marker.position.set(0, 0, 0);
+  }
 
-var computedSledCircleGeometry = new THREE.CircleGeometry(1,32);
-var computedSledCircleEdges = new THREE.EdgesGeometry(computedSledCircleGeometry)
-var computedSledCircle = new THREE.LineSegments(computedSledCircleEdges,grayLineMaterial);
+  initLineBuffers(bufferSize, drawRange, lineMaterial) {
+    const lineGeometry = new THREE.BufferGeometry();
+    const linePositions = new Float32Array(bufferSize * 3);
+    lineGeometry.setAttribute("position", new THREE.BufferAttribute(linePositions, 3));
+    lineGeometry.setDrawRange(0, drawRange);
+    const line = new THREE.Line(lineGeometry, lineMaterial);
+    line.frustumCulled = false;
+    return line;
+  }
 
-var computedSled = new THREE.Group();
-computedSled.add(computedSledHorizontalLine);
-computedSled.add(computedSledVerticalLine);
-computedSled.add(computedSledCircle);
-computedSled.position.set(0,0,0);
+  initBoardGroup(boardGroup, boardOutlineFill, boardOutlineOutline) {
+    boardGroup.add(boardOutlineFill);
+    boardGroup.add(boardOutlineOutline);
 
-var cursorHorizontalLineSegments = new THREE.Geometry();
-cursorHorizontalLineSegments.vertices.push(new THREE.Vector3(-1.5, 0, 0));
-cursorHorizontalLineSegments.vertices.push(new THREE.Vector3(1.5, 0, 0));
-var cursorHorizontalLine = new THREE.LineSegments(cursorHorizontalLineSegments, blueLineMaterial);
+    boardGroup.position.set(0, 0, -0.75 / 2);
+  }
 
-var cursorVerticalLineSegments = new THREE.Geometry();
-cursorVerticalLineSegments.vertices.push(new THREE.Vector3(0, -1.5, 0));
-cursorVerticalLineSegments.vertices.push(new THREE.Vector3(0, 1.5, 0));
-var cursorVerticalLine = new THREE.LineSegments(cursorVerticalLineSegments, blueLineMaterial);
+  initAll() {
+    this.initWorkArea(this.renderer);
 
-var cursorCircleGeometry = new THREE.CircleGeometry(1,32);
-var cursorCircleEdges = new THREE.EdgesGeometry(cursorCircleGeometry)
-var cursorCircle = new THREE.LineSegments(cursorCircleEdges,blueLineMaterial);
+    this.cameraO = this.initCameraO(this.w, this.h, this.scale);
+    this.cameraP = this.initCameraP(this.w, this.h);
+    this.initCamera(this.cameraO);
+    this.initCamera(this.cameraP);
+    this.controlsO = this.initControls(this.cameraO, this.renderer);
+    this.controlsP = this.initControls(this.cameraP, this.renderer);
+    this.toggle3DView(); // makes it not true and applies appropriate settings
+    //controls.update();
+    this.controlsO.saveState();
+    this.controlsP.saveState();
 
-var cursor = new THREE.Group();
-cursor.add(cursorHorizontalLine);
-cursor.add(cursorVerticalLine);
-cursor.add(cursorCircle);
-cursor.position.set(0,0,0);
+    this.initScene(this.scene, this.blackLineMaterial, this.blackDashedMaterial);
 
+    this.initMarkers(this.sled, 1.5, 1, this.redLineMaterial);
+    this.initMarkers(this.home, 1.25, 0.75, this.greenLineMaterial);
+    this.initMarkers(this.gcodePos, 1, 0.5, this.blackLineMaterial);
+    this.initMarkers(this.computedSled, 1.5, 1, this.grayLineMaterial);
+    this.initMarkers(this.cursor, 1.5, 1, this.blueLineMaterial);
 
-var cursorVLineGeometry = new THREE.BufferGeometry();
-var cursorVLinePositions = new Float32Array(2*3);
-cursorVLineGeometry.addAttribute( 'position', new THREE.BufferAttribute(cursorVLinePositions, 3));
-cursorVLineGeometry.setDrawRange(0, 2);
-var cursorVLine = new THREE.Line(cursorVLineGeometry, lightBlueLineMaterial);
-cursorVLine.frustumCulled = false;
-scene.add(cursorVLine);
+    this.cursorVLine = this.initLineBuffers(2, 2, this.lightBlueLineMaterial);
+    this.cursorHLine = this.initLineBuffers(2, 2, this.lightBlueLineMaterial);
+    this.boardCutLines = this.initLineBuffers(1000, 100, this.redLineMaterial);
 
-var cursorHLineGeometry = new THREE.BufferGeometry();
-var cursorHLinePositions = new Float32Array(2*3);
-cursorHLineGeometry.addAttribute( 'position', new THREE.BufferAttribute(cursorHLinePositions, 3));
-cursorHLineGeometry.setDrawRange(0, 2);
-var cursorHLine = new THREE.Line(cursorHLineGeometry, lightBlueLineMaterial);
-cursorHLine.frustumCulled = false;
-scene.add(cursorHLine);
+    this.scene.add(this.cursorVLine);
+    this.scene.add(this.cursorHLine);
+    this.scene.add(this.boardCutLines);
 
-var boardCutLinesGeometry = new THREE.BufferGeometry();
-var boardCutLinesPositions = new Float32Array(1000*3);
-boardCutLinesGeometry.addAttribute( 'position', new THREE.BufferAttribute(boardCutLinesPositions, 3));
-boardCutLinesGeometry.setDrawRange(0, 100);
-var boardCutLines = new THREE.Line(boardCutLinesGeometry, redLineMaterial);
-boardCutLines.frustumCulled = false;
-scene.add(boardCutLines);
+    this.initBoardGroup(this.boardGroup, this.boardOutlineFill, this.boardOutlineOutline);
 
-var boardGroup = new THREE.Group();
+    if (this.showBoard) {
+      this.scene.add(this.cutSquareGroup);
+      this.scene.add(this.boardGroup);
+    }
+    this.scene.add(this.sled);
+    this.scene.add(this.home);
+    this.scene.add(this.gcodePos);
+    if (!this.isMobile) {
+      this.scene.add(this.cursor);
+    }
+    //this.scene.add(this.cutSquareGroup);
+  }
 
-var boardOutlineGeometry = new THREE.BoxBufferGeometry(96,48,0.75);
-var boardFillMaterial = new THREE.MeshBasicMaterial({ color: 0xD2B48C, opacity: 0.5, transparent:true})
-var boardOutlineFill = new THREE.Mesh(boardOutlineGeometry, boardFillMaterial);
-var boardOutlineMaterial = new THREE.LineBasicMaterial({ color: 0x783E04})
-var boardEdgesGeometry = new THREE.EdgesGeometry( boardOutlineGeometry )
-var boardOutlineOutline = new THREE.LineSegments( boardEdgesGeometry, boardOutlineMaterial);
-boardGroup.add(boardOutlineFill);
-boardGroup.add(boardOutlineOutline);
+  toggle3DView() {
+    console.log("toggling");
+    if (this.view3D) {
+      this.controlsO.enableRotate = false;
+      this.controlsO.mouseButtons = {
+        LEFT: THREE.MOUSE.RIGHT,
+        MIDDLE: THREE.MOUSE.MIDDLE,
+        RIGHT: THREE.MOUSE.LEFT
+      };
+      this.controlsP.enableRotate = false;
+      this.controlsP.mouseButtons = {
+        LEFT: THREE.MOUSE.RIGHT,
+        MIDDLE: THREE.MOUSE.MIDDLE,
+        RIGHT: THREE.MOUSE.LEFT
+      }
 
-boardGroup.position.set(0,0,-0.75/2);
+      this.view3D = false;
+      if (this.isMobile) {
+        $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
+      } else {
+        $("#button3D").removeClass('btn-primary').addClass('btn-secondary');
+      }
+      console.log("toggled off");
+    } else {
+      this.controlsO.enableRotate = true;
+      this.controlsO.mouseButtons = {
+        LEFT: THREE.MOUSE.RIGHT,
+        MIDDLE: THREE.MOUSE.MIDDLE,
+        RIGHT: THREE.MOUSE.LEFT
+      }
+      this.controlsP.enableRotate = true;
+      this.controlsP.mouseButtons = {
+        LEFT: THREE.MOUSE.RIGHT,
+        MIDDLE: THREE.MOUSE.MIDDLE,
+        RIGHT: THREE.MOUSE.LEFT
+      }
 
-if (showBoard)
-{
-    scene.add(cutSquareGroup);
-    scene.add(boardGroup);
-}
-scene.add(sled);
-scene.add(home);
-scene.add(gcodePos);
-if (!isMobile)
-    scene.add(cursor);
-//scene.add(cutSquareGroup);
+      this.view3D = true;
+      if (this.isMobile) {
+        $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
+      } else {
+        $("#button3D").removeClass('btn-secondary').addClass('btn-primary');
+      }
+      console.log("toggled on");
+    }
+    this.controlsO.update();
+    this.controlsP.update();
+  }
 
-var isComputedEnabled = false;
+  cursorPosition(event) {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const vec = new THREE.Vector3();
+    const pos = new THREE.Vector3();
+    vec.set(
+      ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
+      - ((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
+      0.5);
+  
+    const camera = (this.cameraPerspective == 0) ? this.cameraO : this.cameraP;
+    vec.unproject(camera);
+    vec.sub(camera.position).normalize();
+    const distance = -camera.position.z / vec.z;
+    pos.copy(camera.position).add(vec.multiplyScalar(distance));
 
-animate();
+    //console.log(pos);
+    return (pos);
+  }
 
-window.addEventListener( 'resize', onWindowResize, false );
+  animate() {
+    window.requestAnimationFrame(this.animate);
+    this.controlsO.update();
+    this.controlsP.update();
+    this.renderer.render(this.scene, (this.cameraPerspective == 0) ? this.cameraO: this.cameraP);
+  }
 
-function onWindowResize(){
-
+  onWindowResize() {
     //w=window.innerWidth;
     //h=window.innerHeight;
     //console.log("wr="+w+", hr="+h);
-    we = $("#workarea").width(); //-20;
-    he = $("#workarea").height(); //-20;
+    const we = $("#workarea").width(); //-20;
+    const he = $("#workarea").height(); //-20;
     //console.log("we="+we+", he="+he);
-
-    //cameraO.aspect = window.innerWidth / window.innerHeight;
-    cameraO.left = we/-2*scale;
-    cameraO.right = we/2*scale;
-    cameraO.top = he/2*scale;
-    cameraO.bottom = he/-2*scale;
-    cameraO.updateProjectionMatrix();
-    //cameraP.aspect = window.innerWidth / window.innerHeight;
-    cameraP.aspect = we / he;
-    cameraP.updateProjectionMatrix();
-
-    renderer.setSize( we, he );
-
-}
-
-
-function animate() {
-    requestAnimationFrame(animate);
-    controlsO.update();
-    controlsP.update();
-    if (cameraPerspective == 0)
-        renderer.render( scene, cameraO );
-    else
-        renderer.render( scene, cameraP );
-}
-
-function positionUpdate(x,y,z){
-    if ($("#units").text()=="MM"){
-        x /= 25.4
-        y /= 25.4
-        z /= 25.4
+  
+    if (this.cameraO) {
+      //this.cameraO.aspect = window.innerWidth / window.innerHeight;
+      this.cameraO.left = we / -2 * this.scale;
+      this.cameraO.right = we / 2 * this.scale;
+      this.cameraO.top = he / 2 * this.scale;
+      this.cameraO.bottom = he / -2 * this.scale;
+      this.cameraO.updateProjectionMatrix();
     }
-    sled.position.set(x,y,z);
-    computedSled.position.setComponent(2,z-0.01);
 
-    //console.log("x="+x+", y="+y+", z="+z)
-}
-
-
-function homePositionUpdate(x,y){
-    if ($("#units").text()=="MM"){
-        x /= 25.4
-        y /= 25.4
+    if (this.cameraP) {
+      //this.cameraP.aspect = window.innerWidth / window.innerHeight;
+      this.cameraP.aspect = we / he;
+      this.cameraP.updateProjectionMatrix();
     }
-    home.position.set(x,y,0);
-    //shift any gcode
-    homeX = x;
-    homeY = y;
-    gcode.position.set(x,y,0);
-
-
-}
-
-function gcodePositionUpdate(x,y,z){
-    if ($("#units").text()=="MM"){
-        x /= 25.4
-        y /= 25.4
-        z /= 25.4
-    }
-    gcodePos.position.set(x+homeX,y+homeY,z);
-    //console.log("x="+x+", y="+y)
-}
-
-$(document).ready(function(){
-    $( "#workarea" ).contextmenu(function() {
-        if (!view3D)
-        {
-            pos = cursorPosition();
-
-            x = pos.x;
-            x = x.toFixed(4);
-            pos.x = x;
-
-            y = pos.y;
-            y = y.toFixed(4);
-            pos.y = y;
-            requestPage("screenAction",pos)
-        }
-    });
-});
-
-function processError3d(data){
- if ( !data.computedEnabled )
- {
-    if (isComputedEnabled){
-        scene.remove(computedSled);
-        isComputedEnabled = false;
-    }
-    return;
- }
- else
- {
-     var x = data.computedX/25.4;
-     var y = data.computedY/25.4;
-     if ($("#units").text()==""){
-        x /= 25.4
-        y /= 25.4
-     }
-     computedSled.position.setComponent(0,x);
-     computedSled.position.setComponent(1,y);
-     if (!isComputedEnabled){
-        scene.add(computedSled);
-        //scene.add(cutTrailGroup);
-        isComputedEnabled = true;
-     }
- }
-}
-
-
-function gcodeUpdateCompressed(data){
-  console.log("updating gcode compressed");
-  if (gcode.children.length!=0) {
-    for (var i = gcode.children.length -1; i>=0; i--){
-        gcode.remove(gcode.children[i]);
-    }
-  }
-  if (textLabels.children.length!=0) {
-    for (var i = textLabels.children.length -1; i>=0; i--){
-        textLabels.remove(textLabels.children[i]);
+  
+    if (this.renderer) {
+      this.renderer.setSize(we, he);
     }
   }
 
-  var gcodeLineSegments = new THREE.Geometry();
-  var gcodeDashedLineSegments = new THREE.Geometry();
+  onMouseMove(event) {
+    if (!this.isMobile) {
+      this.pos = this.cursorPosition(event);
+      this.cursor.position.set(this.pos.x, this.pos.y, this.pos.z);
+      const linePosX = confine(this.pos.x, -48, 48);
+      const linePosY = confine(this.pos.y, -24, 24);
+  
+      let positions = this.cursorVLine.geometry.attributes.position.array;
+      positions[0] = linePosX;
+      positions[1] = 24;
+      positions[2] = -0.001;
+      positions[3] = linePosX;
+      positions[4] = -24;
+      positions[5] = -0.001;
+      this.cursorVLine.geometry.attributes.position.needsUpdate = true;
+  
+      positions = this.cursorHLine.geometry.attributes.position.array;
+      positions[0] = 48;
+      positions[1] = linePosY;
+      positions[2] = -0.001;
+      positions[3] = -48;
+      positions[4] = linePosY;
+      positions[5] = -0.001;
+      this.cursorHLine.geometry.attributes.position.needsUpdate = true;
 
-  if ((data!=null) && (data!="")){
-    var uncompressed = pako.inflate(data);
-    var _str = ab2str(uncompressed);
-    var data = JSON.parse(_str)
-    console.log(data)
-    var pX, pY, pZ = -99999.9
-    var gcodeDashed;
-    var gcodeUndashed;
-    data.forEach(function(line) {
-      if (line.type=='line'){
-        //console.log("Line length="+line.points.length+", dashed="+line.dashed);
-        if (line.dashed==true) {
-          var gcodeDashedLineSegments = new THREE.Geometry();
-          line.points.forEach(function(point) {
-            gcodeDashedLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-          })
-          gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
-          gcodeDashed.computeLineDistances();
-          gcode.add(gcodeDashed);
-        } else {
-          var gcodeLineSegments = new THREE.Geometry();
-          line.points.forEach(function(point) {
-            gcodeLineSegments.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-          })
-          gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
-          gcode.add(gcodeUndashed);
-
-        }
+      if ($("#units").text() == "MM") {
+        this.pos.x *= 25.4
+        this.pos.y *= 25.4
       }
-      else
-      {
-        if ( (line.command == "SpindleOnCW") || (line.command=="SpindlenOnCCW") || (line.command=="SpindleOff") ) //(line.points[1][0]>=3) && (line.points[1][0]<=5) )
-        {
+      $("#cursorPosition").text("X: " + this.pos.x.toFixed(2) + ", Y: " + this.pos.y.toFixed(2));
+    }
+  }
+
+  board3DDataUpdate(data) {
+    console.log("updating board data");
+    this.boardOutlineGeometry.dispose();
+    this.boardOutlineGeometry = new THREE.BoxGeometry(data.width, data.height, data.thickness);
+    this.boardOutlineFill.geometry = this.boardOutlineGeometry;
+    this.boardEdgesGeometry = new THREE.EdgesGeometry(this.boardOutlineGeometry)
+    this.boardOutlineOutline.geometry = this.boardEdgesGeometry;
+  
+    this.boardOutlineFill.geometry.needsUpdate = true;
+    this.boardOutlineOutline.geometry.needsUpdate = true;
+    this.boardGroup.position.set(data.centerX, data.centerY, data.thickness / -2.0);
+  }
+
+  positionUpdate(x, y, z) {
+    if ($("#units").text() == "MM") {
+      x /= 25.4
+      y /= 25.4
+      z /= 25.4
+    }
+    this.sled.position.set(x, y, z);
+    this.computedSled.position.setComponent(2, z - 0.01);
+  
+    //console.log("x="+x+", y="+y+", z="+z)
+  }
+
+  homePositionUpdate(x, y) {
+    if ($("#units").text() == "MM") {
+      x /= 25.4
+      y /= 25.4
+    }
+    this.home.position.set(x, y, 0);
+    //shift any gcode
+    this.homeX = x;
+    this.homeY = y;
+    this.gcode.position.set(x, y, 0);
+  }
+
+  gcodePositionUpdate(x, y, z) {
+    if ($("#units").text() == "MM") {
+      x /= 25.4
+      y /= 25.4
+      z /= 25.4
+    }
+    this.gcodePos.position.set(x + homeX, y + homeY, z);
+    //console.log("x="+x+", y="+y)
+  }
+
+  processError3d(data) {
+    if (!data.computedEnabled) {
+      if (this.isComputedEnabled) {
+        this.scene.remove(this.computedSled);
+        this.isComputedEnabled = false;
+      }
+      return;
+    } else {
+      var x = data.computedX / 25.4;
+      var y = data.computedY / 25.4;
+      if ($("#units").text() == "") {
+        x /= 25.4
+        y /= 25.4
+      }
+      this.computedSled.position.setComponent(0, x);
+      this.computedSled.position.setComponent(1, y);
+      if (!this.isComputedEnabled) {
+        this.scene.add(this.computedSled);
+        //this.scene.add(this.cutTrailGroup);
+        this.isComputedEnabled = true;
+      }
+    }
+  }
+
+  gcodeUpdateCompressed(data) {
+    console.log("updating gcode compressed");
+    if (this.gcode.children.length != 0) {
+      for (let i = this.gcode.children.length - 1; i >= 0; i--) {
+        this.gcode.remove(this.gcode.children[i]);
+      }
+    }
+    if (this.textLabels.children.length != 0) {
+      for (var i = this.textLabels.children.length - 1; i >= 0; i--) {
+        this.textLabels.remove(this.textLabels.children[i]);
+      }
+    }
+  
+    const greenLineDashedMaterial = new THREE.LineDashedMaterial({ color: 0x00aa00, dashSize: .1, gapSize: .1 });
+  
+    if ((data != null) && (data != "")) {
+      var uncompressed = pako.inflate(data);
+      var _str = ab2str(uncompressed);
+      var data = JSON.parse(_str)
+      console.log(data)
+
+      let gcodeDashed;
+      let gcodeUndashed;
+      data.forEach((line) => {
+        if (line.type == 'line') {
+          //console.log("Line length="+line.points.length+", dashed="+line.dashed);
+          if (line.dashed == true) {
+            const gcodeDashedLinePoints = [];
+            line.points.forEach(function (point) {
+              gcodeDashedLinePoints.push(new THREE.Vector3(point[0], point[1], point[2]));
+            })
+            const gcodeDashedLineSegments = new THREE.BufferGeometry().setFromPoints( gcodeDashedLinePoints );
+            gcodeDashed = new THREE.Line(gcodeDashedLineSegments, greenLineDashedMaterial)
+            gcodeDashed.computeLineDistances();
+            this.gcode.add(gcodeDashed);
+          } else {
+            var gcodeLinePoints = [];
+            line.points.forEach(function (point) {
+              gcodeLinePoints.push(new THREE.Vector3(point[0], point[1], point[2]));
+            })
+            var gcodeLineSegments = new THREE.BufferGeometry().setFromPoints( gcodeLinePoints );
+            gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
+            this.gcode.add(gcodeUndashed);
+          }
+        } else {
+          if (["SpindleOnCW", "SpindleOnCCW", "SpindleOff"].includes(line.command)) {
+            //(line.points[1][0]>=3) && (line.points[1][0]<=5) )
             //spindle
-            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
+            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25 / 32, 16);
             var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
             var circleMaterial = redLineMaterial;
-            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges, circleMaterial);
             gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
-            gcode.add(gcodeCircle);
-            var gcodeLineSegments = new THREE.Geometry();
+            this.gcode.add(gcodeCircle);
             var xFactor = 3.25;
             var yFactor = 3.25;
-            if (line.command == "SpindleOff") //(line.points[1][0]==5)
-            {
-                xFactor = .707107*2.25;
-                yFactor = .707107*2.25;
+            if (line.command == "SpindleOff") {
+              //(line.points[1][0]==5)
+              xFactor = .707107 * 2.25;
+              yFactor = .707107 * 2.25;
             }
-            if (line.command == "SpindleOnCCW") // (line.points[1][0]==4)
-            {
-                xFactor = 3.25;
-                yFactor = 3.25;
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+  
+            const gcodeLinePoints = [];
+            if (line.command == "SpindleOnCCW") {
+              // (line.points[1][0]==4)
+              xFactor = 3.25;
+              yFactor = 3.25;
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] + xFactor / 32, line.points[0][1] + yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] - xFactor / 32, line.points[0][1] + yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] + xFactor / 32, line.points[0][1] - yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] - xFactor / 32, line.points[0][1] - yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+            } else {
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] + xFactor / 32, line.points[0][1] + yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] + xFactor / 32, line.points[0][1] - yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] - xFactor / 32, line.points[0][1] + yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0] - xFactor / 32, line.points[0][1] - yFactor / 32, line.points[0][2]));
+              gcodeLinePoints.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
             }
-            else
-            {
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]+xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]+yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0]-xFactor/32, line.points[0][1]-yFactor/32, line.points[0][2]));
-                gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
-            }
+            const gcodeLineSegments = new THREE.BufferGeometry().setFromPoints( gcodeLinePoints );
             gcodeUndashed = new THREE.Line(gcodeLineSegments, redLineMaterial)
-            gcode.add(gcodeUndashed);
-            if (line.command != "SpindleOff")
-            {
-                text = new SpriteText('S'+line.points[1][1].toString(),.1, 'red');
-                text.position.x = line.points[0][0];
-                text.position.y = line.points[0][1];
-                text.position.z = line.points[0][2];
-                textLabels.add(text);
+            this.gcode.add(gcodeUndashed);
+            if (line.command != "SpindleOff") {
+              text = new SpriteText('S' + line.points[1][1].toString(), .1, 'red');
+              text.position.x = line.points[0][0];
+              text.position.y = line.points[0][1];
+              text.position.z = line.points[0][2];
+              textLabels.add(text);
             }
-        }
-        else if (line.command == "ToolChange")
-        {
-            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25/32,16);
+          } else if (line.command == "ToolChange") {
+            var gcodeCircleGeometry = new THREE.CircleGeometry(2.25 / 32, 16);
             var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
             circleMaterial = redLineMaterial;
-            text = new SpriteText('T'+line.points[1][1].toString(),.1, 'red');
+            text = new SpriteText('T' + line.points[1][1].toString(), .1, 'red');
             text.position.x = line.points[0][0];
             text.position.y = line.points[0][1];
             text.position.z = line.points[0][2];
             textLabels.add(text);
-            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges, circleMaterial);
             gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
-            gcode.add(gcodeCircle);
-        }
-        else
-        {
-            var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0]/32,16);
+            this.gcode.add(gcodeCircle);
+          } else {
+            var gcodeCircleGeometry = new THREE.CircleGeometry(line.points[1][0] / 32, 16);
             var gcodeCircleEdges = new THREE.EdgesGeometry(gcodeCircleGeometry)
             var circleMaterial = greenLineMaterial;
-            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges,circleMaterial);
+            var gcodeCircle = new THREE.LineSegments(gcodeCircleEdges, circleMaterial);
             gcodeCircle.position.set(line.points[0][0], line.points[0][1], line.points[0][2]);
-            gcode.add(gcodeCircle);
+            this.gcode.add(gcodeCircle);
+          }
+  
+          const gcodeLinePoints = [];
+          gcodeLinePoints.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
+          gcodeLinePoints.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[1][2]));
+          const gcodeLineSegments = new THREE.BufferGeometry().setFromPoints( gcodeLinePoints );
+          gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
+          this.gcode.add(gcodeUndashed);
         }
-
-        var gcodeLineSegments = new THREE.Geometry();
-        gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[0][2]));
-        gcodeLineSegments.vertices.push(new THREE.Vector3(line.points[0][0], line.points[0][1], line.points[1][2]));
-        gcodeUndashed = new THREE.Line(gcodeLineSegments, blueLineMaterial)
-        gcode.add(gcodeUndashed);
-
+      });
+      this.scene.add(this.gcode);
+      if (this.showLabels) {
+        this.scene.add(this.textLabels);
       }
-    });
-    scene.add(gcode);
-    if (showLabels)
-        scene.add(textLabels);
+    } else {
+      this.scene.remove(this.gcode);
+      this.scene.remove(this.textLabels);
+    }
+    $("#fpCircle").hide();
   }
-  else{
-    scene.remove(gcode);
-    scene.remove(textLabels);
-  }
-  $("#fpCircle").hide();
 
+  toggleLabels() {
+    if (this.showLabels) {
+      this.scene.remove(this.textLabels);
+      $("#labelsID").removeClass('btn-primary').addClass('btn-secondary');
+    }
+    else {
+      this.scene.add(this.textLabels);
+      $("#labelsID").removeClass('btn-secondary').addClass('btn-primary');
+    }
+    this.showLabels = !this.showLabels;
+  }
+
+  resetView() {
+    this.controlsO.reset();
+    this.controlsP.reset();
+  }
 }
 
-function toggleLabels()
-{
-    if (showLabels)
-    {
-        scene.remove(textLabels);
-        $("#labelsID").removeClass('btn-primary').addClass('btn-secondary');
+const frontpage3d = new Frontpage3d();
+
+$(document).ready(() => {
+  frontpage3d.initAll();
+  frontpage3d.animate();
+  $("#workarea").contextmenu(() => {
+    if (!frontpage3d.view3D) {
+      // cursorPosition expects an event
+      frontpage3d.pos = frontpage3d.cursorPosition({clientX: 0, clientY: 0});
+
+      x = frontpage3d.pos.x;
+      x = x.toFixed(4);
+      frontpage3d.pos.x = x;
+
+      y = frontpage3d.pos.y;
+      y = y.toFixed(4);
+      frontpage3d.pos.y = y;
+      // This global function is defined in baseSocket.js
+      requestPage("screenAction", frontpage3d.pos)
     }
-    else
-    {
-        scene.add(textLabels);
-        $("#labelsID").removeClass('btn-secondary').addClass('btn-primary');
-    }
-    showLabels = !showLabels;
+  });
+  console.log(frontpage3d);
+  window.addEventListener("resize", frontpage3d.onWindowResize, false);
+  document.onmousemove = (event) => {
+    frontpage3d.onMouseMove(event);
+  }
+});
+
+function toggleLabels() {
+  // Called by frontpage3d.html
+  frontpage3d.toggleLabels();
 }
 
 function ab2str(buf) {
-    var bufView = new Uint16Array(buf);
-    var unis =""
-    for (var i = 0; i < bufView.length; i++) {
-        unis=unis+String.fromCharCode(bufView[i]);
+  var bufView = new Uint16Array(buf);
+  var unis = ""
+  for (var i = 0; i < bufView.length; i++) {
+    unis = unis + String.fromCharCode(bufView[i]);
+  }
+  return unis
+}
+
+/** You spin me right round, baby right round, like a record player, right round, round, round */
+function showFPSpinner(msg) {
+  $("#fpCircle").show();
+}
+
+function resetView() {
+  // Called by frontpage3d.html and frontpage3d_mobile.html
+  frontpage3d.resetView();
+}
+
+function processCameraMessage(data) {
+  if (data.command == "cameraImageUpdated") {
+    var newImg = new Image();
+    if (imageShowing == 1) {
+      newImg.onload = function () {
+        document.getElementById("cameraImage2").setAttribute('src', this.src);
+        if (isMobile) {
+          document.getElementById("mobileCameraDiv2").style.zIndex = "95";
+          document.getElementById("mobileCameraDiv1").style.zIndex = "94";
+        } else {
+          document.getElementById("cameraDiv2").style.zIndex = "95";
+          document.getElementById("cameraDiv1").style.zIndex = "94";
+        }
+        imageShowing = 2
+      }
     }
-    return unis
-}
-
-function showFPSpinner(msg){
-    $("#fpCircle").show();
-}
-
-
-function toggle3DView()
-{
-    console.log("toggling");
-    if (view3D){
-        controlsO.enableRotate = false;
-        controlsO.mouseButtons = {
-            LEFT: THREE.MOUSE.RIGHT,
-            MIDDLE: THREE.MOUSE.MIDDLE,
-            RIGHT: THREE.MOUSE.LEFT
+    else {
+      newImg.onload = function () {
+        document.getElementById("cameraImage1").setAttribute('src', this.src);
+        if (isMobile) {
+          document.getElementById("mobileCameraDiv1").style.zIndex = "95";
+          document.getElementById("mobileCameraDiv2").style.zIndex = "94";
+        } else {
+          document.getElementById("cameraDiv1").style.zIndex = "95";
+          document.getElementById("cameraDiv2").style.zIndex = "94";
         }
-        controlsP.enableRotate = false;
-        controlsP.mouseButtons = {
-            LEFT: THREE.MOUSE.RIGHT,
-            MIDDLE: THREE.MOUSE.MIDDLE,
-            RIGHT: THREE.MOUSE.LEFT
-        }
-
-        view3D=false;
-        if (isMobile)
-        {
-            $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
-        }
-        else
-        {
-            $("#button3D").removeClass('btn-primary').addClass('btn-secondary');
-        }
-        console.log("toggled off");
-    } else {
-        controlsO.enableRotate = true;
-        controlsO.mouseButtons = {
-            LEFT: THREE.MOUSE.RIGHT,
-            MIDDLE: THREE.MOUSE.MIDDLE,
-            RIGHT: THREE.MOUSE.LEFT
-        }
-        controlsP.enableRotate = true;
-        controlsP.mouseButtons = {
-            LEFT: THREE.MOUSE.RIGHT,
-            MIDDLE: THREE.MOUSE.MIDDLE,
-            RIGHT: THREE.MOUSE.LEFT
-        }
-
-        view3D=true;
-        if (isMobile)
-        {
-            $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
-        }
-        else
-        {
-            $("#button3D").removeClass('btn-secondary').addClass('btn-primary');
-        }
-        console.log("toggled on");
+        imageShowing = 1
+      }
     }
-    controlsO.update();
-    controlsP.update();
-}
+    newImg.setAttribute('src', 'data:image/png;base64,' + data.data)
 
-function resetView(){
-    controlsO.reset();
-    controlsP.reset();
-}
-
-function cursorPosition(){
-    var rect = renderer.domElement.getBoundingClientRect();
-    var vec = new THREE.Vector3(); // create once and reuse
-    var pos = new THREE.Vector3(); // create once and reuse
-    vec.set(
-        ( ( event.clientX - rect.left ) / ( rect.right - rect.left ) ) * 2 - 1,
-        - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
-        0.5 );
-
-    if (cameraPerspective == 0)
-    {
-        vec.unproject( cameraO );
-        vec.sub( cameraO.position ).normalize();
-        var distance = - cameraO.position.z / vec.z;
-        pos.copy( cameraO.position ).add( vec.multiplyScalar( distance ) );
+  }
+  if (data.command == "updateCamera") {
+    if (data.data == "on") {
+      $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
+      feather.replace();
+      console.log("video on");
+      document.getElementById("cameraImage1").style.display = "block"
+      document.getElementById("cameraImage2").style.display = "block"
+      if (isMobile)
+        document.getElementById("mobileCameraArea").style.display = "block"
     }
-    else
-    {
-        vec.unproject( cameraP );
-        vec.sub( cameraP.position ).normalize();
-        var distance = - cameraP.position.z / vec.z;
-        pos.copy( cameraP.position ).add( vec.multiplyScalar( distance ) );
-    }
-    //console.log(pos);
-    return(pos);
-}
 
-function processCameraMessage(data){
-    if(data.command=="cameraImageUpdated"){
-        var newImg = new Image();
-        if (imageShowing==1)
-        {
-            newImg.onload = function() {
-                document.getElementById("cameraImage2").setAttribute('src',this.src);
-                if (isMobile){
-                    document.getElementById("mobileCameraDiv2").style.zIndex = "95";
-                    document.getElementById("mobileCameraDiv1").style.zIndex = "94";
-                } else {
-                    document.getElementById("cameraDiv2").style.zIndex = "95";
-                    document.getElementById("cameraDiv1").style.zIndex = "94";
-                }
-                imageShowing = 2
-            }
-        }
-        else
-        {
-            newImg.onload = function() {
-                document.getElementById("cameraImage1").setAttribute('src',this.src);
-                if (isMobile){
-                    document.getElementById("mobileCameraDiv1").style.zIndex = "95";
-                    document.getElementById("mobileCameraDiv2").style.zIndex = "94";
-                } else {
-                    document.getElementById("cameraDiv1").style.zIndex = "95";
-                    document.getElementById("cameraDiv2").style.zIndex = "94";
-                }
-                imageShowing = 1
-            }
-        }
-        newImg.setAttribute('src', 'data:image/png;base64,'+data.data)
-
-    }
-    if(data.command=="updateCamera")
-    {
-        if (data.data=="on"){
-            $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
-            feather.replace();
-            console.log("video on");
-            document.getElementById("cameraImage1").style.display = "block"
-            document.getElementById("cameraImage2").style.display = "block"
-            if (isMobile)
-                document.getElementById("mobileCameraArea").style.display = "block"
-        }
-
-        if (data.data=="off"){
-            $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
-            feather.replace();
-            console.log("video off")
-            document.getElementById("cameraImage1").style.display = "none";
-            document.getElementById("cameraImage2").style.display = "none"
-            if (isMobile)
-                document.getElementById("mobileCameraArea").style.display = "none"
-        }
-    }
-}
-
-document.onmousemove = function(event){
-    if (!isMobile)
-    {
-        pos = cursorPosition();
-        cursor.position.set(pos.x,pos.y,pos.z);
-        var linePosX = confine(pos.x,-48, 48);
-        var linePosY = confine(pos.y,-24, 24);
-
-        var positions = cursorVLine.geometry.attributes.position.array;
-        positions[0]=linePosX;
-        positions[1]=24;
-        positions[2]=-0.001;
-        positions[3]=linePosX;
-        positions[4]=-24;
-        positions[5]=-0.001;
-        cursorVLine.geometry.attributes.position.needsUpdate=true;
-
-        positions = cursorHLine.geometry.attributes.position.array;
-        positions[0]=48;
-        positions[1]=linePosY;
-        positions[2]=-0.001;
-        positions[3]=-48;
-        positions[4]=linePosY;
-        positions[5]=-0.001;
-        cursorHLine.geometry.attributes.position.needsUpdate=true;
-
-
-        if ($("#units").text()=="MM"){
-            pos.x *= 25.4
-            pos.y *= 25.4
-        }
-        $("#cursorPosition").text("X: "+pos.x.toFixed(2)+", Y: "+pos.y.toFixed(2));
-    }
-}
-
-function confine(value, low, high)
-{
-    if (value<low)
-        return low;
-    if (value>high)
-        return high;
-    return value;
-}
-
-function board3DDataUpdate(data){
-  console.log("updating board data");
-  boardOutlineGeometry.dispose();
-  boardOutlineGeometry = new THREE.BoxBufferGeometry(boardWidth,boardHeight,boardThickness);
-  boardOutlineFill.geometry = boardOutlineGeometry;
-  boardEdgesGeometry = new THREE.EdgesGeometry( boardOutlineGeometry )
-  boardOutlineOutline.geometry = boardEdgesGeometry;
-
-  boardOutlineFill.geometry.needsUpdate=true;
-  boardOutlineOutline.geometry.needsUpdate=true;
-  boardGroup.position.set(boardCenterX,boardCenterY,boardThickness/-2.0);
-
-}
-
-function boardCutDataUpdateCompressed(data){
-  console.log("updating board cut data compressed");
-  if (cutSquareGroup.children.length!=0) {
-    for (var i = cutSquareGroup.children.length -1; i>=0; i--){
-        cutSquareGroup.remove(cutSquareGroup.children[i]);
+    if (data.data == "off") {
+      $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
+      feather.replace();
+      console.log("video off")
+      document.getElementById("cameraImage1").style.display = "none";
+      document.getElementById("cameraImage2").style.display = "none"
+      if (isMobile)
+        document.getElementById("mobileCameraArea").style.display = "none"
     }
   }
-  if (data!=null){
+}
+
+function confine(value, low, high) {
+  if (value < low)
+    return low;
+  if (value > high)
+    return high;
+  return value;
+}
+
+function boardCutDataUpdateCompressed(data) {
+  console.log("updating board cut data compressed");
+  if (cutSquareGroup.children.length != 0) {
+    for (var i = cutSquareGroup.children.length - 1; i >= 0; i--) {
+      cutSquareGroup.remove(cutSquareGroup.children[i]);
+    }
+  }
+  if (data != null) {
     //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
-    var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xff6666});
-    var noncutSquareMaterial = new THREE.MeshBasicMaterial( {color:0x333333});
+    var cutSquareMaterial = new THREE.MeshBasicMaterial({ color: 0xff6666 });
+    var noncutSquareMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
     var uncompressed = pako.inflate(data);
     var _str = ab2str(uncompressed);
     var data = JSON.parse(_str)
 
     var pointsX = Math.ceil(boardWidth)
     var pointsY = Math.ceil(boardHeight)
-    console.log("boardWidth="+boardWidth)
-    console.log("boardHeight="+boardHeight)
-    console.log("boardCenterY="+boardCenterY)
+    console.log("boardWidth=" + boardWidth)
+    console.log("boardHeight=" + boardHeight)
+    console.log("boardCenterY=" + boardCenterY)
     var offsetX = pointsX / 2
     var offsetY = pointsY / 2
 
-    for (var x =0; x<pointsX; x++){
-        for (var y =0; y<pointsY; y++){
-            if (data[x+y*pointsX]){
-                //console.log(x+", "+y);
-                var geometry = new THREE.PlaneGeometry(1,1);
-                var plane = new THREE.Mesh(geometry, cutSquareMaterial);
-                plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
-                cutSquareGroup.add(plane);
-            }/*
+    for (var x = 0; x < pointsX; x++) {
+      for (var y = 0; y < pointsY; y++) {
+        if (data[x + y * pointsX]) {
+          //console.log(x+", "+y);
+          var geometry = new THREE.PlaneGeometry(1, 1);
+          var plane = new THREE.Mesh(geometry, cutSquareMaterial);
+          plane.position.set(x - offsetX + boardCenterX, y - offsetY + boardCenterY, 0.01);
+          cutSquareGroup.add(plane);
+        }/*
             else{
                 var geometry = new THREE.PlaneGeometry(1,1);
                 var plane = new THREE.Mesh(geometry, noncutSquareMaterial);
                 plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
                 cutSquareGroup.add(plane);
             }*/
-        }
+      }
     }
   }
   var e = new Date();
@@ -779,31 +731,31 @@ function boardCutDataUpdateCompressed(data){
 
 }
 
-function toggleBoard(){
-    if (showBoard) {
-        showBoard = false;
-        scene.remove(cutSquareGroup);
-        scene.remove(boardGroup);
-        $("#boardID").removeClass('btn-primary').addClass('btn-secondary');
-    } else {
-        showBoard = true;
-        scene.add(cutSquareGroup);
-        scene.add(boardGroup);
-        $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
-    }
+function toggleBoard() {
+  if (showBoard) {
+    showBoard = false;
+    scene.remove(cutSquareGroup);
+    scene.remove(boardGroup);
+    $("#boardID").removeClass('btn-primary').addClass('btn-secondary');
+  } else {
+    showBoard = true;
+    scene.add(cutSquareGroup);
+    scene.add(boardGroup);
+    $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
+  }
 }
 
-function toggle3DPO(){
-    cameraPerspective = !cameraPerspective;
-    if (cameraPerspective == 0){
-        $("#buttonPO").text("Ortho");
-        $("#mobilebuttonPO").text("Ortho");
-        renderer.render(scene, cameraO)
-    }
-    else {
-        $("#buttonPO").text("Persp");
-        $("#mobilebuttonPO").text("Persp");
-        renderer.render(scene, cameraP)
-    }
+function toggle3DPO() {
+  cameraPerspective = !cameraPerspective;
+  if (cameraPerspective == 0) {
+    $("#buttonPO").text("Ortho");
+    $("#mobilebuttonPO").text("Ortho");
+    renderer.render(scene, cameraO)
+  }
+  else {
+    $("#buttonPO").text("Persp");
+    $("#mobilebuttonPO").text("Persp");
+    renderer.render(scene, cameraP)
+  }
 }
 

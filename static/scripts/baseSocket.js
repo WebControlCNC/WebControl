@@ -1,13 +1,16 @@
-var socket;
+let socket;
 var socketClientID;
 var controllerMessages = [];
 var hostAddress = "..."
 var enable3D = true;
+
 $(document).ready(function(){
   namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
-  socket = io.connect('//' + document.domain + ':' + location.port + namespace, {'forceNew':true});
+  const serverURL = `//${location.hostname}:${location.port}${namespace}`;
+  console.log(serverURL);
+  socket = io(serverURL, {'forceNew': true});
 
   setListeners();
   setupStatusButtons();
@@ -173,10 +176,11 @@ function setListeners(){
                 showFPSpinner(msg.message);
                 break;
             case 'gcodeUpdateCompressed':
-                if (enable3D)
-                    gcodeUpdateCompressed(data);
-                else
+                if (enable3D) {
+                    frontpage3d.gcodeUpdateCompressed(data);
+                } else {
                     $("#fpCircle").hide();
+                }
                 break;
             case 'boardDataUpdate':
                 boardDataUpdate(data);
@@ -284,7 +288,7 @@ function statusRequest(status){
 }
 
 function requestPage(page, args=""){
-  console.log("requesting page..")
+  console.log(`requesting page: ${page}`)
   socket.emit('requestPage',{data:{page:page, isMobile:isMobile, args:args}});
 }
 
