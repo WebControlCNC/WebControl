@@ -286,11 +286,17 @@ class Frontpage3d {
     return (pos);
   }
 
-  animate() {
-    window.requestAnimationFrame(this.animate);
-    this.controlsO.update();
-    this.controlsP.update();
-    this.renderer.render(this.scene, (this.cameraPerspective == 0) ? this.cameraO: this.cameraP);
+  static animate() {
+    // frontpage3d has to be initialized before coming here
+    if (frontpage3d) {
+      frontpage3d.controlsO.update();
+      frontpage3d.controlsP.update();
+      frontpage3d.renderer.render(
+        frontpage3d.scene,
+        (frontpage3d.cameraPerspective == 0) ? frontpage3d.cameraO: frontpage3d.cameraP
+      );
+    }
+    window.requestAnimationFrame(Frontpage3d.animate);
   }
 
   onWindowResize() {
@@ -710,11 +716,11 @@ class Frontpage3d {
   }
 }
 
-const frontpage3d = new Frontpage3d();
-
 $(document).ready(() => {
+  window.frontpage3d = new Frontpage3d();
   frontpage3d.initAll();
-  frontpage3d.animate();
+  // Note that this is a call to a static method
+  window.requestAnimationFrame(Frontpage3d.animate);
   $("#workarea").contextmenu(() => {
     if (!frontpage3d.view3D) {
       // cursorPosition expects an event
@@ -731,7 +737,6 @@ $(document).ready(() => {
       requestPage("screenAction", frontpage3d.pos)
     }
   });
-  console.log(frontpage3d);
   window.addEventListener("resize", frontpage3d.onWindowResize, false);
   document.onmousemove = (event) => {
     frontpage3d.onMouseMove(event);
