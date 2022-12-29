@@ -11,6 +11,9 @@ from flask_mobility.decorators import mobile_template
 
 
 def init_route(app):
+    route_type = "route"
+    print(f"Initializing {route_type} handling for the app")
+
     @app.route("/")
     @mobile_template("{mobile/}")
     def index(template):
