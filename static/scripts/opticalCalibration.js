@@ -1,4 +1,5 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { action, settingRequest } from "./socketEmits.js";
 import { OrbitControls } from "./OrbitControls.js";
 
 settingRequest('Optical Calibration Settings','calibrationCurve');

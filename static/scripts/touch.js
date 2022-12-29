@@ -1,3 +1,5 @@
+import { requestPage } from "./socketEmits.js";
+
 var onlongtouch; 
 var timer;
 var touchduration = 1500; //length of time we want the user to touch before we do something

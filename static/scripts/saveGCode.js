@@ -1,3 +1,4 @@
+import { checkForGCodeUpdate } from "./socketEmits.js";
 
 $('#gcCircle').hide();
 var unselected = [];
@@ -24,8 +25,6 @@ function refreshList(){
       }
   });
 }
-
-
 
 function onFooterSubmit(){
     //var formdata = $("#gcodeForm").serialize();

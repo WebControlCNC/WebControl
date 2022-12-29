@@ -1,3 +1,5 @@
+import { action, updateSetting } from "./socketEmits.js";
+import { processZAxisRequestedSetting } from "./zAxis.js";
 
 var boardWidth = 96
 var boardHeight = 48
@@ -20,7 +22,6 @@ function unitSwitch() {
 }
 
 $(document).ready(function () {
-  action("statusRequest", "cameraStatus");
   var controllerMessage = document.getElementById('controllerMessage');
   controllerMessage.scrollTop = controllerMessage.scrollHeight;
   $("#stickyButtons").css("top", $(".navbar").outerHeight());

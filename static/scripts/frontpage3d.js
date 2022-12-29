@@ -1,5 +1,9 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { OrbitControls } from "./OrbitControls.js";
+import {
+  // checkForGCodeUpdate,
+  requestPage,
+} from "./socketEmits.js";
 
 //checkForGCodeUpdate();
 //checkForGCodeUpdate();
@@ -723,7 +727,7 @@ $(document).ready(() => {
       y = frontpage3d.pos.y;
       y = y.toFixed(4);
       frontpage3d.pos.y = y;
-      // This global function is defined in baseSocket.js
+
       requestPage("screenAction", frontpage3d.pos)
     }
   });

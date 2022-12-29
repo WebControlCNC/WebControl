@@ -6,17 +6,22 @@
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/bootstrap.min.css', version='10262018a') }}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/switches.css', version='10262018a') }}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/base.css', version='10262019l') }}" crossorigin="anonymous">
-  <script src="{{ url_for('static',filename='node_modules/socket.io-client/dist/socket.io.min.js', version='11232022a') }}" crossorigin="anonymous"></script>
+  <!-- <script src="{{ url_for('static',filename='node_modules/socket.io-client/dist/socket.io.min.js', version='11232022a') }}" crossorigin="anonymous"></script> -->
   <script src="{{ url_for('static',filename='node_modules/jquery/dist/jquery.min.js', version='22122022a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', version='22122022a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='11102018t') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018t') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/touch.js', version='11102018t') }}" crossorigin="anonymous"></script>
+  <script type="module">
+    import { action, requestPage } from "{{ url_for('static',filename='scripts/socketEmits.js', version='12292022u') }}";
+    window.action = action;
+    window.requestPage = requestPage;
+  </script>
+  <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='12292022u') }}" type="module" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/base.js', version='11102018t') }}" type="module" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/touch.js', version='11102018t') }}" type="module" crossorigin="anonymous"></script>
 
   <script type="text/javascript" charset="utf-8">
   </script>
-
 </head>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" data-name="">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">WebControl</a>

@@ -1,3 +1,5 @@
+import { action } from "./socketEmits.js";
+
 function onFooterSubmit(){
     var url = $("#pageID").val()
     $.ajax({

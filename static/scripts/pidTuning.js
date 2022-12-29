@@ -1,12 +1,9 @@
+import { action } from "./socketEmits.js";
 
 var _xError = [];
 var _yError = [];
 var _xValues = [];
 var colorwayLayout = ['#313131','#3D019D','#3810DC','#2D47F9','#2503FF','#2ADEF6','#60FDFA','#AEFDFF','#BBBBBB','#FFFDA9','#FAFD5B','#F7DA29','#FF8E25','#F8432D','#D90D39','#D7023D','#313131']
-
-
-
-
 
 function updateVErrorCurve(data) {
     console.log(data)

@@ -1,3 +1,5 @@
+import { action, checkForGCodeUpdate } from "./socketEmits.js";
+
 function updateDirectories(data){
    var directory = data.directory;
    console.log(directory);

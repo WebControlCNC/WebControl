@@ -1,3 +1,4 @@
+import { checkForGCodeUpdate } from "./socketEmits.js";
 
 $('#gcCircle').hide();
 var unselected = [];
