@@ -14,7 +14,7 @@
   <script src="{{ url_for('static',filename='node_modules/three/build/three.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='node_modules/three-spritetext/dist/three-spritetext.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102019w') }}" type="module" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102019w') }}" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102019w') }}" type="module" crossorigin="anonymous"></script>
   <script> feather.replace() </script>
 {% endblock %}
 
@@ -142,17 +142,17 @@
           </div>
           <div class="col-3">
             <div class="progress">
-              <div id="leftError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
+              <div id="leftError" class = "progress-bar" data-bs-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
             </div>
           </div>
           <div class="col-3">
             <div class="progress">
-              <div id="rightError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
+              <div id="rightError" class = "progress-bar" data-bs-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
             </div>
           </div>
           <div class="col-3">
             <div class="progress">
-              <div id="zError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 20%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
+              <div id="zError" class = "progress-bar" data-bs-toggle="tooltip" role="progressbar" style="width: 20%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="0-255"></div>
             </div>
           </div>
         </div>

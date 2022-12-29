@@ -176,6 +176,18 @@ And that's the virtual environment creation and set up done. From now on you'll 
 
 When running on the Pi, you'll also need some extra dependencies and will need to build OpenCV from source. See the Dockerfile for details. (TODO: add instructions here)
 
+### Get the Client Side Libraries Set Up
+
+We're using `npm` (Node Package Manager) to manage the third party JavaScript libraries in use for the client side code (the stuff that actually runs in your browser), `npm` comes with `node`.
+
+Note that we're not using `node` as the web server, we're only using it for `npm` to manage the JavaScript libraries.
+
+To manage `node` it is better to use a node version manager, such as [nvm](https://github.com/nvm-sh/nvm) (or [nvm-windows](https://github.com/coreybutler/nvm-windows) for windows).
+
+Once `nvm` is installed. Run `nvm install lts` to install the latest 'long term support' version of `node`. Which will get you both `node` and `npm`. There are other `nvm` commands, such as `nvm current` to show which version of `node` you're currently using, and `nvm use lts` to switch `nvm` to using the latest `lts` version of `node` if it was on another version.
+
+Then finally go to the `static` folder in the WebControl project, which is where all the Javascript lives, and run `npm install` to get it to download all of the required JavaScript packages. It will create a folder called `node_modules` and put them all within that.
+
 ### Now What? Let's Start Up WebControl🎉
 
 Then you can run the code with.

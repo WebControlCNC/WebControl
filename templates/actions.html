@@ -22,7 +22,7 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('restoreWebControl');$('#contentModal').modal('hide');">Restore WebControl</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('clearLogs');$('#contentModal').modal('hide');">Clear Log Files</button>
 				<button type="button" class="btn btn-lg btn-block btn-danger" onclick="action('shutdown');$('#contentModal').modal('hide');">{{'Shutdown WebControl/WebMCP' if docker else 'Shutdown WebControl'}}</button>
-				<button type="button" class="btn btn-lg btn-block btn-danger" {{'' if enableRPIshutdown else 'data-toggle="tooltip" title="Raspberry Pi System Shutdown"' | safe}} onclick="action('TurnOffRPI');$('#contentModal').modal('hide');"{{'' if enableRPIshutdown else 'hidden'}}>Turn off RPI</button>
+				<button type="button" class="btn btn-lg btn-block btn-danger" {{'' if enableRPIshutdown else 'data-bs-toggle="tooltip" title="Raspberry Pi System Shutdown"' | safe}} onclick="action('TurnOffRPI');$('#contentModal').modal('hide');"{{'' if enableRPIshutdown else 'hidden'}}>Turn off RPI</button>
 			</div>
 		</div>
 	</div>
@@ -34,11 +34,11 @@
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('importWCJSON');$('#contentModal').modal('hide');">Import webcontrol.json File</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('quickConfigure');$('#contentModal').modal('hide');">Quick Configure</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('setSprockets');$('#contentModal').modal('hide');">Set Sprockets & Chains</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if firmwareSupportsZaxisLimit else 'data-toggle="tooltip" title="Set Z Axis Limits"' | safe}} onclick="requestPage('setZaxis');$('#contentModal').modal('hide');"{{'' if firmwareSupportsZaxisLimit else 'hidden'}}>Set Z-Axis Limit</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if firmwareSupportsZaxisLimit else 'data-bs-toggle="tooltip" title="Set Z Axis Limits"' | safe}} onclick="requestPage('setZaxis');$('#contentModal').modal('hide');"{{'' if firmwareSupportsZaxisLimit else 'hidden'}}>Set Z-Axis Limit</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="requestPage('resetChains');$('#contentModal').modal('hide');">Reset Chains</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if not enableCustom and not enableHoley else 'data-toggle="tooltip" title="Stock Firmware Required"' | safe}} onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');" {{'' if not enableCustom and not enableHoley else 'disabled'}}>Triangular Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
-				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if not enableCustom and not enableHoley else 'data-bs-toggle="tooltip" title="Stock Firmware Required"' | safe}} onclick="requestPage('triangularCalibration');$('#contentModal').modal('hide');" {{'' if not enableCustom and not enableHoley else 'disabled'}}>Triangular Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableCustom else 'data-bs-toggle="tooltip" title="Custom Firmware Required"' | safe}} onclick="requestPage('opticalCalibration');$('#contentModal').modal('hide');" {{'' if enableCustom else 'disabled'}}>Optical Calibration</button>
+				<button type="button" class="btn btn-lg btn-block btn-secondary" {{'' if enableHoley else 'data-bs-toggle="tooltip" title="Holey Firmware Required"' | safe}} onclick="requestPage('holeyCalibration');$('#contentModal').modal('hide');" {{'' if enableHoley else 'disabled'}}>Holey Calibration</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('returnToCenter');$('#contentModal').modal('hide');">Return to Center</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('resetHomeToCenter');$('#contentModal').modal('hide');">Reset Home to Center</button>
 				<button type="button" class="btn btn-lg btn-block btn-secondary" onclick="action('moveToDefault');$('#contentModal').modal('hide');">Check for Chain Skip</button>

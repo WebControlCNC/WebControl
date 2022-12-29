@@ -4,7 +4,7 @@
     <div class="form-group">
       <div class="row mb-2">
         <label for="directorySelect">Select Target Directory</label>
-        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-bs-group="{{title}}">
           {% for directory in directories %}
             <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
               {{directory if directory != '.' else './'}}

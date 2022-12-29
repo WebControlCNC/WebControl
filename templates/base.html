@@ -18,6 +18,7 @@
 
 </head>
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" data-name="">
+  <div class="container-fluid">
     <a class="navbar-brand" href="#">WebControl</a>
     <!--<button id="mobileClientStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>-->
     <div id="mobileClientStatus" class="alert alert-danger alert-sm"><i data-feather="alert-circle"></i></div>
@@ -27,67 +28,67 @@
     <!--<button id="mobileControllerStatus" class="btn btn-outline-danger my-2 my-sm-0" type="button"><i data-feather="alert-circle"></i></button>-->
     <div id="mobileControllerStatusAlert" style="display:none" class="alert alert-danger alert-sm"><i data-feather="alert-circle"></i></div>
     <button id="mobileControllerStatusButton" style="display:none" type="button" class="btn btn-sm btn-danger" onclick="requestPage('fakeServo');"><i id="mobileControllerStatusButtonIcon" data-feather="check-circle"></i></button>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             G-Code
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
-            <a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('saveGCode');">Save</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('uploadGCode');">Upload</a>
-            <a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('editGCode');">View/Edit</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('sendGCode');">Send Custom GCode</a>
-            <!--<a class="dropdown-item" href="#" onclick="action('optimizeGCode');">Optimize GCode</a>-->
-          </div>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
+            <li><a class="dropdown-item" href="#" onclick="requestPage('openGCode');">Open</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('saveGCode');">Save</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('uploadGCode');">Upload</a></li>
+            <li><a class="dropdown-item" href="#" onclick="action('clearGCode');">Clear GCode</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('editGCode');">View/Edit</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('sendGCode');">Send Custom GCode</a></li>
+            <!--<li><a class="dropdown-item" href="#" onclick="action('optimizeGCode');">Optimize GCode</a></li>-->
+          </ul>
         </li>
         <li class="nav-item" id="actionsNavItem">
             <a class="nav-link" href="#" onclick="requestPage('actions');">Actions</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Settings
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-            <a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Settings</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl Settings</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('cameraSettings');">Camera Settings</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('gpioSettings');">GPIO Settings</a>
-          </div>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+            <li><a class="dropdown-item" href="#" onclick="requestPage('maslowSettings');">Maslow Settings</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('advancedSettings');">Advanced Settings</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('webControlSettings');">WebControl Settings</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('cameraSettings');">Camera Settings</a>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('gpioSettings');">GPIO Settings</a></li></li>
+          </ul>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Boards
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
-            <a class="dropdown-item" href="#" onclick="requestPage('openBoard');">Open Board</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('saveBoard');">Save Board</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('editBoard');">Create/Edit Board</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('trimBoard');">Trim Board</a>
-            <a class="dropdown-item" href="#" onclick="action('boardProcessGCode');">Process GCode</a>
-            <a class="dropdown-item" href="#" onclick="action('boardClearBoard');">Clear Board</a>
-          </div>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown3">
+            <li><a class="dropdown-item" href="#" onclick="requestPage('openBoard');">Open Board</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('saveBoard');">Save Board</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('editBoard');">Create/Edit Board</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('trimBoard');">Trim Board</a></li>
+            <li><a class="dropdown-item" href="#" onclick="action('boardProcessGCode');">Process GCode</a></li>
+            <li><a class="dropdown-item" href="#" onclick="action('boardClearBoard');">Clear Board</a></li>
+          </ul>
         </li>
         <li class="nav-item dropdown">
           <span id="helpBadge" class="badge badge-pill badge-primary" style="float:left;margin-bottom:-10px;"></span>
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Help
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
-            <a class="dropdown-item" href="#" onclick="requestPage('gettingStarted');">Getting Started</a>
-            <a class="dropdown-item" href="https://webcontrolcnc.github.io/WebControl/" target="_blank">Online Help</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('help');">Offline Help</a>
-            <a class="dropdown-item" href="#" onclick="requestPage('about');">About</a>
-            <span id="updateBadge" class="badge badge-pill badge-primary" style="float:left;margin-bottom:-10px;"></span>
-            <a class="dropdown-item" href="#" onclick="requestPage('releases');">Update</a>
-            <a class="dropdown-item" href="logs" target="_blank">Logs</a>
-        </div>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown4">
+            <li><a class="dropdown-item" href="#" onclick="requestPage('gettingStarted');">Getting Started</a></li>
+            <li><a class="dropdown-item" href="https://webcontrolcnc.github.io/WebControl/" target="_blank">Online Help</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('help');">Offline Help</a></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('about');">About</a></li>
+            <li><span id="updateBadge" class="badge badge-pill badge-primary" style="float:left;margin-bottom:-10px;"></span></li>
+            <li><a class="dropdown-item" href="#" onclick="requestPage('releases');">Update</a></li>
+            <li><a class="dropdown-item" href="logs" target="_blank">Logs</a></li>
+          </ul>
         </li>
       </ul>
       <div id="clientStatus" class="alert alert-danger">Not Connect</div>
@@ -97,6 +98,7 @@
       <div id="controllerStatusAlert" class="alert alert-danger">Not Connected</div>
       <button id="controllerStatusButton" style="display:none" type="button" class="btn btn-sm btn-danger" onclick="requestPage('fakeServo');">Not Connected</button>
     </div>
+  </div>
 </nav>
 
 <body>
@@ -115,7 +117,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 id="notificationModalTitle" class="modal-title">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -135,9 +137,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="resumeButton" type="button" class="btn btn-info" onclick="resumeRun()" data-dismiss="modal">Resume</button>
-          <button id="fakeServoButton" type="button" class="btn btn-info" onclick="disableFakeServo()" data-dismiss="modal">Disable Fake Servo</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button id="resumeButton" type="button" class="btn btn-info" onclick="resumeRun()" data-bs-dismiss="modal">Resume</button>
+          <button id="fakeServoButton" type="button" class="btn btn-info" onclick="disableFakeServo()" data-bs-dismiss="modal">Disable Fake Servo</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -148,7 +150,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 id="contentModalTitle" class="modal-title">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -158,7 +160,7 @@
         </div>
         <div class="modal-footer">
           <button id="footerSubmit" type="button" class="btn btn-primary" onclick="onFooterSubmit();">Submit</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -169,15 +171,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 id="alertModalTitle" class="modal-title">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div id="alertModalText" class="modal-body">
         </div>
         <div class="modal-footer">
-          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-dismiss="modal">Clear Alert</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button id="clearButton" type="button" class="btn btn-info" onclick="action('stopRun')" data-bs-dismiss="modal">Clear Alert</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>

@@ -5,12 +5,12 @@
     {% if isMobile == true %}
     <div class="col-12">
       <div class="card" id="configurationAccordion">
-        <button class="btn text-left" data-toggle="collapse" data-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
+        <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
           <h4 class="card-title" id="configurationHeader">
             Configuration...
           </h4>
         </button>
-        <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-parent="#configurationAccordion">
+        <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-bs-parent="#configurationAccordion">
           <div class="card-body">
             <div class="row">
               <div class="col">
@@ -76,10 +76,10 @@
     </div>
     <div class="col-12">
       <div class="card" id="calibrationExtentsAccordion">
-        <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationExtents" aria-expanded="false" aria-controls="collapseCalibrationExtents">
+        <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseCalibrationExtents" aria-expanded="false" aria-controls="collapseCalibrationExtents">
           <h4 class="card-title" id="calibrationExtentsHeader">Calibration Extents...</h4>
         </button>
-        <div id="collapseCalibrationExtents" class="collapse" aria-labelledby="calibrationExtentsHeader" data-parent="#calibrationExtentsAccordion">
+        <div id="collapseCalibrationExtents" class="collapse" aria-labelledby="calibrationExtentsHeader" data-bs-parent="#calibrationExtentsAccordion">
           <div class="card-body">
             <h4 class="card-title">Calibration Extents</h4>
             <select class="custom-select" name="calibrationExtents" id="calibrationExtents">
@@ -141,12 +141,12 @@
     {% else %}
     <div class="col-12">
       <div class="card" id="configurationAccordion">
-        <button class="btn text-left" data-toggle="collapse" data-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
+        <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseConfiguration" aria-expanded="false" aria-controls="collapseConfiguration">
           <h4 class="card-title" id="configurationHeader">
             Configuration and Calibration Extents...
           </h4>
         </button>
-        <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-parent="#configurationAccordion">
+        <div id="collapseConfiguration" class="collapse" aria-labelledby="configurationHeader" data-bs-parent="#configurationAccordion">
           <div class="row">
             <div class="col">
               <div class="card">
@@ -278,12 +278,12 @@
     {% endif %}
   </div>
   <div class="card" id="opticalRecognitionAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseOpticalRecognition" aria-expanded="false" aria-controls="collapseOpticalRecognition">
+    <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseOpticalRecognition" aria-expanded="false" aria-controls="collapseOpticalRecognition">
       <h4 class="card-title" id="opticalRecognitionHeader">
         Optical Recognition...
       </h4>
     </button>
-    <div id="collapseOpticalRecognition" class="collapse" aria-labelledby="opticalRecognitionHeader" data-parent="#opticalRecognitionAccordion">
+    <div id="collapseOpticalRecognition" class="collapse" aria-labelledby="opticalRecognitionHeader" data-bs-parent="#opticalRecognitionAccordion">
       <div class="card-body">
         <div class="row">
           <div class={{"col-12" if isMobile==true else "col-6"}}>
@@ -354,12 +354,12 @@
     </div>
   </div>
   <div class="card" id="curveFitAccordion">
-      <button class="btn text-left" data-toggle="collapse" data-target="#collapseCurveFit" aria-expanded="false" aria-controls="collapseCurveFit">
+      <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseCurveFit" aria-expanded="false" aria-controls="collapseCurveFit">
         <h4 class="card-title" id="curveFitHeader">
           Curve Fitting...
         </h4>
       </button>
-      <div id="collapseCurveFit" class="collapse" aria-labelledby="curveFitHeader" data-parent="#curveFitAccordion">
+      <div id="collapseCurveFit" class="collapse" aria-labelledby="curveFitHeader" data-bs-parent="#curveFitAccordion">
           <div class="card-body">
             <button id="curveFitButton" type="button" class="btn btn-lg btn-secondary mt-1" onclick="action('curveFitOpticalCalibration');">Do Curve Fit</button>
             <button id="curveChartButton" type="button" class="btn btn-lg btn-primary mt-1" onclick="redrawCurveCharts('all');">Draw Charts</button>
@@ -381,12 +381,12 @@
       </div>
   </div>
   <div class="card" id="calibrationMatrixAccordion">
-        <button class="btn text-left" data-toggle="collapse" data-target="#collapseCalibrationMatrix" aria-expanded="false" aria-controls="collapseCalibrationMatrix"">
+        <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseCalibrationMatrix" aria-expanded="false" aria-controls="collapseCalibrationMatrix"">
           <h4 class="card-title" id="calibrationMatrixHeader">
             Calibration Matrix...
           </h4>
         </button>
-        <div id="collapseCalibrationMatrix" class="collapse" aria-labelledby="calibrationMatrixHeader" data-parent="#calibrationMatrixAccordion">
+        <div id="collapseCalibrationMatrix" class="collapse" aria-labelledby="calibrationMatrixHeader" data-bs-parent="#calibrationMatrixAccordion">
           <div class="card-body">
             <button id="errorChartButton" type="button" class="btn btn-lg btn-primary" onclick="redrawErrorCharts('all');" >Draw Charts</button>
             <div class="row">

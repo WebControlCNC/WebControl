@@ -130,8 +130,9 @@ function setListeners(){
                 break;
             case 'cameraMessage':
                 //completed
-                if (enable3D)
-                    processCameraMessage(data);
+                if (enable3D) {
+                    frontpage3d.processCameraMessage(data);
+                }
                 break;
             case 'positionMessage':
                 //completed
@@ -186,10 +187,11 @@ function setListeners(){
                 boardDataUpdate(data);
                 break;
             case 'boardCutDataUpdateCompressed':
-                if (enable3D)
-                    boardCutDataUpdateCompressed(data);
-                else
+                if (enable3D) {
+                    frontpage3d.boardCutDataUpdateCompressed(data);
+                } else {
                     $("#fpCircle").hide();
+                }
                 break;
             case 'updatePorts':
                 //completed

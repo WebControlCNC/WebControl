@@ -11,7 +11,7 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 $(document).ready(function(){
 	// Make all navbar drop down items collapse the menu when clicked.
 	if (isMobile) {
-		$("#navbarSupportedContent a.dropdown-item").attr("data-toggle", "collapse").attr("data-target", "#navbarSupportedContent");
+		$("#navbarSupportedContent a.dropdown-item").attr("data-bs-toggle", "collapse").attr("data-bs-target", "#navbarSupportedContent");
 	}
 })
 

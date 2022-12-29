@@ -317,12 +317,20 @@ class Frontpage3d {
     }
   }
 
+  confine(value, low, high) {
+    if (value < low)
+      return low;
+    if (value > high)
+      return high;
+    return value;
+  }
+
   onMouseMove(event) {
     if (!this.isMobile) {
       this.pos = this.cursorPosition(event);
       this.cursor.position.set(this.pos.x, this.pos.y, this.pos.z);
-      const linePosX = confine(this.pos.x, -48, 48);
-      const linePosY = confine(this.pos.y, -24, 24);
+      const linePosX = this.confine(this.pos.x, -48, 48);
+      const linePosY = this.confine(this.pos.y, -24, 24);
   
       let positions = this.cursorVLine.geometry.attributes.position.array;
       positions[0] = linePosX;
@@ -568,6 +576,134 @@ class Frontpage3d {
     this.controlsO.reset();
     this.controlsP.reset();
   }
+
+  processCameraMessage(data) {
+    if (!["cameraImageUpdated", "updateCamera"].includes(data.command)) {
+      return;
+    }
+
+    if (data.command == "cameraImageUpdated") {
+      var newImg = new Image();
+      if (imageShowing == 1) {
+        newImg.onload = function () {
+          document.getElementById("cameraImage2").setAttribute('src', this.src);
+          if (isMobile) {
+            document.getElementById("mobileCameraDiv2").style.zIndex = "95";
+            document.getElementById("mobileCameraDiv1").style.zIndex = "94";
+          } else {
+            document.getElementById("cameraDiv2").style.zIndex = "95";
+            document.getElementById("cameraDiv1").style.zIndex = "94";
+          }
+          imageShowing = 2;
+        }
+      } else {
+        newImg.onload = function () {
+          document.getElementById("cameraImage1").setAttribute('src', this.src);
+          if (isMobile) {
+            document.getElementById("mobileCameraDiv1").style.zIndex = "95";
+            document.getElementById("mobileCameraDiv2").style.zIndex = "94";
+          } else {
+            document.getElementById("cameraDiv1").style.zIndex = "95";
+            document.getElementById("cameraDiv2").style.zIndex = "94";
+          }
+          imageShowing = 1;
+        }
+      }
+      newImg.setAttribute('src', 'data:image/png;base64,' + data.data);
+      return;
+    }
+    // data.command == "updateCamera"
+    if (data.data == "on") {
+      $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
+      feather.replace();
+      console.log("video on");
+      document.getElementById("cameraImage1").style.display = "block";
+      document.getElementById("cameraImage2").style.display = "block";
+      if (isMobile) {
+        document.getElementById("mobileCameraArea").style.display = "block";
+      }
+      return;
+    }
+
+    // data.data == "off"
+    $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
+    feather.replace();
+    console.log("video off");
+    document.getElementById("cameraImage1").style.display = "none";
+    document.getElementById("cameraImage2").style.display = "none";
+    if (isMobile){
+      document.getElementById("mobileCameraArea").style.display = "none";
+    }
+  }
+
+  boardCutDataUpdateCompressed(data) {
+    console.log("updating board cut data compressed");
+    if (this.cutSquareGroup.children.length != 0) {
+      for (var i = this.cutSquareGroup.children.length - 1; i >= 0; i--) {
+        this.cutSquareGroup.remove(this.cutSquareGroup.children[i]);
+      }
+    }
+    if (data != null) {
+      //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
+      var cutSquareMaterial = new THREE.MeshBasicMaterial({ color: 0xff6666 });
+      // var noncutSquareMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
+      var uncompressed = pako.inflate(data);
+      var _str = ab2str(uncompressed);
+      var data = JSON.parse(_str)
+  
+      var pointsX = Math.ceil(boardWidth)
+      var pointsY = Math.ceil(boardHeight)
+      console.log("boardWidth=" + boardWidth)
+      console.log("boardHeight=" + boardHeight)
+      console.log("boardCenterY=" + boardCenterY)
+      var offsetX = pointsX / 2
+      var offsetY = pointsY / 2
+  
+      for (var x = 0; x < pointsX; x++) {
+        for (var y = 0; y < pointsY; y++) {
+          if (data[x + y * pointsX]) {
+            //console.log(x+", "+y);
+            var geometry = new THREE.PlaneGeometry(1, 1);
+            var plane = new THREE.Mesh(geometry, cutSquareMaterial);
+            plane.position.set(x - offsetX + boardCenterX, y - offsetY + boardCenterY, 0.01);
+            this.cutSquareGroup.add(plane);
+          }/*
+              else{
+                  var geometry = new THREE.PlaneGeometry(1,1);
+                  var plane = new THREE.Mesh(geometry, noncutSquareMaterial);
+                  plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
+                  this.cutSquareGroup.add(plane);
+              }*/
+        }
+      }
+    }
+    var e = new Date();
+    $("#fpCircle").hide();
+  }
+
+  toggleBoard() {
+    if (this.showBoard) {
+      this.showBoard = false;
+      this.scene.remove(this.cutSquareGroup);
+      this.scene.remove(this.boardGroup);
+      $("#boardID").removeClass('btn-primary').addClass('btn-secondary');
+    } else {
+      this.showBoard = true;
+      this.scene.add(this.cutSquareGroup);
+      this.scene.add(this.boardGroup);
+      $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
+    }
+  }
+
+  toggle3DPO() {
+    this.cameraPerspective = !this.cameraPerspective;
+    const txt = this.cameraPerspective == 0 ? "Ortho" : "Persp";
+    const camera = this.cameraPerspective == 0 ? this.cameraO : this.cameraP;
+
+    $("#buttonPO").text(txt);
+    $("#mobilebuttonPO").text(txt);
+    this.renderer.render(this.scene, camera);
+  }
 }
 
 const frontpage3d = new Frontpage3d();
@@ -622,140 +758,12 @@ function resetView() {
   frontpage3d.resetView();
 }
 
-function processCameraMessage(data) {
-  if (data.command == "cameraImageUpdated") {
-    var newImg = new Image();
-    if (imageShowing == 1) {
-      newImg.onload = function () {
-        document.getElementById("cameraImage2").setAttribute('src', this.src);
-        if (isMobile) {
-          document.getElementById("mobileCameraDiv2").style.zIndex = "95";
-          document.getElementById("mobileCameraDiv1").style.zIndex = "94";
-        } else {
-          document.getElementById("cameraDiv2").style.zIndex = "95";
-          document.getElementById("cameraDiv1").style.zIndex = "94";
-        }
-        imageShowing = 2
-      }
-    }
-    else {
-      newImg.onload = function () {
-        document.getElementById("cameraImage1").setAttribute('src', this.src);
-        if (isMobile) {
-          document.getElementById("mobileCameraDiv1").style.zIndex = "95";
-          document.getElementById("mobileCameraDiv2").style.zIndex = "94";
-        } else {
-          document.getElementById("cameraDiv1").style.zIndex = "95";
-          document.getElementById("cameraDiv2").style.zIndex = "94";
-        }
-        imageShowing = 1
-      }
-    }
-    newImg.setAttribute('src', 'data:image/png;base64,' + data.data)
-
-  }
-  if (data.command == "updateCamera") {
-    if (data.data == "on") {
-      $("#videoStatus svg.feather.feather-video-off").replaceWith(feather.icons.video.toSvg());
-      feather.replace();
-      console.log("video on");
-      document.getElementById("cameraImage1").style.display = "block"
-      document.getElementById("cameraImage2").style.display = "block"
-      if (isMobile)
-        document.getElementById("mobileCameraArea").style.display = "block"
-    }
-
-    if (data.data == "off") {
-      $("#videoStatus svg.feather.feather-video").replaceWith(feather.icons["video-off"].toSvg());
-      feather.replace();
-      console.log("video off")
-      document.getElementById("cameraImage1").style.display = "none";
-      document.getElementById("cameraImage2").style.display = "none"
-      if (isMobile)
-        document.getElementById("mobileCameraArea").style.display = "none"
-    }
-  }
-}
-
-function confine(value, low, high) {
-  if (value < low)
-    return low;
-  if (value > high)
-    return high;
-  return value;
-}
-
-function boardCutDataUpdateCompressed(data) {
-  console.log("updating board cut data compressed");
-  if (cutSquareGroup.children.length != 0) {
-    for (var i = cutSquareGroup.children.length - 1; i >= 0; i--) {
-      cutSquareGroup.remove(cutSquareGroup.children[i]);
-    }
-  }
-  if (data != null) {
-    //var cutSquareMaterial = new THREE.MeshBasicMaterial( {color:0xffff00, side: THREE.DoubleSide});
-    var cutSquareMaterial = new THREE.MeshBasicMaterial({ color: 0xff6666 });
-    var noncutSquareMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
-    var uncompressed = pako.inflate(data);
-    var _str = ab2str(uncompressed);
-    var data = JSON.parse(_str)
-
-    var pointsX = Math.ceil(boardWidth)
-    var pointsY = Math.ceil(boardHeight)
-    console.log("boardWidth=" + boardWidth)
-    console.log("boardHeight=" + boardHeight)
-    console.log("boardCenterY=" + boardCenterY)
-    var offsetX = pointsX / 2
-    var offsetY = pointsY / 2
-
-    for (var x = 0; x < pointsX; x++) {
-      for (var y = 0; y < pointsY; y++) {
-        if (data[x + y * pointsX]) {
-          //console.log(x+", "+y);
-          var geometry = new THREE.PlaneGeometry(1, 1);
-          var plane = new THREE.Mesh(geometry, cutSquareMaterial);
-          plane.position.set(x - offsetX + boardCenterX, y - offsetY + boardCenterY, 0.01);
-          cutSquareGroup.add(plane);
-        }/*
-            else{
-                var geometry = new THREE.PlaneGeometry(1,1);
-                var plane = new THREE.Mesh(geometry, noncutSquareMaterial);
-                plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
-                cutSquareGroup.add(plane);
-            }*/
-      }
-    }
-  }
-  var e = new Date();
-  $("#fpCircle").hide();
-
-}
-
 function toggleBoard() {
-  if (showBoard) {
-    showBoard = false;
-    scene.remove(cutSquareGroup);
-    scene.remove(boardGroup);
-    $("#boardID").removeClass('btn-primary').addClass('btn-secondary');
-  } else {
-    showBoard = true;
-    scene.add(cutSquareGroup);
-    scene.add(boardGroup);
-    $("#boardID").removeClass('btn-secondary').addClass('btn-primary');
-  }
+  // Called by frontpage3d.html and frontpage3d_mobile.html
+  frontpage3d.toggleBoard();
 }
 
 function toggle3DPO() {
-  cameraPerspective = !cameraPerspective;
-  if (cameraPerspective == 0) {
-    $("#buttonPO").text("Ortho");
-    $("#mobilebuttonPO").text("Ortho");
-    renderer.render(scene, cameraO)
-  }
-  else {
-    $("#buttonPO").text("Persp");
-    $("#mobilebuttonPO").text("Persp");
-    renderer.render(scene, cameraP)
-  }
+  // Called by frontpage3d.html and frontpage3d_mobile.html
+  frontpage3d.toggle3DPO();
 }
-

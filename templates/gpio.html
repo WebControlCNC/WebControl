@@ -11,7 +11,7 @@
               </div>
               <div class="col-7">
                 {% if setting.type=="options" %}
-                  <select name="{{setting.key}}" data-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+                  <select name="{{setting.key}}" data-bs-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                     {% for option in options %}
                       <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
                         {{option}}
