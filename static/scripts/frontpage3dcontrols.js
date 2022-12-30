@@ -11,10 +11,6 @@ $(document).ready(function () {
   window.isFrontpage3d_mobilecontrols = true;
 });
 
-function gcodeUpdate(msg) {
-  console.log("Unsupported");
-}
-
 function unsupported() {
   console.log("Unsupported");
 }

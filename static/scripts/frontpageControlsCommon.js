@@ -14,12 +14,6 @@ window.board = {
 
 function pauseRun() {
   action($("#pauseButton").text() == "Pause" ? "pauseRun" : "resumeRun");
-  if ($("#pauseButton").text() == "Pause") {
-    action('pauseRun');
-  }
-  else {
-    action('resumeRun');
-  }
 }
 
 function resumeRun() {

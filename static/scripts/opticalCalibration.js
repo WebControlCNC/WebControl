@@ -35,8 +35,6 @@ var osledCircle;
 
 var osled;
 
-
-
 function oanimate() {
     requestAnimationFrame(oanimate);
     ocontrols.update();
@@ -59,7 +57,6 @@ function positionUpdateOptical(x,y,z){
 function processPositionMessageOptical(data){
   positionUpdateOptical(data.xval,data.yval,data.zval);
 }
-
 
 function process(processName){
   var markerX = $("#markerX").val();
@@ -197,7 +194,6 @@ function redrawCurveCharts(chart){
       $('#curveChartButton').removeClass('btn-primary').addClass('btn-secondary');
 }
 
-
 function redrawErrorCharts(chart){
     if ( (chart == "xError") || (chart=="all") ){
       xErrorPlot = document.getElementById('xErrorPlot');
@@ -321,7 +317,6 @@ $(document).ready(function () {
     console.log("here1");
     setupDisplay();
 });
-
 
 function setupDisplay(){
     orenderer = new THREE.WebGLRenderer();
@@ -488,3 +483,11 @@ function drawCalibration(){
     drawOptical.zoom(10, {x:originXOptical,y:originYOptical});
 }
 */
+
+export {
+  processPositionMessageOptical,
+  updateCalibrationImage,
+  updateOpticalCalibrationCurve,
+  updateOpticalCalibrationError,
+  updateOpticalCalibrationFindCenter,
+};

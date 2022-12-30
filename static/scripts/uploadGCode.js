@@ -84,3 +84,5 @@ function onFooterSubmit(){
         }
     });
 }
+
+export { updateDirectories };

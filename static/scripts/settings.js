@@ -57,3 +57,5 @@ function updatePorts(data){
     });
   }
 }
+
+export { updatePorts };

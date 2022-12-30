@@ -1,5 +1,3 @@
-import { settingRequest } from "./socketEmits.js";
-
 export function processZAxisRequestedSetting(msg) {
   if (msg.setting == "unitsZ") {
     console.log("requestedSetting:" + msg.value);

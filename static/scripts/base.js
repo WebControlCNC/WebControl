@@ -106,8 +106,7 @@ function processActivateModal(data) {
     console.log("content modal")
     //message = JSON.parse(data.message);
     message = data.message;
-  }
-  else if (data.modalType == "alert") {
+  } else if (data.modalType == "alert") {
     $modal = $('#alertModal');
     $modalDialog = $('#alertDialog');
     $modalTitle = $('#alertModalTitle');
@@ -119,8 +118,7 @@ function processActivateModal(data) {
     }
     //data is coming in as a jsonified string.. need to drop the extra quotes
     message = JSON.parse(data.message);
-  }
-  else {
+  } else {
     $modal = $('#notificationModal');
     $modalDialog = $('#notificationDialog');
     $modalTitle = $('#notificationModalTitle');

@@ -22,8 +22,18 @@ import {
   processRequestedSetting,
   processStatusMessage,
 } from "./frontpageControlsCommon.js";
+import {
+  processPositionMessageOptical,
+  updateCalibrationImage,
+  updateOpticalCalibrationCurve,
+  updateOpticalCalibrationError,
+  updateOpticalCalibrationFindCenter,
+} from "./opticalCalibration.js";
+import { updatePIDData } from "./pidTuning.js";
 import { processCalibrationMessage } from "./setSprockets.js";
+import { updatePorts } from "./settings.js";
 import { action, settingRequest, checkForGCodeUpdate, checkForBoardUpdate } from "./socketEmits.js";
+import { updateDirectories } from "./uploadGCode.js";
 
 // Note: because this is a module, these variables are NOT global
 let socketClientID;
@@ -160,6 +170,7 @@ function setListeners() {
           processControllerStatus(data);
           break;
         case 'calibrationMessage':
+          // TODO: handle optical calibration not supporting this (and not being included)
           processCalibrationMessage(data);
           break;
         case 'cameraMessage':
@@ -202,13 +213,13 @@ function setListeners() {
         case 'gcodeUpdate':
           console.log("---gcodeUpdate received via socket---");
           if (window.enable3D)
-            gcodeUpdate(msg.message);
+            window.frontpage3d.gcodeUpdate(msg.message);
           else
             $("#fpCircle").hide();
           break;
         case 'showFPSpinner':
           //completed
-          showFPSpinner(msg.message);
+          window.showFPSpinner(msg.message);
           break;
         case 'gcodeUpdateCompressed':
           if (window.enable3D) {

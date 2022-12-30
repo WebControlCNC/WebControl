@@ -71,14 +71,6 @@ function updatePIDData(msg){
       }
 }
 
-
-
-$(document).ready(function () {
-
-});
-
-
-
 function vExecute(){
   var vMotor = $('#vMotor label.active input').val();
   var vStart= $("#vStart").val();
@@ -125,3 +117,4 @@ function pExecute(){
   action('executePositionPIDTest',parameters);
 }
 
+export { updatePIDData };
