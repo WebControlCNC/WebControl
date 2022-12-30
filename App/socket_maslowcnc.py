@@ -56,7 +56,6 @@ def init_socket_maslowcnc(app):
     @socketio.on("requestPage", namespace=namespace)
     def requestPage(msg):
         print(f"requestPage: {msg}")
-        print(f"request: {request.__dict__}")
         app.data.logger.resetIdler()
         app.data.console_queue.put(request.sid)
         client = request.sid

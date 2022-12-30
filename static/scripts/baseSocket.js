@@ -75,7 +75,7 @@ function setListeners() {
   console.log("setting Listeners");
 
   window.socket.on('after connect', function (msg) {
-    socketClientID = window.socket.io.engine.id;
+    socketClientID = window.socket.id;
     console.log("id=" + socketClientID);
     window.socket.emit('my event', { data: 'I\'m connected!' });
     $("#clientStatus").text("Connected: " + hostAddress);
@@ -205,7 +205,6 @@ function setListeners() {
           break;
         case 'activateModal':
           //completed
-          console.log(msg)
           processActivateModal(data);
           break;
         case 'requestedSetting':

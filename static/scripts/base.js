@@ -90,7 +90,7 @@ function processControllerStatus(data) {
 }
 
 function processActivateModal(data) {
-  var $modal, $modalTitle, $modalText
+  var $modal, $modalDialog, $modalTitle, $modalText
   var message
   //console.log(data)
   if (data.modalType == "content") {
@@ -165,20 +165,21 @@ function processActivateModal(data) {
   $modalText.html(message);
 
   if (!($modal.data('bs.modal') || {})._isShown) {
-    console.log("showing modal")
+    console.log("showing modal");
     $modal.modal();
   }
-  if (data.isStatic == true) {
+  console.log(`Modal data: ${JSON.stringify($modal.data())}`);
+  if (data.isStatic) {
     console.log("Static Modal")
     $modal.data('bs.modal')._config.backdrop = 'static';
     $modal.data('bs.modal')._config.keyboard = false;
   } else {
     console.log("showing non static modal")
-    $modal.data('bs.modal')._config.backdrop = true;
-    $modal.data('bs.modal')._config.keyboard = true;
+    // $modal.data('bs.modal')._config.backdrop = true;
+    // $modal.data('bs.modal')._config.keyboard = true;
   }
-  console.log($modal.data('bs.modal')._config.backdrop)
-  console.log($modal.data('bs.modal')._config.keyboard)
+  // console.log($modal.data('bs.modal')._config.backdrop);
+  // console.log($modal.data('bs.modal')._config.keyboard);
   $modalText.scrollTop(0);
 }
 
