@@ -24,6 +24,6 @@ app.debug = True
 # Override the app wsgi_app property
 # app.wsgi_app = PyjionWsgiMiddleware(app.wsgi_app)
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*", logger=True)
 mobility = Mobility(app)
 # md.init_app(app)

@@ -106,11 +106,16 @@ if __name__ == "__main__":
     webHost = "http://localhost"
     print(f"opening browser on {webHost}:{webPortInt}")
     webbrowser.open_new_tab(f"{webHost}:{webPortInt}")
+
+    default_host_ip = "0.0.0.0"
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
+    if host_ip.startswith("127.0."):
+        # Thanks Ubuntu for mucking it up
+        host_ip = default_host_ip
     print(f"setting app data host address to {host_ip}:{webPortInt}")
     app.data.hostAddress = f"{host_ip}:{webPortInt}"
 
     # app.data.shutdown = shutdown
-    socketio.run(app, use_reloader=False, host="0.0.0.0", port=webPortInt)
+    socketio.run(app, use_reloader=False, host=host_ip, port=webPortInt, log_output=False)
     # socketio.run(app, host='0.0.0.0')
