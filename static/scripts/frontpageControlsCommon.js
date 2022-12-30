@@ -30,15 +30,15 @@ function processRequestedSetting(data) {
   }
   if (data.setting == "units") {
     console.log("requestedSetting:" + data.value);
-    $("#units").text(data.value)
+    $("#units").text(data.value);
   }
   if (data.setting == "distToMove") {
     console.log("requestedSetting for distToMove:" + data.value);
-    $("#distToMove").val(data.value)
+    $("#distToMove").val(data.value);
   }
   if ((data.setting == "unitsZ") || (data.setting == "distToMoveZ")) {
     if (typeof processZAxisRequestedSetting === "function") {
-      processZAxisRequestedSetting(data)
+      processZAxisRequestedSetting(data);
     }
   }
 }

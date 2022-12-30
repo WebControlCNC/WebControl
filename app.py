@@ -24,6 +24,7 @@ app.debug = True
 # Override the app wsgi_app property
 # app.wsgi_app = PyjionWsgiMiddleware(app.wsgi_app)
 
+# import eventlet is implied for engine.io async_mode parameter
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
@@ -31,5 +32,6 @@ socketio = SocketIO(
     engineio_logger=False,
     always_connect=True
 )
+
 mobility = Mobility(app)
 # md.init_app(app)

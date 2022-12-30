@@ -12,7 +12,7 @@ from flask_mobility.decorators import mobile_template
 
 def init_route(app):
     route_type = "route"
-    print(f"Initializing {route_type} handling for the app")
+    app.data.console_queue.put(f"{__name__}: Initializing {route_type} handling for the app")
 
     @app.route("/")
     @mobile_template("{mobile/}")
@@ -85,7 +85,7 @@ def init_route(app):
     @app.route("/logs")
     @mobile_template("/logs/{mobile/}")
     def logs(template):
-        print("here")
+        app.data.console_queue.put(f"{__name__}: here")
         app.data.logger.resetIdler()
         if template == "/logs/mobile/":
             return render_template("logs.html")
@@ -159,9 +159,9 @@ def init_route(app):
         if request.method == "POST":
             result = request.form
             directory = result["selectedDirectory"]
-            # print(directory)
+            # app.data.console_queue.put(f"{__name__}: {directory}")
             f = request.files.getlist("file[]")
-            print(f)
+            app.data.console_queue.put(f"{__name__}: {f}")
             home = app.data.config.getHome()
             app.data.config.setValue(
                 "Computed Settings", "lastSelectedDirectory", directory
@@ -231,7 +231,7 @@ def init_route(app):
     def saveGCode():
         app.data.logger.resetIdler()
         if request.method == "POST":
-            print(request.form)
+            app.data.console_queue.put(f"{__name__}: {request.form}")
             f = request.form["fileName"]
             d = request.form["selectedDirectory"]
             app.data.console_queue.put(f"selectedGcode={f}")
@@ -289,7 +289,7 @@ def init_route(app):
     def saveBoard():
         app.data.logger.resetIdler()
         if request.method == "POST":
-            print(request.form)
+            app.data.console_queue.put(f"{__name__}: {request.form}")
             f = request.form["fileName"]
             d = request.form["selectedDirectory"]
             app.data.console_queue.put(f"selectedBoard={f}")
@@ -377,7 +377,7 @@ def init_route(app):
     @app.route("/sendGCode", methods=["POST"])
     def sendGcode():
         app.data.logger.resetIdler()
-        # print(request.form)#["gcodeInput"])
+        # app.data.console_queue.put(f"{__name__}: {request.form)#['gcodeInput']}")
         if request.method == "POST":
             returnVal = app.data.actions.sendGCode(request.form["gcode"].rstrip())
             if returnVal:
@@ -403,7 +403,7 @@ def init_route(app):
                 chainSagCorrectionEst,
                 cut34YoffsetEst,
             ) = app.data.actions.calibrate(result)
-            # print(returnVal)
+            # app.data.console_queue.put(f"{__name__}: {returnVal}")
             if motorYoffsetEst:
                 message = {
                     "status": 200,
@@ -436,7 +436,7 @@ def init_route(app):
                 rightChainTolerance,
                 calibrationError,
             ) = app.data.actions.holeyCalibrate(result)
-            # print(returnVal)
+            # app.data.console_queue.put(f"{__name__}: {returnVal}")
             if motorYoffsetEst:
                 message = {
                     "status": 200,
@@ -489,7 +489,7 @@ def init_route(app):
     @app.route("/editGCode", methods=["POST"])
     def editGCode():
         app.data.logger.resetIdler()
-        # print(request.form["gcode"])
+        # app.data.console_queue.put(f"{__name__}: {request.form['gcode']}")
         if request.method == "POST":
             returnVal = app.data.actions.updateGCode(request.form["gcode"].rstrip())
             if returnVal:
@@ -510,7 +510,7 @@ def init_route(app):
         if request.method == "GET":
             returnVal = app.data.actions.downloadDiagnostics()
             if returnVal != False:
-                print(returnVal)
+                app.data.console_queue.put(f"{__name__}: {returnVal}")
                 return send_file(returnVal, as_attachment=True)
             else:
                 resp = jsonify("failed")
@@ -524,7 +524,7 @@ def init_route(app):
         if request.method == "GET":
             returnVal = app.data.actions.backupWebControl()
             if returnVal != False:
-                print(returnVal)
+                app.data.console_queue.put(f"{__name__}: {returnVal}")
                 return send_file(returnVal)
             else:
                 resp = jsonify("failed")
@@ -564,5 +564,5 @@ def init_route(app):
 
     @app.route("/assets/<path:path>")
     def sendDocs(path):
-        print(path)
+        app.data.console_queue.put(f"{__name__}: {path}")
         return send_from_directory("docs/assets/", path)

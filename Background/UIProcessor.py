@@ -1,4 +1,4 @@
-from __main__ import socketio
+from app import socketio
 
 import json
 import math
@@ -17,19 +17,20 @@ passed the app.
 '''
 
 class UIProcessor:
-    app = None
-    lastCameraTime = 0
-    lastHealthCheck = 0
-    previousUploadFlag = None
-    previousCurrentTool = None
-    previousPositioningMode = None
-    namespace = "/MaslowCNC"
+    def __init__(self):
+        self.app = None
+        self.lastCameraTime = 0
+        self.lastHealthCheck = 0
+        self.previousUploadFlag = None
+        self.previousCurrentTool = None
+        self.previousPositioningMode = None
+        self.namespace = "/MaslowCNC"
 
     def start(self, _app):
-
         self.app = _app
-        self.app.data.console_queue.put("starting UI")
+        self.app.data.console_queue.put(f"{__name__}: starting")
         with self.app.app_context():
+            self.app.data.console_queue.put(f"{__name__}: entering processing loop")
             while True:
                 time.sleep(0.001)
                 # send health message
@@ -631,6 +632,7 @@ class UIProcessor:
         '''
         currentTime = time.time()
         if currentTime - self.lastHealthCheck > 5:
+            self.app.data.console_queue.put(f"{__name__}: performing health check")
             self.lastHealthCheck = currentTime
             load = max(psutil.cpu_percent(interval=None, percpu=True))
             weAreBufferingLines = bool(int(self.app.data.config.getValue("Maslow Settings", "bufferOn")))
@@ -644,7 +646,6 @@ class UIProcessor:
             }
             socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
                           namespace=self.namespace)
-            self.performStatusCheck(True)
 
     def performStatusCheck(self, healthCheckCalled=False):
         '''

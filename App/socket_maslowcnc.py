@@ -6,11 +6,11 @@ from flask import current_app, json, request
 def init_socket_maslowcnc(app):
     route_type = "socket"
     namespace = "/MaslowCNC"
-    print(f"Initializing {route_type} handling for {namespace}")
+    app.data.console_queue.put(f"{__name__}: Initializing {route_type} handling for {namespace}")
 
     @socketio.on("my event", namespace=namespace)
     def my_event(msg):
-        app.data.console_queue.put(msg["data"])
+        app.data.console_queue.put(f"{__name__}: {msg['data']}")
 
     @socketio.on("modalClosed", namespace=namespace)
     def modalClosed(msg):
@@ -28,7 +28,7 @@ def init_socket_maslowcnc(app):
         # todo: cleanup
         app.data.logger.resetIdler()
         data = json.dumps({"title": msg["data"]})
-        print(data)
+        app.data.console_queue.put(f"{__name__}: {data}")
         # socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
         #              namespace=namespace, )
 
@@ -55,9 +55,9 @@ def init_socket_maslowcnc(app):
 
     @socketio.on("requestPage", namespace=namespace)
     def requestPage(msg):
-        print(f"requestPage: {msg}")
+        app.data.console_queue.put(f"{__name__}: requestPage: {msg}")
         app.data.logger.resetIdler()
-        app.data.console_queue.put(request.sid)
+        app.data.console_queue.put(f"{__name__}: {request.sid}")
         client = request.sid
         try:
             (
@@ -89,24 +89,22 @@ def init_socket_maslowcnc(app):
                 namespace=namespace,
             )
         except Exception as e:
-            app.data.console_queue.put(e)
+            app.data.console_queue.put(f"{__name__}: {e}")
 
     @socketio.on("connect", namespace=namespace)
-    def test_connect():
-        app.data.console_queue.put(f"client connected to socket for namespace {namespace}")
-        app.data.console_queue.put(request.sid)
+    def test_connect(msg):
+        app.data.console_queue.put(f"{__name__}: client connected to socket for namespace {namespace}")
+        app.data.console_queue.put(f"{__name__}: {request.sid}")
 
         if not app.data.connectionStatus:
-            app.data.console_queue.put(
-                "Attempting to re-establish connection to controller"
-            )
+            app.data.console_queue.put(f"{__name__}: Attempting to re-establish connection to controller")
             app.data.serialPort.openConnection()
 
-        app.data.console_queue.put(f"Emit connect reply back to the client for namespace {namespace}")
+        app.data.console_queue.put(f"{__name__}: Emit connect reply back to the client for namespace {namespace}")
         socketio.emit("after connect", {"data": "Connected", "count": 0}, namespace=namespace)
         address = app.data.hostAddress
         data = json.dumps({"hostAddress": address})
-        print(data)
+        app.data.console_queue.put(f"{__name__}: {data}")
         socketio.emit(
             "message",
             {"command": "hostAddress", "data": data, "dataFormat": "json"},
@@ -115,28 +113,20 @@ def init_socket_maslowcnc(app):
         if app.data.pyInstallUpdateAvailable:
             app.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
 
-        # TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
-        # if app.uithread == None:
-        #     app.data.console_queue.put(f"starting up the app.uithread as a background task")
-        #     app.uithread = socketio.start_background_task(
-        #         app.UIProcessor.start, current_app._get_current_object()
-        #     )
-        #     app.uithread.start()
-
     @socketio.on("disconnect", namespace=namespace)
     def test_disconnect():
-        app.data.console_queue.put("Client disconnected")
+        app.data.console_queue.put(f"{__name__}: Client disconnected")
 
     @socketio.on("action", namespace=namespace)
     def command(msg):
         app.data.logger.resetIdler()
         retval = app.data.actions.processAction(msg)
         if retval == "Shutdown":
-            print("Shutting Down")
+            app.data.console_queue.put(f"{__name__}: Shutting Down")
             socketio.stop()
-            print("Shutdown")
+            app.data.console_queue.put(f"{__name__}: Shutdown")
         if retval == "TurnOffRPI":
-            print("Turning off RPI")
+            app.data.console_queue.put(f"{__name__}: Turning off RPI")
             os.system("sudo poweroff")
 
     @socketio.on("settingRequest", namespace=namespace)
@@ -156,6 +146,7 @@ def init_socket_maslowcnc(app):
 
     @socketio.on("updateSetting", namespace=namespace)
     def updateSetting(msg):
+        app.data.console_queue.put(f"{__name__}: updateSetting: {msg}")
         app.data.logger.resetIdler()
         if not app.data.actions.updateSetting(msg["data"]["setting"], msg["data"]["value"]):
             app.data.ui_queue1.put("Alert", "Alert", "Error updating setting")

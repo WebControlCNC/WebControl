@@ -95,13 +95,13 @@ class NonVisibleWidgets(MakesmithInitFuncs):
 
         if data.pyInstallPlatform == "linux":
             _platform = distro.linux_distribution()[0].lower()
-            print("##")
-            print(_platform)
-            print("##")
+            print(f"{__name__}: ##")
+            print(f"{__name__}: {_platform}")
+            print(f"{__name__}: ##")
             if _platform.find("raspbian") != -1:
                 data.pyInstallPlatform = "rpi"
-        print("----")
-        print(data.pyInstallPlatform)
+        print(f"{__name__}: ----")
+        print(f"{__name__}: {data.pyInstallPlatform}")
 
         if getattr(sys, "frozen", False):
             if hasattr(sys, "_MEIPASS"):
@@ -112,8 +112,8 @@ class NonVisibleWidgets(MakesmithInitFuncs):
         else:
             data.pyInstallType = "singledirectory"
 
-        print(data.pyInstallType)
-        print("----")
+        print(f"{__name__}: {data.pyInstallType}")
+        print(f"{__name__}: ----")
 
         self.serialPort.setUpData(data)
         self.gcodeFile.setUpData(data)

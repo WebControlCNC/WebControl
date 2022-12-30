@@ -25,10 +25,10 @@ def init_data(app):
 
     if version[:2] > (3, 5):
         app.data.pythonVersion35 = False
-        print("Using routines for Python > 3.5")
+        app.data.console_queue.put(f"{__name__}: Using routines for Python > 3.5")
     else:
         app.data.pythonVersion35 = True
-        print("Using routines for Python == 3.5")
+        app.data.console_queue.put(f"{__name__}: Using routines for Python == 3.5")
 
     app.data.firstRun = False
     # app.previousPosX = 0.0

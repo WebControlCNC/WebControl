@@ -21,7 +21,7 @@ class Frontpage3d {
   // cutTrailGroup = new THREE.Group();
 
   cameraPerspective = 0; // 0 = Orthographic, 1 = Perspective
-  scale = .07;
+  scale = 0.07;
 
   cameraO = null;
   cameraP = null;
@@ -63,12 +63,17 @@ class Frontpage3d {
 
   isComputedEnabled = false;
 
-  initWorkArea(renderer) {
+  getWorkAreaSize() {
     const container = document.getElementById("workarea");
     this.w = container.clientWidth;//-20;
     this.h = container.clientHeight;//-20;
-    renderer.setSize(this.w, this.h);
     console.log(`workarea w=${this.w}, h=${this.h}`);
+    return container;
+  }
+
+  initWorkArea(renderer) {
+    const container = this.getWorkAreaSize();
+    renderer.setSize(this.w, this.h);
 
     container.appendChild(renderer.domElement);
   }
@@ -292,31 +297,28 @@ class Frontpage3d {
     window.requestAnimationFrame(Frontpage3d.animate);
   }
 
-  onWindowResize() {
-    //w=window.innerWidth;
-    //h=window.innerHeight;
-    //console.log("wr="+w+", hr="+h);
-    const we = $("#workarea").width(); //-20;
-    const he = $("#workarea").height(); //-20;
-    //console.log("we="+we+", he="+he);
+  static onWindowResize() {
+    // frontpage3d has to be initialized before coming here
+    const fp3d = window.frontpage3d;
+    fp3d.getWorkAreaSize();
   
-    if (this.cameraO) {
-      //this.cameraO.aspect = window.innerWidth / window.innerHeight;
-      this.cameraO.left = we / -2 * this.scale;
-      this.cameraO.right = we / 2 * this.scale;
-      this.cameraO.top = he / 2 * this.scale;
-      this.cameraO.bottom = he / -2 * this.scale;
-      this.cameraO.updateProjectionMatrix();
+    if (fp3d.cameraO) {
+      //fp3d.cameraO.aspect = window.innerWidth / window.innerHeight;
+      fp3d.cameraO.left = (fp3d.w / -2) * fp3d.scale;
+      fp3d.cameraO.right = (fp3d.w / 2) * fp3d.scale;
+      fp3d.cameraO.top = (fp3d.h / 2) * fp3d.scale;
+      fp3d.cameraO.bottom = (fp3d.h / -2) * fp3d.scale;
+      fp3d.cameraO.updateProjectionMatrix();
     }
 
-    if (this.cameraP) {
-      //this.cameraP.aspect = window.innerWidth / window.innerHeight;
-      this.cameraP.aspect = we / he;
-      this.cameraP.updateProjectionMatrix();
+    if (fp3d.cameraP) {
+      //fp3d.cameraP.aspect = window.innerWidth / window.innerHeight;
+      fp3d.cameraP.aspect = fp3d.w / fp3d.h;
+      fp3d.cameraP.updateProjectionMatrix();
     }
   
-    if (this.renderer) {
-      this.renderer.setSize(we, he);
+    if (fp3d.renderer) {
+      fp3d.renderer.setSize(fp3d.w, fp3d.h);
     }
   }
 
@@ -739,7 +741,7 @@ $(document).ready(() => {
       requestPage("screenAction", window.frontpage3d.pos);
     }
   });
-  window.addEventListener("resize", window.frontpage3d.onWindowResize, false);
+  window.addEventListener("resize", Frontpage3d.onWindowResize, false);
   document.onmousemove = (event) => {
     window.frontpage3d.onMouseMove(event);
   }

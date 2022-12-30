@@ -13,6 +13,8 @@ import webbrowser
 
 import schedule
 
+from flask import current_app
+
 from App.data import init_data
 from App.route import init_route
 from App.socket_maslowcnc import init_socket_maslowcnc
@@ -87,6 +89,24 @@ def isnumber(s):
 # def shutdown():
 #    print("Shutdown")
 
+with app.app_context():
+    capp = current_app._get_current_object()
+
+    if app.uithread == None:
+        app.data.console_queue.put(f"{__name__}: starting up the app.uithread as a background task")
+        app.uithread = socketio.server.eio._async['thread'](target=app.UIProcessor.start, args=capp)
+        app.data.console_queue.put(f"{__name__}: created and started app.uithread")
+
+    if app.logstreamerthread == None:
+        app.data.console_queue.put(f"{__name__}: starting up the app.logstreamerthread as a background task")
+        app.logstreamerthread = socketio.server.eio._async['thread'](target=app.LogStreamer.start, args=capp)
+        app.data.console_queue.put(f"{__name__}: created and started app.logstreamerthread")
+
+    if app.mcpthread == None:
+        app.data.console_queue.put(f"{__name__}: starting up the app.mcpthread as a background task")
+        app.mcpthread = socketio.server.eio._async['thread'](target=app.data.mcpProcessor.start, args=capp)
+        app.data.console_queue.put(f"{__name__}: created and started app.mcpthread")
+
 
 if __name__ == "__main__":
     app.debug = False
@@ -101,15 +121,15 @@ if __name__ == "__main__":
             webPortInt = 5000
     except Exception as e:
         app.data.console_queue.put(e)
-        app.data.console_queue.put("Invalid port assignment found in webcontrol.json")
+        app.data.console_queue.put("Main: Invalid port assignment found in webcontrol.json")
 
-    print("-$$$$$-")
-    print(os.path.abspath(__file__))
+    app.data.console_queue.put("Main: -$$$$$-")
+    app.data.console_queue.put(f"Main: {os.path.abspath(__file__)}")
     app.data.releaseManager.processAbsolutePath(os.path.abspath(__file__))
-    print("-$$$$$-")
+    app.data.console_queue.put("Main: -$$$$$-")
 
     webHost = "http://localhost"
-    print(f"opening browser on {webHost}:{webPortInt}")
+    app.data.console_queue.put(f"Main: opening browser on {webHost}:{webPortInt}")
     webbrowser.open_new_tab(f"{webHost}:{webPortInt}")
 
     default_host_ip = "0.0.0.0"
@@ -118,7 +138,7 @@ if __name__ == "__main__":
     if host_ip.startswith("127.0."):
         # Thanks Ubuntu for mucking it up
         host_ip = default_host_ip
-    print(f"setting app data host address to {host_ip}:{webPortInt}")
+    app.data.console_queue.put(f"Main: setting app data host address to {host_ip}:{webPortInt}")
     app.data.hostAddress = f"http://{host_ip}:{webPortInt}"
 
     # app.data.shutdown = shutdown
