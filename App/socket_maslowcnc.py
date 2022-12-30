@@ -12,7 +12,6 @@ def init_socket_maslowcnc(app):
     def my_event(msg):
         app.data.console_queue.put(msg["data"])
 
-
     @socketio.on("modalClosed", namespace=namespace)
     def modalClosed(msg):
         app.data.logger.resetIdler()
@@ -23,7 +22,6 @@ def init_socket_maslowcnc(app):
             namespace=namespace,
         )
 
-
     @socketio.on("contentModalClosed", namespace=namespace)
     def contentModalClosed(msg):
         # Note, this shouldn't be called anymore
@@ -33,7 +31,6 @@ def init_socket_maslowcnc(app):
         print(data)
         # socketio.emit("message", {"command": "closeContentModals", "data": data, "dataFormat": "json"},
         #              namespace=namespace, )
-
 
     """
     todo: cleanup
@@ -46,7 +43,6 @@ def init_socket_maslowcnc(app):
                     namespace=namespace, )
     """
 
-
     @socketio.on("alertModalClosed", namespace=namespace)
     def alertModalClosed(msg):
         app.data.logger.resetIdler()
@@ -57,10 +53,10 @@ def init_socket_maslowcnc(app):
             namespace=namespace,
         )
 
-
     @socketio.on("requestPage", namespace=namespace)
     def requestPage(msg):
         print(f"requestPage: {msg}")
+        print(f"request: {request.__dict__}")
         app.data.logger.resetIdler()
         app.data.console_queue.put(request.sid)
         client = request.sid
@@ -96,16 +92,10 @@ def init_socket_maslowcnc(app):
         except Exception as e:
             app.data.console_queue.put(e)
 
-
     @socketio.on("connect", namespace=namespace)
     def test_connect():
-        app.data.console_queue.put("connected")
+        app.data.console_queue.put(f"client connected to socket for namespace {namespace}")
         app.data.console_queue.put(request.sid)
-        if app.uithread == None:
-            app.uithread = socketio.start_background_task(
-                app.UIProcessor.start, current_app._get_current_object()
-            )
-            app.uithread.start()
 
         if not app.data.connectionStatus:
             app.data.console_queue.put(
@@ -113,7 +103,8 @@ def init_socket_maslowcnc(app):
             )
             app.data.serialPort.openConnection()
 
-        socketio.emit("my response", {"data": "Connected", "count": 0})
+        app.data.console_queue.put(f"Emit connect reply back to the client for namespace {namespace}")
+        socketio.emit("after connect", {"data": "Connected", "count": 0}, namespace=namespace)
         address = app.data.hostAddress
         data = json.dumps({"hostAddress": address})
         print(data)
@@ -125,11 +116,17 @@ def init_socket_maslowcnc(app):
         if app.data.pyInstallUpdateAvailable:
             app.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
 
+        # TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
+        # if app.uithread == None:
+        #     app.data.console_queue.put(f"starting up the app.uithread as a background task")
+        #     app.uithread = socketio.start_background_task(
+        #         app.UIProcessor.start, current_app._get_current_object()
+        #     )
+        #     app.uithread.start()
 
     @socketio.on("disconnect", namespace=namespace)
     def test_disconnect():
         app.data.console_queue.put("Client disconnected")
-
 
     @socketio.on("action", namespace=namespace)
     def command(msg):
@@ -142,7 +139,6 @@ def init_socket_maslowcnc(app):
         if retval == "TurnOffRPI":
             print("Turning off RPI")
             os.system("sudo poweroff")
-
 
     @socketio.on("settingRequest", namespace=namespace)
     def settingRequest(msg):
@@ -159,13 +155,11 @@ def init_socket_maslowcnc(app):
                 namespace=namespace,
             )
 
-
     @socketio.on("updateSetting", namespace=namespace)
     def updateSetting(msg):
         app.data.logger.resetIdler()
         if not app.data.actions.updateSetting(msg["data"]["setting"], msg["data"]["value"]):
             app.data.ui_queue1.put("Alert", "Alert", "Error updating setting")
-
 
     @socketio.on("checkForGCodeUpdate", namespace=namespace)
     def checkForGCodeUpdate(msg):
@@ -174,7 +168,6 @@ def init_socket_maslowcnc(app):
         ## the gcode file might change the active units so we need to inform the UI of the change.
         app.data.ui_queue1.put("Action", "unitsUpdate", "")
         app.data.ui_queue1.put("Action", "gcodeUpdate", "")
-
 
     @socketio.on("checkForBoardUpdate", namespace=namespace)
     def checkForBoardUpdate(msg):

@@ -18,11 +18,13 @@ def init_socket_mcp(app):
         app.data.console_queue.put("watchdog connected")
         app.data.console_queue.put(request.sid)
         socketio.emit("connect", namespace=namespace)
-        if app.mcpthread == None:
-            app.data.console_queue.put("going to start mcp thread")
-            app.mcpthread = socketio.start_background_task(
-                app.data.mcpProcessor.start, current_app._get_current_object()
-            )
-            app.data.console_queue.put("created mcp thread")
-            app.mcpthread.start()
-            app.data.console_queue.put("started mcp thread")
+
+        # TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
+        # if app.mcpthread == None:
+        #     app.data.console_queue.put("going to start mcp thread")
+        #     app.mcpthread = socketio.start_background_task(
+        #         app.data.mcpProcessor.start, current_app._get_current_object()
+        #     )
+        #     app.data.console_queue.put("created mcp thread")
+        #     app.mcpthread.start()
+        #     app.data.console_queue.put("started mcp thread")

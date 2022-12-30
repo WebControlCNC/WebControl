@@ -11,7 +11,7 @@ $(document).ready(function () {
   const namespace = "/MaslowCNCLogs"; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
-  const serverURL = `//${location.hostname}:${location.port}${namespace}`;
+  const serverURL = `${location.protocol}//${location.hostname}:${location.port}${namespace}`;
   window.logSocket = io.connect(serverURL);
   setListeners();
 
@@ -26,7 +26,7 @@ $(document).ready(function () {
 
 function setListeners() {
   console.log("setting Listeners");
-  window.logSocket.on('connect', () => {
+  window.logSocket.on('after connect', () => {
     window.logSocket.emit('my event', { data: 'I\'m connected!' });
   });
 

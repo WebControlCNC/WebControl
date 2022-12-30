@@ -44,11 +44,11 @@ $(document).ready(function () {
   const namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
-  const serverURL = `//${location.hostname}:${location.port}${namespace}`;
+  const serverURL = `${location.protocol}//${location.hostname}:${location.port}${namespace}`;
   console.log(serverURL);
 
   // Set up our globals
-  window.socket = io(serverURL);
+  window.socket = io.connect(serverURL, {reconnect: true});
   window.enable3D = true;
   window.controllerMessages = [];
 
@@ -73,7 +73,8 @@ function processHostAddress(data) {
 
 function setListeners() {
   console.log("setting Listeners");
-  window.socket.on('connect', function (msg) {
+
+  window.socket.on('after connect', function (msg) {
     socketClientID = window.socket.io.engine.id;
     console.log("id=" + socketClientID);
     window.socket.emit('my event', { data: 'I\'m connected!' });
@@ -140,12 +141,13 @@ function setListeners() {
       $("#mobileCPUUsage").removeClass('alert-warning').addClass('alert-success');
     }, 125);
     //console.log(msg.command);
+    let data;
     if (msg.dataFormat == 'json')
       data = JSON.parse(msg.data);
     else
       data = msg.data;
-    passValue = true
-    if ((data != null) && (data.hasOwnProperty('client'))) {
+    let passValue = true;
+    if (data?.client) {
       //console.log(data.client);
       if ((data.client != socketClientID) && (data.client != "all"))
         passValue = false;
@@ -203,7 +205,7 @@ function setListeners() {
           break;
         case 'activateModal':
           //completed
-          //console.log(msg)
+          console.log(msg)
           processActivateModal(data);
           break;
         case 'requestedSetting':
@@ -304,5 +306,4 @@ function setListeners() {
       }
     }
   });
-
 }

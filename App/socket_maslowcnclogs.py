@@ -10,18 +10,18 @@ def init_socket_maslowcnclogs(app):
 
     @socketio.on("connect", namespace=namespace)
     def log_connect():
-        app.data.console_queue.put("connected to log")
+        app.data.console_queue.put(f"client connected to socket for namespace {namespace}")
         app.data.console_queue.put(request.sid)
-        if app.logstreamerthread == None:
-            app.logstreamerthread = socketio.start_background_task(
-                app.LogStreamer.start, current_app._get_current_object()
-            )
-            app.logstreamerthread.start()
-
         socketio.emit(
-            "my response", {"data": "Connected", "count": 0}, namespace=namespace
+            "after connect", {"data": "Connected", "count": 0}, namespace=namespace
         )
 
+        # TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
+        # if app.logstreamerthread == None:
+        #     app.logstreamerthread = socketio.start_background_task(
+        #         app.LogStreamer.start, current_app._get_current_object()
+        #     )
+        #     app.logstreamerthread.start()
 
     @socketio.on("disconnect", namespace=namespace)
     def log_disconnect():

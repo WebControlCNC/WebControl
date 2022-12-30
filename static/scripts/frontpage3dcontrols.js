@@ -1,5 +1,4 @@
-// These are used only in frontpage3d_mobilecontrols.html
-// And share function names with frontpageControls.js
+// This is used only in frontpage3d_mobilecontrols.html
 
 $(document).ready(function () {
   //settingRequest("Computed Settings","units");

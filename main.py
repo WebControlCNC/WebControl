@@ -18,6 +18,7 @@ from App.route import init_route
 from App.socket_maslowcnc import init_socket_maslowcnc
 from App.socket_maslowcnclogs import init_socket_maslowcnclogs
 from App.socket_mcp import init_socket_mcp
+from App.socket_catchall import init_socket_catchall
 
 from Background.UIProcessor import UIProcessor  # do this after socketio is declared
 from Background.LogStreamer import LogStreamer  # do this after socketio is declared
@@ -56,18 +57,22 @@ app.th2.daemon = True
 app.th2.start()
 
 ## uithread set to None.. will be activated upon first websocket connection from browser
+# TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
 app.uithread = None
 
 ## uithread set to None.. will be activated upon first websocket connection from webmcp
+# TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
 app.mcpthread = None
 
 ## logstreamerthread set to None.. will be activated upon first websocket connection from log streamer browser
+# TODO: This requires handling in a completely different way - this breaks socketio.on connect handling
 app.logstreamerthread = None
 
 init_route(app)
 init_socket_mcp(app)
 init_socket_maslowcnc(app)
 init_socket_maslowcnclogs(app)
+init_socket_catchall(app)
 
 
 @app.template_filter("isnumber")
@@ -114,7 +119,7 @@ if __name__ == "__main__":
         # Thanks Ubuntu for mucking it up
         host_ip = default_host_ip
     print(f"setting app data host address to {host_ip}:{webPortInt}")
-    app.data.hostAddress = f"{host_ip}:{webPortInt}"
+    app.data.hostAddress = f"http://{host_ip}:{webPortInt}"
 
     # app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host=host_ip, port=webPortInt, log_output=False)
