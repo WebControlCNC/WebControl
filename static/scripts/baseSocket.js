@@ -23,6 +23,7 @@ import {
   processStatusMessage,
 } from "./frontpageControlsCommon.js";
 import {
+  initializeOpticalCalibration,
   processPositionMessageOptical,
   updateCalibrationImage,
   updateOpticalCalibrationCurve,
@@ -60,6 +61,9 @@ $(document).ready(function () {
   // Originally From zAxis.js
   settingRequest("Computed Settings", "unitsZ");
   settingRequest("Computed Settings", "distToMoveZ");
+
+  // opticalCalibration.js
+  initializeOpticalCalibration();
 });
 
 function processHostAddress(data) {

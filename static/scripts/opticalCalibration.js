@@ -2,9 +2,6 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { action, settingRequest } from "./socketEmits.js";
 import { OrbitControls } from "./OrbitControls.js";
 
-settingRequest('Optical Calibration Settings','calibrationCurve');
-settingRequest('Optical Calibration Settings','calibrationError');
-
 var _xError = [];
 var _yError = [];
 var _xValues = [];
@@ -35,6 +32,11 @@ var osledCircle;
 
 var osled;
 
+function initializeOpticalCalibration() {
+  settingRequest('Optical Calibration Settings', 'calibrationCurve');
+  settingRequest('Optical Calibration Settings', 'calibrationError');
+}
+
 function oanimate() {
     requestAnimationFrame(oanimate);
     ocontrols.update();
@@ -42,16 +44,14 @@ function oanimate() {
 }
 
 function positionUpdateOptical(x,y,z){
-    if ($("#units").text()=="MM"){
-        x /= 25.4
-        y /= 25.4
-        z /= 25.4
-    }
-    if (osled !== undefined)
-    {
-        osled.position.set(x,y,z);
-    }
-
+  if ($("#units").text()=="MM") {
+    x /= 25.4
+    y /= 25.4
+    z /= 25.4
+  }
+  if (osled !== undefined) {
+    osled.position.set(x,y,z);
+  }
 }
 
 function processPositionMessageOptical(data){
@@ -315,7 +315,10 @@ $(document).ready(function () {
       }
     });
     console.log("here1");
-    setupDisplay();
+    ocontainer = document.getElementById('workareaOptical');
+    if (ocontainer) {
+      setupDisplay();
+    }
 });
 
 function setupDisplay(){
@@ -485,6 +488,7 @@ function drawCalibration(){
 */
 
 export {
+  initializeOpticalCalibration,
   processPositionMessageOptical,
   updateCalibrationImage,
   updateOpticalCalibrationCurve,
