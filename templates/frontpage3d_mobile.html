@@ -8,9 +8,6 @@
 {% block javascript %}
   <script src="{{ url_for('static',filename='node_modules/pako/dist/pako.min.js') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='node_modules/feather-icons/dist/feather.min.js') }}" crossorigin="anonymous"></script>
-  <!-- <script src="{{ url_for('static',filename='node_modules/three/build/three.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='node_modules/three-spritetext/dist/three-spritetext.min.js') }}" crossorigin="anonymous"></script> -->
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018s') }}" type="module" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102018s') }}" type="module" crossorigin="anonymous"></script>
   <script>feather.replace()</script>
 {% endblock %}
@@ -212,17 +209,17 @@
   </div>
   <div class="row mb-1">
     <div class="col-4">
-      <button class="btn btn-secondary btn-block" type="button" id="mobilebutton3D" onclick="toggle3DView()">3D</button>
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebutton3D" onclick="window.frontpage3d.toggle3DView()">3D</button>
     </div>
     <div class="col-4">
-      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonPO" onclick="toggle3DPO()">Ortho</button>
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonPO" onclick="window.frontpage3d.toggle3DPO()">Ortho</button>
     </div>
     <div class="col-4">
-      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonReset" onclick="resetView()">Reset</button>
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonReset" onclick="window.frontpage3d.resetView()">Reset</button>
     </div>
   </div>
   <div class="row mb-1">
-    <button id="boardID" class="btn btn-primary btn-block" onclick="toggleBoard()">...</button>
+    <button id="boardID" class="btn btn-primary btn-block" onclick="window.frontpage3d.toggleBoard()">...</button>
   </div>
   <div class="card">
     <div class = "card-body">

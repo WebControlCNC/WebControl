@@ -24,22 +24,7 @@
     window.action = action;
     window.requestPage = requestPage;
   </script>
-  <script type="module">
-    import {
-      resetView,
-      showFPSpinner,
-      toggle3DPO,
-      toggle3DView,
-      toggleBoard,
-      toggleLabels
-    } from "{{ url_for('static',filename='scripts/frontpage3d.js', version='12302022u') }}";
-    window.resetView = resetView;
-    window.showFPSpinner = showFPSpinner;
-    window.toggle3DPO = toggle3DPO;
-    window.toggle3DView = toggle3DView;
-    window.toggleBoard = toggleBoard;
-    window.toggleLabels = toggleLabels;
-  </script>  
+  <script type="module" src="{{ url_for('static',filename='scripts/frontpage3d.js', version='12302022u') }}" crossorigin="anonymous"></script>
   <script type="module">
     import { unitSwitch, unitSwitchZ } from "{{ url_for('static',filename='scripts/unitSwitch.js', version='12302022u') }}";
     window.unitSwitch = unitSwitch;

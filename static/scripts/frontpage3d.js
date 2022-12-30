@@ -1,14 +1,6 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { OrbitControls } from "./OrbitControls.js";
-import {
-  // checkForGCodeUpdate,
-  requestPage,
-} from "./socketEmits.js";
-
-//checkForGCodeUpdate();
-//checkForGCodeUpdate();
-
-//setInterval(function(){ alert("Hello"); }, 3000);
+import { requestPage } from "./socketEmits.js";
 
 class Frontpage3d {
   cutSquareGroup = new THREE.Group();
@@ -72,13 +64,13 @@ class Frontpage3d {
   isComputedEnabled = false;
 
   initWorkArea(renderer) {
-    this.w = $("#workarea").width();//-20;
-    this.h = $("#workarea").height();//-20;
+    const container = document.getElementById("workarea");
+    this.w = container.clientWidth;//-20;
+    this.h = container.clientHeight;//-20;
     renderer.setSize(this.w, this.h);
-    //console.log("w="+w+", h="+h);
+    console.log(`workarea w=${this.w}, h=${this.h}`);
 
-    const container = document.getElementById('workarea');
-    container.appendChild(this.renderer.domElement);
+    container.appendChild(renderer.domElement);
   }
 
   initCamera(camera) {
@@ -215,6 +207,7 @@ class Frontpage3d {
     if (!window.isMobile) {
       this.scene.add(this.cursor);
     }
+
     //this.scene.add(this.cutSquareGroup);
   }
 
@@ -438,6 +431,15 @@ class Frontpage3d {
       }
     }
   }
+
+  ab2str(buf) {
+    var bufView = new Uint16Array(buf);
+    var unis = "";
+    for (var i = 0; i < bufView.length; i++) {
+      unis = unis + String.fromCharCode(bufView[i]);
+    }
+    return unis;
+  }  
 
   gcodeUpdateCompressed(data) {
     console.log("updating gcode compressed");
@@ -743,43 +745,7 @@ $(document).ready(() => {
   }
 });
 
-function toggleLabels() {
-  // Called by frontpage3d.html
-  window.frontpage3d.toggleLabels();
-}
-
-function ab2str(buf) {
-  var bufView = new Uint16Array(buf);
-  var unis = "";
-  for (var i = 0; i < bufView.length; i++) {
-    unis = unis + String.fromCharCode(bufView[i]);
-  }
-  return unis;
-}
-
 /** You spin me right round, baby right round, like a record player, right round, round, round */
-function showFPSpinner(msg) {
+window.showFPSpinner = (msg) => {
   $("#fpCircle").show();
 }
-
-function resetView() {
-  // Called by frontpage3d.html and frontpage3d_mobile.html
-  window.frontpage3d.resetView();
-}
-
-function toggleBoard() {
-  // Called by frontpage3d.html and frontpage3d_mobile.html
-  window.frontpage3d.toggleBoard();
-}
-
-function toggle3DPO() {
-  // Called by frontpage3d.html and frontpage3d_mobile.html
-  window.frontpage3d.toggle3DPO();
-}
-
-function toggle3DView() {
-  // Called by frontpage3d.html and frontpage3d_mobile.html
-  window.frontpage3d.toggle3DView();
-}
-
-export { resetView, showFPSpinner, toggle3DPO, toggle3DView, toggleBoard, toggleLabels }
