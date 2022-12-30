@@ -10,6 +10,18 @@ import {
   pyInstallUpdateBadge,
   setupStatusButtons,
 } from "./base.js";
+import {
+  boardDataUpdate,
+  clearAlarm,
+  processAlarm,
+  processControllerMessage,
+  processErrorValueMessage,
+  processGCodePositionMessage,
+  processHomePositionMessage,
+  processPositionMessage,
+  processRequestedSetting,
+  processStatusMessage,
+} from "./frontpageControlsCommon.js";
 import { processCalibrationMessage } from "./setSprockets.js";
 import { action, settingRequest, checkForGCodeUpdate, checkForBoardUpdate } from "./socketEmits.js";
 
@@ -25,7 +37,7 @@ $(document).ready(function () {
   console.log(serverURL);
 
   // Set up our globals
-  window.socket = io(serverURL, { 'forceNew': true });
+  window.socket = io(serverURL);
   window.enable3D = true;
   window.controllerMessages = [];
 
@@ -47,10 +59,10 @@ function processHostAddress(data) {
 
 function setListeners() {
   console.log("setting Listeners");
-  socket.on('connect', function (msg) {
-    socketClientID = socket.io.engine.id;
+  window.socket.on('connect', function (msg) {
+    socketClientID = window.socket.io.engine.id;
     console.log("id=" + socketClientID);
-    socket.emit('my event', { data: 'I\'m connected!' });
+    window.socket.emit('my event', { data: 'I\'m connected!' });
     $("#clientStatus").text("Connected: " + hostAddress);
     $("#clientStatus").removeClass('alert-danger').addClass('alert-success');
     $("#mobileClientStatus").removeClass('alert-danger').addClass('alert-success');
@@ -65,7 +77,7 @@ function setListeners() {
     checkForBoardUpdate();
   });
 
-  socket.on('disconnect', function (msg) {
+  window.socket.on('disconnect', function (msg) {
     $("#clientStatus").text("Not Connected");
     hostAddress = "Not Connected"
     $("#clientStatus").removeClass('alert-success').addClass('alert-outline-danger');
@@ -79,7 +91,7 @@ function setListeners() {
   $("#notificationModal").on('hidden.bs.modal', function (e) {
     var name = $('#notificationModal').data('name');
     console.log("closing modal:" + name);
-    socket.emit('modalClosed', { data: name });
+    window.socket.emit('modalClosed', { data: name });
   });
 
   /*
@@ -89,22 +101,22 @@ function setListeners() {
   $("#actionModal").on('hidden.bs.modal', function(e){
       var name = $('#actionModal').data('name');
       console.log("closing modal:"+name);
-      socket.emit('actionModalClosed', {data:name});
+      window.socket.emit('actionModalClosed', {data:name});
   });
 */
   $("#alertModal").on('hidden.bs.modal', function (e) {
     var name = $('#alertModal').data('name');
     console.log("closing modal:" + name);
-    socket.emit('alertModalClosed', { data: name });
+    window.socket.emit('alertModalClosed', { data: name });
   });
 
   $("#contentModal").on('hidden.bs.modal', function (e) {
     var name = $('#contentModal').data('name');
     console.log("closing modal:" + name);
-    //socket.emit('contentModalClosed', {data:name});
+    //window.socket.emit('contentModalClosed', {data:name});
   });
 
-  socket.on('message', function (msg) {
+  window.socket.on('message', function (msg) {
     //console.log(msg);
     //blink activity indicator
     $("#cpuUsage").removeClass('alert-success').addClass('alertalert-warning');
@@ -152,8 +164,8 @@ function setListeners() {
           break;
         case 'cameraMessage':
           //completed
-          if (enable3D) {
-            frontpage3d.processCameraMessage(data);
+          if (window.enable3D) {
+            window.frontpage3d.processCameraMessage(data);
           }
           break;
         case 'positionMessage':
@@ -189,7 +201,7 @@ function setListeners() {
           break;
         case 'gcodeUpdate':
           console.log("---gcodeUpdate received via socket---");
-          if (enable3D)
+          if (window.enable3D)
             gcodeUpdate(msg.message);
           else
             $("#fpCircle").hide();
@@ -199,8 +211,8 @@ function setListeners() {
           showFPSpinner(msg.message);
           break;
         case 'gcodeUpdateCompressed':
-          if (enable3D) {
-            frontpage3d.gcodeUpdateCompressed(data);
+          if (window.enable3D) {
+            window.frontpage3d.gcodeUpdateCompressed(data);
           } else {
             $("#fpCircle").hide();
           }
@@ -209,8 +221,8 @@ function setListeners() {
           boardDataUpdate(data);
           break;
         case 'boardCutDataUpdateCompressed':
-          if (enable3D) {
-            frontpage3d.boardCutDataUpdateCompressed(data);
+          if (window.enable3D) {
+            window.frontpage3d.boardCutDataUpdateCompressed(data);
           } else {
             $("#fpCircle").hide();
           }

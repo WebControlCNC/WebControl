@@ -173,7 +173,7 @@ function redrawCurveCharts(chart){
           _y[i][j]=temp
           _x[j]=j
         }
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve" , colorway: colorwayLayout } );
@@ -188,7 +188,7 @@ function redrawCurveCharts(chart){
           _y[i][j]=temp
           _x[j]=j
         }
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve" , colorway: colorwayLayout} );
@@ -205,7 +205,7 @@ function redrawErrorCharts(chart){
          while (xErrorPlot.data.length>0)
               Plotly.deleteTraces(xErrorPlot, [0]);
       for(var i = 0; i<15; i++){
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", colorway: colorwayLayout } );
@@ -217,7 +217,7 @@ function redrawErrorCharts(chart){
           while (yErrorPlot.data.length>0)
               Plotly.deleteTraces(yErrorPlot, [0]);
       for(var i = 0; i<15; i++){
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", colorway: colorwayLayout } );
@@ -239,7 +239,7 @@ function redrawErrorCharts(chart){
       x1 = []
       y1 = []
       //Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error" } );
-      if (isMobile == true)
+      if (window.isMobile)
         Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
       else
         Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error"} );
@@ -251,7 +251,7 @@ function redrawErrorCharts(chart){
          }
       }
       //Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}] );
-      if (isMobile == true)
+      if (window.isMobile)
         Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {title: "XY-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
       else
         Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {title: "XY-Error"} );

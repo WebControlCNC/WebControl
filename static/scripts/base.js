@@ -4,7 +4,7 @@ $('.disabler').prop('disabled', true);
 $(document).ready(function () {
   // Make all navbar drop down items collapse the menu when clicked.
   window.isMobile = testForMobile();
-  if (isMobile) {
+  if (window.isMobile) {
     $("#navbarSupportedContent a.dropdown-item").attr("data-bs-toggle", "collapse").attr("data-bs-target", "#navbarSupportedContent");
   }
   window.isDisabled = true;
@@ -27,14 +27,14 @@ function processHealthMessage(data) {
     if ($("#bufferSize").is(":hidden") == false) {
       $("#bufferSize").hide();
     }
-    if ((isMobile) && ($("#mobileBufferSize").is(":hidden") == false)) {
+    if ((window.isMobile) && ($("#mobileBufferSize").is(":hidden") == false)) {
       $("#mobileBufferSize").hide();
     }
   } else {
     if ($("#bufferSize").is(":hidden") == true) {
       $("#bufferSize").show();
     }
-    if ((isMobile) && ($("#mobileBufferSize").is(":hidden") == true)) {
+    if ((window.isMobile) && ($("#mobileBufferSize").is(":hidden") == true)) {
       $("#mobileBufferSize").show();
     }
     $("#bufferSize").text("Buffer: " + data.bufferSize.toString());
@@ -47,7 +47,7 @@ function processControllerStatus(data) {
     $("#controllerStatusAlert").text("Not Connected");
     $("#controllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
     $("#mobileControllerStatusAlert").removeClass('alert-success').addClass('alert-danger');
-    if (isMobile) {
+    if (window.isMobile) {
       $("#mobileControllerStatusAlert").show();
       $("#mobileControllerStatusAlert svg.feather.feather-check-circle").replaceWith(feather.icons["alert-circle"].toSvg());
     } else {
@@ -61,7 +61,7 @@ function processControllerStatus(data) {
       text = data.port + " / Fake Servo ON";
       $("#controllerStatusAlert").hide();
       $("#mobileControllerStatusAlert").hide();
-      if (isMobile) {
+      if (window.isMobile) {
         $("#mobileControllerStatusButton").show();
         $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
       } else {
@@ -74,7 +74,7 @@ function processControllerStatus(data) {
     } else {
       text = data.port;
       $("#controllerStatusAlert").show();
-      if (isMobile) {
+      if (window.isMobile) {
         $("#mobileControllerStatusAlert").show();
         $("#mobileControllerStatusAlert svg.feather.feather-alert-circle").replaceWith(feather.icons["check-circle"].toSvg());
         $("#mobileControllerStatusAlert").removeClass('alert-danger').addClass('alert-success');
@@ -151,7 +151,7 @@ function processActivateModal(data) {
   $modalDialog.removeClass('modal-sm');
   $modalDialog.removeClass('mw-100 w-75');
   if (data.modalSize == "large") {
-    if (isMobile)
+    if (window.isMobile)
       $modalDialog.addClass('modal-lg');
     else
       $modalDialog.addClass('mw-100 w-75');
@@ -217,7 +217,7 @@ function closeContentModals(data) {
 };
 
 function setupStatusButtons() {
-  if (isMobile) {
+  if (window.isMobile) {
     $('#mobileClientStatus').show();
     $('#mobileCPUUsage').show();
     $('#mobileControllerStatusAlert').show();

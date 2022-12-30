@@ -212,7 +212,7 @@ class Frontpage3d {
     this.scene.add(this.sled);
     this.scene.add(this.home);
     this.scene.add(this.gcodePos);
-    if (!this.isMobile) {
+    if (!window.isMobile) {
       this.scene.add(this.cursor);
     }
     //this.scene.add(this.cutSquareGroup);
@@ -235,7 +235,7 @@ class Frontpage3d {
       }
 
       this.view3D = false;
-      if (this.isMobile) {
+      if (window.isMobile) {
         $("#mobilebutton3D").removeClass('btn-primary').addClass('btn-secondary');
       } else {
         $("#button3D").removeClass('btn-primary').addClass('btn-secondary');
@@ -256,7 +256,7 @@ class Frontpage3d {
       }
 
       this.view3D = true;
-      if (this.isMobile) {
+      if (window.isMobile) {
         $("#mobilebutton3D").removeClass('btn-secondary').addClass('btn-primary');
       } else {
         $("#button3D").removeClass('btn-secondary').addClass('btn-primary');
@@ -288,12 +288,12 @@ class Frontpage3d {
 
   static animate() {
     // frontpage3d has to be initialized before coming here
-    if (frontpage3d) {
-      frontpage3d.controlsO.update();
-      frontpage3d.controlsP.update();
-      frontpage3d.renderer.render(
-        frontpage3d.scene,
-        (frontpage3d.cameraPerspective == 0) ? frontpage3d.cameraO: frontpage3d.cameraP
+    if (window.frontpage3d) {
+      window.frontpage3d.controlsO.update();
+      window.frontpage3d.controlsP.update();
+      window.frontpage3d.renderer.render(
+        window.frontpage3d.scene,
+        (window.frontpage3d.cameraPerspective == 0) ? window.frontpage3d.cameraO: window.frontpage3d.cameraP
       );
     }
     window.requestAnimationFrame(Frontpage3d.animate);
@@ -336,7 +336,7 @@ class Frontpage3d {
   }
 
   onMouseMove(event) {
-    if (!this.isMobile) {
+    if (!window.isMobile) {
       this.pos = this.cursorPosition(event);
       this.cursor.position.set(this.pos.x, this.pos.y, this.pos.z);
       const linePosX = this.confine(this.pos.x, -48, 48);
@@ -597,7 +597,7 @@ class Frontpage3d {
       if (imageShowing == 1) {
         newImg.onload = function () {
           document.getElementById("cameraImage2").setAttribute('src', this.src);
-          if (isMobile) {
+          if (window.isMobile) {
             document.getElementById("mobileCameraDiv2").style.zIndex = "95";
             document.getElementById("mobileCameraDiv1").style.zIndex = "94";
           } else {
@@ -609,7 +609,7 @@ class Frontpage3d {
       } else {
         newImg.onload = function () {
           document.getElementById("cameraImage1").setAttribute('src', this.src);
-          if (isMobile) {
+          if (window.isMobile) {
             document.getElementById("mobileCameraDiv1").style.zIndex = "95";
             document.getElementById("mobileCameraDiv2").style.zIndex = "94";
           } else {
@@ -629,7 +629,7 @@ class Frontpage3d {
       console.log("video on");
       document.getElementById("cameraImage1").style.display = "block";
       document.getElementById("cameraImage2").style.display = "block";
-      if (isMobile) {
+      if (window.isMobile) {
         document.getElementById("mobileCameraArea").style.display = "block";
       }
       return;
@@ -641,7 +641,7 @@ class Frontpage3d {
     console.log("video off");
     document.getElementById("cameraImage1").style.display = "none";
     document.getElementById("cameraImage2").style.display = "none";
-    if (isMobile){
+    if (window.isMobile){
       document.getElementById("mobileCameraArea").style.display = "none";
     }
   }
@@ -661,11 +661,11 @@ class Frontpage3d {
       var _str = ab2str(uncompressed);
       var data = JSON.parse(_str)
   
-      var pointsX = Math.ceil(boardWidth)
-      var pointsY = Math.ceil(boardHeight)
-      console.log("boardWidth=" + boardWidth)
-      console.log("boardHeight=" + boardHeight)
-      console.log("boardCenterY=" + boardCenterY)
+      var pointsX = Math.ceil(window.board.width)
+      var pointsY = Math.ceil(window.board.height)
+      console.log("boardWidth=" + window.board.width)
+      console.log("boardHeight=" + window.board.height)
+      console.log("boardCenterY=" + window.board.centerY)
       var offsetX = pointsX / 2
       var offsetY = pointsY / 2
   
@@ -675,13 +675,13 @@ class Frontpage3d {
             //console.log(x+", "+y);
             var geometry = new THREE.PlaneGeometry(1, 1);
             var plane = new THREE.Mesh(geometry, cutSquareMaterial);
-            plane.position.set(x - offsetX + boardCenterX, y - offsetY + boardCenterY, 0.01);
+            plane.position.set(x - offsetX + window.board.centerX, y - offsetY + window.board.centerY, 0.01);
             this.cutSquareGroup.add(plane);
           }/*
               else{
                   var geometry = new THREE.PlaneGeometry(1,1);
                   var plane = new THREE.Mesh(geometry, noncutSquareMaterial);
-                  plane.position.set(x-offsetX+boardCenterX, y-offsetY+boardCenterY, 0.01);
+                  plane.position.set(x-offsetX+window.board.centerX, y-offsetY+window.board.centerY, 0.01);
                   this.cutSquareGroup.add(plane);
               }*/
         }
@@ -718,34 +718,34 @@ class Frontpage3d {
 
 $(document).ready(() => {
   window.frontpage3d = new Frontpage3d();
-  frontpage3d.initAll();
+  window.frontpage3d.initAll();
   // Note that this is a call to a static method
   window.requestAnimationFrame(Frontpage3d.animate);
   $("#workarea").contextmenu(() => {
-    if (!frontpage3d.view3D) {
+    if (!window.frontpage3d.view3D) {
       // cursorPosition expects an event
-      frontpage3d.pos = frontpage3d.cursorPosition({clientX: 0, clientY: 0});
+      window.frontpage3d.pos = window.frontpage3d.cursorPosition({clientX: 0, clientY: 0});
 
-      x = frontpage3d.pos.x;
+      x = window.frontpage3d.pos.x;
       x = x.toFixed(4);
-      frontpage3d.pos.x = x;
+      window.frontpage3d.pos.x = x;
 
-      y = frontpage3d.pos.y;
+      y = window.frontpage3d.pos.y;
       y = y.toFixed(4);
-      frontpage3d.pos.y = y;
+      window.frontpage3d.pos.y = y;
 
-      requestPage("screenAction", frontpage3d.pos)
+      requestPage("screenAction", window.frontpage3d.pos)
     }
   });
-  window.addEventListener("resize", frontpage3d.onWindowResize, false);
+  window.addEventListener("resize", window.frontpage3d.onWindowResize, false);
   document.onmousemove = (event) => {
-    frontpage3d.onMouseMove(event);
+    window.frontpage3d.onMouseMove(event);
   }
 });
 
 function toggleLabels() {
   // Called by frontpage3d.html
-  frontpage3d.toggleLabels();
+  window.frontpage3d.toggleLabels();
 }
 
 function ab2str(buf) {
@@ -764,15 +764,22 @@ function showFPSpinner(msg) {
 
 function resetView() {
   // Called by frontpage3d.html and frontpage3d_mobile.html
-  frontpage3d.resetView();
+  window.frontpage3d.resetView();
 }
 
 function toggleBoard() {
   // Called by frontpage3d.html and frontpage3d_mobile.html
-  frontpage3d.toggleBoard();
+  window.frontpage3d.toggleBoard();
 }
 
 function toggle3DPO() {
   // Called by frontpage3d.html and frontpage3d_mobile.html
-  frontpage3d.toggle3DPO();
+  window.frontpage3d.toggle3DPO();
 }
+
+function toggle3DView() {
+  // Called by frontpage3d.html and frontpage3d_mobile.html
+  window.frontpage3d.toggle3DView();
+}
+
+export { resetView, showFPSpinner, toggle3DPO, toggle3DView, toggleBoard, toggleLabels }

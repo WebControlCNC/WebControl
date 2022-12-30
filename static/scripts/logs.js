@@ -1,58 +1,54 @@
 import { io } from "../node_modules/socket.io-client/dist/socket.io.esm.min.js";
 
-let logSocket;
-var alogMessages = [];
-var logMessages = [];
-var alogEnabled = true;
-var logEnabled = true;
-var loggingState = false;
+window.logSocket;
+window.alogMessages = [];
+window.logMessages = [];
+window.alogEnabled = true;
+window.logEnabled = true;
+window.loggingState = false;
 
 $(document).ready(function () {
   const namespace = "/MaslowCNCLogs"; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
   const serverURL = `//${location.hostname}:${location.port}${namespace}`;
-  logSocket = io.connect(serverURL, { 'forceNew': true });
+  window.logSocket = io.connect(serverURL);
   setListeners();
 
-  $("#enablealog").change(function () {
-    if ($(this).prop('checked'))
-      alogEnabled = true;
-    else
-      alogEnabled = false;
+  $("#enablealog").change(() => {
+    window.alogEnabled = $(this).prop('checked');
   });
 
-  $("#enablelog").change(function () {
-    if ($(this).prop('checked'))
-      logEnabled = true;
-    else
-      logEnabled = false;
+  $("#enablelog").change(() => {
+    window.logEnabled = $(this).prop('checked');
   });
 });
 
 function setListeners() {
   console.log("setting Listeners");
-  logSocket.on('connect', function (msg) {
-    logSocket.emit('my event', { data: 'I\'m connected!' });
+  window.logSocket.on('connect', () => {
+    window.logSocket.emit('my event', { data: 'I\'m connected!' });
   });
 
-  logSocket.on('disconnect', function (msg) {
+  window.logSocket.on('disconnect', (msg) => {
   });
 
-  logSocket.on('message', function (msg) {
+  window.logSocket.on('message', (msg) => {
     switch (msg.log) {
       case 'alog':
-        if (alogEnabled)
+        if (window.alogEnabled) {
           processalog(msg.data);
+        }
         processLoggingState(msg.state);
         break;
       case 'log':
-        if (logEnabled)
+        if (window.logEnabled) {
           processlog(msg.data);
+        }
         processLoggingState(msg.state);
         break;
       case 'state':
-        if (loggingState != msg.state) {
+        if (window.loggingState != msg.state) {
           processLoggingState(msg.state);
           break;
         }
@@ -66,12 +62,12 @@ function setListeners() {
 }
 
 function processalog(data) {
-  if (alogMessages.length > 1000) {
-    alogMessages.shift();
+  if (window.alogMessages.length > 1000) {
+    window.alogMessages.shift();
     $('#alogMessages').get(0).firstChild.remove();
     $('#alogMessages').get(0).firstChild.remove();
   }
-  alogMessages.push(data);
+  window.alogMessages.push(data);
 
   $('#alogMessages').append(document.createTextNode(data));
   $('#alogMessages').append("<br>");
@@ -79,13 +75,12 @@ function processalog(data) {
 }
 
 function processlog(data) {
-
-  if (logMessages.length > 1000) {
-    logMessages.shift();
+  if (window.logMessages.length > 1000) {
+    window.logMessages.shift();
     $('#logMessages').get(0).firstChild.remove();
     $('#logMessages').get(0).firstChild.remove();
   }
-  logMessages.push(data);
+  window.logMessages.push(data);
 
   $('#logMessages').append(document.createTextNode(data));
   $('#logMessages').append("<br>");

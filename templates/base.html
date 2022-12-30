@@ -10,9 +10,42 @@
   <script src="{{ url_for('static',filename='node_modules/jquery/dist/jquery.min.js', version='22122022a') }}" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', version='22122022a') }}" crossorigin="anonymous"></script>
   <script type="module">
+    import {
+      moveAction,
+      pauseRun,
+      processRequestedSetting,
+      resumeRun
+    } from "{{ url_for('static',filename='scripts/frontpageControlsCommon.js', version='12302022u') }}";
+    window.moveAction = moveAction;
+    window.pauseRun = pauseRun;
+    window.processRequestedSetting = processRequestedSetting;
+    window.resumeRun = resumeRun;
+  </script>
+  <script type="module">
     import { action, requestPage } from "{{ url_for('static',filename='scripts/socketEmits.js', version='12292022u') }}";
     window.action = action;
     window.requestPage = requestPage;
+  </script>
+  <script type="module">
+    import {
+      resetView,
+      showFPSpinner,
+      toggle3DPO,
+      toggle3DView,
+      toggleBoard,
+      toggleLabels
+    } from "{{ url_for('static',filename='scripts/frontpage3d.js', version='12302022u') }}";
+    window.resetView = resetView;
+    window.showFPSpinner = showFPSpinner;
+    window.toggle3DPO = toggle3DPO;
+    window.toggle3DView = toggle3DView;
+    window.toggleBoard = toggleBoard;
+    window.toggleLabels = toggleLabels;
+  </script>  
+  <script type="module">
+    import { unitSwitch, unitSwitchZ } from "{{ url_for('static',filename='scripts/unitSwitch.js', version='12302022u') }}";
+    window.unitSwitch = unitSwitch;
+    window.unitSwitchZ = unitSwitchZ;
   </script>
   <script src="{{ url_for('static',filename='scripts/baseSocket.js', version='12292022u') }}" type="module" crossorigin="anonymous"></script>
   <script src="{{ url_for('static',filename='scripts/base.js', version='11102018t') }}" type="module" crossorigin="anonymous"></script>
