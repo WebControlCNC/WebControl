@@ -726,15 +726,15 @@ $(document).ready(() => {
       // cursorPosition expects an event
       window.frontpage3d.pos = window.frontpage3d.cursorPosition({clientX: 0, clientY: 0});
 
-      x = window.frontpage3d.pos.x;
+      let x = window.frontpage3d.pos.x;
       x = x.toFixed(4);
       window.frontpage3d.pos.x = x;
 
-      y = window.frontpage3d.pos.y;
+      let y = window.frontpage3d.pos.y;
       y = y.toFixed(4);
       window.frontpage3d.pos.y = y;
 
-      requestPage("screenAction", window.frontpage3d.pos)
+      requestPage("screenAction", window.frontpage3d.pos);
     }
   });
   window.addEventListener("resize", window.frontpage3d.onWindowResize, false);
@@ -750,11 +750,11 @@ function toggleLabels() {
 
 function ab2str(buf) {
   var bufView = new Uint16Array(buf);
-  var unis = ""
+  var unis = "";
   for (var i = 0; i < bufView.length; i++) {
     unis = unis + String.fromCharCode(bufView[i]);
   }
-  return unis
+  return unis;
 }
 
 /** You spin me right round, baby right round, like a record player, right round, round, round */
