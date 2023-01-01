@@ -551,6 +551,7 @@ class UIProcessor:
         '''
         # parse the message to get to its components
         msg = json.loads(_message)
+        self.app.data.console_queue.put(f"{__name__}: processMessage command:{msg['command']}, message:{msg['message']}")
         if msg["command"] == "WebMCP":
             self.sendWebMCPMessage(msg["message"])
         if msg["command"] == "SendAlarm":
