@@ -89,60 +89,41 @@ function processControllerStatus(data) {
   }
 }
 
+function showHide(elementName, shouldShow) {
+  if (shouldShow) {
+    $(elementName).show();
+  } else {
+    $(elementName).hide();
+  }
+}
+
 function processActivateModal(data) {
   var $modal, $modalDialog, $modalTitle, $modalText
   var message
+  const modalTypes = ["content", "alert", "notification"];
+  if (!modalTypes.includes(data.modalType)) {
+    // notification is the default modal type
+    data.modalType = "notification";
+  }
+  $modal = $(`#${data.modalType}Modal`);
+  $modalDialog = $(`#${data.modalType}Dialog`);
+  $modalTitle = $(`#${data.modalType}ModalTitle`);
+  $modalText = $(`#${data.modalType}ModalText`);
+  console.log(`Preparing ${data.modalType} modal`)
   //console.log(data)
   if (data.modalType == "content") {
-    $modal = $('#contentModal');
-    $modalDialog = $('#contentDialog');
-    $modalTitle = $('#contentModalTitle');
-    $modalText = $('#contentModalText');
-    if (data.resume == 'footerSubmit') {
-      $('#footerSubmit').show();
-    } else {
-      $('#footerSubmit').hide();
-    }
-    console.log("content modal")
+    showHide("#footerSubmit", data.resume == "footerSubmit");
     //message = JSON.parse(data.message);
     message = data.message;
   } else if (data.modalType == "alert") {
-    $modal = $('#alertModal');
-    $modalDialog = $('#alertDialog');
-    $modalTitle = $('#alertModalTitle');
-    $modalText = $('#alertModalText');
-    if (data.resume == "clear") {
-      $('#clearButton').show();
-    } else {
-      $('#clearButton').hide();
-    }
+    showHide("#clearButton", data.resume == "clear");
     //data is coming in as a jsonified string.. need to drop the extra quotes
     message = JSON.parse(data.message);
   } else {
-    $modal = $('#notificationModal');
-    $modalDialog = $('#notificationDialog');
-    $modalTitle = $('#notificationModalTitle');
-    $modalText = $('#notificationModalText');
-    if (data.resume == "resume") {
-      $('#resumeButton').show();
-    } else {
-      $('#resumeButton').hide();
-    }
-    if (data.fakeServo == "fakeServo") {
-      $('#fakeServoButton').show();
-    } else {
-      $('#fakeServoButton').hide();
-    }
-    if (data.progress == "true") {
-      $('#progressBarDiv').show();
-    } else {
-      $('#progressBarDiv').hide();
-    }
-    if (data.progress == "spinner") {
-      $('#notificationCircle').show();
-    } else {
-      $('#notificationCircle').hide();
-    }
+    showHide("#resumeButton", data.resume == "resume");
+    showHide("#fakeServoButton", data.fakeServo == "fakeServo");
+    showHide("#progressBarDiv", data.progress == "true");
+    showHide("#notificationCircle", data.progress == "spinner");
     message = data.message;
   }
   $modalDialog.removeClass('modal-lg');
@@ -158,23 +139,25 @@ function processActivateModal(data) {
     $modalDialog.addClass('modal-lg');
   if (data.modalSize == "small")
     $modalDialog.addClass('modal-sm');
-  //$modal.data('bs.modal',null);
-  $modal.data('name', data.title);
+  //$modal.data('bs.modal', null);
+  $modal.data("name", data.title);
 
-  $modalTitle.html("<h3>" + data.title + "</h3");
+  $modalTitle.html(`<h3>${data.title}</h3>`);
   $modalText.html(message);
 
-  if (!($modal.data('bs.modal') || {})._isShown) {
-    console.log("showing modal");
+  // console.log(`Supplied data: ${JSON.stringify(data)}`);
+  if (!($modal.data("bs.modal") || {})._isShown) {
+    // console.log("showing modal");
     $modal.modal();
   }
-  console.log(`Modal data: ${JSON.stringify($modal.data())}`);
+  // console.log(`Modal data: ${JSON.stringify($modal.data())}`);
+  // console.log(`Modal: ${JSON.stringify($modal)}`);
   if (data.isStatic) {
     console.log("Static Modal")
     $modal.data('bs.modal')._config.backdrop = 'static';
     $modal.data('bs.modal')._config.keyboard = false;
   } else {
-    console.log("showing non static modal")
+    console.log("Showing non static modal")
     // $modal.data('bs.modal')._config.backdrop = true;
     // $modal.data('bs.modal')._config.keyboard = true;
   }
