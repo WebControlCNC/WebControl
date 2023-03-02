@@ -1,4 +1,5 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import "jquery";
+import * as THREE from "three";
 import { OrbitControls } from "./OrbitControls.js";
 import { requestPage } from "./socketEmits.js";
 

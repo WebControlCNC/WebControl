@@ -1,4 +1,4 @@
-import { io } from "../node_modules/socket.io-client/dist/socket.io.esm.min.js";
+import { io } from "socket.io";
 
 window.logSocket;
 window.alogMessages = [];

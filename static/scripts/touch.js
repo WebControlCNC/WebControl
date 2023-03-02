@@ -1,3 +1,5 @@
+import "jquery";
+
 import { requestPage } from "./socketEmits.js";
 
 var timer;

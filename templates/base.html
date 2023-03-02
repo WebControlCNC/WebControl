@@ -3,12 +3,20 @@
   <title>{% block title %}{% endblock %}WebControl</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="manifest" href="{{ url_for('static',filename='manifest.webmanifest', version='10262018a') }}">
-  <link rel="stylesheet" href="{{ url_for('static',filename='node_modules/bootstrap/dist/css/bootstrap.min.css', version='22122022a') }}" crossorigin="anonymous">
+  <script type="importmap">
+    {
+      "imports": {
+        "@popperjs/core": "{{ url_for('static', filename='node_modules/@popperjs/core/dist/esm/popper.js') }}",
+        "bootstrap": "{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.esm.min.js') }}",
+        "jquery": "{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}",
+        "socket.io": "{{ url_for('static', filename='node_modules/socket.io-client/dist/socket.io.esm.min.js') }}",
+        "three": "{{ url_for('static', filename='node_modules/three/build/three.module.js') }}"
+      }
+    }
+  </script>  
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/switches.css', version='10262018a') }}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/base.css', version='10262019l') }}" crossorigin="anonymous">
-  <!-- <script src="{{ url_for('static',filename='node_modules/socket.io-client/dist/socket.io.min.js', version='11232022a') }}" crossorigin="anonymous"></script> -->
-  <script src="{{ url_for('static',filename='node_modules/jquery/dist/jquery.min.js', version='22122022a') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', version='22122022a') }}" crossorigin="anonymous"></script>
   <script type="module">
     import {
       moveAction,

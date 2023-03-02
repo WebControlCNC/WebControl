@@ -192,7 +192,7 @@ Then finally go to the `static` folder in the WebControl project, which is where
 
 Then you can run the code with.
 
-    python main.py
+`python main.py`
 
 The server will then be available at `http://localhost:5000`
 

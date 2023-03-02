@@ -1,3 +1,5 @@
+import "jquery";
+
 $(document).ready(function () {
   var controllerMessage = document.getElementById('controllerMessage');
   controllerMessage.scrollTop = controllerMessage.scrollHeight;

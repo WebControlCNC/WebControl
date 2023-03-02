@@ -1,3 +1,4 @@
+import { Modal } from "bootstrap";
 
 $('.disabler').prop('disabled', true);
 
@@ -97,53 +98,14 @@ function showHide(elementName, shouldShow) {
   }
 }
 
-function processActivateModal(data) {
-  var $modal, $modalDialog, $modalTitle, $modalText
-  var message
-  const modalTypes = ["content", "alert", "notification"];
-  if (!modalTypes.includes(data.modalType)) {
-    // notification is the default modal type
-    data.modalType = "notification";
-  }
-  $modal = $(`#${data.modalType}Modal`);
-  $modalDialog = $(`#${data.modalType}Dialog`);
-  $modalTitle = $(`#${data.modalType}ModalTitle`);
-  $modalText = $(`#${data.modalType}ModalText`);
-  console.log(`Preparing ${data.modalType} modal`)
-  //console.log(data)
-  if (data.modalType == "content") {
-    showHide("#footerSubmit", data.resume == "footerSubmit");
-    //message = JSON.parse(data.message);
-    message = data.message;
-  } else if (data.modalType == "alert") {
-    showHide("#clearButton", data.resume == "clear");
-    //data is coming in as a jsonified string.. need to drop the extra quotes
-    message = JSON.parse(data.message);
-  } else {
-    showHide("#resumeButton", data.resume == "resume");
-    showHide("#fakeServoButton", data.fakeServo == "fakeServo");
-    showHide("#progressBarDiv", data.progress == "true");
-    showHide("#notificationCircle", data.progress == "spinner");
-    message = data.message;
-  }
-  $modalDialog.removeClass('modal-lg');
-  $modalDialog.removeClass('modal-sm');
-  $modalDialog.removeClass('mw-100 w-75');
-  if (data.modalSize == "large") {
-    if (window.isMobile)
-      $modalDialog.addClass('modal-lg');
-    else
-      $modalDialog.addClass('mw-100 w-75');
-  }
-  if (data.modalSize == "medium")
-    $modalDialog.addClass('modal-lg');
-  if (data.modalSize == "small")
-    $modalDialog.addClass('modal-sm');
+function initializeModal(data) {
+  const $modal = $(`#${data.modalType}Modal`);
+
   //$modal.data('bs.modal', null);
   $modal.data("name", data.title);
 
-  $modalTitle.html(`<h3>${data.title}</h3>`);
-  $modalText.html(message);
+  const bsModal = new Modal($modal);
+  console.log(bsModal);
 
   // console.log(`Supplied data: ${JSON.stringify(data)}`);
   if (!($modal.data("bs.modal") || {})._isShown) {
@@ -163,6 +125,77 @@ function processActivateModal(data) {
   }
   // console.log($modal.data('bs.modal')._config.backdrop);
   // console.log($modal.data('bs.modal')._config.keyboard);
+
+  return $modal;
+}
+
+function initializeModalDialog(data) {
+  const $modalDialog = $(`#${data.modalType}Dialog`);
+
+  $modalDialog.removeClass('modal-lg');
+  $modalDialog.removeClass('modal-sm');
+  $modalDialog.removeClass('mw-100 w-75');
+
+  if (data.modalSize == "large") {
+    if (window.isMobile)
+      $modalDialog.addClass('modal-lg');
+    else
+      $modalDialog.addClass('mw-100 w-75');
+  }
+  if (data.modalSize == "medium") {
+    $modalDialog.addClass('modal-lg');
+  }
+  if (data.modalSize == "small") {
+    $modalDialog.addClass('modal-sm');
+  }
+
+  return $modalDialog;
+}
+
+function initializeModalTitle(data) {
+  const $modalTitle = $(`#${data.modalType}ModalTitle`);
+  $modalTitle.html(`<h3>${data.title}</h3>`);
+
+  return $modalTitle;
+}
+
+function initialiseMessage(data) {
+  //console.log(data)
+  if (data.modalType == "content") {
+    showHide("#footerSubmit", data.resume == "footerSubmit");
+    //message = JSON.parse(data.message);
+    return data.message;
+  } else if (data.modalType == "alert") {
+    showHide("#clearButton", data.resume == "clear");
+    //data is coming in as a jsonified string.. need to drop the extra quotes
+    return JSON.parse(data.message);
+  }
+
+  showHide("#resumeButton", data.resume == "resume");
+  showHide("#fakeServoButton", data.fakeServo == "fakeServo");
+  showHide("#progressBarDiv", data.progress == "true");
+  showHide("#notificationCircle", data.progress == "spinner");
+  return data.message;
+}
+
+function initializeModalText(data) {
+  return $(`#${data.modalType}ModalText`);
+}
+
+function processActivateModal(data) {
+  const modalTypes = ["content", "alert", "notification"];
+  if (!modalTypes.includes(data.modalType)) {
+    // notification is the default modal type
+    data.modalType = "notification";
+  }
+
+  const $modal = initializeModal(data);
+  const $modalDialog = initializeModalDialog(data);
+  const $modalTitle = initializeModalTitle(data);
+  const $modalText = initializeModalText(data);
+  const message = initialiseMessage(data);
+
+  $modalText.html(message);
   $modalText.scrollTop(0);
 }
 
