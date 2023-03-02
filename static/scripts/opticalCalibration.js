@@ -1,4 +1,6 @@
+import "jquery";
 import * as THREE from "three";
+
 import { action, settingRequest } from "./socketEmits.js";
 import { OrbitControls } from "./OrbitControls.js";
 
@@ -262,7 +264,8 @@ function calSurface(x, i, j){
    return retVal
 }
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
     $('#calibrationExtents').change(function(){
       selected = $("#calibrationExtents option:selected").val()
       console.log(selected);

@@ -1,3 +1,4 @@
+import "jquery";
 import { io } from "socket.io";
 
 window.logSocket;
@@ -7,7 +8,8 @@ window.alogEnabled = true;
 window.logEnabled = true;
 window.loggingState = false;
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
   const namespace = "/MaslowCNCLogs"; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace

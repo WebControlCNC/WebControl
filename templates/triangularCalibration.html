@@ -49,8 +49,9 @@
 
 {% block javascript %}
 <script>
-$(document).ready(function () {
-
+import "jquery";
+$(() => {
+    // document.ready
     $("#acceptCalibration").on('click', function(){
       action('acceptTriangularCalibrationResults',0,0);
       $('#contentModal').modal('toggle');

@@ -13,7 +13,9 @@
 
 {% block javascript %}
 <script>
-$(document).ready(function () {
+import "jquery";
+$(() => {
+    // document.ready
     $('#importForm').on('submit', function(e) {
         e.preventDefault();
 

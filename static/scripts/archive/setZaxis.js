@@ -1,6 +1,5 @@
-function (processZAxisLimitMessage){
+import "jquery";
 
-}
 function processZAxisRequestedSetting(msg){
     if (msg.setting=="unitsZ"){
         console.log("requestedSetting:"+msg.value);
@@ -11,6 +10,7 @@ function processZAxisRequestedSetting(msg){
         $("#distToMoveZ").val(msg.value)
     }
 }
+
 function unitSwitchZ(){
     if ( $("#unitsZ").text()=="MM") {
       $("#unitsZ").text("INCHES");
@@ -24,7 +24,9 @@ function unitSwitchZ(){
       updateSetting('toMMZ',distToMoveZ);
     }
 }
-$(document).ready(function(){
+
+$(() => {
+    // document.ready
     settingRequest("Computed Settings","unitsZ");
     settingRequest("Computed Settings","distToMoveZ");
 });

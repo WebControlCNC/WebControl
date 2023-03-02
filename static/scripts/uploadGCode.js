@@ -1,3 +1,5 @@
+import "jquery";
+
 import { action, checkForGCodeUpdate } from "./socketEmits.js";
 
 function updateDirectories(data){
@@ -8,7 +10,8 @@ function updateDirectories(data){
    $("#newDirectory").val("");
 }
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
     $('#newDirectoryButton').on('click',function(){ //bind click handler
         event.preventDefault();
         directory=$("#newDirectory").val();

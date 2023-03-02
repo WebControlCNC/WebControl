@@ -1,7 +1,8 @@
 import "feather";
 import "jquery";
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
   var controllerMessage = document.getElementById('controllerMessage');
   controllerMessage.scrollTop = controllerMessage.scrollHeight;
   

@@ -724,7 +724,8 @@ class Frontpage3d {
   }
 }
 
-$(document).ready(() => {
+$(() => {
+  // document.ready
   window.frontpage3d = new Frontpage3d();
   window.frontpage3d.initAll();
   // Note that this is a call to a static method

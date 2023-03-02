@@ -1,4 +1,5 @@
 import "feather";
+import "jquery";
 import pako from "pako";
 
 //checkForGCodeUpdate();
@@ -107,7 +108,8 @@ function unitSwitch(){
   }
 }
 
-$(document).ready(function(){
+$(() => {
+  // document.ready
     settingRequest("Computed Settings","units");
     settingRequest("Computed Settings","distToMove");
     settingRequest("Computed Settings","homePosition");

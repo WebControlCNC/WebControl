@@ -1,6 +1,8 @@
 // This is used only in frontpage3d_mobilecontrols.html
+import "jquery";
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
   //settingRequest("Computed Settings","units");
   //settingRequest("Computed Settings","distToMove");
   //settingRequest("Computed Settings","homePosition");

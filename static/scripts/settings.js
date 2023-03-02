@@ -1,3 +1,5 @@
+import "jquery";
+
 import { action } from "./socketEmits.js";
 
 function onFooterSubmit(){
@@ -16,7 +18,8 @@ function onFooterSubmit(){
     });
 }
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
     $('#settingsForm').on('submit', function(e) {
         e.preventDefault();
         var url = $("#pageID").val()

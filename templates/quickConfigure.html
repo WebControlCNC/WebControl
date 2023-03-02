@@ -106,10 +106,12 @@
 
 {% block javascript %}
 <script>
+import "jquery";
 function subtract40p4(){
    $("#motorSpacingX").val($("#motorSpacingX").val()-40.4);
 }
-$(document).ready(function () {
+$(() => {
+    // document.ready
     $('#quickConfigureForm').on('submit', function(e) {
         e.preventDefault();
         var url = $("#pageID").val()
