@@ -2,14 +2,15 @@ import "jquery";
 
 import { checkForGCodeUpdate } from "./socketEmits.js";
 
-$('#gcCircle').hide();
-var unselected = [];
-var selectedDirectory = "{{lastSelectedDirectory}}";
-
 $(() => {
     // document.ready
-    refreshList();
-    $("#directorySelect").change(refreshList);
+    
+    $('#gcCircle').hide();
+    var unselected = [];
+    var selectedDirectory = $("#lastSelectedDirectory")?.text || ".";
+
+    refreshList(unselected, selectedDirectory);
+    $("#directorySelect").on("change", {unselected, selectedDirectory}, refreshListHandler);
 
     /*$('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
@@ -38,8 +39,12 @@ $(() => {
     });*/
 });
 
-function refreshList(){
-  unselected.forEach(element => {
+function refreshListHandler(event) {
+    refreshList(event.data.unselected, event.data.selectedDirectory);
+}
+
+function refreshList(unselected, selectedDirectory){
+  unselected.forEach((element) => {
       $("#fileSelect").append(element)
   });
   unselected = [];
@@ -54,7 +59,6 @@ function refreshList(){
       }
   });
 }
-
 
 function onFooterSubmit(){
     //var formdata = $("#gcodeForm").serialize();
