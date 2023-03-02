@@ -4,7 +4,7 @@ import { checkForGCodeUpdate } from "./socketEmits.js";
 
 $('#gcCircle').hide();
 var unselected = [];
-var selectedDirectory = "{{lastSelectedDirectory}}"
+var selectedDirectory = "{{lastSelectedDirectory}}";
 
 $(() => {
     // document.ready

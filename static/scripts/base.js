@@ -3,7 +3,8 @@ import "jquery";
 
 $('.disabler').prop('disabled', true);
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
   // Make all navbar drop down items collapse the menu when clicked.
   window.isMobile = testForMobile();
   if (window.isMobile) {
@@ -102,32 +103,14 @@ function showHide(elementName, shouldShow) {
 function initializeModal(data) {
   const $modal = $(`#${data.modalType}Modal`);
 
-  //$modal.data('bs.modal', null);
   $modal.data("name", data.title);
 
-  const bsModal = new Modal($modal);
-  console.log(bsModal);
+  const modalOptions = data.isStatic
+    ? {backdrop: "static", keyboard: false}
+    : {backdrop: "true", keyboard: true};
+  const bsModal = new Modal($modal, modalOptions);
 
-  // console.log(`Supplied data: ${JSON.stringify(data)}`);
-  if (!($modal.data("bs.modal") || {})._isShown) {
-    // console.log("showing modal");
-    $modal.modal();
-  }
-  // console.log(`Modal data: ${JSON.stringify($modal.data())}`);
-  // console.log(`Modal: ${JSON.stringify($modal)}`);
-  if (data.isStatic) {
-    console.log("Static Modal")
-    $modal.data('bs.modal')._config.backdrop = 'static';
-    $modal.data('bs.modal')._config.keyboard = false;
-  } else {
-    console.log("Showing non static modal")
-    // $modal.data('bs.modal')._config.backdrop = true;
-    // $modal.data('bs.modal')._config.keyboard = true;
-  }
-  // console.log($modal.data('bs.modal')._config.backdrop);
-  // console.log($modal.data('bs.modal')._config.keyboard);
-
-  return $modal;
+  return bsModal;
 }
 
 function initializeModalDialog(data) {
@@ -138,10 +121,11 @@ function initializeModalDialog(data) {
   $modalDialog.removeClass('mw-100 w-75');
 
   if (data.modalSize == "large") {
-    if (window.isMobile)
+    if (window.isMobile) {
       $modalDialog.addClass('modal-lg');
-    else
+    } else {
       $modalDialog.addClass('mw-100 w-75');
+    }
   }
   if (data.modalSize == "medium") {
     $modalDialog.addClass('modal-lg');
@@ -149,22 +133,16 @@ function initializeModalDialog(data) {
   if (data.modalSize == "small") {
     $modalDialog.addClass('modal-sm');
   }
-
-  return $modalDialog;
 }
 
 function initializeModalTitle(data) {
   const $modalTitle = $(`#${data.modalType}ModalTitle`);
   $modalTitle.html(`<h3>${data.title}</h3>`);
-
-  return $modalTitle;
 }
 
 function initialiseMessage(data) {
-  //console.log(data)
   if (data.modalType == "content") {
     showHide("#footerSubmit", data.resume == "footerSubmit");
-    //message = JSON.parse(data.message);
     return data.message;
   } else if (data.modalType == "alert") {
     showHide("#clearButton", data.resume == "clear");
@@ -176,6 +154,7 @@ function initialiseMessage(data) {
   showHide("#fakeServoButton", data.fakeServo == "fakeServo");
   showHide("#progressBarDiv", data.progress == "true");
   showHide("#notificationCircle", data.progress == "spinner");
+
   return data.message;
 }
 
@@ -190,20 +169,20 @@ function processActivateModal(data) {
     data.modalType = "notification";
   }
 
-  const $modal = initializeModal(data);
-  const $modalDialog = initializeModalDialog(data);
-  const $modalTitle = initializeModalTitle(data);
+  const bsModal = initializeModal(data);
+  initializeModalDialog(data);
+  initializeModalTitle(data);
   const $modalText = initializeModalText(data);
   const message = initialiseMessage(data);
 
   $modalText.html(message);
   $modalText.scrollTop(0);
+  
+  bsModal.show();
 }
 
 function closeModals(data) {
-  console.log(data)
   if ($('#notificationModal').data('name') == data.title) {
-    console.log("here, closing notification modal");
     $('#notificationModal').modal('hide');
     $('#notificationCircle').hide()
   }
