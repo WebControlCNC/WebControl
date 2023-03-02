@@ -31,7 +31,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
         # be stopped
         #self.stopped = True
         #self.suspended = False
-        print("Camera initialized")
+        print(f"{__name__}: Camera initialized")
 
     def getSettings(self, src=0):
         cameraOff = False
@@ -68,7 +68,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
 
     def start(self, src = 0):
         # start the thread to read frames from the video stream
-        print("Starting camera thread")
+        print(f"{__name__}: Starting camera thread")
         if self.stream is None:
             self.stream = cv2.VideoCapture(src)
             (self.grabbed, self.frame) = self.stream.read()
@@ -81,11 +81,11 @@ class WebcamVideoStream(MakesmithInitFuncs):
             self.th = threading.Thread(target=self.update)
             self.th.daemon = True
             self.th.start()
-            print("Camera thread started")
+            print(f"{__name__}: Camera thread started")
             #self.data.ui_queue.put("Action:updateCamera_on")
             self.data.ui_queue1.put("Action", "updateCamera", "on")
         else:
-            print("Camera already started")
+            print(f"{__name__}: Camera already started")
         return self
 
     def update(self):
@@ -117,7 +117,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
 
     def read(self):
         # return the frame most recently read
-        #print("Reading camera frame")
+        #print(f"{__name__}: Reading camera frame")
         if self.suspended:
             (self.grabbed, self.frame) = self.stream.read()
             self.suspended = False
@@ -131,7 +131,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
 
     def stop(self):
         # indicate that the thread should be stopped
-        print("Stopping camera")
+        print(f"{__name__}: Stopping camera")
         self.stopped = True
 
     def status(self):
@@ -152,7 +152,7 @@ class WebcamVideoStream(MakesmithInitFuncs):
                 self.setVideoSize()
         if key == 'cameraSleep' and value != self.cameraSleep:
             if value<1:
-                print("changing sleep interval")
+                print(f"{__name__}: changing sleep interval")
                 self.cameraSleep = value
                 if self.stream is not None:
                     self.stopped = True

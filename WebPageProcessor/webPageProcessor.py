@@ -11,6 +11,7 @@ import markdown
 class WebPageProcessor:
 
     data = None
+    namespace = "/MaslowCNC"
 
     def __init__(self, data):
         self.data = data
@@ -142,7 +143,6 @@ class WebPageProcessor:
             return page, "GPIO Settings", False, "medium", "content", "footerSubmit"
         elif pageID == "openGCode":
             lastSelectedFile = self.data.config.getValue("Maslow Settings", "openFile")
-            print(lastSelectedFile)
             lastSelectedDirectory = self.data.config.getValue("Computed Settings", "lastSelectedDirectory")
             home = self.data.config.getHome()
             homedir = home+"/.WebControl/gcode"
@@ -271,7 +271,7 @@ class WebPageProcessor:
                                    )
             return page, "Actions", False, "large", "content", False
         elif pageID == "zAxis":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
             unitsZ = self.data.config.getValue("Computed Settings", "unitsZ")
             touchPlate = self.data.config.getValue("Advanced Settings", "touchPlate")
@@ -289,7 +289,7 @@ class WebPageProcessor:
                                        )
             return page, "Z-Axis", False, "medium", "content", False
         elif pageID == "setZaxis":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             minZlimit = 0 #self.data.config.getValue("Advanced Settings", "minZlimit")
             maxZlimit = 0 #self.data.config.getValue("Advanced Settings", "maxZlimit")
             distToMoveZ = self.data.config.getValue("Computed Settings", "distToMoveZ")
@@ -315,7 +315,7 @@ class WebPageProcessor:
             else:
                 fourMotor = True
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             if isMobile:
                 page = render_template("setSprockets_mobile.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
             else:
@@ -327,7 +327,7 @@ class WebPageProcessor:
             else:
                 fourMotor = True
             chainExtendLength = self.data.config.getValue("Advanced Settings", "chainExtendLength")
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             if isMobile:
                 page = render_template("resetChains_mobile.html", chainExtendLength=chainExtendLength, fourMotor=fourMotor)
             else:
@@ -335,7 +335,7 @@ class WebPageProcessor:
             return page, "Reset Chains", False, "medium", "content", False
 
         elif pageID == "triangularCalibration":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
             rotationRadius = self.data.config.getValue("Advanced Settings", "rotationRadius")
             chainSagCorrection = self.data.config.getValue(
@@ -350,7 +350,7 @@ class WebPageProcessor:
             )
             return page, "Triangular Calibration", True, "medium", "content", False
         elif pageID == "opticalCalibration":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             opticalCenterX = self.data.config.getValue("Optical Calibration Settings", "opticalCenterX")
             opticalCenterY = self.data.config.getValue("Optical Calibration Settings", "opticalCenterY")
             scaleX = self.data.config.getValue("Optical Calibration Settings", "scaleX")
@@ -370,7 +370,7 @@ class WebPageProcessor:
             page = render_template("opticalCalibration.html", pageID="opticalCalibration", opticalCenterX=opticalCenterX, opticalCenterY=opticalCenterY, scaleX=scaleX, scaleY=scaleY, gaussianBlurValue=gaussianBlurValue, cannyLowValue=cannyLowValue, cannyHighValue=cannyHighValue, autoScanDirection=autoScanDirection, markerX=markerX, markerY=markerY, tlX=tlX, tlY=tlY, brX=brX, brY=brY, calibrationExtents=calibrationExtents, isMobile=isMobile, positionTolerance=positionTolerance)
             return page, "Optical Calibration", True, "large", "content", False
         elif pageID == "holeyCalibration":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             motorYoffset = self.data.config.getValue("Maslow Settings", "motorOffsetY")
             distanceBetweenMotors = self.data.config.getValue("Maslow Settings", "motorSpacingX")
             leftChainTolerance = self.data.config.getValue("Advanced Settings", "leftChainTolerance")
@@ -385,7 +385,7 @@ class WebPageProcessor:
             )
             return page, "Holey Calibration", True, "medium", "content", False
         elif pageID == "quickConfigure":
-            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace="/MaslowCNC")
+            socketio.emit("closeModals", {"data": {"title": "Actions"}}, namespace=self.namespace)
             motorOffsetY = self.data.config.getValue("Maslow Settings", "motorOffsetY")
             rotationRadius = self.data.config.getValue("Advanced Settings", "rotationRadius")
             kinematicsType = self.data.config.getValue("Advanced Settings", "kinematicsType")

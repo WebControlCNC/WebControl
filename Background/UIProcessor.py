@@ -17,18 +17,20 @@ passed the app.
 '''
 
 class UIProcessor:
-    app = None
-    lastCameraTime = 0
-    lastHealthCheck = 0
-    previousUploadFlag = None
-    previousCurrentTool = None
-    previousPositioningMode = None
+    def __init__(self):
+        self.app = None
+        self.lastCameraTime = 0
+        self.lastHealthCheck = 0
+        self.previousUploadFlag = None
+        self.previousCurrentTool = None
+        self.previousPositioningMode = None
+        self.namespace = "/MaslowCNC"
 
     def start(self, _app):
-
         self.app = _app
-        self.app.data.console_queue.put("starting UI")
+        self.app.data.console_queue.put(f"{__name__}: starting")
         with self.app.app_context():
+            self.app.data.console_queue.put(f"{__name__}: entering processing loop")
             while True:
                 time.sleep(0.001)
                 # send health message
@@ -104,7 +106,7 @@ class UIProcessor:
                                 data = json.dumps({"setting": "pauseButtonSetting", "value": "Resume"})
                                 socketio.emit("message",
                                               {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                                              namespace="/MaslowCNC", )
+                                              namespace=self.namespace, )
                             elif message[0:12] == "Tool Change:":
                                 # Tool change message detected.
                                 # not sure what manualzaxisadjust is.. ###
@@ -364,7 +366,7 @@ class UIProcessor:
             {"title": title, "message": message, "resume": resume, "progress": progress, "modalSize": "small",
              "modalType": modalType})
         socketio.emit("message", {"command": "activateModal", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC",
+                      namespace=self.namespace,
                       )
 
     def sendAlarm(self, message):
@@ -375,7 +377,7 @@ class UIProcessor:
         '''
         data = json.dumps({"message": message})
         socketio.emit("message", {"command": "alarm", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC",
+                      namespace=self.namespace,
                       )
 
     def sendControllerMessage(self, message):
@@ -386,7 +388,7 @@ class UIProcessor:
         :return:
         '''
         socketio.emit("message", {"command": "controllerMessage", "data": json.dumps(message), "dataFormat": "json"},
-                      namespace="/MaslowCNC")
+                      namespace=self.namespace)
 
     def sendWebMCPMessage(self, message):
         '''
@@ -405,7 +407,7 @@ class UIProcessor:
         :return:
         '''
         socketio.emit("message", {"command": "positionMessage", "data": json.dumps(position), "dataFormat": "json"},
-                      namespace="/MaslowCNC")
+                      namespace=self.namespace)
     
     def sendErrorValueMessage(self, position):
         '''
@@ -414,7 +416,7 @@ class UIProcessor:
         :return:
         '''
         socketio.emit("message", {"command": "errorValueMessage", "data": json.dumps(position), "dataFormat": "json"},
-                      namespace="/MaslowCNC")
+                      namespace=self.namespace)
 
     def sendCameraMessage(self, message, _data=""):
         '''
@@ -426,7 +428,7 @@ class UIProcessor:
         '''
         data = json.dumps({"command": message, "data": _data})
         socketio.emit(
-            "message", {"command": "cameraMessage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+            "message", {"command": "cameraMessage", "data": data, "dataFormat": "json"}, namespace=self.namespace
         )
 
     def updatePIDData(self, message, _data=""):
@@ -438,7 +440,7 @@ class UIProcessor:
         '''
         data = json.dumps({"command": message, "data": _data})
         socketio.emit(
-            "message", {"command": "updatePIDData", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+            "message", {"command": "updatePIDData", "data": data, "dataFormat": "json"}, namespace=self.namespace
         )
 
     def sendGcodeUpdate(self):
@@ -452,19 +454,19 @@ class UIProcessor:
             # turn on spinner on UI clients
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": len(self.app.data.compressedGCode3D), "dataFormat": "int"},
-                          namespace="/MaslowCNC", )
+                          namespace=self.namespace, )
             # pause to let the spinner get turned on.
             time.sleep(0.25)
             # send the data.  Once processed by the UI client, the client will turn off the spinner.
             socketio.emit("message", {"command": "gcodeUpdateCompressed",
                                       "data": self.app.data.compressedGCode3D, "dataFormat": "base64"},
-                          namespace="/MaslowCNC", )
+                          namespace=self.namespace, )
             self.app.data.console_queue.put("Sent Gcode compressed")
         else:
             #send "" if there is no compressed data (i.e., because there's no gcode to compress)
             socketio.emit("message", {"command": "gcodeUpdateCompressed",
                                       "data": "", "dataFormat": "base64"},
-                          namespace="/MaslowCNC", )
+                          namespace=self.namespace, )
 
     def sendBoardUpdate(self):
         '''
@@ -477,7 +479,7 @@ class UIProcessor:
             self.app.data.console_queue.put("Sending Board Data")
             socketio.emit("message", {"command": "boardDataUpdate",
                                       "data": boardData, "dataFormat": "json"},
-                          namespace="/MaslowCNC", )
+                          namespace=self.namespace, )
             self.app.data.console_queue.put("Sent Board Data")
 
         cutData = self.app.data.boardManager.getCurrentBoard().getCompressedCutData()
@@ -485,11 +487,11 @@ class UIProcessor:
             self.app.data.console_queue.put("Sending Board Cut Data compressed")
             socketio.emit("message", {"command": "showFPSpinner",
                                       "data": 1, "dataFormat": "int"},
-                          namespace="/MaslowCNC", )
+                          namespace=self.namespace, )
             time.sleep(0.25)
             socketio.emit("message", {"command": "boardCutDataUpdateCompressed",
                                       "data": cutData, "dataFormat": "base64"},
-                          namespace="/MaslowCNC", )
+                          namespace=self.namespace, )
             self.app.data.console_queue.put("Sent Board Cut Data compressed")
 
     def unitsUpdate(self):
@@ -502,7 +504,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "units", "value": units})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace=self.namespace, )
 
     def distToMoveUpdate(self):
         '''
@@ -514,7 +516,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "distToMove", "value": distToMove})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace=self.namespace, )
 
     def unitsUpdateZ(self):
         '''
@@ -526,7 +528,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "unitsZ", "value": unitsZ})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace=self.namespace, )
 
     def distToMoveUpdateZ(self):
         '''
@@ -538,7 +540,7 @@ class UIProcessor:
         )
         data = json.dumps({"setting": "distToMoveZ", "value": distToMoveZ})
         socketio.emit("message", {"command": "requestedSetting", "data": data, "dataFormat": "json"},
-                      namespace="/MaslowCNC", )
+                      namespace=self.namespace, )
 
     def processMessage(self, _message):
         '''
@@ -549,6 +551,7 @@ class UIProcessor:
         '''
         # parse the message to get to its components
         msg = json.loads(_message)
+        self.app.data.console_queue.put(f"{__name__}: processMessage command:{msg['command']}, message:{msg['message']}")
         if msg["command"] == "WebMCP":
             self.sendWebMCPMessage(msg["message"])
         if msg["command"] == "SendAlarm":
@@ -577,7 +580,7 @@ class UIProcessor:
             elif msg["message"] == "clearAlarm":
                 msg["data"] = json.dumps({"data": ""})
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
-                              namespace="/MaslowCNC")
+                              namespace=self.namespace)
             # I'm pretty sure this can be cleaned up into just a continuation of elif's
             else:
                 if msg["message"] == "setAsPause":
@@ -595,12 +598,12 @@ class UIProcessor:
                     msg["message"] = "getZLimits"
                     msg["data"] = json.dumps({"maxZlimit": max, "minZlimit": min})    
                 socketio.emit("message", {"command": msg["message"], "data": msg["data"], "dataFormat": "json"},
-                              namespace="/MaslowCNC")
+                              namespace=self.namespace)
         # I think I was working on clearing on an issue with the formatting of messages so I added this.  I think the
         # only function that calls it is the serialPortThread when webcontrol connects to the arduino.
         elif msg["command"] == "TextMessage":
             socketio.emit("message", {"command": "controllerMessage", "data": msg["data"], "dataFormat": "json"},
-                          namespace="/MaslowCNC")
+                          namespace=self.namespace)
         # Alerts activate the modal.  If alerts are sent on top of each other, it can mess up the UI client display.
         elif msg["command"] == "Alert":
             self.activateModal(msg["message"], msg["data"], "alert")
@@ -618,7 +621,7 @@ class UIProcessor:
         data = json.dumps({"command": message, "data": _data})
 
         socketio.emit(
-            "message", {"command": "updateCalibrationImage", "data": data, "dataFormat": "json"}, namespace="/MaslowCNC"
+            "message", {"command": "updateCalibrationImage", "data": data, "dataFormat": "json"}, namespace=self.namespace
         )
 
     def performHealthCheck(self):
@@ -630,6 +633,7 @@ class UIProcessor:
         '''
         currentTime = time.time()
         if currentTime - self.lastHealthCheck > 5:
+            self.app.data.console_queue.put(f"{__name__}: performing health check")
             self.lastHealthCheck = currentTime
             load = max(psutil.cpu_percent(interval=None, percpu=True))
             weAreBufferingLines = bool(int(self.app.data.config.getValue("Maslow Settings", "bufferOn")))
@@ -642,8 +646,7 @@ class UIProcessor:
                 "bufferSize": bufferSize,
             }
             socketio.emit("message", {"command": "healthMessage", "data": json.dumps(healthData), "dataFormat": "json"},
-                          namespace="/MaslowCNC")
-            self.performStatusCheck(True)
+                          namespace=self.namespace)
 
     def performStatusCheck(self, healthCheckCalled=False):
         '''
@@ -673,7 +676,7 @@ class UIProcessor:
             }
             socketio.emit("message",
                           {"command": "statusMessage", "data": json.dumps(statusData), "dataFormat": "json"},
-                          namespace="/MaslowCNC")
+                          namespace=self.namespace)
 
     def isChainLengthZero(self, msg):
         #Message: Unable to find valid machine position for chain lengths 0.00, 0.00 Left Chain Length
@@ -683,4 +686,3 @@ class UIProcessor:
         if msg.find(", 0.00") != -1:
             return True
         return False
-
