@@ -1,4 +1,5 @@
 import { Modal } from "bootstrap";
+import "jquery";
 
 $('.disabler').prop('disabled', true);
 

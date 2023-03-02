@@ -1,3 +1,4 @@
+import "feather";
 import "jquery";
 
 $(document).ready(function () {

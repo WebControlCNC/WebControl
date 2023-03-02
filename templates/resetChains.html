@@ -237,7 +237,9 @@
 {% endblock %}
 
 {% block javascript %}
-   <script src="{{ url_for('static',filename='scripts/setSprockets.js', version='10262027a') }}" type="module" crossorigin="anonymous"></script>
-   <script src="{{ url_for('static',filename='node_modules/feather-icons/dist/feather.min.js') }}" crossorigin="anonymous"></script>
-   <script>feather.replace() </script>
+  <script src="{{ url_for('static',filename='scripts/setSprockets.js', version='10262027a') }}" type="module" crossorigin="anonymous"></script>
+  <script type="module">
+    import "feather";
+    feather.replace();
+  </script>
 {% endblock %}

@@ -31,5 +31,8 @@
 
 {% block javascript %}
 <script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" type="module" crossorigin="anonymous"></script>
-<script> feather.replace() </script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

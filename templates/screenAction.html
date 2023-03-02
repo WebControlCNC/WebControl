@@ -25,6 +25,8 @@
 {% endblock %}
 
 {% block javascript %}
-   <script src="{{ url_for('static',filename='node_modules/feather-icons/dist/feather.min.js') }}" crossorigin="anonymous"></script>
-   <script>feather.replace() </script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

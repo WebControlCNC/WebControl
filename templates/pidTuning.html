@@ -478,5 +478,8 @@
   window.vExecute = vExecute;
 </script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script> feather.replace() </script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

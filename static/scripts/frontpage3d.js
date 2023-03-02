@@ -1,5 +1,8 @@
+import "feather";
 import "jquery";
+import pako from "pako";
 import * as THREE from "three";
+
 import { OrbitControls } from "./OrbitControls.js";
 import { requestPage } from "./socketEmits.js";
 
