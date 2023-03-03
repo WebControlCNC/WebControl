@@ -11,6 +11,7 @@ passed the app.
 '''
 class LogStreamer:
     app = None
+    namespace = "/MaslowCNCLogs"
 
     def start(self, _app):
         self.app = _app
@@ -29,18 +30,17 @@ class LogStreamer:
                         message = self.app.data.alog_streamer_queue.get()
                         if message != "":
                             socketio.emit("message", {"log": "alog", "data": message, "state": loggerState,
-                                                      "dataFormat": "text"}, namespace="/MaslowCNCLogs", )
+                                                      "dataFormat": "text"}, namespace=self.namespace, )
                             timeSinceLastLoggerState = time.time()
                     # process a line from the log queue
                     if not self.app.data.log_streamer_queue.empty():
                         message = self.app.data.log_streamer_queue.get()
                         if message != "":
                             socketio.emit("message", {"log": "log", "data": message, "state": loggerState,
-                                                      "dataFormat": "text"}, namespace="/MaslowCNCLogs", )
+                                                      "dataFormat": "text"}, namespace=self.namespace, )
                             timeSinceLastLoggerState = time.time()
                 currentTime = time.time()
                 if currentTime - timeSinceLastLoggerState > 5:
                     socketio.emit("message", {"log": "state", "state": loggerState, "dataFormat":"text"},
-                                  namespace="/MaslowCNCLogs", )
+                                  namespace=self.namespace, )
                     timeSinceLastLoggerState = currentTime
-

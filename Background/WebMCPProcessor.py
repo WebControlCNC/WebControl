@@ -34,7 +34,7 @@ class WebMCPProcessor(MakesmithInitFuncs):
 
 class ConsoleProcessor(MakesmithInitFuncs):
     def start(self):
-        print("Starting Console Queue Processor")
+        print(f"{__name__}: Starting Console Queue Processor")
         while True:
             time.sleep(0.001)
             while (

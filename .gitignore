@@ -26,3 +26,6 @@ alog.txt
 __pycache__/
 *.py[cod]
 *$py.class
+
+# node
+static/node_modules/

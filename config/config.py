@@ -34,28 +34,28 @@ class Config(MakesmithInitFuncs):
         self.home = str(Path.home())
         if hasattr(sys, '_MEIPASS'):
             self.home1 = os.path.join(sys._MEIPASS)
-            print(self.home1)
+            print(f"{__name__}: {self.home1}")
 
         '''
         This portion creates directories that are missing and creates a new webcontrol.json
         file if this is the first run (copies defaultwebcontrol.json)
         '''
-        print("Initializing Configuration")
+        print(f"{__name__}: Initializing")
         if not os.path.isdir(self.home+"/.WebControl"):
-            print("creating "+self.home+"/.WebControl directory")
+            print(f"{__name__}: creating {self.home}/.WebControl directory")
             os.mkdir(self.home+"/.WebControl")
         if not os.path.exists(self.home+"/.WebControl/webcontrol.json"):
-            print("copying defaultwebcontrol.json to "+self.home+"/.WebControl/")
+            print(f"{__name__}: copying defaultwebcontrol.json to {self.home}/.WebControl/")
             copyfile(self.home1+"/defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
         if not os.path.isdir(self.home+"/.WebControl/gcode"):
-            print("creating "+self.home+"/.WebControl/gcode directory")
+            print(f"{__name__}: creating {self.home}/.WebControl/gcode directory")
             os.mkdir(self.home+"/.WebControl/gcode")
         if not os.path.isdir(self.home+"/.WebControl/imports"):
-            print("creating "+self.home+"/.WebControl/imports directory")
+            print(f"{__name__}: creating {self.home}/.WebControl/imports directory")
             os.mkdir(self.home+"/.WebControl/imports")
         if not os.path.isdir(self.home+"/.WebControl/boards"):
-            print("creating "+self.home+"/.WebControl/boards directory")
+            print(f"{__name__}: creating {self.home}/.WebControl/boards directory")
             os.mkdir(self.home+"/.WebControl/boards")
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
@@ -83,11 +83,11 @@ class Config(MakesmithInitFuncs):
                                break
                 if found == False:
                     if sectionFound:
-                        print("section found")
+                        print(f"{__name__}: section found")
                     else:
-                        print("section not found")
+                        print(f"{__name__}: section not found")
                         self.settings[section]=[]
-                    print(section+"->"+self.defaults[section][x]["key"]+" was not found..")
+                    print(f"{__name__}: {section}->{self.defaults[section][x]['key']} was not found..")
                     t = {}
                     if "default" in self.defaults[section][x]:
                         t["default"]=self.defaults[section][x]["default"]
@@ -109,7 +109,7 @@ class Config(MakesmithInitFuncs):
                         t["options"]=self.defaults[section][x]["options"]
 
                     self.settings[section].append(t)
-                    print("added "+section+"->"+self.settings[section][len(self.settings[section])-1]["key"])
+                    print(f"{__name__}: added {section}->{self.settings[section][len(self.settings[section])-1]['key']}")
                     updated = True
 
         '''
@@ -118,7 +118,7 @@ class Config(MakesmithInitFuncs):
         '''
         if updated:
             with open(self.home+"/.WebControl/webcontrol.json", "w") as outfile:
-                # print ("writing file")
+                # print(f"{__name__}: writing file")
                 json.dump(
                     self.settings, outfile, sort_keys=True, indent=4, ensure_ascii=False
                 )
@@ -133,7 +133,7 @@ class Config(MakesmithInitFuncs):
             for item in dir:
                 if item.startswith("webcontrol"):
                     if item.endswith("gz") or item.endswith("zip") or item.endswith("dmg"):
-                        print("Removing file:"+item)
+                        print(f"{__name__}: Removing file: {item}")
                         os.remove(os.path.join(dirName, item))
 
     def checkForTouchedPort(self):
@@ -144,17 +144,17 @@ class Config(MakesmithInitFuncs):
         '''
         home = self.home
         path = home+"/.WebControl/webcontrol-*.port"
-        print(path)
+        print(f"{__name__}: {path}")
         try:
             for filename in glob.glob(path):
-                print(filename)
+                print(f"{__name__}: {filename}")
                 port = filename.split("-")
                 port = port[1].split(".port")
-                print(port[0])
+                print(f"{__name__}: {port[0]}")
                 self.data.config.setValue("WebControl Settings", "webPort", port[0])
                 os.remove(filename)
         except Exception as e:
-            print(e)
+            print(f"{__name__}: {e}")
             return False
         return True
 
@@ -727,7 +727,7 @@ class Config(MakesmithInitFuncs):
         home = "."
         if hasattr(sys, '_MEIPASS'):
             home = os.path.join(sys._MEIPASS)
-            print(self.home)
+            print(f"{__name__}: {self.home}")
         path = home+"/firmware/madgrizzle/*.hex"
         for filename in glob.glob(path):
             version = filename.split("-")
@@ -789,7 +789,7 @@ class Config(MakesmithInitFuncs):
         try:
             return fmt.format(value)
         except:
-            print('firmwareKeyString Exception: value = ' + str(value))
+            print(f"{__name__}: firmwareKeyString Exception: value = {str(value)}")
             return str(value)
 
     def reloadWebControlJSON(self):
@@ -802,5 +802,5 @@ class Config(MakesmithInitFuncs):
                 self.settings = json.load(infile)
             return True
         except:
-            print("error reloading WebControlJSON")
+            print(f"{__name__}: error reloading WebControlJSON")
             return False

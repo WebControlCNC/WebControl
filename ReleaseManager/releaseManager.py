@@ -35,7 +35,7 @@ class ReleaseManager(MakesmithInitFuncs):
 
     def checkForLatestPyRelease(self):
         if True:  # self.data.platform=="PYINSTALLER":
-            print("Checking latest pyrelease.")
+            print(f"{__name__}: Checking latest pyrelease.")
             try:
                 enableExperimental = self.data.config.getValue(
                     "WebControl Settings", "experimentalReleases"
@@ -63,20 +63,20 @@ class ReleaseManager(MakesmithInitFuncs):
                         latestVersionGithub = tag_float
                         self.latestRelease = release
 
-                print(f"Latest pyrelease: {latestVersionGithub}")
+                print(f"{__name__}: Latest pyrelease: {latestVersionGithub}")
                 if (
                     self.latestRelease is not None
                     and latestVersionGithub > self.data.pyInstallCurrentVersion
                 ):
-                    print(f"Latest release tag: {self.latestRelease.tag_name}")
+                    print(f"{__name__}: Latest release tag: {self.latestRelease.tag_name}")
                     assets = self.latestRelease.get_assets()
                     for asset in assets:
                         if (
                             asset.name.find(self.data.pyInstallType) != -1
                             and asset.name.find(self.data.pyInstallPlatform) != -1
                         ):
-                            print(asset.name)
-                            print(asset.url)
+                            print(f"{__name__}: {asset.name}")
+                            print(f"{__name__}: {asset.url}")
                             self.data.ui_queue1.put("Action", "pyinstallUpdate", "on")
                             self.data.pyInstallUpdateAvailable = True
                             self.data.pyInstallUpdateBrowserUrl = (
@@ -84,7 +84,7 @@ class ReleaseManager(MakesmithInitFuncs):
                             )
                             self.data.pyInstallUpdateVersion = self.latestRelease
             except Exception as e:
-                print(f"Error checking pyrelease: {e}")
+                print(f"{__name__}: Error checking pyrelease: {e}")
 
     def isExperimental(self, tag):
         """
@@ -103,21 +103,21 @@ class ReleaseManager(MakesmithInitFuncs):
     def processAbsolutePath(self, path):
         index = path.find("main.py")
         self.data.pyInstallInstalledPath = path[0 : index - 1]
-        print(self.data.pyInstallInstalledPath)
+        print(f"{__name__}: {self.data.pyInstallInstalledPath}")
 
     def updatePyInstaller(self, bypassCheck=False):
         home = self.data.config.getHome()
         if self.data.pyInstallUpdateAvailable == True or bypassCheck:
             if not os.path.exists(home + "/.WebControl/downloads"):
-                print("creating downloads directory")
+                print(f"{__name__}: creating downloads directory")
                 os.mkdir(home + "/.WebControl/downloads")
             fileList = glob.glob(home + "/.WebControl/downloads/*.gz")
             for filePath in fileList:
                 try:
                     os.remove(filePath)
                 except:
-                    print("error cleaning download directory: ", filePath)
-                    print("---")
+                    print(f"{__name__}: error cleaning download directory: {filePath}")
+                    print(f"{__name__}: ---")
             req = requests.get(self.data.pyInstallUpdateBrowserUrl)
             if (
                 self.data.pyInstallPlatform == "win32"
@@ -127,7 +127,7 @@ class ReleaseManager(MakesmithInitFuncs):
             else:
                 filename = home + "/.WebControl/downloads"
             open(filename, "wb").write(req.content)
-            print(filename)
+            print(f"{__name__}: {filename}")
 
             if self.data.platform == "PYINSTALLER":
                 lhome = os.path.join(self.data.platformHome)
@@ -161,20 +161,20 @@ class ReleaseManager(MakesmithInitFuncs):
             arguments = [filename, self.data.pyInstallInstalledPath, tool_path]
             command = [program_name]
             command.extend(arguments)
-            print("popening")
-            print(command)
+            print(f"{__name__}: popening")
+            print(f"{__name__}: {command}")
             subprocess.Popen(command)
             return True
         return False
 
     def make_executable(self, path):
-        print("1")
+        print(f"{__name__}: 1")
         mode = os.stat(path).st_mode
-        print("2")
+        print(f"{__name__}: 2")
         mode |= (mode & 0o444) >> 2  # copy R bits to X
-        print("3")
+        print(f"{__name__}: 3")
         os.chmod(path, mode)
-        print("4")
+        print(f"{__name__}: 4")
 
     def update(self, version):
         """
@@ -190,10 +190,10 @@ class ReleaseManager(MakesmithInitFuncs):
                         asset.name.find(self.data.pyInstallType) != -1
                         and asset.name.find(self.data.pyInstallPlatform) != -1
                     ):
-                        print(asset.name)
-                        print(asset.url)
+                        print(f"{__name__}: {asset.name}")
+                        print(f"{__name__}: {asset.url}")
                         self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
-                        print(self.data.pyInstallUpdateBrowserUrl)
+                        print(f"{__name__}: {self.data.pyInstallUpdateBrowserUrl}")
                         return self.updatePyInstaller(True)
-        print("hmmm.. issue")
+        print(f"{__name__}: hmmm.. issue")
         return False

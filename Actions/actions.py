@@ -306,7 +306,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("WebMCP", "shutdown", "")
                 return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
     
     def turnOff(self):
@@ -364,7 +364,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue1.put("Action", "homePositionMessage", position)
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def home(self):
@@ -394,7 +394,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G00 Z0 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def resetChainLengths(self):
@@ -412,7 +412,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("G21 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def defineZ0(self):
@@ -424,7 +424,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G10 Z0 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def stopZ(self):
@@ -439,7 +439,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
         
     def setMinZ(self):
@@ -451,7 +451,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B18")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
         
     def setMaxZ(self):
@@ -463,7 +463,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B17")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
         
     def clearZ(self):
@@ -475,7 +475,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B19")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
         
     def getZlimits(self):
@@ -487,7 +487,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B20")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
         
     def startRun(self):
@@ -518,7 +518,7 @@ class Actions(MakesmithInitFuncs):
                 return False
         except Exception as e:
             # something goes wrong, stop uploading.
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             self.data.uploadFlag = 0
             self.data.gcodeIndex = 0
             return False
@@ -529,7 +529,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
-            self.data.console_queue.put("stopping run")
+            self.data.console_queue.put(f"{__name__}: stopping run")
             # this is necessary because of the way PID data is being processed.  Otherwise could potentially get stuck
             # in PID test
             self.data.inPIDPositionTest = False
@@ -541,7 +541,7 @@ class Actions(MakesmithInitFuncs):
             with self.data.gcode_queue.mutex:
                 self.data.gcode_queue.queue.clear()
             # TODO: app.onUploadFlagChange(self.stopRun, 0) edit: not sure this is needed anymore
-            self.data.console_queue.put("Gcode stopped")
+            self.data.console_queue.put(f"{__name__}: Gcode stopped")
             self.sendGCodePositionUpdate(self.data.gcodeIndex)
             # notify UI client to clear any alarm that's active because a stop has been process.
             self.data.ui_queue1.put("Action", "clearAlarm", "")
@@ -551,7 +551,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def moveToDefault(self):
@@ -577,7 +577,7 @@ class Actions(MakesmithInitFuncs):
 
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def testMotors(self):
@@ -589,7 +589,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B04 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def wipeEEPROM(self, extent):
@@ -622,7 +622,7 @@ class Actions(MakesmithInitFuncs):
             #self.timer.start()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def pauseRun(self):
@@ -633,7 +633,7 @@ class Actions(MakesmithInitFuncs):
         try:
             if self.data.uploadFlag == 1:
                 self.data.uploadFlag = 2
-                self.data.console_queue.put("Run Paused")
+                self.data.console_queue.put(f"{__name__}: Run Paused")
                 self.data.ui_queue1.put("Action", "setAsResume", "")
                 # The idea was to be able to make sure the machine returns to
                 # the correct z-height after a pause in the event the user raised/lowered the bit.
@@ -646,7 +646,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gpioActions.causeAction("PauseLED", "on")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def resumeRun(self):
@@ -713,7 +713,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gpioActions.causeAction("PauseLED", "off")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def returnToCenter(self):
@@ -734,7 +734,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G00 X0.0 Y0.0 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def clearGCode(self):
@@ -746,7 +746,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcodeFile.clearGcodeFile()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def moveGcodeZ(self, moves):
@@ -770,7 +770,7 @@ class Actions(MakesmithInitFuncs):
             else:
                 return False
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def moveGcodeIndex(self, dist, index=False):
@@ -804,12 +804,12 @@ class Actions(MakesmithInitFuncs):
                 retval = self.sendGCodePositionUpdate(recalculate=True)
                 return retval
             except Exception as e:
-                self.data.console_queue.put(str(e))
-                self.data.console_queue.put("Unable to update position for new gcode line")
+                self.data.console_queue.put(f"{__name__}: {e}")
+                self.data.console_queue.put(f"{__name__}: Unable to update position for new gcode line")
                 return False
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def move(self, direction, distToMove):
@@ -852,7 +852,7 @@ class Actions(MakesmithInitFuncs):
             self.data.config.setValue("Computed Settings", "distToMove", distToMove)
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def moveZ(self, direction, distToMoveZ):
@@ -893,7 +893,7 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcode_queue.put("G20 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
 
@@ -916,7 +916,7 @@ class Actions(MakesmithInitFuncs):
             self.data.measureRequest = self.defineZ0()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def updateSetting(self, setting, value, fromGcode = False):
@@ -928,7 +928,7 @@ class Actions(MakesmithInitFuncs):
         :return:
         '''
         try:
-            self.data.console_queue.put("at update setting from gcode("+str(fromGcode)+"): "+setting+" with value: "+str(value))
+            self.data.console_queue.put(f"{__name__}: '{setting}': '{value}' - (from gcode? {fromGcode})")
             # if front page button has been pressed or serialPortThread is going to send gcode with a G21 or G20..
             if setting == "toInches" or setting == "toMM":
                 # this shouldn't be reached any more after I reordered the processActions function
@@ -1030,7 +1030,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "distToMoveUpdateZ", "")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def rotateSprocket(self, sprocket, time):
@@ -1048,7 +1048,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("B11 "+sprocket+" S-100 T"+str(abs(time)))
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
             
@@ -1086,7 +1086,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("G90 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def setSprocketAutomatic(self):
@@ -1099,7 +1099,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B10 L")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def getLeftChainLength(self, dist):
@@ -1154,7 +1154,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B06 L0 R0 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def setSprocketsDefault(self):
@@ -1168,7 +1168,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put("B08 ")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def updatePorts(self):
@@ -1176,7 +1176,7 @@ class Actions(MakesmithInitFuncs):
         Updates the list of ports found on the computer.
         :return:
         '''
-        self.data.console_queue.put("at Update Ports")
+        self.data.console_queue.put(f"{__name__}: at Update Ports")
         portsList = []
         try:
             if sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
@@ -1199,7 +1199,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue1.put("Action", "updatePorts", "")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def acceptTriangularKinematicsResults(self):
@@ -1212,7 +1212,7 @@ class Actions(MakesmithInitFuncs):
             self.data.triangularCalibration.acceptTriangularKinematicsResults()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
             
@@ -1237,7 +1237,7 @@ class Actions(MakesmithInitFuncs):
                 cut34YoffsetEst,
             )
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def holeyCalibrate(self, result):
@@ -1262,7 +1262,7 @@ class Actions(MakesmithInitFuncs):
                 calibrationError,
             )
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
 
@@ -1279,7 +1279,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put(line)
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
     
     def macro(self, number):
@@ -1300,11 +1300,9 @@ class Actions(MakesmithInitFuncs):
                 print("here2")
                 self.data.gpioActions.setGPIOAction(3, "Stop")
                 return True
-
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
-
         '''
         try:
             if number == 1:
@@ -1314,7 +1312,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put(macro)
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def testImage(self):
@@ -1327,7 +1325,7 @@ class Actions(MakesmithInitFuncs):
             self.data.opticalCalibration.testImage()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def adjustCenter(self, dist):
@@ -1343,7 +1341,7 @@ class Actions(MakesmithInitFuncs):
                 return False
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def processSettingRequest(self, section, setting):
@@ -1381,7 +1379,7 @@ class Actions(MakesmithInitFuncs):
                     data = {"curveX": xCurve, "curveY": yCurve}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationCurve", data)
                 except Exception as e:
-                    self.data.console_queue.put(str(e))
+                    self.data.console_queue.put(f"{__name__}: {e}")
             elif setting == "calibrationError":
                 # send calibration error matrix
                 try:
@@ -1391,7 +1389,7 @@ class Actions(MakesmithInitFuncs):
                     data = {"errorX": errorX, "errorY": errorY}
                     self.data.ui_queue1.put("Action", "updateOpticalCalibrationError", data)
                 except Exception as e:
-                    self.data.console_queue.put(str(e))
+                    self.data.console_queue.put(f"{__name__}: {e}")
             elif setting == "pauseButtonSetting":
                 # send current pause button state
                 try:
@@ -1400,7 +1398,7 @@ class Actions(MakesmithInitFuncs):
                     else:
                         return setting, "Resume"
                 except Exception as e:
-                    self.data.console_queue.put(str(e))
+                    self.data.console_queue.put(f"{__name__}: {e}")
             else:
                 # send whatever is being request
                 if setting == "units":
@@ -1595,7 +1593,7 @@ class Actions(MakesmithInitFuncs):
                 return True
             return False
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def processGCode(self):
@@ -1810,7 +1808,7 @@ class Actions(MakesmithInitFuncs):
         try:
             for x in range(6):
                 self.data.ui_queue1.put("Action", "updateTimer", chain+":"+str(5-x))
-                self.data.console_queue.put("Action:updateTimer_" + chain + ":" + str(5 - x))
+                self.data.console_queue.put(f"{__name__}: Action:updateTimer_{chain}:{5 - x}")
                 time.sleep(1)
             if chain == "left":
                 self.data.gcode_queue.put("B02 L1 R0 ")
@@ -1822,7 +1820,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("B10 R")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def issueStopCommand(self, distance):
@@ -1832,7 +1830,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.queue.clear()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def toggleCamera(self):
@@ -1850,7 +1848,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.camera.stop()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def cameraStatus(self):
@@ -1869,7 +1867,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Action", "updateCamera", "on")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def queryCamera(self):
@@ -1882,7 +1880,7 @@ class Actions(MakesmithInitFuncs):
             self.data.camera.getSettings()
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def velocityPIDTest(self, parameters):
@@ -1904,7 +1902,7 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def positionPIDTest(self, parameters):
@@ -1928,12 +1926,11 @@ class Actions(MakesmithInitFuncs):
             self.data.gcode_queue.put(gcodeString)
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def velocityPIDTestRun(self, command, msg):
         '''
-
         :param command:
         :param msg:
         :return:
@@ -1958,7 +1955,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.PIDVelocityTestData = []
                 print("PID velocity test started")
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def positionPIDTestRun(self, command, msg):
@@ -1982,7 +1979,7 @@ class Actions(MakesmithInitFuncs):
                 self.data.PIDPositionTestData = []
                 print("PID position test started")
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def updateGCode(self, gcode):
@@ -2004,7 +2001,7 @@ class Actions(MakesmithInitFuncs):
             self.data.ui_queue1.put("Action", "gcodeUpdate", "")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def downloadDiagnostics(self):
@@ -2021,7 +2018,7 @@ class Actions(MakesmithInitFuncs):
             zipObj.close()
             return filename
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def clearLogs(self):
@@ -2029,7 +2026,7 @@ class Actions(MakesmithInitFuncs):
             retval = self.data.logger.deleteLogFiles()
             return retval
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
     '''
     def checkForLatestPyRelease(self):
@@ -2050,7 +2047,6 @@ class Actions(MakesmithInitFuncs):
                     if float(tag_name) > latest:
                         latest = float(tag_name)
                         latestRelease = release
-
                 except:
                     print("error parsing tagname")
             print(latest)
@@ -2066,7 +2062,6 @@ class Actions(MakesmithInitFuncs):
                             self.data.pyInstallUpdateAvailable = True
                             self.data.pyInstallUpdateBrowserUrl = asset.browser_download_url
                             self.data.pyInstallUpdateVersion = latest
-
     def processAbsolutePath(self, path):
         index = path.find("main.py")
         self.data.pyInstallInstalledPath = path[0:index-1]
@@ -2117,7 +2112,6 @@ class Actions(MakesmithInitFuncs):
             subprocess.Popen(command)
             return True
         return False
-
     def make_executable(self, path):
         print("1")
         mode = os.stat(path).st_mode
@@ -2164,7 +2158,7 @@ class Actions(MakesmithInitFuncs):
             #zipObj.close()
             return filename
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
 
@@ -2178,7 +2172,7 @@ class Actions(MakesmithInitFuncs):
                     self.data.gcode_queue.put("$$")
             return retval
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False
 
     def setFakeServo(self, value):
@@ -2189,5 +2183,5 @@ class Actions(MakesmithInitFuncs):
                 self.data.gcode_queue.put("B99 OFF")
             return True
         except Exception as e:
-            self.data.console_queue.put(str(e))
+            self.data.console_queue.put(f"{__name__}: {e}")
             return False

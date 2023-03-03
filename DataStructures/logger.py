@@ -30,13 +30,13 @@ class Logger(MakesmithInitFuncs):
     loggingTimeout = -1
 
     def __init__(self):
-        print("Initializing Logger")
+        print(f"{__name__}: Initializing")
         self.home = str(Path.home())
         # clear the old log file
         if not os.path.isdir(self.home + "/.WebControl"):
-            print("creating " + self.home + "/.WebControl directory")
+            print(f"{__name__}: creating {self.home} /.WebControl directory")
             os.mkdir(self.home + "/.WebControl")
-        print(self.home+"/.WebControl/"+"log.txt")
+        print(f"{__name__}: {self.home}/.WebControl/log.txt")
         with open(self.home+"/.WebControl/"+"log.txt", "a") as logFile:
             logFile.truncate()
 
