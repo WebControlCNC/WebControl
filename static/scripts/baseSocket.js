@@ -40,7 +40,8 @@ import { updateDirectories } from "./uploadGCode.js";
 let socketClientID;
 let hostAddress = "..."
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
   const namespace = '/MaslowCNC'; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace

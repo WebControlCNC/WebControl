@@ -1,6 +1,6 @@
 import { updateSetting } from "./socketEmits.js";
 
-export function unitSwitch() {
+function unitSwitch() {
   if ($("#units").text() == "MM") {
     window.distToMove = (parseFloat($("#distToMove").val()) / 25.4).toFixed(3)
     updateSetting('toInches', window.distToMove);
@@ -10,7 +10,7 @@ export function unitSwitch() {
   }
 }
 
-export function unitSwitchZ() {
+function unitSwitchZ() {
   if ($("#unitsZ").text() == "MM") {
     $("#unitsZ").text("INCHES");
     window.distToMoveZ = (parseFloat($("#distToMoveZ").val()) / 25.4).toFixed(2);
@@ -23,3 +23,5 @@ export function unitSwitchZ() {
     updateSetting('toMMZ', window.distToMoveZ);
   }
 }
+
+export { unitSwitch, unitSwitchZ }
