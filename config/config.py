@@ -25,6 +25,14 @@ class Config(MakesmithInitFuncs):
     home1 = "."
     firstRun = False
 
+    def pathBuild(self, path, title):
+        required_path = f"{self.home}/{path}"
+        if not os.path.isdir(required_path):
+            print(f"{__name__}: creating {title} directory at {required_path}")
+            os.mkdir(required_path)
+        else:
+            print(f"{__name__}: {title} directory is {required_path}")        
+
     def __init__(self):
         '''
         This function determines if a pyinstaller version is being run and if so,
@@ -41,22 +49,16 @@ class Config(MakesmithInitFuncs):
         file if this is the first run (copies defaultwebcontrol.json)
         '''
         print(f"{__name__}: Initializing")
-        if not os.path.isdir(self.home+"/.WebControl"):
-            print(f"{__name__}: creating {self.home}/.WebControl directory")
-            os.mkdir(self.home+"/.WebControl")
+        print(f"{__name__}: Home path is: {self.home}")
+        self.pathBuild(".WebControl", "WebControl")
+        self.pathBuild(".WebControl/gcode", "GCode")
+        self.pathBuild(".WebControl/imports", "Imports")
+        self.pathBuild(".WebControl/boards", "Boards")
+
         if not os.path.exists(self.home+"/.WebControl/webcontrol.json"):
             print(f"{__name__}: copying defaultwebcontrol.json to {self.home}/.WebControl/")
             copyfile(self.home1+"/defaultwebcontrol.json",self.home+"/.WebControl/webcontrol.json")
             self.firstRun = True
-        if not os.path.isdir(self.home+"/.WebControl/gcode"):
-            print(f"{__name__}: creating {self.home}/.WebControl/gcode directory")
-            os.mkdir(self.home+"/.WebControl/gcode")
-        if not os.path.isdir(self.home+"/.WebControl/imports"):
-            print(f"{__name__}: creating {self.home}/.WebControl/imports directory")
-            os.mkdir(self.home+"/.WebControl/imports")
-        if not os.path.isdir(self.home+"/.WebControl/boards"):
-            print(f"{__name__}: creating {self.home}/.WebControl/boards directory")
-            os.mkdir(self.home+"/.WebControl/boards")
         with open(self.home+"/.WebControl/webcontrol.json", "r") as infile:
             self.settings = json.load(infile)
         # load default and see if there is anything missing.. if so, add it
