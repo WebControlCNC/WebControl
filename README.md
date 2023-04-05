@@ -148,16 +148,16 @@ To manage multiple python versions and virtual environments get `pyenv` (or [`py
 Here's a well-written [walkthrough](https://community.cisco.com/t5/developer-general-knowledge-base/pyenv-for-managing-python-versions-and-environments/ta-p/4696819) of setting up your system (macOS, Ubuntu/Debian, Fedora/CentOS/RHEL, Windows) for `pyenv` and then using `pyenv` to set up your virtual environment.
 
 Once you've prepared your system and installed `pyenv`
-- get the latest version of Python that we know works with WebControl, currently that's `3.10.10`:
-    `pyenv install 3.10.10`
+- get the latest version of Python that we know works with WebControl, currently that's `3.10.10` (Windows) or `3.10.5` (everything else):
+    `pyenv install 3.10.10` or `pyenv install 3.10.5`
 - you can also list what versions are available with:
     `pyenv install -l`
     Note that many of the Python libraries used by WebControl may not have been recompiled to the latest version of Python, meaning you either have to have all the other tools (usually C language compilers for you system) to build these libraries youself, or choose a slightly older version of Python (which is what we're doing here).
 
 Then for regular `pyenv` (i.e. except `pyenv-win`)
 - create a virtual environment with it:
-    `pyenv virtualenv 3.10.10 webcontrol_3_10`
-    The `webcontrol_3_10` name is arbitrary
+    `pyenv virtualenv 3.10.5 webcontrol_3_10`
+    The `webcontrol_3_5` name is arbitrary
 - activate the virtual environment - this will help isolate what you do from the rest of your system:
     `pyenv activate webcontrol_3_10`
 
@@ -174,7 +174,7 @@ This next stuff should only need to be done once in your virtual environment. If
     `pip install pip-tools`
     `pip install black`
 - rebuild the list of requirements needed by WebControl (optional)
-    You should do this step if you're using a different version of Python from 3.10.5 shown above
+    You should do this step if you're using a different version of Python from 3.10.5/3.10.10 shown above
     `rm requirements.txt`
     `pip-compile -r requirements.in --resolver=backtracking --verbose`
 - install the requirements
