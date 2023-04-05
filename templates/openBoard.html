@@ -39,5 +39,8 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/openBoard.js', version='11102018b') }}" type="module" crossorigin="anonymous"></script>
+<script type="module" crossorigin="anonymous">
+  import { onFooterSubmit } from "{{ url_for('static', filename='scripts/openBoard.js') }}";
+  window.onFooterSubmit = onFooterSubmit;
+</script>
 {% endblock %}

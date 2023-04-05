@@ -54,3 +54,5 @@ function onFooterSubmit(){
         }
     });
 }
+
+export { onFooterSubmit };

@@ -85,3 +85,5 @@ function onFooterSubmit(){
         }
     });
 }
+
+export { onFooterSubmit };

@@ -61,4 +61,4 @@ function updatePorts(data){
   }
 }
 
-export { updatePorts };
+export { onFooterSubmit, updatePorts };

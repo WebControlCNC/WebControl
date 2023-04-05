@@ -33,6 +33,8 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/uploadGCode.js', version='11102020k') }}" type="module" crossorigin="anonymous"></script>
-
+<script type="module" crossorigin="anonymous">
+  import { onFooterSubmit } from "{{ url_for('static', filename='scripts/uploadGCode.js') }}";
+  window.onFooterSubmit = onFooterSubmit;
+</script>
 {% endblock %}
