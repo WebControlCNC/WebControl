@@ -158,6 +158,7 @@ def init_socket_maslowcnc(app):
         ## the gcode file might change the active units so we need to inform the UI of the change.
         app.data.ui_queue1.put("Action", "unitsUpdate", "")
         app.data.ui_queue1.put("Action", "gcodeUpdate", "")
+        app.data.console_queue.put(f"{__name__}: updateSetting: {msg}")
 
     @socketio.on("checkForBoardUpdate", namespace=namespace)
     def checkForBoardUpdate(msg):

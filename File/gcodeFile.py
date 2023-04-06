@@ -61,12 +61,12 @@ class GCodeFile(MakesmithInitFuncs):
             homeY = float(self.data.config.getValue("Advanced Settings", "homeY"))
             fileToWrite = directory + "/" + fileName
             gfile = open(fileToWrite, "w+")
-            print(fileToWrite)
+            print(f"{__name__}: writing file {fileToWrite}")
             for line in self.data.gcode:
                 gfile.write(line+'\n')
             #gfile = open(directory+fileName, "w+")
             #gfile.writelines(map(lambda s: s+ '\n', self.data.gcode))
-            print("Closing File")
+            print(f"{__name__}:Closing File")
             gfile.close()
         except Exception as e:
             self.data.console_queue.put(str(e))
@@ -76,17 +76,10 @@ class GCodeFile(MakesmithInitFuncs):
             return False
         return True
 
-
-
     def loadUpdateFile(self, gcode=""):
-        print("At loadUpdateFile")
-        gcodeLoad = False
-        if gcode=="":
-            gcodeLoad = True
-        if self.data.units == "MM":
-            self.canvasScaleFactor = self.MILLIMETERS
-        else:
-            self.canvasScaleFactor = self.INCHES
+        print(f"{__name__}:loadUpdateFile called")
+
+        self.canvasScaleFactor = self.MILLIMETERS if self.data.units == "MM" else self.INCHES
 
         if gcode == "":
             filename = self.data.gcodeFile.filename
@@ -106,6 +99,7 @@ class GCodeFile(MakesmithInitFuncs):
                 self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
                 self.data.gcodeFile.filename = ""
                 return False
+
             rawfilters = filterfile.read()
             filterfile.close()  # closes the filter save file
         else:
@@ -139,9 +133,7 @@ class GCodeFile(MakesmithInitFuncs):
                 "\n", filtersparsed
             )  # splits the gcode into elements to be added to the list
             filtersparsed = [x.lstrip() for x in filtersparsed] # remove leading spaces
-            filtersparsed = [
-                x + " " for x in filtersparsed
-            ]  # adds a space to the end of each line
+            filtersparsed = [f"{x} " for x in filtersparsed] # adds a space to the end of each line
             filtersparsed = [x.replace("X ", "X") for x in filtersparsed]
             filtersparsed = [x.replace("Y ", "Y") for x in filtersparsed]
             filtersparsed = [x.replace("Z ", "Z") for x in filtersparsed]
@@ -150,8 +142,6 @@ class GCodeFile(MakesmithInitFuncs):
             filtersparsed = [x.replace("F ", "F") for x in filtersparsed]
             self.data.gcode = "[]"
             self.data.gcode = filtersparsed
-
-
 
             # Find gcode indicies of z moves
             self.data.zMoves = [0]
@@ -182,6 +172,7 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.ui_queue1.put("Alert", "Alert", "Cannot open gcode file.")
             self.data.gcodeFile.filename = ""
             return False
+
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
         self.data.actions.sendGCodePositionUpdate(self.data.gcodeIndex, recalculate=True)
@@ -210,19 +201,14 @@ class GCodeFile(MakesmithInitFuncs):
 
 
     def isNotReallyClose(self, x0, x1):
-        if abs(x0 - x1) > 0.0001:
-            return True
-        else:
-            return False
+        return abs(x0 - x1) > 0.0001
 
     def drawLine(self, gCodeLine, command):
         """
-
         drawLine draws a line using the previous command as the start point and the xy coordinates
         from the current command as the end point. The line is styled based on the command to allow
         visually differentiating between normal and rapid moves. If the z-axis depth is changed a
         circle is placed at the location of the depth change to alert the user.
-
         """
 
         if True:
@@ -241,17 +227,16 @@ class GCodeFile(MakesmithInitFuncs):
                 yTarget = float(y.groups()[0]) * self.canvasScaleFactor
                 if self.absoluteFlag == 1:
                     yTarget = self.yPosition + yTarget
+
             z = re.search("Z(?=.)(([ ]*)?[+-]?([0-9]*)(\.([0-9]+))?)", gCodeLine)
             if z:
                 zTarget = float(z.groups()[0]) * self.canvasScaleFactor
 
-            if self.isNotReallyClose(self.xPosition, xTarget) or self.isNotReallyClose(
-                self.yPosition, yTarget
-            ):
-
+            notCloseX = self.isNotReallyClose(self.xPosition, xTarget)
+            notCloseY = self.isNotReallyClose(self.yPosition, yTarget)
+            if notCloseX or notCloseY:
                 if command == "G00":
                     # draw a dashed line
-
                     self.line3D.append(Line())  # points = (), width = 1, group = 'gcode')
                     self.line3D[-1].type = "line"
                     self.line3D[-1].command = None
@@ -266,7 +251,6 @@ class GCodeFile(MakesmithInitFuncs):
                         self.line3D[-1].command = None
                         self.addPoint3D(self.xPosition, self.yPosition, self.zPosition)
                         self.line3D[-1].dashed = False
-
 
                     self.addPoint3D(xTarget, yTarget, zTarget)
 
@@ -294,9 +278,7 @@ class GCodeFile(MakesmithInitFuncs):
 
     def drawMCommand(self, mString):
         """
-
         drawToolChange draws a circle indicating a tool change.
-
         """
         #print(mString)
         code = self.getMCommand(mString)
@@ -381,11 +363,9 @@ class GCodeFile(MakesmithInitFuncs):
 
     def drawArc(self, gCodeLine, command):
         """
-
         drawArc draws an arc using the previous command as the start point, the xy coordinates from
         the current command as the end point, and the ij coordinates from the current command as the
         circle center. Clockwise or counter-clockwise travel is based on the command.
-
         """
 
         if True:
@@ -466,31 +446,24 @@ class GCodeFile(MakesmithInitFuncs):
 
     def clearGcode(self):
         """
-
         clearGcode deletes the lines and arcs corresponding to gcode commands from the canvas.
-
         """
+        print(f"{__name__}:clearGcode")
 
         del self.line3D[:]
 
     def clearGcodeFile(self):
         """
-
         clearGcodeFile deletes the lines and arcs and the file
-
         """
 
-        del self.line3D[:]
+        self.clearGcode()
 
         self.data.gcode = []
         self.updateGcode()
         self.data.gcodeFile.isChanged = True
 
-
-
-
     def moveLine(self, gCodeLine):
-
         originalLine = gCodeLine
         shiftX = self.data.gcodeShift[0]
         shiftY = self.data.gcodeShift[1]
@@ -571,9 +544,7 @@ class GCodeFile(MakesmithInitFuncs):
 
     def loadNextLine(self):
         """
-
         Load the next line of gcode
-
         """
 
         try:
@@ -598,9 +569,7 @@ class GCodeFile(MakesmithInitFuncs):
 
     def updateOneLine(self, fullString):
         """
-
         Draw the next line on the gcode canvas
-
         """
 
         validPrefixList = [
@@ -615,21 +584,21 @@ class GCodeFile(MakesmithInitFuncs):
             "G17",
         ]
 
-        fullString = (
-            fullString.upper() + " "
-        )  # ensures that there is a space at the end of the line
-        # find 'G' anywhere in string
+        # ensure there is a space at the end of the line, and that everything is UPPERCASE
+        fullString = f"{fullString.upper()} "
 
+        # find 'G' anywhere in string
         gString = fullString[fullString.find("G") : fullString.find("G") + 3]
 
         if gString in validPrefixList:
             self.prependString = gString
 
-        if (
-            fullString.find("G") == -1
-        ):  # this adds the gcode operator if it is omitted by the program
-            fullString = self.prependString + " " + fullString
+        if fullString.find("G") == -1:
+            # this adds the gcode operator if it is omitted by the program
+            fullString = f"{self.prependString} {fullString}"
             gString = self.prependString
+
+        # self.data.console_queue.put(f"{__name__}:updateOneLine {fullString}")
 
         # print gString
         if gString == "G00" or gString == "G0 ":
@@ -695,8 +664,8 @@ class GCodeFile(MakesmithInitFuncs):
             f.write(tstr.encode())
         self.data.compressedGCode3D = out.getvalue()
 
-        self.data.console_queue.put("uncompressed:"+str(len(tstr)))
-        self.data.console_queue.put("compressed3D:"+str(len(self.data.compressedGCode3D)))
+        self.data.console_queue.put(f"{__name__}:callBackMechanism uncompressed:{len(tstr)}")
+        self.data.console_queue.put(f"{__name__}:callBackMechanism compressed3D:{len(self.data.compressedGCode3D)}")
 
 
     def updateGcode(self):
@@ -707,9 +676,9 @@ class GCodeFile(MakesmithInitFuncs):
         # reset variables
         self.data.backgroundRedraw = False
         if (self.data.units=="INCHES"):
-            scaleFactor = 1.0;
+            scaleFactor = 1.0
         else:
-            scaleFactor = 1/25.4;
+            scaleFactor = 1/25.4
         #before, gcode shift = home X
         #old #self.xPosition = self.data.gcodeShift[0] * scaleFactor
         #old #self.yPosition = self.data.gcodeShift[1] * scaleFactor

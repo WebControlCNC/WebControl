@@ -208,7 +208,7 @@ def init_route(app):
         app.data.logger.resetIdler()
         if request.method == "POST":
             f = request.form["selectedGCode"]
-            app.data.console_queue.put(f"selectedGcode={f}")
+            app.data.console_queue.put(f"{__name__}:openGCode selectedGcode={f}")
             tDir = f.split("/")
             app.data.config.setValue("Computed Settings", "lastSelectedDirectory", tDir[0])
             home = app.data.config.getHome()
@@ -234,7 +234,7 @@ def init_route(app):
             app.data.console_queue.put(f"{__name__}: {request.form}")
             f = request.form["fileName"]
             d = request.form["selectedDirectory"]
-            app.data.console_queue.put(f"selectedGcode={f}")
+            app.data.console_queue.put(f"{__name__}:saveGCode selectedGcode={f}")
             app.data.config.setValue("Computed Settings", "lastSelectedDirectory", d)
             home = app.data.config.getHome()
             returnVal = app.data.gcodeFile.saveFile(f, home + "/.WebControl/gcode/" + d)
