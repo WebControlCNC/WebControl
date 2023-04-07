@@ -148,17 +148,27 @@ To manage multiple python versions and virtual environments get `pyenv` (or [`py
 Here's a well-written [walkthrough](https://community.cisco.com/t5/developer-general-knowledge-base/pyenv-for-managing-python-versions-and-environments/ta-p/4696819) of setting up your system (macOS, Ubuntu/Debian, Fedora/CentOS/RHEL, Windows) for `pyenv` and then using `pyenv` to set up your virtual environment.
 
 Once you've prepared your system and installed `pyenv`
-- get the latest version of Python that we know works with WebControl, currently that's `3.10.5`:
-    `pyenv install 3.10.5`
+- get the latest version of Python that we know works with WebControl, currently that's `3.10.10`:
+    `pyenv install 3.10.10`
+- you can also list what versions are available with:
+    `pyenv install -l`
+    Note that many of the Python libraries used by WebControl may not have been recompiled to the latest version of Python, meaning you either have to have all the other tools (usually C language compilers for you system) to build these libraries youself, or choose a slightly older version of Python (which is what we're doing here).
+
+Then for regular `pyenv` (i.e. except `pyenv-win`)
 - create a virtual environment with it:
-    `pyenv virtualenv 3.10.5 webcontrol_3_10`
+    `pyenv virtualenv 3.10.10 webcontrol_3_10`
     The `webcontrol_3_10` name is arbitrary
 - activate the virtual environment - this will help isolate what you do from the rest of your system:
     `pyenv activate webcontrol_3_10`
 
+For Windows and `pyenv-win` it's a bit simpler
+- use that version in your shell (assuming powershell here)
+    `pyenv shell 3.10.10`
+- Done
+
 #### Prepare the Virtual Environment itself
 
-This next stuff should only need to be done once in your virtual environment.
+This next stuff should only need to be done once in your virtual environment. If you change Python versions you will need to do this again.
 - install some useful tools
     `pip install setuptools`
     `pip install pip-tools`
@@ -170,7 +180,7 @@ This next stuff should only need to be done once in your virtual environment.
 - install the requirements
     `pip install -r requirements.txt`
 
-And that's the virtual environment creation and set up done. From now on you'll only need to activate the virtual environment after any restart to get going.
+And that's the virtual environment creation and set up done. From now on you'll only need to activate the virtual environment (for Windows use the `pyenv shell` command) after any restart to get going.
 
 #### Virtualenv on a Raspberry Pi
 
@@ -182,7 +192,7 @@ We're using `npm` (Node Package Manager) to manage the third party JavaScript li
 
 Note that we're not using `node` as the web server, we're only using it for `npm` to manage the JavaScript libraries.
 
-To manage `node` it is better to use a node version manager, such as [nvm](https://github.com/nvm-sh/nvm) (or [nvm-windows](https://github.com/coreybutler/nvm-windows) for windows).
+To manage `node` it is better to use a node version manager, such as [nvm](https://github.com/nvm-sh/nvm) (or [nvm-windows](https://github.com/coreybutler/nvm-windows) for Windows).
 
 Once `nvm` is installed. Run `nvm install lts` to install the latest 'long term support' version of `node`. Which will get you both `node` and `npm`. There are other `nvm` commands, such as `nvm current` to show which version of `node` you're currently using, and `nvm use lts` to switch `nvm` to using the latest `lts` version of `node` if it was on another version.
 
@@ -196,7 +206,15 @@ Then you can run the code with.
 
 The server will then be available at `http://localhost:5000`
 
-* If you get an error message with something like `ModuleNotFoundError: No module named '_ctypes'` within it. Then it means that you didn't get your system properly prepared before creating your virtual environment (looking at you Ubuntu). Please follow the walkthrough linked above to:
+... but maybe your browser says 'Nope' and won't let you in. In that case, go back to your Terminal window (where you are running WebControl) and shut it down with `Ctrl-C` or `Cmd-C`. Take a note of the other address it says that it is using, this will vary depending on your Wi-Fi network.
+```
+Main: opening browser on http://localhost:5000
+Main: setting app data host address to 192.168.62.67:5000
+```
+
+Restart with `python main.py`, which will open your browser at `http://localhost:5000`, which still won't work because of permissions, so change to the `host address` listed above, in the above example that would be `192.168.62.67:5000`
+
+* If you get an error message in the Terminal window with something like `ModuleNotFoundError: No module named '_ctypes'` within it. Then it means that you didn't get your system properly prepared before creating your virtual environment (looking at you Ubuntu). Please follow the walkthrough linked above to:
 1. deactivate your virtual environment,
 2. delete it,
 3. prepare your system,
