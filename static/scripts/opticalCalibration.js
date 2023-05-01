@@ -1,5 +1,8 @@
-settingRequest('Optical Calibration Settings','calibrationCurve');
-settingRequest('Optical Calibration Settings','calibrationError');
+import "jquery";
+import * as THREE from "three";
+
+import { action, settingRequest } from "./socketEmits.js";
+import { OrbitControls } from "./OrbitControls.js";
 
 var _xError = [];
 var _yError = [];
@@ -31,7 +34,10 @@ var osledCircle;
 
 var osled;
 
-
+function initializeOpticalCalibration() {
+  settingRequest('Optical Calibration Settings', 'calibrationCurve');
+  settingRequest('Optical Calibration Settings', 'calibrationError');
+}
 
 function oanimate() {
     requestAnimationFrame(oanimate);
@@ -40,22 +46,19 @@ function oanimate() {
 }
 
 function positionUpdateOptical(x,y,z){
-    if ($("#units").text()=="MM"){
-        x /= 25.4
-        y /= 25.4
-        z /= 25.4
-    }
-    if (osled !== undefined)
-    {
-        osled.position.set(x,y,z);
-    }
-
+  if ($("#units").text()=="MM") {
+    x /= 25.4
+    y /= 25.4
+    z /= 25.4
+  }
+  if (osled !== undefined) {
+    osled.position.set(x,y,z);
+  }
 }
 
 function processPositionMessageOptical(data){
   positionUpdateOptical(data.xval,data.yval,data.zval);
 }
-
 
 function process(processName){
   var markerX = $("#markerX").val();
@@ -169,7 +172,7 @@ function redrawCurveCharts(chart){
           _y[i][j]=temp
           _x[j]=j
         }
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(xCurvePlot, [{x: _x, y: _y[i] }], {title: "X-Curve" , colorway: colorwayLayout } );
@@ -184,7 +187,7 @@ function redrawCurveCharts(chart){
           _y[i][j]=temp
           _x[j]=j
         }
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(yCurvePlot, [{x: _x, y: _y[i] }], {title: "Y-Curve" , colorway: colorwayLayout} );
@@ -193,7 +196,6 @@ function redrawCurveCharts(chart){
       $('#curveChartButton').removeClass('btn-primary').addClass('btn-secondary');
 }
 
-
 function redrawErrorCharts(chart){
     if ( (chart == "xError") || (chart=="all") ){
       xErrorPlot = document.getElementById('xErrorPlot');
@@ -201,7 +203,7 @@ function redrawErrorCharts(chart){
          while (xErrorPlot.data.length>0)
               Plotly.deleteTraces(xErrorPlot, [0]);
       for(var i = 0; i<15; i++){
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(xErrorPlot, [{x: _xValues, y: _xError[i] }], {title: "X-Error", colorway: colorwayLayout } );
@@ -213,7 +215,7 @@ function redrawErrorCharts(chart){
           while (yErrorPlot.data.length>0)
               Plotly.deleteTraces(yErrorPlot, [0]);
       for(var i = 0; i<15; i++){
-        if (isMobile == true)
+        if (window.isMobile)
           Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4}, colorway: colorwayLayout } );
         else
           Plotly.plot(yErrorPlot, [{x: _xValues, y: _yError[i] }], {title: "Y-Error", colorway: colorwayLayout } );
@@ -235,7 +237,7 @@ function redrawErrorCharts(chart){
       x1 = []
       y1 = []
       //Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error" } );
-      if (isMobile == true)
+      if (window.isMobile)
         Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
       else
         Plotly.plot(xyErrorPlot, [{x: x0, y: y0, mode:'markers', type:'scatter'}], {title: "XY-Error"} );
@@ -247,7 +249,7 @@ function redrawErrorCharts(chart){
          }
       }
       //Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}] );
-      if (isMobile == true)
+      if (window.isMobile)
         Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {title: "XY-Error", showlegend: false, margin: {l: 20,r: 20, b: 40, t: 40, pad: 4} } );
       else
         Plotly.plot(xyErrorPlot, [{x: x1, y: y1, mode:'markers', type:'scatter'}], {title: "XY-Error"} );
@@ -262,7 +264,8 @@ function calSurface(x, i, j){
    return retVal
 }
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
     $('#calibrationExtents').change(function(){
       selected = $("#calibrationExtents option:selected").val()
       console.log(selected);
@@ -315,9 +318,11 @@ $(document).ready(function () {
       }
     });
     console.log("here1");
-    setupDisplay();
+    ocontainer = document.getElementById('workareaOptical');
+    if (ocontainer) {
+      setupDisplay();
+    }
 });
-
 
 function setupDisplay(){
     orenderer = new THREE.WebGLRenderer();
@@ -332,7 +337,7 @@ function setupDisplay(){
     oimageShowing = 1
 
     ocamera = new THREE.PerspectiveCamera(45, ow/oh, 1, 500);
-    ocontrols = new THREE.OrbitControls(ocamera, orenderer.domElement);
+    ocontrols = new OrbitControls(ocamera, orenderer.domElement);
     ocontrols.screenSpacePanning = true;
 
     ocamera.position.set(0, 0, 100);
@@ -484,3 +489,12 @@ function drawCalibration(){
     drawOptical.zoom(10, {x:originXOptical,y:originYOptical});
 }
 */
+
+export {
+  initializeOpticalCalibration,
+  processPositionMessageOptical,
+  updateCalibrationImage,
+  updateOpticalCalibrationCurve,
+  updateOpticalCalibrationError,
+  updateOpticalCalibrationFindCenter,
+};

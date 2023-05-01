@@ -2,12 +2,12 @@
 {% block content %}
 <div class="container-fluid">
   <div class="card" id="motorAdjustmentAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseMotorAdjustment" aria-expanded="false" aria-controls="collapseMotorAdjustment">
+    <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseMotorAdjustment" aria-expanded="false" aria-controls="collapseMotorAdjustment">
       <h4 class="card-title" id="motorAdjustmentHeader">
         Motor Adjustment...
       </h4>
     </button>
-    <div id="collapseMotorAdjustment" class="collapse" aria-labelledby="motorAdjustmentHeader" data-parent="#motorAdjustmentAccordion">
+    <div id="collapseMotorAdjustment" class="collapse" aria-labelledby="motorAdjustmentHeader" data-bs-parent="#motorAdjustmentAccordion">
       <div class = "row">
         <div class = "col-6">
           <div class="card">
@@ -253,12 +253,12 @@
     </div>
   </div>
   <div class="card" id="velocityPIDAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapseVelocityPID" aria-expanded="false" aria-controls="collapseVelocityPID">
+    <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapseVelocityPID" aria-expanded="false" aria-controls="collapseVelocityPID">
       <h4 class="card-title" id="velocityPIDHeader">
         Velocity PID Testing...
       </h4>
     </button>
-    <div id="collapseVelocityPID" class="collapse" aria-labelledby="velocityPIDHeader" data-parent="#velocityPIDAccordion">
+    <div id="collapseVelocityPID" class="collapse" aria-labelledby="velocityPIDHeader" data-bs-parent="#velocityPIDAccordion">
       <div class = "row">
        <div class = "col-6">
          <div class="card-body">
@@ -267,7 +267,7 @@
                <div class="col">
                  <div class="form-group">
                    <label for="vMotor">Motor</label>
-                   <div id="vMotor" class="btn-group btn-group-toggle" data-toggle="buttons">
+                   <div id="vMotor" class="btn-group btn-group-toggle" data-bs-toggle="buttons">
                    <label class="btn btn-secondary active">
                      <input type="radio" name="options" id="vMotorTL" autocomplete="off" value="L"> Top Left
                    </label>
@@ -356,12 +356,12 @@
     </div>
   </div>
   <div class="card" id="positionPIDAccordion">
-    <button class="btn text-left" data-toggle="collapse" data-target="#collapsePositionPID" aria-expanded="false" aria-controls="collapsePositionPID">
+    <button class="btn text-left" data-bs-toggle="collapse" data-bs-target="#collapsePositionPID" aria-expanded="false" aria-controls="collapsePositionPID">
       <h4 class="card-title" id="positionPIDHeader">
         Position PID Testing...
       </h4>
     </button>
-    <div id="collapsePositionPID" class="collapse" aria-labelledby="positionPIDHeader" data-parent="#positionPIDAccordion">
+    <div id="collapsePositionPID" class="collapse" aria-labelledby="positionPIDHeader" data-bs-parent="#positionPIDAccordion">
       <div class = "row">
        <div class = "col-6">
          <div class="card-body">
@@ -370,7 +370,7 @@
                <div class="col">
                  <div class="form-group">
                    <label for="pMotor">Motor</label>
-                   <div id="pMotor" class="btn-group btn-group-toggle" data-toggle="buttons">
+                   <div id="pMotor" class="btn-group btn-group-toggle" data-bs-toggle="buttons">
                    <label class="btn btn-secondary active">
                      <input type="radio" name="options" id="pMotorTL" autocomplete="off" value="L" > Top Left
                    </label>
@@ -471,7 +471,15 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018l') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static',filename='scripts/pidTuning.js', version='11102018l') }}" type="module" crossorigin="anonymous"></script>
+<script type="module">
+  import { pExecute, vExecute } from "{{ url_for('static',filename='scripts/pidTuning.js', version='12302022u') }}";
+  window.pExecute = pExecute;
+  window.vExecute = vExecute;
+</script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script> feather.replace() </script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

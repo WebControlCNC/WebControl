@@ -1,3 +1,7 @@
+import "jquery";
+
+import { action } from "./socketEmits.js";
+
 function onFooterSubmit(){
     var url = $("#pageID").val()
     $.ajax({
@@ -14,7 +18,8 @@ function onFooterSubmit(){
     });
 }
 
-$(document).ready(function () {
+$(() => {
+  // document.ready
     $('#settingsForm').on('submit', function(e) {
         e.preventDefault();
         var url = $("#pageID").val()
@@ -55,3 +60,5 @@ function updatePorts(data){
     });
   }
 }
+
+export { onFooterSubmit, updatePorts };

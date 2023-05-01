@@ -126,7 +126,7 @@ Open your web browser to `localhost:5000` (or use the IP address of your device)
 
 * [Flask](http://flask.pocoo.org/) - The web framework used
 * [Flask-Socketio](https://github.com/miguelgrinberg/Flask-SocketIO) - Websocket integration for communications with browser clients
-* [Bootstrap4](https://getbootstrap.com/) - Front-end component library
+* [Bootstrap5](https://getbootstrap.com/) - Front-end component library
 * [Jinja2](http://jinja.pocoo.org/) - Template engine for web page generation
 * [Feather.js](https://feathericons.com/) - Only icon library I could find that had diagonal arrows.. works well to boot.
 * [OpenCV](https://github.com/skvark/opencv-python) - Library for computer vision to implement optical calibration
@@ -148,42 +148,72 @@ To manage multiple python versions and virtual environments get `pyenv` (or [`py
 Here's a well-written [walkthrough](https://community.cisco.com/t5/developer-general-knowledge-base/pyenv-for-managing-python-versions-and-environments/ta-p/4696819) of setting up your system (macOS, Ubuntu/Debian, Fedora/CentOS/RHEL, Windows) for `pyenv` and then using `pyenv` to set up your virtual environment.
 
 Once you've prepared your system and installed `pyenv`
-- get the latest version of Python that we know works with WebControl, currently that's `3.9.13`:
-    `pyenv install 3.9.13`
+- get the latest version of Python that we know works with WebControl, currently that's `3.10.10` (Windows) or `3.10.5` (everything else):
+    `pyenv install 3.10.10` or `pyenv install 3.10.5`
+- you can also list what versions are available with:
+    `pyenv install -l`
+    Note that many of the Python libraries used by WebControl may not have been recompiled to the latest version of Python, meaning you either have to have all the other tools (usually C language compilers for you system) to build these libraries youself, or choose a slightly older version of Python (which is what we're doing here).
+
+Then for regular `pyenv` (i.e. except `pyenv-win`)
 - create a virtual environment with it:
-    `pyenv virtualenv 3.9.13 webcontrol_3_9`
-    The `webcontrol_3_9` name is arbitrary
+    `pyenv virtualenv 3.10.5 webcontrol_3_10`
+    The `webcontrol_3_5` name is arbitrary
 - activate the virtual environment - this will help isolate what you do from the rest of your system:
-    `pyenv activate webcontrol_3_9`
+    `pyenv activate webcontrol_3_10`
+
+For Windows and `pyenv-win` it's a bit simpler
+- use that version in your shell (assuming powershell here)
+    `pyenv shell 3.10.10`
+- Done
 
 #### Prepare the Virtual Environment itself
 
-This next stuff should only need to be done once in your virtual environment.
+This next stuff should only need to be done once in your virtual environment. If you change Python versions you will need to do this again.
 - install some useful tools
     `pip install setuptools`
     `pip install pip-tools`
     `pip install black`
 - rebuild the list of requirements needed by WebControl (optional)
+    You should do this step if you're using a different version of Python from 3.10.5/3.10.10 shown above
     `rm requirements.txt`
     `pip-compile -r requirements.in --resolver=backtracking --verbose`
 - install the requirements
     `pip install -r requirements.txt`
 
-And that's the virtual environment creation and set up done. From now on you'll only need to activate the virtual environment after any restart to get going.
+And that's the virtual environment creation and set up done. From now on you'll only need to activate the virtual environment (for Windows use the `pyenv shell` command) after any restart to get going.
 
 #### Virtualenv on a Raspberry Pi
 
 When running on the Pi, you'll also need some extra dependencies and will need to build OpenCV from source. See the Dockerfile for details. (TODO: add instructions here)
 
+### Get the Client Side Libraries Set Up
+
+We're using `npm` (Node Package Manager) to manage the third party JavaScript libraries in use for the client side code (the stuff that actually runs in your browser), `npm` comes with `node`.
+
+Note that we're not using `node` as the web server, we're only using it for `npm` to manage the JavaScript libraries.
+
+To manage `node` it is better to use a node version manager, such as [nvm](https://github.com/nvm-sh/nvm) (or [nvm-windows](https://github.com/coreybutler/nvm-windows) for Windows).
+
+Once `nvm` is installed. Run `nvm install lts` to install the latest 'long term support' version of `node`. Which will get you both `node` and `npm`. There are other `nvm` commands, such as `nvm current` to show which version of `node` you're currently using, and `nvm use lts` to switch `nvm` to using the latest `lts` version of `node` if it was on another version.
+
+Then finally go to the `static` folder in the WebControl project, which is where all the Javascript lives, and run `npm install` to get it to download all of the required JavaScript packages. It will create a folder called `node_modules` and put them all within that.
+
 ### Now What? Let's Start Up WebControl🎉
 
 Then you can run the code with.
 
-    python main.py
+`python main.py`
 
-The server will then be available at `http://localhost:5000`
+It will start up the server, find the IP address that the server is running at (this is provided by your router), and then start up a browser at that IP address using port `5000` as the complete URK. So in the terminal window you should see something like
 
-* If you get an error message with something like `ModuleNotFoundError: No module named '_ctypes'` within it. Then it means that you didn't get your system properly prepared before creating your virtual environment (looking at you Ubuntu). Please follow the walkthrough linked above to:
+```
+Main: setting app data host address to 192.168.80.67:5000
+Main: opening browser on http://192.168.80.67:5000
+```
+
+If you close the browser window/tab that you're running WebControl on, you can always use that URL to access it again.
+
+* If you get an error message in the Terminal window with something like `ModuleNotFoundError: No module named '_ctypes'` within it. Then it means that you didn't get your system properly prepared before creating your virtual environment (looking at you Ubuntu). Please follow the walkthrough linked above to:
 1. deactivate your virtual environment,
 2. delete it,
 3. prepare your system,

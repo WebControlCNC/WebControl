@@ -6,9 +6,11 @@
 {% endblock %}
 
 {% block javascript %}
-  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018t') }}" crossorigin="anonymous"></script>
-<script> feather.replace() </script>
+  <script src="{{ url_for('static',filename='scripts/frontpage3dcontrols.js', version='11102018t') }}" type="module" crossorigin="anonymous"></script>
+  <script type="module">
+    import "feather";
+    feather.replace();
+  </script>
 {% endblock %}
 
 {% block content %}

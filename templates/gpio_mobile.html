@@ -11,7 +11,7 @@
               </div>
               <div class="col-7">
                 {% if setting.type=="options" %}
-                  <select name="{{setting.key}}" data-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+                  <select name="{{setting.key}}" data-bs-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                     {% for option in options %}
                       <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
                         {{option}}
@@ -30,6 +30,9 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>
-<script> feather.replace() </script>
+<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" type="module" crossorigin="anonymous"></script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

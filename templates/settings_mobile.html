@@ -13,7 +13,7 @@
           <div class="col-5">
             {% if setting.key =="COMport" %}
               <div class="input-group mb-3">
-                <select class="custom-select" name="{{setting.key}}" id="comPorts" data-group="{{title}}">
+                <select class="custom-select" name="{{setting.key}}" id="comPorts" data-bs-group="{{title}}">
                   {% if ports|length == 0 %}
                     <option value="{{setting.value}}" 'selected'>
                       {{setting.value}}
@@ -33,7 +33,7 @@
                 </div>
               </div>
             {% elif setting.type=="options" %}
-              <select name="{{setting.key}}" data-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+              <select name="{{setting.key}}" data-bs-group="{{title}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                 {% for option in setting.options %}
                   <option value="{{option}}" {{'selected' if option == setting.value else ''}}>
                     {{option}}
@@ -42,12 +42,12 @@
               </select>
             {% elif setting.type=="bool" %}
               <span class="switch switch-lg">
-                <input name="{{setting.key}}" data-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %} {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+                <input name="{{setting.key}}" data-bs-group="{{title}}" type="checkbox" class="switch" id="switch-{{setting.key}}" {% if setting.value==1 %}checked{% endif %} {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
                 <label for="switch-{{setting.key}}"></label>
               </span>
             {% else %}
-              <input name="{{setting.key}}" {{'type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$"' | safe if setting.value | isnumber else '' }} data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
-              <!--<input name="{{setting.key}}" data-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>-->
+              <input name="{{setting.key}}" {{'type="text" inputmode="decimal" pattern="^[0-9]*(\.[0-9]{0,5})?$"' | safe if setting.value | isnumber else '' }} data-bs-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>
+              <!--<input name="{{setting.key}}" data-bs-group="{{title}}" class="form-control" value="{{setting.value}}" {{'' if enableCustom or setting.custom != 1 else 'disabled'}}>-->
             {% endif %}
           </div>
         </div>
@@ -60,6 +60,9 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" crossorigin="anonymous"></script>
-<script> feather.replace() </script>
+<script src="{{ url_for('static',filename='scripts/settings.js', version='11102020a') }}" type="module" crossorigin="anonymous"></script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

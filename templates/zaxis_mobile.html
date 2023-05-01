@@ -36,7 +36,13 @@
 {% endblock %}
 
 {% block javascript %}
-  <script src="{{ url_for('static',filename='scripts/zAxis.js', version='10262019c') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script> feather.replace() </script>
+<script type="module">
+  import { unitSwitchZ } from "{{ url_for('static',filename='scripts/unitSwitch.js', version='12302022u') }}";
+  // This will probably redefine the global unitSwitchZ - but we don't care
+  window.unitSwitchZ = unitSwitchZ;
+</script>
+<script type="module">
+  import "feather";
+  feather.replace();
+</script>
 {% endblock %}

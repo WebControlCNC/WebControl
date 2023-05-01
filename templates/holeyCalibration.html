@@ -96,9 +96,10 @@
 
 {% block javascript %}
 <script>
+import "jquery";
 var localAction;
-$(document).ready(function() {
-
+$(() => {
+    // document.ready
     $("#acceptCalibration").on('click', function(){
       action('acceptHoleyCalibrationResults',0,0);
       $('#contentModal').modal('toggle');

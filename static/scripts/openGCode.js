@@ -1,11 +1,16 @@
+import "jquery";
 
-$('#gcCircle').hide();
-var unselected = [];
-var selectedDirectory = "{{lastSelectedDirectory}}"
+import { checkForGCodeUpdate } from "./socketEmits.js";
 
-$(document).ready(function () {
-    refreshList();
-    $("#directorySelect").change(refreshList);
+$(() => {
+    // document.ready
+    
+    $('#gcCircle').hide();
+    var unselected = [];
+    var selectedDirectory = $("#lastSelectedDirectory")?.text || ".";
+
+    refreshList(unselected, selectedDirectory);
+    $("#directorySelect").on("change", {unselected, selectedDirectory}, refreshListHandler);
 
     /*$('#gcodeForm').on('submit', function(e) {
         e.preventDefault();
@@ -34,8 +39,12 @@ $(document).ready(function () {
     });*/
 });
 
-function refreshList(){
-  unselected.forEach(element => {
+function refreshListHandler(event) {
+    refreshList(event.data.unselected, event.data.selectedDirectory);
+}
+
+function refreshList(unselected, selectedDirectory){
+  unselected.forEach((element) => {
       $("#fileSelect").append(element)
   });
   unselected = [];
@@ -50,7 +59,6 @@ function refreshList(){
       }
   });
 }
-
 
 function onFooterSubmit(){
     //var formdata = $("#gcodeForm").serialize();
@@ -77,3 +85,5 @@ function onFooterSubmit(){
         }
     });
 }
+
+export { onFooterSubmit };

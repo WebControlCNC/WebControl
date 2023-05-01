@@ -4,23 +4,25 @@
     <div class="form-group mb-3">
       <div class="row mb-3">
         <label for="directorySelect">Select Directory</label>
-        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-group="{{title}}">
+        <select id="directorySelect" class="custom-select" name="selectedDirectory" data-bs-group="{{title}}">
           {% for directory in directories %}
             <option value="{{directory}}" {{'selected' if directory == lastSelectedDirectory else ''}}>
               {{directory if directory != '.' else './'}}
             </option>
           {% endfor %}
         </select>
+        <span id="lastSelectedDirectory" hidden>{{lastSelectedDirectory}}</span>
       </div>
       <div class="row">
         <label for="fileSelect">Select File</label>
-        <select id="fileSelect" class="custom-select" name="selectedGCode" data-group="{{title}}">
+        <select id="fileSelect" class="custom-select" name="selectedGCode" data-bs-group="{{title}}">
           {% for file in files %}
             <option value="{{file['directory']}}/{{file['file']}}" {{'selected' if file["file"] == lastSelectedFile else ''}}>
               {{file["file"]}}
             </option>
           {% endfor %}
         </select>
+        <span id="lastSelectedFile" hidden>{{lastSelectedFile}}</span>
       </div>
     </div>
     <!--<button type="submit" class="btn btn-primary mt-1">Submit</button>-->
@@ -32,11 +34,15 @@
             </div>
           </div>
         </div>
-
+      </div>
+    </div>
   </form>
 </div>
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ url_for('static',filename='scripts/openGCode.js', version='11102018b') }}" crossorigin="anonymous"></script>
+<script type="module" crossorigin="anonymous">
+  import { onFooterSubmit } from "{{ url_for('static', filename='scripts/openGCode.js') }}";
+  window.onFooterSubmit = onFooterSubmit;
+</script>
 {% endblock %}

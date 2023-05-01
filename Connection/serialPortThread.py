@@ -47,7 +47,7 @@ class SerialPortThread(MakesmithInitFuncs):
         message = message + "\n"
 
         if len(message) > 1:
-            self.data.console_queue.put("Sending: " + str(message).rstrip('\n'))
+            self.data.console_queue.put(f"{__name__}: Sending: " + str(message).rstrip('\n'))
         
             self.bufferSpace = self.bufferSpace - len(
                 message
@@ -100,12 +100,12 @@ class SerialPortThread(MakesmithInitFuncs):
                     #print("Set positioning mode: " + str(positioningMode))
                 self.data.logger.writeToLog("Sent: " + str(message.decode()))
             except:
-                self.data.console_queue.put("write issue")
+                self.data.console_queue.put(f"{__name__}: write issue")
                 self.data.logger.writeToLog("Send FAILED: " + str(message.decode()))
 
             self.lastWriteTime = time.time()
         else:
-            self.data.console_queue.put("Skipping: " + str(message).rstrip('\n'))
+            self.data.console_queue.put(f"{__name__}: Skipping: " + str(message).rstrip('\n'))
 
     def _getFirmwareVersion(self):
         '''
@@ -169,7 +169,7 @@ class SerialPortThread(MakesmithInitFuncs):
             else:
                 self.data.uploadFlag = 0
                 self.data.gcodeIndex = 0
-                self.data.console_queue.put("Gcode Ended")
+                self.data.console_queue.put(f"{__name__}: Gcode Ended")
 
     def managePause(self, line):
         if line.find("M0 ") != -1 or line.find("M00") != -1 or line.find("M1 ") != -1 or line.find("M01") != -1:
@@ -186,8 +186,8 @@ class SerialPortThread(MakesmithInitFuncs):
             # if this is a the same tool as the controller is currently tracking, it will continue on.
             # first, determine the tool being called for...
             toolNumber = int(self.extractGcodeValue(line, 'T', 0))
-            print(toolNumber)
-            print(self.data.currentTool)
+            self.data.console_queue.put(f"{__name__}: {toolNumber}")
+            self.data.console_queue.put(f"{__name__}: {self.data.currentTool}")
             # so, in the first case...
             if toolNumber != self.data.currentTool:
                 # set uploadFlag to -1 to turn off sending more lines (after this one)
@@ -219,9 +219,9 @@ class SerialPortThread(MakesmithInitFuncs):
         if self.serialInstance is not None:
             self.serialInstance.close()
             self.data.serialPort.serialPortRequest = "Closed"
-            print("connection closed at serialPortThread")
+            self.data.console_queue.put(f"{__name__}: connection closed at serialPortThread")
         else:
-            print("serial Instance is none??")
+            self.data.console_queue.put(f"{__name__}: serial Instance is none??")
         return
 
 
@@ -235,16 +235,14 @@ class SerialPortThread(MakesmithInitFuncs):
         # check for serial version being > 3
         if float(serial.VERSION[0]) < 3:
             self.data.ui_queue1.put("Alert", "Incompability Detected",
-                "Pyserial version 3.x is needed, but version "
-                + serial.VERSION
-                + " is installed"
+                f"Pyserial version 3.x is needed, but version {serial.VERSION} is installed"
             )
 
         self.weAreBufferingLines = bool(int(self.data.config.getValue("Maslow Settings", "bufferOn")) )
 
         try:
             self.data.comport = self.data.config.getValue("Maslow Settings", "COMport")
-            connectMessage = "Trying to connect to controller on " +self.data.comport
+            connectMessage = f"{__name__}:  Trying to connect to controller on COM port {self.data.comport}"
             self.data.console_queue.put(connectMessage)
             self.serialInstance = serial.Serial(
                 self.data.comport, 57600, timeout=0.25
@@ -253,7 +251,7 @@ class SerialPortThread(MakesmithInitFuncs):
             #self.data.console_queue.put(self.data.comport + " is unavailable or in use")
             pass
         else:
-            self.data.console_queue.put("\r\nConnected on port " + self.data.comport + "\r\n")
+            self.data.console_queue.put(f"\r\n{__name__}:  Connected on port {self.data.comport}\r\n")
             self.data.ui_queue1.put("Action", "connectionStatus", {'status': 'connected', 'port': self.data.comport, 'fakeServoStatus': self.data.fakeServoStatus})
             self.data.ui_queue1.put("TextMessage", "", "Connected on port " + self.data.comport)
 
@@ -281,7 +279,7 @@ class SerialPortThread(MakesmithInitFuncs):
 
                 # check to see if the serail port needs to be closed (for firmware upgrade)
                 if self.data.serialPort.serialPortRequest == "requestToClose":
-                    print("processing request to close")
+                    self.data.console_queue.put(f"{__name__}: processing request to close")
                     self.closeConnection()
                     # do not change status just yet...
                     return
@@ -354,7 +352,7 @@ class SerialPortThread(MakesmithInitFuncs):
                             if self.bufferSpace > len(line):
                                 self.sendNextLine()
                         except IndexError:
-                            self.data.console_queue.put("index error when reading gcode")
+                            self.data.console_queue.put(f"{__name__}: index error when reading gcode")
                             # we don't want the whole serial thread to close if the gcode can't be sent because of an
                             # index error (file deleted...etc)
                     else:
@@ -365,7 +363,7 @@ class SerialPortThread(MakesmithInitFuncs):
                 # Check for serial connection loss
                 # -------------------------------------------------------------------------------------
                 if time.time() - self.lastMessageTime > 5:
-                    self.data.console_queue.put("Connection Timed Out")
+                    self.data.console_queue.put(f"{__name__}: Connection Timed Out")
                     if self.data.uploadFlag > 0:
                         self.data.ui_queue1.put("Alert", "Connection Lost",
                                                 "Message: USB connection lost. This has likely caused the machine to loose it's calibration, which can cause erratic behavior. It is recommended to stop the program, remove the sled, and perform the chain calibration process. Press Continue to override and proceed with the cut.")

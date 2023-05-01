@@ -1,112 +1,105 @@
-var socket
-var alogMessages = [];
-var logMessages = [];
-var alogEnabled = true;
-var logEnabled = true;
-var loggingState = false;
+import "jquery";
+import { io } from "socket.io";
 
-$(document).ready(function(){
-  namespace = '/MaslowCNCLogs'; // change to an empty string to use the global namespace
+window.logSocket;
+window.alogMessages = [];
+window.logMessages = [];
+window.alogEnabled = true;
+window.logEnabled = true;
+window.loggingState = false;
+
+$(() => {
+  // document.ready
+  const namespace = "/MaslowCNCLogs"; // change to an empty string to use the global namespace
   // the socket.io documentation recommends sending an explicit package upon connection
   // this is specially important when using the global namespace
-  socket = io.connect('//' + document.domain + ':' + location.port + namespace, {'forceNew':true});
+  const serverURL = `${location.protocol}//${location.hostname}:${location.port}${namespace}`;
+  window.logSocket = io.connect(serverURL);
   setListeners();
 
-  $("#enablealog").change(function(){
-    if ($(this).prop('checked'))
-        alogEnabled=true;
-    else
-        alogEnabled=false;
+  $("#enablealog").change(() => {
+    window.alogEnabled = $(this).prop('checked');
   });
 
-  $("#enablelog").change(function(){
-    if ($(this).prop('checked'))
-        logEnabled=true;
-    else
-        logEnabled=false;
+  $("#enablelog").change(() => {
+    window.logEnabled = $(this).prop('checked');
   });
-
-
 });
 
-function setListeners(){
+function setListeners() {
   console.log("setting Listeners");
-  socket.on('connect', function(msg) {
-      socket.emit('my event', {data: 'I\'m connected!'});
+  window.logSocket.on('after connect', () => {
+    window.logSocket.emit('my event', { data: 'I\'m connected!' });
   });
 
-  socket.on('disconnect', function(msg) {
+  window.logSocket.on('disconnect', (msg) => {
   });
 
-  socket.on('message', function(msg){
-      switch(msg.log) {
-        case 'alog':
-            if (alogEnabled)
-                processalog(msg.data);
-                processLoggingState(msg.state);
-            break;
-        case 'log':
-            if (logEnabled)
-                processlog(msg.data);
-                processLoggingState(msg.state);
-            break;
-        case 'state':
-            if (loggingState != msg.state){
-                processLoggingState(msg.state);
-                break;
-            }
+  window.logSocket.on('message', (msg) => {
+    switch (msg.log) {
+      case 'alog':
+        if (window.alogEnabled) {
+          processalog(msg.data);
+        }
+        processLoggingState(msg.state);
+        break;
+      case 'log':
+        if (window.logEnabled) {
+          processlog(msg.data);
+        }
+        processLoggingState(msg.state);
+        break;
+      case 'state':
+        if (window.loggingState != msg.state) {
+          processLoggingState(msg.state);
+          break;
+        }
 
-        default:
-            console.log("!!!!!!");
-            console.log("uncaught action:"+msg.command);
-            console.log("!!!!!!");
-      }
+      default:
+        console.log("!!!!!!");
+        console.log("uncaught action:" + msg.command);
+        console.log("!!!!!!");
+    }
   });
 }
 
-function processalog(data){
-    if (alogMessages.length >1000){
-        alogMessages.shift();
-        $('#alogMessages').get(0).firstChild.remove();
-        $('#alogMessages').get(0).firstChild.remove();
-    }
-    alogMessages.push(data);
+function processalog(data) {
+  if (window.alogMessages.length > 1000) {
+    window.alogMessages.shift();
+    $('#alogMessages').get(0).firstChild.remove();
+    $('#alogMessages').get(0).firstChild.remove();
+  }
+  window.alogMessages.push(data);
 
-    $('#alogMessages').append(document.createTextNode(data));
-    $('#alogMessages').append("<br>");
-    $('#alogMessages').scrollBottom();
-
-
+  $('#alogMessages').append(document.createTextNode(data));
+  $('#alogMessages').append("<br>");
+  $('#alogMessages').scrollBottom();
 }
 
-function processlog(data){
+function processlog(data) {
+  if (window.logMessages.length > 1000) {
+    window.logMessages.shift();
+    $('#logMessages').get(0).firstChild.remove();
+    $('#logMessages').get(0).firstChild.remove();
+  }
+  window.logMessages.push(data);
 
-    if (logMessages.length >1000){
-        logMessages.shift();
-        $('#logMessages').get(0).firstChild.remove();
-        $('#logMessages').get(0).firstChild.remove();
-    }
-    logMessages.push(data);
-
-    $('#logMessages').append(document.createTextNode(data));
-    $('#logMessages').append("<br>");
-    $('#logMessages').scrollBottom();
+  $('#logMessages').append(document.createTextNode(data));
+  $('#logMessages').append("<br>");
+  $('#logMessages').scrollBottom();
 }
 
-function processLoggingState(data){
-    if (data)
-    {
-        $("#loggingState").text("Logging Suspended");
-        $("#loggingState").removeClass('alert-success').addClass('alert-secondary');
-    }
-    else
-    {
-        $("#loggingState").text("Logging Active");
-        $("#loggingState").removeClass('alert-secondary').addClass('alert-success');
-    }
+function processLoggingState(data) {
+  if (data) {
+    $("#loggingState").text("Logging Suspended");
+    $("#loggingState").removeClass('alert-success').addClass('alert-secondary');
+  }
+  else {
+    $("#loggingState").text("Logging Active");
+    $("#loggingState").removeClass('alert-secondary').addClass('alert-success');
+  }
 }
 
-
-$.fn.scrollBottom = function() {
-    return $(this).scrollTop($(this)[0].scrollHeight);
+$.fn.scrollBottom = function () {
+  return $(this).scrollTop($(this)[0].scrollHeight);
 };

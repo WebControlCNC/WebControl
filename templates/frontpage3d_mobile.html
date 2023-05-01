@@ -6,14 +6,11 @@
 {% endblock %}
 
 {% block javascript %}
-  <script src="{{ url_for('static',filename='scripts/pako.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/feather.min.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/three.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/orbitcontrols.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/sprite3D.js') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpage3d.js', version='11102018s') }}" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102018s') }}" crossorigin="anonymous"></script>
-  <script>feather.replace()</script>
+  <script src="{{ url_for('static',filename='scripts/frontpageControls.js', version='11102018s') }}" type="module" crossorigin="anonymous"></script>
+  <script type="module">
+    import "feather";
+    feather.replace();
+  </script>
 {% endblock %}
 
 {% block content %}
@@ -160,17 +157,17 @@
     </div>
     <div class="col-3">
       <div class="progress">
-        <div id="leftError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id="leftError" class = "progress-bar" data-bs-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
     <div class="col-3">
       <div class="progress">
-        <div id="rightError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id="rightError" class = "progress-bar" data-bs-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
     <div class="col-3">
       <div class="progress">
-        <div id="zError" class = "progress-bar" data-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id="zError" class = "progress-bar" data-bs-toggle="tooltip" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
   </div>
@@ -213,17 +210,17 @@
   </div>
   <div class="row mb-1">
     <div class="col-4">
-      <button class="btn btn-secondary btn-block" type="button" id="mobilebutton3D" onclick="toggle3DView()">3D</button>
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebutton3D" onclick="window.frontpage3d.toggle3DView()">3D</button>
     </div>
     <div class="col-4">
-      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonPO" onclick="toggle3DPO()">Ortho</button>
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonPO" onclick="window.frontpage3d.toggle3DPO()">Ortho</button>
     </div>
     <div class="col-4">
-      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonReset" onclick="resetView()">Reset</button>
+      <button class="btn btn-secondary btn-block" type="button" id="mobilebuttonReset" onclick="window.frontpage3d.resetView()">Reset</button>
     </div>
   </div>
   <div class="row mb-1">
-    <button id="boardID" class="btn btn-primary btn-block" onclick="toggleBoard()">...</button>
+    <button id="boardID" class="btn btn-primary btn-block" onclick="window.frontpage3d.toggleBoard()">...</button>
   </div>
   <div class="card">
     <div class = "card-body">

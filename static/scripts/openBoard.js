@@ -1,9 +1,13 @@
+import "jquery";
+
+import { checkForGCodeUpdate } from "./socketEmits.js";
 
 $('#gcCircle').hide();
 var unselected = [];
 var selectedDirectory = "{{lastSelectedDirectory}}"
 
-$(document).ready(function () {
+$(() => {
+    // document.ready
     refreshList();
     $("#directorySelect").change(refreshList);
 });
@@ -50,3 +54,5 @@ function onFooterSubmit(){
         }
     });
 }
+
+export { onFooterSubmit };

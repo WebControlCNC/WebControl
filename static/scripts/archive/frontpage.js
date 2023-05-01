@@ -1,3 +1,7 @@
+import "feather";
+import "jquery";
+import pako from "pako";
+
 //checkForGCodeUpdate();
 
 //setInterval(function(){ alert("Hello"); }, 3000);
@@ -104,7 +108,8 @@ function unitSwitch(){
   }
 }
 
-$(document).ready(function(){
+$(() => {
+  // document.ready
     settingRequest("Computed Settings","units");
     settingRequest("Computed Settings","distToMove");
     settingRequest("Computed Settings","homePosition");
