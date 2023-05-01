@@ -128,10 +128,6 @@ if __name__ == "__main__":
     app.data.releaseManager.processAbsolutePath(os.path.abspath(__file__))
     app.data.console_queue.put("Main: -$$$$$-")
 
-    webHost = "http://localhost"
-    app.data.console_queue.put(f"Main: opening browser on {webHost}:{webPortInt}")
-    webbrowser.open_new_tab(f"{webHost}:{webPortInt}")
-
     default_host_ip = "0.0.0.0"
     host_name = socket.gethostname()
     host_ip = socket.gethostbyname(host_name)
@@ -140,6 +136,9 @@ if __name__ == "__main__":
         host_ip = default_host_ip
     app.data.console_queue.put(f"Main: setting app data host address to {host_ip}:{webPortInt}")
     app.data.hostAddress = f"http://{host_ip}:{webPortInt}"
+
+    app.data.console_queue.put(f"Main: opening browser on {app.data.hostAddress}")
+    webbrowser.open_new_tab(app.data.hostAddress)
 
     # app.data.shutdown = shutdown
     socketio.run(app, use_reloader=False, host=host_ip, port=webPortInt, log_output=False)

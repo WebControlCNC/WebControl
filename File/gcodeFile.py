@@ -52,9 +52,9 @@ class GCodeFile(MakesmithInitFuncs):
         return sendStr
 
     def saveFile(self, fileName, directory):
-        if fileName is "":  # Blank the g-code if we're loading "nothing"
+        if fileName == "":  # Blank the g-code if we're loading "nothing"
             return False
-        if directory is "":
+        if directory == "":
             return False
         try:
             homeX = float(self.data.config.getValue("Advanced Settings", "homeX"))
@@ -87,7 +87,7 @@ class GCodeFile(MakesmithInitFuncs):
             self.data.gcodeShift[1] = round(float(self.data.config.getValue("Advanced Settings", "homeY")),4)
 
             del self.line3D[:]
-            if filename is "":  # Blank the g-code if we're loading "nothing"
+            if filename == "":  # Blank the g-code if we're loading "nothing"
                 self.data.gcode = ""
                 return False
 

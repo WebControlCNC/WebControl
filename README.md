@@ -204,15 +204,14 @@ Then you can run the code with.
 
 `python main.py`
 
-The server will then be available at `http://localhost:5000`
+It will start up the server, find the IP address that the server is running at (this is provided by your router), and then start up a browser at that IP address using port `5000` as the complete URK. So in the terminal window you should see something like
 
-... but maybe your browser says 'Nope' and won't let you in. In that case, go back to your Terminal window (where you are running WebControl) and shut it down with `Ctrl-C` or `Cmd-C`. Take a note of the other address it says that it is using, this will vary depending on your Wi-Fi network.
 ```
-Main: opening browser on http://localhost:5000
-Main: setting app data host address to 192.168.62.67:5000
+Main: setting app data host address to 192.168.80.67:5000
+Main: opening browser on http://192.168.80.67:5000
 ```
 
-Restart with `python main.py`, which will open your browser at `http://localhost:5000`, which still won't work because of permissions, so change to the `host address` listed above, in the above example that would be `192.168.62.67:5000`
+If you close the browser window/tab that you're running WebControl on, you can always use that URL to access it again.
 
 * If you get an error message in the Terminal window with something like `ModuleNotFoundError: No module named '_ctypes'` within it. Then it means that you didn't get your system properly prepared before creating your virtual environment (looking at you Ubuntu). Please follow the walkthrough linked above to:
 1. deactivate your virtual environment,
